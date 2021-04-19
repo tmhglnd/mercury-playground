@@ -1,0 +1,2 @@
+export declare type TInvalidStateErrorFactory = () => DOMException;
+//# sourceMappingURL=invalid-state-error-factory.d.ts.map

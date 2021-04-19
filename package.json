@@ -1,0 +1,27 @@
+{
+  "name": "mercury-playground",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "build": "watchify src/main.js -o public/bundle.js -v"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "codemirror": "^5.60.0",
+    "express": "^4.17.1",
+    "fast-glob": "^3.2.5",
+    "fs-extra": "^9.1.0",
+    "mercury-lang": "^1.0.1",
+    "tone": "^14.7.77",
+    "webmidi": "^2.5.2"
+  },
+  "devDependencies": {
+    "browserify": "^17.0.0",
+    "watchify": "^4.0.0"
+  }
+}

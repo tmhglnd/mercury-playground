@@ -1,0 +1,56 @@
+body {
+	/* background: rgb(20, 20, 20); */
+	background: black;
+}
+
+h1 {
+	font-family: "Andale Mono";
+	color: rgb(180, 180, 180);
+}
+
+p {
+	font-family: "Andale Mono";
+	/* font-family: "courier new"; */
+	color: rgb(180, 180, 180);
+}
+
+button {
+	font-family: "Andale Mono";
+	border-radius: 2px;
+	border-width: 0px;
+	border-color: rgb(180, 180, 180);
+	background: rgb(30, 30, 30);
+	color:  rgb(180, 180, 180);
+	width: 25%;
+	margin: 2px;
+}
+
+select {
+	font-family: "Andale Mono";
+	border-color: darkgrey;
+	border-width: 0px;
+	color:  rgb(180, 180, 180);
+	background: rgb(30, 30, 30);
+	border-radius: 2px;
+	width: 25%;
+	margin: 2px; 
+}
+
+textarea {
+	font-family: "Andale Mono";
+	border-color: darkgrey;
+	color: white;
+	background: rgb(30, 30, 30);
+}
+
+textarea:focus {
+	outline: none !important;
+	border-color: black;
+}
+
+.CodeMirror {
+	border: 1px solid black;
+	font-size: 16px;
+	height: auto;
+	font-family: "Consolas";
+}

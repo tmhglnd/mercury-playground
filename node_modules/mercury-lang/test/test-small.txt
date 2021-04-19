@@ -1,0 +1,7 @@
+// A small example for the Mercury parser
+set tempo 140
+
+list myBeat euclidean(8 5 1)
+
+new synth saw time(1/8) play(myBeat) name(s1)
+	give s1 fx(reverb 0.9 7)
