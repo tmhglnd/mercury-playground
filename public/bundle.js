@@ -24204,7 +24204,8 @@ const Tone = require('tone');
 let samples = {};
 let buffers;
 
-fetch('./data/samples.json')
+// fetch('./data/samples.json')
+fetch("/samples")
 .then(function(response) {
 	return response.json();
 })
