@@ -200,7 +200,8 @@ class MonoSample {
 
 	add_fx(...fx){
 		this._fx = [];
-
+		console.log('Effects currently disabled');
+/*
 		fx.forEach((f) => {
 			if (fxMap[f[0]]){
 				this._fx.push(fxMap[f[0]](f.slice(1)));
@@ -209,7 +210,7 @@ class MonoSample {
 			}
 		});
 
-		this.sample.chain(...this._fx, Tone.Destination);
+		this.sample.chain(...this._fx, Tone.Destination);*/
 	}
 }
 module.exports = MonoSample;

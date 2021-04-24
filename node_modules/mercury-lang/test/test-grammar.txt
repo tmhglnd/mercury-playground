@@ -1,50 +1,50 @@
 
 // Parse numbers
-012
-34
--56
-+7.89
-1.0111213141E5
-0.4321
-12 34 -56 7.89
+print 012
+print 34
+print -56
+print +7.89
+print 1.0111213141E5
+print 0.4321
+print 12 34 -56 7.89
 // 1 + 2 / 4
-[ 1 2 3.14 5 foo bar 'to_to t1T1' ]
-[ ]
+print [ 1 2 3.14 5 foo bar 'to_to t1T1' ]
+print [ ]
 
 // Parse note names
-a A b B c C d D e E f F g G
-a# B# C# Dx Gb
-a## Bbb C## Dx Gb fbb
-a1 A0 b2b B4# c1 C2bb d4## D3 e2 E1 f4# F5 g6 G2
+print a A b B c C d D e E f F g G
+print a# B# C# Dx Gb
+print a## Bbb C## Dx Gb fbb
+print a1 A0 b2b B4# c1 C2bb d4## D3 e2 E1 f4# F5 g6 G2
 
 // Parse rhythmic division values
-1/4
-3/16
-7/16 4/5 3/1
-7:8 3:2 1:5
+print 1/4
+print 3/16
+print 7/16 4/5 3/1
+print 7:8 3:2 1:5
 
 // Parse comments
 # not another comment
-$ also a type of comment
+$ also not a type of comment
 not a type of comment
-// 1.0111213141E5 < commented
+// 1.0111213141E5 < commented number
 
 // valid strings start and end with: "" '' ``
 // or a combination of those works as well
-"hello world"
-'also a string'
-`and another! `
-'this works?`
-` this does as well?"
-'1 +2 /3.14* 45.67' 
+print "hello world"
+print 'also a string'
+print `and another! `
+print 'this works?`
+print ` this does as well?"
+print '1 +2 /3.14* 45.67' 
 
 // Parse identifier/name
 // valid identifiers start with characters [a-zA-Z]
 // can have _ - . and numbers [0-9]
-Kick_dub
-dub_15
-foLey-02.wav
--negative
+print Kick_dub
+print dub_15
+print foLey-02.wav
+print -negative
 
 // Parse Signal modulation strings TODO
 // ~mySig

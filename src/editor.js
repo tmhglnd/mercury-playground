@@ -1,5 +1,6 @@
 
 const CodeMirror = require('codemirror');
+const { AutoFilter } = require('tone');
 const code = require('./worker.js');
 
 // require('codemirror/lib/codemirror.css');
@@ -65,7 +66,7 @@ const Editor = function({ context, engine }) {
 		cursorHeight: 1,
 		indentUnit: 4,
 		firstLineNumber: 0,
-		undoDepth: 0,
+		undoDepth: 50,
 		cursorScrollMargin: 20,
 		mode: "mercury",
 		// keymaps for execute/stopping/commenting code
@@ -110,7 +111,7 @@ const Editor = function({ context, engine }) {
 		// cEditor.setOption('theme', t);
 	}
 
-	// play/silence buttons
+	// play/silence/empty buttons
 	this.controls = function(){
 		let div = document.getElementById('menu');
 		let play = document.createElement('button');
@@ -121,8 +122,37 @@ const Editor = function({ context, engine }) {
 		stop.innerHTML = 'silence';
 		stop.onclick = () => { this.silence() };
 
+		let clear = document.createElement('button');
+		clear.innerHTML = 'empty';
+		clear.onclick = () => { 
+			this.set(''); 
+			this.silence(); 
+		};
+		
+		let example = document.createElement('button');
+		example.innerHTML = 'example';
+		example.onclick = () => {
+			// initialize editor with some code
+			this.set(
+				'// Welcome to the Mercury Playground ^^\n' + 
+				'// click "play" to execute the code\n' +
+				'// and adjust the code below:\n' +
+				'\n' +
+				'list kickBeat [1 0.01 0.1 1 0]\n' +
+				'new sample kick_min time(1/16) play(kickBeat)\n' +
+				'\n' +
+				'list hatBeat euclid(16 7)\n' +
+				'new sample hat_min time(1/16) play(hatBeat)\n' +
+				'\n' +
+				'new sample snare_min time(1 3/4)\n'
+			);
+			this.evaluate();
+		};
+
 		div.appendChild(play);
 		div.appendChild(stop);
+		div.appendChild(clear);
+		div.appendChild(example);
 	}
 
 	// theme menu for editor
@@ -156,21 +186,6 @@ module.exports = Editor;
 
 // keymaps for execute/stopping/commenting code
 // editor.setOption();
-
-// initialize editor with some code
-/*editor.setValue(
-	'// Welcome to the Mercury Playground ^^\n' + 
-	'// click "play" to execute the code\n' +
-	'// and adjust the code below:\n' +
-	'\n' +
-	'list kickBeat [1 0.01 0.1 1 0]\n' +
-	'new sample kick_min time(1/16) play(kickBeat)\n' +
-	'\n' +
-	'list hatBeat euclid(16 7)\n' +
-	'new sample hat_min time(1/16) play(hatBeat)\n' +
-	'\n' +
-	'new sample snare_min time(1 3/4)\n'
-);*/
 
 // options['readOnly'] = "nocursor";
 // options['mode'] = "none";

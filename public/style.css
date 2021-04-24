@@ -1,43 +1,52 @@
 body {
 	/* background: rgb(20, 20, 20); */
 	background: black;
+	/* font-family: "Andale Mono"; */
+	font-family: 'Ubuntu Mono', monospace;
 }
 
 h1 {
-	font-family: "Andale Mono";
+	font-family: 'Major Mono Display', monospace;
+	/* font-weight: 'normal'; */
+	/* font-size: 36px; */
+	/* font-size: 6vw; */
+	font-size: 2em;
 	color: rgb(180, 180, 180);
 }
 
 p {
-	font-family: "Andale Mono";
+	/* font-family: "Andale Mono"; */
 	/* font-family: "courier new"; */
 	color: rgb(180, 180, 180);
 }
 
 button {
-	font-family: "Andale Mono";
-	border-radius: 2px;
+	/* font-family: "Andale Mono"; */
+	font-family: inherit;
+	border-radius: 0px;
 	border-width: 0px;
 	border-color: rgb(180, 180, 180);
 	background: rgb(30, 30, 30);
 	color:  rgb(180, 180, 180);
-	width: 25%;
+	width: 19%;
+	height: 25px;
 	margin: 2px;
 }
 
 select {
-	font-family: "Andale Mono";
+	font-family: inherit;
 	border-color: darkgrey;
 	border-width: 0px;
 	color:  rgb(180, 180, 180);
 	background: rgb(30, 30, 30);
-	border-radius: 2px;
-	width: 25%;
+	border-radius: 0px;
+	width: 19%;
+	height: 25px;
 	margin: 2px; 
 }
 
 textarea {
-	font-family: "Andale Mono";
+	font-family: inherit;
 	border-color: darkgrey;
 	color: white;
 	background: rgb(30, 30, 30);
@@ -52,5 +61,8 @@ textarea:focus {
 	border: 1px solid black;
 	font-size: 16px;
 	height: auto;
-	font-family: "Consolas";
+	/* font-family: "Consolas"; */
+	/* font-family: 'Ubuntu Mono', monospace; */
+	font-family: inherit;
+	font-size: 1em;
 }

@@ -304,7 +304,15 @@ const functionMap = {
 		return TL.setTempo(v[0]);
 	},
 	'scale' : (...v) => {
-		return TL.setScale(...v);
+		TL.setScale(...v);
+		return TL.getSettings().map;
+	},
+	'tuning' : (...v) => {
+		console.log('set tuning', v);
+	},
+	'root' : (v) => {
+		TL.setRoot(v[0]);
+		return TL.getSettings().root;
 	},
 	'toScale' : (...v) => {
 		return TL.toScale(...v);

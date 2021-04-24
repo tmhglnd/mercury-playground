@@ -17825,7 +17825,8 @@ module.exports={
 	"amp" :[ "*" ],
 	"env" : [ "^" ],
 	"add_fx" : [ "~" ],
-	"name" : [ "@" ]
+	"name" : [ "@" ],
+	"group" : [ "}" ]
 }
 },{}],31:[function(require,module,exports){
 // 
@@ -17868,6 +17869,19 @@ const objects = {
 			'stretch': [0, 1, 1],
 			'add_fx' : [],
 		}
+	},
+	'midi' : {
+		'object' : '',
+		'type' : 'undefined',
+		'functions' : {
+			'group' : [],
+			'time' : [ '1/1', 0 ],
+			'note' : [0, 0],
+			'env' : [ 100 ],
+			'out' : [ 1 ],
+			'chord' : 'off',
+			'sync' : 'off',
+		}
 	}
 }
 module.exports = { objects };
@@ -17894,7 +17908,8 @@ const moo = require('moo');
 const IR = require('./mercuryIR.js');
 
 const lexer = moo.compile({
-	comment:	/(?:\/\/|\$).*?$/,
+	// comment:	/(?:\/\/|\$).*?$/,
+	comment:	/(?:\/\/).*?$/,
 	
 	//instrument: [/synth/, /sample/, /polySynth/, /loop/, /emitter/],
 	/*instrument:	{
@@ -17902,15 +17917,16 @@ const lexer = moo.compile({
 					value: x => x.slice(0, x.length-1)
 				},*/
 
-	list:		[/ring\ /, /array\ /, /list\ /],
-	newObject:	[/new\ /, /make\ /, /add\ /],
-	setObject:	[/set\ /, /apply\ /, /give\ /, /send\ /],
-	print:		[/print\ /, /post\ /, /log\ /],
+	list:		[/ring/, /array/, /list/],
+	newObject:	[/new/, /make/, /add(?: |$)/],
+	setObject:	[/set/, /apply/, /give/, /send/],
+	print:		[/print/, /post/, /log/],
 
 	//action:		[/ring\ /, /new\ /, /set\ /],
 	//kill:		/kill[\-|_]?[a|A]ll/,
 
-	//seperator:	/&/,
+	seperator:	/,/,
+	//newLine:	/[&;]/,
 	
 	//note:		/[a-gA-G](?:[0-9])?(?:#+|b+|x)?/,
 	number:		/[+-]?(?:[0-9]|[0-9]+)(?:\.[0-9]+)?(?:[eE][-+]?[0-9]+)?\b/,
@@ -17951,7 +17967,7 @@ var grammar = {
     {"name": "main$ebnf$3", "symbols": [(lexer.has("comment") ? {type: "comment"} : comment)], "postprocess": id},
     {"name": "main$ebnf$3", "symbols": [], "postprocess": function(d) {return null;}},
     {"name": "main", "symbols": ["_", "objectStatement", "_", "main$ebnf$3"], "postprocess": (d) => { return { "@object" : d[1] }}},
-    {"name": "objectStatement", "symbols": [(lexer.has("newObject") ? {type: "newObject"} : newObject), "_", (lexer.has("identifier") ? {type: "identifier"} : identifier), "__", "objectIdentifier"], "postprocess":  (d) => {
+    {"name": "objectStatement", "symbols": [(lexer.has("newObject") ? {type: "newObject"} : newObject), "__", (lexer.has("identifier") ? {type: "identifier"} : identifier), "__", "objectIdentifier"], "postprocess":  (d) => {
         	return {
         		//"@action" : 'new',
         		"@new" : {
@@ -17960,7 +17976,7 @@ var grammar = {
         		}
         	}
         }},
-    {"name": "objectStatement", "symbols": [(lexer.has("newObject") ? {type: "newObject"} : newObject), "_", (lexer.has("identifier") ? {type: "identifier"} : identifier), "__", "objectIdentifier", "__", "objExpression"], "postprocess":  (d) => {
+    {"name": "objectStatement", "symbols": [(lexer.has("newObject") ? {type: "newObject"} : newObject), "__", (lexer.has("identifier") ? {type: "identifier"} : identifier), "__", "objectIdentifier", "__", "objExpression"], "postprocess":  (d) => {
         	return {
         		//"@action" : 'new',
         		"@new" : {
@@ -17970,7 +17986,7 @@ var grammar = {
         		}
         	}
         }},
-    {"name": "objectStatement", "symbols": [(lexer.has("setObject") ? {type: "setObject"} : setObject), "_", (lexer.has("identifier") ? {type: "identifier"} : identifier), "__", "objExpression"], "postprocess":  (d) => {	
+    {"name": "objectStatement", "symbols": [(lexer.has("setObject") ? {type: "setObject"} : setObject), "__", (lexer.has("identifier") ? {type: "identifier"} : identifier), "__", "objExpression"], "postprocess":  (d) => {	
         	return {
         		"@set" : {
         			"@name" : d[2].value,
@@ -17989,26 +18005,33 @@ var grammar = {
         } },
     {"name": "globalStatement", "symbols": [(lexer.has("comment") ? {type: "comment"} : comment)], "postprocess": (d) => { return { "@comment" : d[0].value }}},
     {"name": "globalStatement", "symbols": [(lexer.has("print") ? {type: "print"} : print), "_", "objExpression"], "postprocess": (d) => { return { "@print" : d[2] }}},
-    {"name": "globalStatement", "symbols": ["objExpression"], "postprocess": (d) => { return { "@print" : d[0] }}},
     {"name": "objExpression", "symbols": ["paramElement"], "postprocess": (d) => [d[0]]},
     {"name": "objExpression", "symbols": ["paramElement", "__", "objExpression"], "postprocess": (d) => [d[0], d[2]].flat(Infinity)},
-    {"name": "function", "symbols": [(lexer.has("identifier") ? {type: "identifier"} : identifier), "functionArguments"], "postprocess":  (d) => {
+    {"name": "function", "symbols": [(lexer.has("identifier") ? {type: "identifier"} : identifier), "_", "functionArguments"], "postprocess":  (d) => {
         	return { 
         		//"@function": IR.bindFunction(d[0].value),
         		"@function": { 
         			"@name": IR.keyBind(d[0].value),
-        			"@args": d[1]
+        			"@args": d[2]
         		}
         	}
         }},
     {"name": "functionArguments$ebnf$1", "symbols": ["params"], "postprocess": id},
     {"name": "functionArguments$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
-    {"name": "functionArguments", "symbols": [(lexer.has("lParam") ? {type: "lParam"} : lParam), "_", "functionArguments$ebnf$1", "_", (lexer.has("rParam") ? {type: "rParam"} : rParam)], "postprocess": (d) => d[2]},
+    {"name": "functionArguments$ebnf$2", "symbols": [(lexer.has("rParam") ? {type: "rParam"} : rParam)], "postprocess": id},
+    {"name": "functionArguments$ebnf$2", "symbols": [], "postprocess": function(d) {return null;}},
+    {"name": "functionArguments", "symbols": [(lexer.has("lParam") ? {type: "lParam"} : lParam), "_", "functionArguments$ebnf$1", "_", "functionArguments$ebnf$2"], "postprocess": (d) => d[2]},
     {"name": "array$ebnf$1", "symbols": ["params"], "postprocess": id},
     {"name": "array$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
-    {"name": "array", "symbols": [(lexer.has("lArray") ? {type: "lArray"} : lArray), "_", "array$ebnf$1", "_", (lexer.has("rArray") ? {type: "rArray"} : rArray)], "postprocess": (d) => { return { "@array" : d[2] }}},
-    {"name": "params", "symbols": ["paramElement"], "postprocess": (d) => [d[0]]},
-    {"name": "params", "symbols": ["paramElement", "_", "params"], "postprocess": (d) => [d[0], d[2]].flat(Infinity)},
+    {"name": "array$ebnf$2", "symbols": [(lexer.has("rArray") ? {type: "rArray"} : rArray)], "postprocess": id},
+    {"name": "array$ebnf$2", "symbols": [], "postprocess": function(d) {return null;}},
+    {"name": "array", "symbols": [(lexer.has("lArray") ? {type: "lArray"} : lArray), "_", "array$ebnf$1", "_", "array$ebnf$2"], "postprocess": (d) => { return { "@array" : d[2] }}},
+    {"name": "params$ebnf$1", "symbols": [(lexer.has("seperator") ? {type: "seperator"} : seperator)], "postprocess": id},
+    {"name": "params$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
+    {"name": "params", "symbols": ["paramElement", "_", "params$ebnf$1"], "postprocess": (d) => [d[0]]},
+    {"name": "params$ebnf$2", "symbols": [(lexer.has("seperator") ? {type: "seperator"} : seperator)], "postprocess": id},
+    {"name": "params$ebnf$2", "symbols": [], "postprocess": function(d) {return null;}},
+    {"name": "params", "symbols": ["paramElement", "_", "params$ebnf$2", "_", "params"], "postprocess": (d) => [d[0], d[4]].flat(Infinity)},
     {"name": "paramElement", "symbols": [(lexer.has("number") ? {type: "number"} : number)], "postprocess": (d) => { return IR.num(d) }},
     {"name": "paramElement", "symbols": ["name"], "postprocess": (d) => d[0]},
     {"name": "paramElement", "symbols": ["array"], "postprocess": (d) => d[0]},
@@ -18058,6 +18081,8 @@ const miniLang = require('../data/mini-functions.json');
 let keywordBinds = {};
 keywordBinds = keywordBindings(keywords, keywordBinds);
 keywordBinds = keywordBindings(miniLang, keywordBinds);
+
+// keywordBinds = keywordBindings(langDutch, keywordBinds);
 // console.log(keywordBinds);
 
 // processing for identifiers
@@ -18114,22 +18139,27 @@ function keywordBindings(dict, obj){
 	return binds;
 }
 
+// code accepted global parameters
+const globals = 'tempo volume scale root randomSeed highPass lowPass silence'.split(' ');
+
+// code defaults
 let code = {
 	'global' : {
-		'volume' : [ 0.8 ],
-		'tempo' : [ 90 ],
-		'scale' : [ 'chromatic', 'c' ],
-		'root' : [ 'c' ],
+		// 'tempo' : [ 90 ],
+		// 'volume' : [ 0.8 ],
+		// 'scale' : [ 'chromatic', 'c' ],
+		// 'root' : [ 'c' ],
 		'randomSeed' : [ 0 ],
 		'highPass' : [ 20000, 0 ],
 		'lowPass' : [ 1, 0 ],
-		'silence' : false,
+		// 'silence' : false,
 	},
 	'variables' : {},
 	'objects' : {},
 	'groups' : {},
 	'print' : [],
-	'comments' : []
+	'comments' : [],
+	'errors' : []
 }
 
 function deepCopy(o){
@@ -18170,11 +18200,11 @@ function traverseTree(tree, code, level){
 			el.map((e) => {
 				Object.keys(e).forEach((k) => {
 					let p = map[k](ccode, e[k]);
-					log += (Array.isArray(p)? p.flat(Infinity).join(' ') : p) + ' ';
+					// log += (Array.isArray(p)? p.flat(Infinity).join(' ') : p) + ' ';
 					ccode.print.push(p);
 				});
 			});
-			console.log(log);
+			// console.log(log);
 			// ccode.print = prints;
 			return ccode;
 		},
@@ -18237,7 +18267,8 @@ function traverseTree(tree, code, level){
 					});
 					ccode.objects[inst.functions.name] = inst;
 				});
-			} else if (ccode.global[name]){
+			// } else if (ccode.global[name]){
+			} else if (globals.includes(name)){
 				let args;
 				Object.keys(el).forEach((k) => {
 					args = map[k](ccode, el[k], args, '@setting');
@@ -18252,7 +18283,8 @@ function traverseTree(tree, code, level){
 				}
 				ccode.global[name] = args;
 			} else {
-				console.error(`Unkown instrument or setting name: ${name}`);
+				// console.error(`Unkown instrument or setting name: ${name}`);
+				ccode.errors.push(`Unkown instrument or setting name: ${name}`);
 			}
 			return ccode;
 		},
@@ -18265,7 +18297,8 @@ function traverseTree(tree, code, level){
 			let inst;
 
 			if (!instruments[obj]){
-				console.error(`Unknown instrument type: ${obj}`);
+				// console.error(`Unknown instrument type: ${obj}`);
+				ccode.errors.push(`Unknown instrument type: ${obj}`);
 				inst = deepCopy(instruments['empty']);
 			}
 			inst = deepCopy(instruments[obj]);
@@ -18329,7 +18362,8 @@ function traverseTree(tree, code, level){
 				}
 				return tsIR[func]();
 			} else if (level === '@list'){
-				console.error(`Unknown list function: ${func}`);
+				// console.error(`Unknown list function: ${func}`);
+				ccode.errors.push(`Unknown list function: ${func}`);
 				return [0];
 			} else if (level === '@object'){
 				if (func === 'add_fx'){
@@ -18404,10 +18438,12 @@ function traverseTree(tree, code, level){
 		})
 	} else {
 		// console.log('object process of', tree);
-		Object.keys(tree).map((k) => {
-			// console.log(k);
-			code = map[k](code, tree[k], level);
-		});
+		if (tree){
+			Object.keys(tree).map((k) => {
+				// console.log(k);
+				code = map[k](code, tree[k], level);
+			});
+		}
 	}
 	return code;
 }
@@ -18443,16 +18479,17 @@ function mercuryParser(code){
 	// split multiple lines into array of strings
 	let lines = code.split('\n');
 	let syntaxTree = { '@main' : [] };
+	let errors = [];
 	let parseTree = {};
 
 	for (let l in lines){
-		let parser = new nearley.Parser(nearley.Grammar.fromCompiled(grammar));
-		// create a Parser object from our grammar
 		if (lines[l] !== ''){
+			// create a Parser object from our grammar
+			let parser = new nearley.Parser(nearley.Grammar.fromCompiled(grammar));
+
 			try {
 				// parse something!
 				parser.feed(lines[l]);
-
 				// parser.results is an array of possible parsings.
 				let results = parser.results.length;
 
@@ -18461,23 +18498,36 @@ function mercuryParser(code){
 						console.log("Warning, ambiguous grammar!");
 						for (var i=0; i<results; i++){
 							// console.log("Result", i+1, "of", results, "\n", util.inspect(parser.results[i], { depth: 10 }), "\n");
-							// console.log(parser.results[i]);
+							console.log(parser.results[i]);
 						}
+					} else {
+						console.log(parser.results[0]);
 					}
 				}
 				// build the tokenized syntax tree
 				syntaxTree['@main'].push(parser.results[0]);
 			} catch (e) {
-				// console.error(e);
-				console.error(`Syntax error at line ${Number(l)+1} col ${e.token.col}: Unexpected ${e.token.type}: ${e.token.value} at ${lines[l].slice(0, e.token.offset)}${e.token.text}<-`);
+				// console.error(e)
+				// column: ${e.token.col}
+				let err = `Syntax error at line ${Number(l)+1}: Unexpected ${e.token.type}: ${e.token.value} at ${lines[l].slice(0, e.token.offset)}${e.token.text}<-`;
+				if (DEBUG){
+					console.error(err);
+				}
+				errors.push(err);
 			}
 		}
 	}
 	// traverse Syntax Tree and create Intermediate Representation
 	parseTree = worker.traverseTreeIR(syntaxTree['@main']);
 
+	errors = parseTree.errors.concat(errors);
+	delete parseTree.errors;
 	// return both the parseTree and syntaxTree in one object
-	return { 'parseTree': parseTree, 'syntaxTree': syntaxTree };
+	return { 
+		'parseTree': parseTree, 
+		'syntaxTree': syntaxTree, 
+		'errors': errors 
+	};
 }
 exports.mercuryParser = mercuryParser;
 },{"./mercuryGrammar.js":33,"./mercuryIR.js":34,"nearley":38}],36:[function(require,module,exports){
@@ -18787,7 +18837,15 @@ const functionMap = {
 		return TL.setTempo(v[0]);
 	},
 	'scale' : (...v) => {
-		return TL.setScale(...v);
+		TL.setScale(...v);
+		return TL.getSettings().map;
+	},
+	'tuning' : (...v) => {
+		console.log('set tuning', v);
+	},
+	'root' : (v) => {
+		TL.setRoot(v[0]);
+		return TL.getSettings().root;
 	},
 	'toScale' : (...v) => {
 		return TL.toScale(...v);
@@ -24004,7 +24062,8 @@ class MonoSample {
 
 	add_fx(...fx){
 		this._fx = [];
-
+		console.log('Effects currently disabled');
+/*
 		fx.forEach((f) => {
 			if (fxMap[f[0]]){
 				this._fx.push(fxMap[f[0]](f.slice(1)));
@@ -24013,7 +24072,7 @@ class MonoSample {
 			}
 		});
 
-		this.sample.chain(...this._fx, Tone.Destination);
+		this.sample.chain(...this._fx, Tone.Destination);*/
 	}
 }
 module.exports = MonoSample;
@@ -24057,6 +24116,7 @@ module.exports = { lookup, randLookup, toArray, msToS, formatRatio }
 },{}],62:[function(require,module,exports){
 
 const CodeMirror = require('codemirror');
+const { AutoFilter } = require('tone');
 const code = require('./worker.js');
 
 // require('codemirror/lib/codemirror.css');
@@ -24122,7 +24182,7 @@ const Editor = function({ context, engine }) {
 		cursorHeight: 1,
 		indentUnit: 4,
 		firstLineNumber: 0,
-		undoDepth: 0,
+		undoDepth: 50,
 		cursorScrollMargin: 20,
 		mode: "mercury",
 		// keymaps for execute/stopping/commenting code
@@ -24167,7 +24227,7 @@ const Editor = function({ context, engine }) {
 		// cEditor.setOption('theme', t);
 	}
 
-	// play/silence buttons
+	// play/silence/empty buttons
 	this.controls = function(){
 		let div = document.getElementById('menu');
 		let play = document.createElement('button');
@@ -24178,8 +24238,37 @@ const Editor = function({ context, engine }) {
 		stop.innerHTML = 'silence';
 		stop.onclick = () => { this.silence() };
 
+		let clear = document.createElement('button');
+		clear.innerHTML = 'empty';
+		clear.onclick = () => { 
+			this.set(''); 
+			this.silence(); 
+		};
+		
+		let example = document.createElement('button');
+		example.innerHTML = 'example';
+		example.onclick = () => {
+			// initialize editor with some code
+			this.set(
+				'// Welcome to the Mercury Playground ^^\n' + 
+				'// click "play" to execute the code\n' +
+				'// and adjust the code below:\n' +
+				'\n' +
+				'list kickBeat [1 0.01 0.1 1 0]\n' +
+				'new sample kick_min time(1/16) play(kickBeat)\n' +
+				'\n' +
+				'list hatBeat euclid(16 7)\n' +
+				'new sample hat_min time(1/16) play(hatBeat)\n' +
+				'\n' +
+				'new sample snare_min time(1 3/4)\n'
+			);
+			this.evaluate();
+		};
+
 		div.appendChild(play);
 		div.appendChild(stop);
+		div.appendChild(clear);
+		div.appendChild(example);
 	}
 
 	// theme menu for editor
@@ -24214,21 +24303,6 @@ module.exports = Editor;
 // keymaps for execute/stopping/commenting code
 // editor.setOption();
 
-// initialize editor with some code
-/*editor.setValue(
-	'// Welcome to the Mercury Playground ^^\n' + 
-	'// click "play" to execute the code\n' +
-	'// and adjust the code below:\n' +
-	'\n' +
-	'list kickBeat [1 0.01 0.1 1 0]\n' +
-	'new sample kick_min time(1/16) play(kickBeat)\n' +
-	'\n' +
-	'list hatBeat euclid(16 7)\n' +
-	'new sample hat_min time(1/16) play(hatBeat)\n' +
-	'\n' +
-	'new sample snare_min time(1 3/4)\n'
-);*/
-
 // options['readOnly'] = "nocursor";
 // options['mode'] = "none";
 // let cEditor = CodeMirror.fromTextArea(document.getElementById('console'), options);
@@ -24238,7 +24312,7 @@ module.exports = Editor;
 // 	editor.setOption('theme', t);
 // 	cEditor.setOption('theme', t);
 // }
-},{"./worker.js":65,"codemirror":27,"codemirror/addon/comment/comment.js":25,"codemirror/addon/mode/simple.js":26,"codemirror/mode/javascript/javascript.js":28}],63:[function(require,module,exports){
+},{"./worker.js":65,"codemirror":27,"codemirror/addon/comment/comment.js":25,"codemirror/addon/mode/simple.js":26,"codemirror/mode/javascript/javascript.js":28,"tone":47}],63:[function(require,module,exports){
 const Tone = require('tone');
 
 let samples = {};
