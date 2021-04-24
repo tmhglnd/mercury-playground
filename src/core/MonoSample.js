@@ -129,28 +129,19 @@ class MonoSample {
 	}
 
 	sound(s){
-		this._sound = Util.toArray(s);
-
-		this._sound = this.checkBuffer(this._sound);
-		// this._sound = this._sound.map((s) => {
-		// 	// error if soundfile does not exist
-		// 	if (!this._bufs.has(s)){
-		// 		// set default (should be empty sound?)
-		// 		console.log(`sample ${s} not found`);
-		// 		return 'kick_min';
-		// 	}
-		// 	return s;
-		// });
+		// load all soundfiles and return as array
+		this._sound = this.checkBuffer(Util.toArray(s));
 	}
 
 	checkBuffer(a){
+		// check if file is part of the loaded samples
 		return a.map((s) => {
 			if (Array.isArray(s)) {
 				return this.checkBuffer(s);
 			}
 			// error if soundfile does not exist
 			else if (!this._bufs.has(s)){
-				// set default (should be empty sound?)
+				// set default (or an ampty soundfile?)
 				console.log(`sample ${s} not found`);
 				return 'kick_min';
 			}
