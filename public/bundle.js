@@ -23847,11 +23847,11 @@ class MonoSample {
 	makeSampler(){
 		this.panner = new Tone.Panner(0).toDestination();
 		// this.sample = new Tone.Player(buffers.get('kick_min')).toDestination();
-		this.sample = new Tone.Player(this._bufs.get('kick_min')).connect(this.panner);
+		this.sample = new Tone.Player().connect(this.panner);
 
 		// this.sample.load(this._sound);
 		this.sample.autostart = false;
-		// console.log('MonoSample');
+		// console.log('MonoSample()', this.sample.numberOfOutputs);
 	}
 
 	makeLoop(){
@@ -23875,8 +23875,14 @@ class MonoSample {
 
 			// if random value is below probability, then play
 			if (Math.random() < b){
-				// this.sample.buffer = buffers.get(this._sound);
-				this.sample.buffer = this._bufs.get(Util.randLookup(Util.lookup(this._sound, c)));
+				// get the sample from array
+				let f = Util.randLookup(Util.lookup(this._sound, c));
+				if (this._bufs.has(f)){
+					this.sample.buffer = this._bufs.get(f);
+				} else {
+					// default sample if file does not exist
+					this.sample.buffer = this._bufs.get('kick_min');
+				}
 
 				// get speed and if 2d array pick randomly
 				let s = Util.randLookup(Util.lookup(this._speed, c));
@@ -23934,7 +23940,7 @@ class MonoSample {
 			if (!this._bufs.has(s)){
 				// set default (should be empty sound?)
 				// this._sound = ['kick_min'];
-				print(`sample ${s} not found`);
+				console.log(`sample ${s} not found`);
 			}
 		});
 	}
@@ -23995,7 +24001,7 @@ class MonoSample {
 			if (fxMap[f[0]]){
 				this._fx.push(fxMap[f[0]](f.slice(1)));
 			} else {
-				print(`Effect ${f[0]} does not exist`);
+				console.log(`Effect ${f[0]} does not exist`);
 			}
 		});
 
@@ -24193,15 +24199,6 @@ const Editor = function({ context, engine }) {
 	this.clear();
 }
 module.exports = Editor;
-
-// extraKeys: {
-// 	'Ctrl-/': 'toggleComment',
-// 	'Ctrl-Enter': () => { code() },
-// 	'Ctrl-.': () => { silence() },
-// 	'Alt-/': 'toggleComment',
-// 	'Alt-Enter': () => { code() },
-// 	'Alt-.': () => { silence() },
-// }
 
 // the codemirror editor
 // let editor = CodeMirror.fromTextArea(document.getElementById('code'), options);

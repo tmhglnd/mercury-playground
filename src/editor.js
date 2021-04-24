@@ -151,15 +151,6 @@ const Editor = function({ context, engine }) {
 }
 module.exports = Editor;
 
-// extraKeys: {
-// 	'Ctrl-/': 'toggleComment',
-// 	'Ctrl-Enter': () => { code() },
-// 	'Ctrl-.': () => { silence() },
-// 	'Alt-/': 'toggleComment',
-// 	'Alt-Enter': () => { code() },
-// 	'Alt-.': () => { silence() },
-// }
-
 // the codemirror editor
 // let editor = CodeMirror.fromTextArea(document.getElementById('code'), options);
 
