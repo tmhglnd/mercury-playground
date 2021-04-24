@@ -131,13 +131,30 @@ class MonoSample {
 	sound(s){
 		this._sound = Util.toArray(s);
 
-		this._sound.map((s) => {
-			// error if soundfile does not exist
-			if (!this._bufs.has(s)){
-				// set default (should be empty sound?)
-				// this._sound = ['kick_min'];
-				console.log(`sample ${s} not found`);
+		this._sound = this.checkBuffer(this._sound);
+		// this._sound = this._sound.map((s) => {
+		// 	// error if soundfile does not exist
+		// 	if (!this._bufs.has(s)){
+		// 		// set default (should be empty sound?)
+		// 		console.log(`sample ${s} not found`);
+		// 		return 'kick_min';
+		// 	}
+		// 	return s;
+		// });
+	}
+
+	checkBuffer(a){
+		return a.map((s) => {
+			if (Array.isArray(s)) {
+				return this.checkBuffer(s);
 			}
+			// error if soundfile does not exist
+			else if (!this._bufs.has(s)){
+				// set default (should be empty sound?)
+				console.log(`sample ${s} not found`);
+				return 'kick_min';
+			}
+			return s;
 		});
 	}
 
