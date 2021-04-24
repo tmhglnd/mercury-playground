@@ -6,7 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
-    "build": "watchify src/main.js -o public/bundle.js -v"
+    "watch": "watchify src/main.js -o public/bundle.js -v",
+    "build": "browserify src/main.js -o public/bundle.js && npm run uglify",
+    "uglify": "terser public/bundle.js -o public/bundle.min.js -c -m --comments 'false'"
   },
   "keywords": [],
   "author": "",
@@ -22,6 +24,7 @@
   },
   "devDependencies": {
     "browserify": "^17.0.0",
+    "terser": "^5.6.1",
     "watchify": "^4.0.0"
   }
 }
