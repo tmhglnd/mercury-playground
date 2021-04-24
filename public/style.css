@@ -23,7 +23,7 @@ p {
 button {
 	/* font-family: "Andale Mono"; */
 	font-family: inherit;
-	border-radius: 0px;
+	border-radius: 2px;
 	border-width: 0px;
 	border-color: rgb(180, 180, 180);
 	background: rgb(30, 30, 30);
@@ -33,13 +33,17 @@ button {
 	margin: 2px;
 }
 
+button:active {
+	background: rgb(50, 50, 50);
+}
+
 select {
 	font-family: inherit;
 	border-color: darkgrey;
 	border-width: 0px;
 	color:  rgb(180, 180, 180);
 	background: rgb(30, 30, 30);
-	border-radius: 0px;
+	border-radius: 2px;
 	width: 19%;
 	height: 25px;
 	margin: 2px; 
@@ -65,4 +69,9 @@ textarea:focus {
 	/* font-family: 'Ubuntu Mono', monospace; */
 	font-family: inherit;
 	font-size: 1em;
+}
+
+.editorFlash {
+	background: rgb(255, 255, 255, 0.2);
+	/* mix-blend-mode: difference; */
 }

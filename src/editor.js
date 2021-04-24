@@ -1,6 +1,5 @@
 
 const CodeMirror = require('codemirror');
-const { AutoFilter } = require('tone');
 const code = require('./worker.js');
 
 // require('codemirror/lib/codemirror.css');
@@ -95,9 +94,21 @@ const Editor = function({ context, engine }) {
 	}
 
 	this.evaluate = function(){
+		this.flash();
+
 		console.log('evaluating code...');
 		engine.resume();
 		code({ file: this.cm.getValue(), engine: engine });
+	}
+
+	this.flash = function(){
+		let start = { line: this.cm.firstLine(), ch: 0 };
+		let end = { line: this.cm.lastLine(), ch: 0 };
+		console.log(start, end);
+
+		let marker = this.cm.markText(start, end, { className: 'editorFlash' });
+
+		setTimeout(() => marker.clear(), 250);
 	}
 
 	this.silence = function(){

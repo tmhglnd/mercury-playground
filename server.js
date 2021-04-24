@@ -18,15 +18,25 @@ const listener = app.listen(port, () => {
 const fg = require('fast-glob');
 const path = require('path');
 
+// get sample paths
 app.get("/samples", (request, response) => {
-	const fold = fg.sync('public/samples/**/*.wav');
-	let samples = {};
+	response.json(getFiles('public/assets/samples/**/*.wav'));
+});
+
+// get example paths
+app.get("/assets", (request, response) => {
+	response.json(getFiles('public/assets/examples/**/*.txt'));
+});
+// fs.outputJSONSync('./data/samples.json', samples, { spaces: 2 });
+
+function getFiles(glob){
+	const fold = fg.sync(glob);
+	let files = {};
 
 	for (let f in fold){
 		let file = path.parse(fold[f]);
 		let rel = fold[f].split(path.sep).slice(1).join('/');
-		samples[file.name] = rel;
+		files[file.name] = rel;
 	}
-	response.json(samples);
-});
-// fs.outputJSONSync('./data/samples.json', samples, { spaces: 2 });
+	return files;
+}

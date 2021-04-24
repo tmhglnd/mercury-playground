@@ -9112,6 +9112,7 @@
     if (cm.options.lineNumbers || markers) {
       var wrap$1 = ensureLineWrapped(lineView);
       var gutterWrap = lineView.gutter = elt("div", null, "CodeMirror-gutter-wrapper", ("left: " + (cm.options.fixedGutter ? dims.fixedPos : -dims.gutterTotalWidth) + "px"));
+      gutterWrap.setAttribute("aria-hidden", "true");
       cm.display.input.setUneditable(gutterWrap);
       wrap$1.insertBefore(gutterWrap, lineView.text);
       if (lineView.line.gutterClass)
@@ -11161,6 +11162,8 @@
   function updateGutterSpace(display) {
     var width = display.gutters.offsetWidth;
     display.sizer.style.marginLeft = width + "px";
+    // Send an event to consumers responding to changes in gutter width.
+    signalLater(display, "gutterChanged", display);
   }
 
   function setDocumentHeight(cm, measure) {
@@ -13610,10 +13613,9 @@
   // Very basic readline/emacs-style bindings, which are standard on Mac.
   keyMap.emacsy = {
     "Ctrl-F": "goCharRight", "Ctrl-B": "goCharLeft", "Ctrl-P": "goLineUp", "Ctrl-N": "goLineDown",
-    "Alt-F": "goWordRight", "Alt-B": "goWordLeft", "Ctrl-A": "goLineStart", "Ctrl-E": "goLineEnd",
-    "Ctrl-V": "goPageDown", "Shift-Ctrl-V": "goPageUp", "Ctrl-D": "delCharAfter", "Ctrl-H": "delCharBefore",
-    "Alt-D": "delWordAfter", "Alt-Backspace": "delWordBefore", "Ctrl-K": "killLine", "Ctrl-T": "transposeChars",
-    "Ctrl-O": "openLine"
+    "Ctrl-A": "goLineStart", "Ctrl-E": "goLineEnd", "Ctrl-V": "goPageDown", "Shift-Ctrl-V": "goPageUp",
+    "Ctrl-D": "delCharAfter", "Ctrl-H": "delCharBefore", "Alt-Backspace": "delWordBefore", "Ctrl-K": "killLine",
+    "Ctrl-T": "transposeChars", "Ctrl-O": "openLine"
   };
   keyMap.macDefault = {
     "Cmd-A": "selectAll", "Cmd-D": "deleteLine", "Cmd-Z": "undo", "Shift-Cmd-Z": "redo", "Cmd-Y": "redo",
@@ -15759,7 +15761,7 @@
       var kludge = hiddenTextarea(), te = kludge.firstChild;
       cm.display.lineSpace.insertBefore(kludge, cm.display.lineSpace.firstChild);
       te.value = lastCopied.text.join("\n");
-      var hadFocus = document.activeElement;
+      var hadFocus = activeElt();
       selectInput(te);
       setTimeout(function () {
         cm.display.lineSpace.removeChild(kludge);
@@ -15782,7 +15784,7 @@
 
   ContentEditableInput.prototype.prepareSelection = function () {
     var result = prepareSelection(this.cm, false);
-    result.focus = document.activeElement == this.div;
+    result.focus = activeElt() == this.div;
     return result
   };
 
@@ -15878,7 +15880,7 @@
 
   ContentEditableInput.prototype.focus = function () {
     if (this.cm.options.readOnly != "nocursor") {
-      if (!this.selectionInEditor() || document.activeElement != this.div)
+      if (!this.selectionInEditor() || activeElt() != this.div)
         { this.showSelection(this.prepareSelection(), true); }
       this.div.focus();
     }
@@ -16720,7 +16722,7 @@
 
   addLegacyProps(CodeMirror);
 
-  CodeMirror.version = "5.60.0";
+  CodeMirror.version = "5.61.0";
 
   return CodeMirror;
 
@@ -16745,6 +16747,7 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
   var statementIndent = parserConfig.statementIndent;
   var jsonldMode = parserConfig.jsonld;
   var jsonMode = parserConfig.json || jsonldMode;
+  var trackScope = parserConfig.trackScope !== false
   var isTS = parserConfig.typescript;
   var wordRE = parserConfig.wordCharacters || /[\w$\xa1-\uffff]/;
 
@@ -16960,6 +16963,7 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
   }
 
   function inScope(state, varname) {
+    if (!trackScope) return false
     for (var v = state.localVars; v; v = v.next)
       if (v.name == varname) return true;
     for (var cx = state.context; cx; cx = cx.prev) {
@@ -17006,6 +17010,7 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
   function register(varname) {
     var state = cx.state;
     cx.marked = "def";
+    if (!trackScope) return
     if (state.context) {
       if (state.lexical.info == "var" && state.context && state.context.block) {
         // FIXME function decls are also not block scoped
@@ -17105,7 +17110,7 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
       return cont(pushlex("form"), parenExpr, statement, poplex, maybeelse);
     }
     if (type == "function") return cont(functiondef);
-    if (type == "for") return cont(pushlex("form"), forspec, statement, poplex);
+    if (type == "for") return cont(pushlex("form"), pushblockcontext, forspec, statement, popcontext, poplex);
     if (type == "class" || (isTS && value == "interface")) {
       cx.marked = "keyword"
       return cont(pushlex("form", type == "class" ? type : value), className, poplex)
@@ -17612,7 +17617,7 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
       if (!/^\s*else\b/.test(textAfter)) for (var i = state.cc.length - 1; i >= 0; --i) {
         var c = state.cc[i];
         if (c == poplex) lexical = lexical.prev;
-        else if (c != maybeelse) break;
+        else if (c != maybeelse && c != popcontext) break;
       }
       while ((lexical.type == "stat" || lexical.type == "form") &&
              (firstChar == "}" || ((top = state.cc[state.cc.length - 1]) &&
@@ -21494,6 +21499,7 @@ exports.cosine = cosine;
 // pisano period on youtube.
 //==============================================================================
 
+const Util = require('./utility.js');
 const Transform = require('./transform.js');
 const BigNumber = require('bignumber.js');
 
@@ -21602,6 +21608,75 @@ function linden(axiom=[1], iteration=3, rules={1: [1, 0], 0: [1]}){
 	return res;
 }
 exports.linden = linden;
+
+// Generate a single sequence of the Collatz Conjecture given
+// a starting value greater than 1
+// The conjecture states that any giving positive integer will
+// eventually reach zero after iteratively applying the following rules
+// if the number is even, divide by 2
+// if the number is odd, multiply by 3 and add 1
+// 
+// @param {Int+} -> starting number
+// @return {Array} -> the sequence (inverted, so starting at 1)
+// 
+function collatz(n=12){
+	n = Math.max(2, n);
+	let sequence = [];
+
+	while (n != 1){
+		if (n % 2){
+			n = n * 3 + 1;
+		} else {
+			n = n / 2;
+		}
+		sequence.push(n);
+	}
+	return sequence.reverse();
+}
+exports.collatz = collatz;
+
+// Return the modulus of a collatz conjecture sequence
+// Set the modulo
+// 
+// @param {Int+} -> starting number
+// @param {Int+} -> modulus
+// 
+function collatzMod(n=12, m=2){
+	return Util.mod(collatz(n), Math.min(m, Math.floor(m)));
+}
+exports.collatzMod = collatzMod;
+
+// The collatz conjecture with BigNumber library
+// 
+function bigCollatz(n){
+	let num = new BigNumber(n);
+	let sequence = [];
+
+	while (num.gt(1)){
+		if (num.mod(2).eq(1)){
+			num = num.times(3);
+			num = num.plus(1);
+		} else {
+			num = num.div(2);
+		}
+		sequence.push(num.toFixed());
+	}
+	return sequence.reverse();
+}
+exports.bigCollatz = bigCollatz;
+
+// Return the modulus of a collatz conjecture sequence
+// Set the modulo
+// 
+function bigCollatzMod(n=12, m=2){
+	let arr = bigCollatz(n);
+	for (let i in arr){
+		arr[i] = new BigNumber(arr[i]);
+		arr[i] = arr[i].mod(m).toNumber();
+	}
+	return arr;
+}
+exports.bigCollatzMod = bigCollatzMod;
 
 // Generate any n-bonacci sequence as an array of BigNumber objects
 // F(n) = t * F(n-1) + F(n-2). This possibly generatres various 
@@ -21886,7 +21961,7 @@ class Automaton {
 	}
 }
 exports.Automaton = Automaton;
-},{"./transform.js":56,"bignumber.js":23}],54:[function(require,module,exports){
+},{"./transform.js":56,"./utility.js":58,"bignumber.js":23}],54:[function(require,module,exports){
 //=======================================================================
 // gen-stochastic.js
 // part of 'total-serialism' Package
@@ -24116,7 +24191,6 @@ module.exports = { lookup, randLookup, toArray, msToS, formatRatio }
 },{}],62:[function(require,module,exports){
 
 const CodeMirror = require('codemirror');
-const { AutoFilter } = require('tone');
 const code = require('./worker.js');
 
 // require('codemirror/lib/codemirror.css');
@@ -24211,9 +24285,21 @@ const Editor = function({ context, engine }) {
 	}
 
 	this.evaluate = function(){
+		this.flash();
+
 		console.log('evaluating code...');
 		engine.resume();
 		code({ file: this.cm.getValue(), engine: engine });
+	}
+
+	this.flash = function(){
+		let start = { line: this.cm.firstLine(), ch: 0 };
+		let end = { line: this.cm.lastLine(), ch: 0 };
+		console.log(start, end);
+
+		let marker = this.cm.markText(start, end, { className: 'editorFlash' });
+
+		setTimeout(() => marker.clear(), 250);
 	}
 
 	this.silence = function(){
@@ -24312,7 +24398,7 @@ module.exports = Editor;
 // 	editor.setOption('theme', t);
 // 	cEditor.setOption('theme', t);
 // }
-},{"./worker.js":65,"codemirror":27,"codemirror/addon/comment/comment.js":25,"codemirror/addon/mode/simple.js":26,"codemirror/mode/javascript/javascript.js":28,"tone":47}],63:[function(require,module,exports){
+},{"./worker.js":65,"codemirror":27,"codemirror/addon/comment/comment.js":25,"codemirror/addon/mode/simple.js":26,"codemirror/mode/javascript/javascript.js":28}],63:[function(require,module,exports){
 const Tone = require('tone');
 
 let samples = {};
