@@ -15,6 +15,21 @@ require('codemirror/addon/comment/comment.js');
 
 const defaultTheme = 'moxer';
 
+let _rand;
+let examples = {};
+// get the example code files from server
+fetch("/examples")
+	.then(function(response) {
+		return response.json();
+	})
+	.then(function(data) {
+		examples = data;
+		console.log(examples);
+	})
+	.catch(function(error) {
+		console.log('Error loading examples:' + error);
+	});
+
 // the simple mode lexer for Mercury syntax-highlighting
 CodeMirror.defineSimpleMode("mercury", {
 	meta: {
@@ -51,10 +66,11 @@ const Editor = function({ context, engine }) {
 
 	console.log('=> Created Editor()');
 
-	let container = document.createElement('div');
-	container.id = 'code-editor';
+	// let container = document.createElement('div');
+	// container.id = 'code-editor';
+	let container = document.getElementById('code-editor');
 	let text = document.createElement('textarea');
-	document.body.appendChild(container);
+	// document.body.appendChild(container);
 	container.appendChild(text);
 
 	this.options = {
@@ -90,7 +106,20 @@ const Editor = function({ context, engine }) {
 	}
 
 	this.clear = function(){
-		this.cm.setValue('// start coding here ^^');
+		// this.cm.setValue('// start coding here ^^');
+		this.set(
+				'// Welcome to the Mercury Playground ^^\n' + 
+				'// click "play" to execute the code\n' +
+				'// and adjust the code below:\n' +
+				'\n' +
+				'list kickBeat [1 0.01 0.1 1 0]\n' +
+				'new sample kick_min time(1/16) play(kickBeat)\n' +
+				'\n' +
+				'list hatBeat euclid(16 7)\n' +
+				'new sample hat_min time(1/16) play(hatBeat)\n' +
+				'\n' +
+				'new sample snare_min time(1 3/4)\n'
+			);
 	}
 
 	this.evaluate = function(){
@@ -144,19 +173,14 @@ const Editor = function({ context, engine }) {
 		example.innerHTML = 'example';
 		example.onclick = () => {
 			// initialize editor with some code
-			this.set(
-				'// Welcome to the Mercury Playground ^^\n' + 
-				'// click "play" to execute the code\n' +
-				'// and adjust the code below:\n' +
-				'\n' +
-				'list kickBeat [1 0.01 0.1 1 0]\n' +
-				'new sample kick_min time(1/16) play(kickBeat)\n' +
-				'\n' +
-				'list hatBeat euclid(16 7)\n' +
-				'new sample hat_min time(1/16) play(hatBeat)\n' +
-				'\n' +
-				'new sample snare_min time(1 3/4)\n'
-			);
+			let names = Object.keys(examples);
+			let amount = names.length;
+			let rand = Math.floor(Math.random() * amount);
+			rand = (rand === _rand)? (rand + 1) % amount : rand;
+
+			this.set(examples[names[rand]]);
+			_rand = rand;
+
 			this.evaluate();
 		};
 
@@ -164,6 +188,30 @@ const Editor = function({ context, engine }) {
 		div.appendChild(stop);
 		div.appendChild(clear);
 		div.appendChild(example);
+	}
+
+	this.links = function(){
+		let div = document.getElementById('links');
+		let p = document.createElement('p');
+		div.appendChild(p);
+
+		let tuts = document.createElement('button');
+		tuts.innerHTML = "tutorial";
+		tuts.onclick = () => {
+			window.open('https://tmhglnd.github.io/mercury/tutorial.html', '_blank') };
+		p.appendChild(tuts);
+
+		let docs = document.createElement('button');
+		docs.innerHTML = "documentation";
+		docs.onclick = () => {
+			window.open('https://tmhglnd.github.io/mercury/reference.html', '_blank') };
+		p.appendChild(docs);
+		
+		let full = document.createElement('button');
+		full.innerHTML = "full version";
+		full.onclick = () => {
+			window.open('https://github.com/tmhglnd/mercury', '_blank') };
+		p.appendChild(full);
 	}
 
 	// theme menu for editor
@@ -188,6 +236,7 @@ const Editor = function({ context, engine }) {
 
 	this.controls();
 	this.themeMenu();
+	this.links();
 	this.clear();
 }
 module.exports = Editor;

@@ -8,7 +8,7 @@ class MonoSample {
 		// console.log('MonoSample()', this._bufs);
 		this._bufs = engine.getBuffers();
 		this._bpm = engine.getBPM();
-		console.log('MonoSample()', s, this._bufs, this._bpm);
+		console.log('=> MonoSample()', s, this._bufs, this._bpm);
 		
 		this._sound = s;
 		this._count = 0;

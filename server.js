@@ -14,7 +14,7 @@ const listener = app.listen(port, () => {
 });
 
 // Read all the audio-files and serve the data sheet
-// const fs = require('fs-extra');
+const fs = require('fs-extra');
 const fg = require('fast-glob');
 const path = require('path');
 
@@ -24,8 +24,12 @@ app.get("/samples", (request, response) => {
 });
 
 // get example paths
-app.get("/assets", (request, response) => {
-	response.json(getFiles('public/assets/examples/**/*.txt'));
+app.get("/examples", (request, response) => {
+	let examples = getFiles('public/assets/examples/**/*.txt');
+	Object.keys(examples).forEach((f) => {
+		examples[f] = fs.readFileSync(`./public/${examples[f]}`, 'utf-8');
+	});
+	response.json(examples);
 });
 // fs.outputJSONSync('./data/samples.json', samples, { spaces: 2 });
 

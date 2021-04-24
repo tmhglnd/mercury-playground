@@ -3,26 +3,26 @@ const Tone = require('tone');
 let samples = {};
 let buffers;
 
-// fetch('./data/samples.json')
+// get the sample file paths from server
 fetch("/samples")
-.then(function(response) {
-	return response.json();
-})
-.then(function(data) {
-	samples = data;
-	console.log(samples)
+	.then(function(response) {
+		return response.json();
+	})
+	.then(function(data) {
+		samples = data;
+		console.log(samples)
 
-	buffers = new Tone.ToneAudioBuffers({
-		urls: samples,
-		onload: function(){ 
-			console.log('buffers loaded');
-			// init();
-		}
+		buffers = new Tone.ToneAudioBuffers({
+			urls: samples,
+			onload: function(){ 
+				console.log('buffers loaded');
+				// init();
+			}
+		});
+	})
+	.catch(function(error) {
+		console.log('error:' + error);
 	});
-})
-.catch(function(error) {
-	console.log('error:' + error);
-});
 
 // resume webaudio and transport for livecoding
 function resume(){
