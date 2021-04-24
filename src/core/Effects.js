@@ -1,3 +1,5 @@
+const Tone = require('tone');
+
 // all the available effects
 const fxMap = {
 	'drive' : (params) => {
@@ -6,7 +8,7 @@ const fxMap = {
 		return new Tone.Distortion(d);
 	},
 	'reverb' : (param) => {
-		// console.log('reverb', param);
+		console.log('reverb', param);
 
 		// let amp = new Tone.Gain(0).toDestination();
 		let verb = new Tone.Reverb();

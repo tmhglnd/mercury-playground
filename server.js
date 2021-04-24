@@ -14,7 +14,7 @@ const listener = app.listen(port, () => {
 });
 
 // Read all the audio-files and serve the data sheet
-const fs = require('fs-extra');
+// const fs = require('fs-extra');
 const fg = require('fast-glob');
 const path = require('path');
 

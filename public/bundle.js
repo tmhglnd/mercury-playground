@@ -23773,7 +23773,38 @@ function draw(a=[0], prefs){
 exports.draw = draw;
 },{"asciichart":22}],59:[function(require,module,exports){
 const Tone = require('tone');
+
+// all the available effects
+const fxMap = {
+	'drive' : (params) => {
+		// console.log('drive', params);
+		let d = (params[0])? params[0] : 1;
+		return new Tone.Distortion(d);
+	},
+	'reverb' : (param) => {
+		console.log('reverb', param);
+
+		// let amp = new Tone.Gain(0).toDestination();
+		let verb = new Tone.Reverb();
+		// amp.gain.rampTo( (param[0] !== undefined)? param[0] : 0.5, 0.01 );
+		verb.decay = (param[0])? param[0] : 5;
+
+		return verb;
+	}, 
+	'delay' : (param) => {
+		// console.log('delay', param);
+		let t = (param[0] !== undefined)? param[0] : '3/16';
+		let fb = (param[1] !== undefined)? param[1] : 0.3;
+		let del = new Tone.PingPongDelay(formatRatio(t), fb);
+
+		return del;
+	}
+}
+module.exports = fxMap;
+},{"tone":47}],60:[function(require,module,exports){
+const Tone = require('tone');
 const Util = require('./Util.js');
+const fxMap = require('./Effects.js');
 
 // simple mono sample playback
 class MonoSample {
@@ -23972,7 +24003,7 @@ class MonoSample {
 	}
 }
 module.exports = MonoSample;
-},{"./Util.js":60,"tone":47}],60:[function(require,module,exports){
+},{"./Effects.js":59,"./Util.js":61,"tone":47}],61:[function(require,module,exports){
 // lookup a value from array with wrap index
 function lookup(a, i){
 	return a[i % a.length];
@@ -24009,7 +24040,7 @@ function formatRatio(d, bpm){
 }
 
 module.exports = { lookup, randLookup, toArray, msToS, formatRatio }
-},{}],61:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 
 const CodeMirror = require('codemirror');
 const code = require('./worker.js');
@@ -24024,6 +24055,8 @@ const code = require('./worker.js');
 require('codemirror/mode/javascript/javascript.js');
 require('codemirror/addon/mode/simple.js');
 require('codemirror/addon/comment/comment.js');
+
+const defaultTheme = 'moxer';
 
 // the simple mode lexer for Mercury syntax-highlighting
 CodeMirror.defineSimpleMode("mercury", {
@@ -24071,7 +24104,7 @@ const Editor = function({ context, engine }) {
 		// options for the editor
 		cursorHeight: 0.85,
 		lineNumbers: true,
-		theme: "ayu-dark",
+		theme: defaultTheme,
 		cursorHeight: 1,
 		indentUnit: 4,
 		firstLineNumber: 0,
@@ -24143,7 +24176,7 @@ const Editor = function({ context, engine }) {
 		menu.onchange = () => { this.changeTheme() };
 		
 		let themes = ['ayu-dark', 'base16-dark', 'material-darker', 'material-ocean', 'moxer'];
-		
+
 		for (let t in themes){
 			let option = document.createElement('option');
 			option.value = themes[t];
@@ -24151,6 +24184,8 @@ const Editor = function({ context, engine }) {
 			menu.appendChild(option);
 		}
 		div.appendChild(menu);
+
+		menu.value = defaultTheme;
 	}
 
 	this.controls();
@@ -24198,7 +24233,7 @@ module.exports = Editor;
 // 	editor.setOption('theme', t);
 // 	cEditor.setOption('theme', t);
 // }
-},{"./worker.js":64,"codemirror":27,"codemirror/addon/comment/comment.js":25,"codemirror/addon/mode/simple.js":26,"codemirror/mode/javascript/javascript.js":28}],62:[function(require,module,exports){
+},{"./worker.js":65,"codemirror":27,"codemirror/addon/comment/comment.js":25,"codemirror/addon/mode/simple.js":26,"codemirror/mode/javascript/javascript.js":28}],63:[function(require,module,exports){
 const Tone = require('tone');
 
 let samples = {};
@@ -24275,7 +24310,7 @@ module.exports = { resume, silence, setBPM, getBPM, getBuffers };
 
 // set initial BPM on pageload to random value
 setBPM(Math.floor(Math.random() * 40) + 80);
-},{"tone":47}],63:[function(require,module,exports){
+},{"tone":47}],64:[function(require,module,exports){
 
 const Tone = require('tone');
 const Engine = require('./engine.js');
@@ -24520,7 +24555,7 @@ function formatRatio(d){
 	}
 }
 */
-},{"./editor.js":61,"./engine.js":62,"tone":47}],64:[function(require,module,exports){
+},{"./editor.js":62,"./engine.js":63,"tone":47}],65:[function(require,module,exports){
 const Tone = require('tone');
 const Mercury = require('mercury-lang');
 const MonoSample = require('./core/MonoSample.js');
@@ -24632,4 +24667,4 @@ function code({ file, engine }){
 	}
 }
 module.exports = code;
-},{"./core/MonoSample.js":59,"mercury-lang":32,"tone":47}]},{},[63]);
+},{"./core/MonoSample.js":60,"mercury-lang":32,"tone":47}]},{},[64]);

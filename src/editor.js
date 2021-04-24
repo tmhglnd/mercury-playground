@@ -13,6 +13,8 @@ require('codemirror/mode/javascript/javascript.js');
 require('codemirror/addon/mode/simple.js');
 require('codemirror/addon/comment/comment.js');
 
+const defaultTheme = 'moxer';
+
 // the simple mode lexer for Mercury syntax-highlighting
 CodeMirror.defineSimpleMode("mercury", {
 	meta: {
@@ -59,7 +61,7 @@ const Editor = function({ context, engine }) {
 		// options for the editor
 		cursorHeight: 0.85,
 		lineNumbers: true,
-		theme: "ayu-dark",
+		theme: defaultTheme,
 		cursorHeight: 1,
 		indentUnit: 4,
 		firstLineNumber: 0,
@@ -131,7 +133,7 @@ const Editor = function({ context, engine }) {
 		menu.onchange = () => { this.changeTheme() };
 		
 		let themes = ['ayu-dark', 'base16-dark', 'material-darker', 'material-ocean', 'moxer'];
-		
+
 		for (let t in themes){
 			let option = document.createElement('option');
 			option.value = themes[t];
@@ -139,6 +141,8 @@ const Editor = function({ context, engine }) {
 			menu.appendChild(option);
 		}
 		div.appendChild(menu);
+
+		menu.value = defaultTheme;
 	}
 
 	this.controls();
