@@ -1,8 +1,14 @@
+/* * {
+    box-sizing: border-box
+}  */
+
 body {
 	/* background: rgb(20, 20, 20); */
 	background: black;
 	/* font-family: "Andale Mono"; */
 	font-family: 'Ubuntu Mono', monospace;
+
+	margin: 20px;
 }
 
 h1 {
@@ -20,17 +26,41 @@ p {
 	color: rgb(180, 180, 180);
 }
 
+#menu {
+	margin: 0 auto; 
+	width: 100%;
+	max-width: 100%;
+	/* height: auto; */
+	display: inline-block;
+}
+
 button {
+	/* display: block; */
 	/* font-family: "Andale Mono"; */
 	font-family: inherit;
 	border-radius: 2px;
 	border-width: 0px;
 	border-color: rgb(180, 180, 180);
-	background: rgb(30, 30, 30);
+	background: rgb(20, 20, 20);
 	color:  rgb(180, 180, 180);
 	width: 19%;
 	height: 25px;
 	margin: 2px;
+	/* padding: 10px; */
+}
+	
+.hide p {
+	text-align: right;
+}
+
+.hide button {
+	background: rgb(255, 255, 255, 0.05);
+	color: rgb(255, 255, 255, 0.5);
+}
+
+button:hover {
+	/* background: black; */
+	background: rgb(50, 50, 50);
 }
 
 button:active {
@@ -38,15 +68,20 @@ button:active {
 }
 
 select {
+	/* display: block; */
 	font-family: inherit;
 	border-color: darkgrey;
 	border-width: 0px;
 	color:  rgb(180, 180, 180);
-	background: rgb(30, 30, 30);
+	background: rgb(20, 20, 20);
 	border-radius: 2px;
 	width: 19%;
 	height: 25px;
 	margin: 2px; 
+}
+
+select:hover {
+	background: rgb(50, 50, 50);
 }
 
 textarea {

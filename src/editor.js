@@ -214,6 +214,28 @@ const Editor = function({ context, engine }) {
 		p.appendChild(full);
 	}
 
+	this.menuHidden = false;
+
+	this.hide = function(){
+		let div = document.getElementById('hide');
+		let p = document.createElement('p');
+		div.appendChild(p);
+
+		let btn = document.createElement('button');
+		btn.innerHTML = 'hide menu';
+		btn.onclick = () => {
+			this.menuHidden = !this.menuHidden;
+
+			let divs = ['header', 'settings', 'menu', 'links'];
+			for (let i in divs){
+				let d = document.getElementById(divs[i]);
+				d.style.display = (this.menuHidden)? 'none' : 'inline';
+				btn.innerHTML = (this.menuHidden)? 'show menu' : 'hide menu';
+			}
+		}
+		p.appendChild(btn);
+	}
+
 	// theme menu for editor
 	this.themeMenu = function(){
 		let div = document.getElementById('menu');
@@ -237,6 +259,7 @@ const Editor = function({ context, engine }) {
 	this.controls();
 	this.themeMenu();
 	this.links();
+	this.hide();
 	this.clear();
 }
 module.exports = Editor;
