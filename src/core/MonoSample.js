@@ -20,6 +20,9 @@ class MonoSample {
 		
 		this._time = 1;
 		this._offset = 0;
+
+		// playback start position
+		this._pos = [ 0 ];
 		
 		// default gain value -6 dB
 		this._gain = [-6, 0];
@@ -57,8 +60,9 @@ class MonoSample {
 		}
 		let now = Tone.now();
 		let then = Tone.Time(this._offset).toSeconds();
-		// let then = this._offset * 2.0 * (60 / getBPM()); 
-		// console.log('time2', then);
+		// let then = this._offset * 2.0 * (60 / getBPM());
+
+		console.log('makeLoop()', this._time);
 
 		// create new loop for synth
 		this._loop = new Tone.Loop((time) => {
@@ -79,6 +83,8 @@ class MonoSample {
 					// default sample if file does not exist
 					this.sample.buffer = this._bufs.get('kick_min');
 				}
+				// the duration of the buffer in seconds
+				let dur = this.sample.buffer.duration;
 
 				// get speed and if 2d array pick randomly
 				let s = Util.randLookup(Util.lookup(this._speed, c));
@@ -92,12 +98,19 @@ class MonoSample {
 				this.sample.volume.rampTo(g, r, time);
 
 				// set panning
-				let p = Util.lookup(this._pan, c);
+				let p = Util.randLookup(Util.lookup(this._pan, c));
 				this.panner.pan.rampTo(p, Util.msToS(1));
 
+				// get the start position
+				let o = dur * Util.randLookup(Util.lookup(this._pos, c));
+				// end position for playback
+				let e = this._time;
+
+				this.sample.fadeIn = 1 / 1000;
+				this.sample.fadeOut = 2 / 1000;
 				// when sample is loaded, start
 				if (this.sample.loaded){
-					this.sample.start(time);
+					this.sample.start(time, o, e);
 				}
 			}
 			// increment count for sequencing
@@ -172,6 +185,11 @@ class MonoSample {
 	speed(s){
 		// set the speed pattern as an array
 		this._speed = Util.toArray(s);
+	}
+
+	offset(o){
+		// set the playback start position as an array
+		this._pos = Util.toArray(o);
 	}
 
 	env(){

@@ -23957,6 +23957,9 @@ class MonoSample {
 		
 		this._time = 1;
 		this._offset = 0;
+
+		// playback start position
+		this._pos = [ 0 ];
 		
 		// default gain value -6 dB
 		this._gain = [-6, 0];
@@ -23994,8 +23997,9 @@ class MonoSample {
 		}
 		let now = Tone.now();
 		let then = Tone.Time(this._offset).toSeconds();
-		// let then = this._offset * 2.0 * (60 / getBPM()); 
-		// console.log('time2', then);
+		// let then = this._offset * 2.0 * (60 / getBPM());
+
+		console.log('makeLoop()', this._time);
 
 		// create new loop for synth
 		this._loop = new Tone.Loop((time) => {
@@ -24016,6 +24020,8 @@ class MonoSample {
 					// default sample if file does not exist
 					this.sample.buffer = this._bufs.get('kick_min');
 				}
+				// the duration of the buffer in seconds
+				let dur = this.sample.buffer.duration;
 
 				// get speed and if 2d array pick randomly
 				let s = Util.randLookup(Util.lookup(this._speed, c));
@@ -24029,12 +24035,19 @@ class MonoSample {
 				this.sample.volume.rampTo(g, r, time);
 
 				// set panning
-				let p = Util.lookup(this._pan, c);
+				let p = Util.randLookup(Util.lookup(this._pan, c));
 				this.panner.pan.rampTo(p, Util.msToS(1));
 
+				// get the start position
+				let o = dur * Util.randLookup(Util.lookup(this._pos, c));
+				// end position for playback
+				let e = this._time;
+
+				this.sample.fadeIn = 1 / 1000;
+				this.sample.fadeOut = 2 / 1000;
 				// when sample is loaded, start
 				if (this.sample.loaded){
-					this.sample.start(time);
+					this.sample.start(time, o, e);
 				}
 			}
 			// increment count for sequencing
@@ -24109,6 +24122,11 @@ class MonoSample {
 	speed(s){
 		// set the speed pattern as an array
 		this._speed = Util.toArray(s);
+	}
+
+	offset(o){
+		// set the playback start position as an array
+		this._pos = Util.toArray(o);
 	}
 
 	env(){
@@ -24230,7 +24248,7 @@ CodeMirror.defineSimpleMode("mercury", {
 		// string
 		{ regex: /["'`](?:\\["\\]|[^\n"'``])*["'`]/, token: "string" },
 		// keywords
-		{ regex: /(?:new|make|add|ring|list|array|set|apply|give)\b/, token: "keyword", next: "object" },
+		{ regex: /(?:new |make |add |ring |list |array |set |apply |give )\b/, token: "keyword", next: "object" },
 		// global
 		{ regex: /(?:print|post|log|audio|record|silence|mute|killAll|default)\b/, token: "variable-2" },
 		// numbers
@@ -24384,9 +24402,9 @@ const Editor = function({ context, engine }) {
 	this.links = function(){
 		let urls = {
 			'tutorial': 'https://tmhglnd.github.io/mercury/tutorial.html',
+			'sounds' : 'https://github.com/tmhglnd/mercury/blob/master/mercury_ide/media/README.md',
 			'documentation': 'https://tmhglnd.github.io/mercury/reference.html',
-			'full version': 'https://github.com/tmhglnd/mercury',
-			'sounds' : 'https://github.com/tmhglnd/mercury/blob/master/mercury_ide/media/README.md'
+			'full version': 'https://github.com/tmhglnd/mercury'
 		}
 
 		let div = document.getElementById('links');
@@ -24401,32 +24419,6 @@ const Editor = function({ context, engine }) {
 			}
 			p.appendChild(btn);
 		});
-		
-		/*
-		let tuts = document.createElement('button');
-		tuts.innerHTML = "tutorial";
-		tuts.onclick = () => {
-			window.open('https://tmhglnd.github.io/mercury/tutorial.html', '_blank') };
-		p.appendChild(tuts);
-
-		let docs = document.createElement('button');
-		docs.innerHTML = "documentation";
-		docs.onclick = () => {
-			window.open('https://tmhglnd.github.io/mercury/reference.html', '_blank') };
-		p.appendChild(docs);
-		
-		let full = document.createElement('button');
-		full.innerHTML = "full version";
-		full.onclick = () => {
-			window.open('https://github.com/tmhglnd/mercury', '_blank') };
-		p.appendChild(full);
-
-		let snds = document.createElement('button');
-		snds.innerHTML = "sounds";
-		snds.onclick = () => {
-			window.open('https://')
-		}
-		*/
 	}
 
 	this.menuHidden = false;

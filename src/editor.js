@@ -39,7 +39,7 @@ CodeMirror.defineSimpleMode("mercury", {
 		// string
 		{ regex: /["'`](?:\\["\\]|[^\n"'``])*["'`]/, token: "string" },
 		// keywords
-		{ regex: /(?:new|make|add|ring|list|array|set|apply|give)\b/, token: "keyword", next: "object" },
+		{ regex: /(?:new |make |add |ring |list |array |set |apply |give )\b/, token: "keyword", next: "object" },
 		// global
 		{ regex: /(?:print|post|log|audio|record|silence|mute|killAll|default)\b/, token: "variable-2" },
 		// numbers
@@ -193,9 +193,9 @@ const Editor = function({ context, engine }) {
 	this.links = function(){
 		let urls = {
 			'tutorial': 'https://tmhglnd.github.io/mercury/tutorial.html',
+			'sounds' : 'https://github.com/tmhglnd/mercury/blob/master/mercury_ide/media/README.md',
 			'documentation': 'https://tmhglnd.github.io/mercury/reference.html',
-			'full version': 'https://github.com/tmhglnd/mercury',
-			'sounds' : 'https://github.com/tmhglnd/mercury/blob/master/mercury_ide/media/README.md'
+			'full version': 'https://github.com/tmhglnd/mercury'
 		}
 
 		let div = document.getElementById('links');
