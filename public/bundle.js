@@ -24382,10 +24382,27 @@ const Editor = function({ context, engine }) {
 	}
 
 	this.links = function(){
+		let urls = {
+			'tutorial': 'https://tmhglnd.github.io/mercury/tutorial.html',
+			'documentation': 'https://tmhglnd.github.io/mercury/reference.html',
+			'full version': 'https://github.com/tmhglnd/mercury',
+			'sounds' : 'https://github.com/tmhglnd/mercury/blob/master/mercury_ide/media/README.md'
+		}
+
 		let div = document.getElementById('links');
 		let p = document.createElement('p');
 		div.appendChild(p);
 
+		Object.keys(urls).forEach((k) => {
+			let btn = document.createElement('button');
+			btn.innerHTML = k;
+			btn.onclick = () => {
+				window.open(urls[k], '_blank');
+			}
+			p.appendChild(btn);
+		});
+		
+		/*
 		let tuts = document.createElement('button');
 		tuts.innerHTML = "tutorial";
 		tuts.onclick = () => {
@@ -24403,6 +24420,13 @@ const Editor = function({ context, engine }) {
 		full.onclick = () => {
 			window.open('https://github.com/tmhglnd/mercury', '_blank') };
 		p.appendChild(full);
+
+		let snds = document.createElement('button');
+		snds.innerHTML = "sounds";
+		snds.onclick = () => {
+			window.open('https://')
+		}
+		*/
 	}
 
 	this.menuHidden = false;

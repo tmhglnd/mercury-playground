@@ -191,27 +191,25 @@ const Editor = function({ context, engine }) {
 	}
 
 	this.links = function(){
+		let urls = {
+			'tutorial': 'https://tmhglnd.github.io/mercury/tutorial.html',
+			'documentation': 'https://tmhglnd.github.io/mercury/reference.html',
+			'full version': 'https://github.com/tmhglnd/mercury',
+			'sounds' : 'https://github.com/tmhglnd/mercury/blob/master/mercury_ide/media/README.md'
+		}
+
 		let div = document.getElementById('links');
 		let p = document.createElement('p');
 		div.appendChild(p);
 
-		let tuts = document.createElement('button');
-		tuts.innerHTML = "tutorial";
-		tuts.onclick = () => {
-			window.open('https://tmhglnd.github.io/mercury/tutorial.html', '_blank') };
-		p.appendChild(tuts);
-
-		let docs = document.createElement('button');
-		docs.innerHTML = "documentation";
-		docs.onclick = () => {
-			window.open('https://tmhglnd.github.io/mercury/reference.html', '_blank') };
-		p.appendChild(docs);
-		
-		let full = document.createElement('button');
-		full.innerHTML = "full version";
-		full.onclick = () => {
-			window.open('https://github.com/tmhglnd/mercury', '_blank') };
-		p.appendChild(full);
+		Object.keys(urls).forEach((k) => {
+			let btn = document.createElement('button');
+			btn.innerHTML = k;
+			btn.onclick = () => {
+				window.open(urls[k], '_blank');
+			}
+			p.appendChild(btn);
+		});
 	}
 
 	this.menuHidden = false;
