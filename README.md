@@ -10,7 +10,7 @@ Subset of the Mercury Live Coding Environment running in the browser
 
 [**🚀 Start Sketching Online!**](https://mercury-sketch.glitch.me/)
 
-<!-- ![Livecoding Performance with Mercury (photo: Zuzanna Zgierska)](media/mercury-live.png) -->
+![The Mercury playground in the browser](media/screenshot.png)
 
 ## 📋 Table of Contents
 
@@ -168,7 +168,7 @@ A computer that runs a browser like Chrome or Firefox.
 
 Many sounds in Mercury are downloaded from [freesound.org](http://www.freesound.org) and are licensed with Creative Commons Attribution or Creative Commons 0 licenses. If not downloaded from freesound it is made sure that the license allows to redistribute the sounds via the Mercury environment and that you can use them in your projects. A list of all the available sounds and the original sample can be found here:
 
-- [List of sounds and credits](././mercury_ide/media/README.md)
+- [List of sounds and credits](https://github.com/tmhglnd/mercury/blob/master/mercury_ide/media/README.md)
 
 ## 📝 Contribute
 
@@ -189,7 +189,7 @@ Contributions to the Mercury environment are much appreciated in whatever form t
 
 ## ✨ Inspiration
 
-During the development of Mercury (both the playground and the full version) I find inspiration in many other live coding environments, practices and other platforms. Some of these are:
+During the development of Mercury (both the playground and the full version) I've found inspiration in many other live coding environments, practices and other platforms. Some of these are:
 
 - [Hydra](https://hydra.ojack.xyz/) - Live coding visual synthesizer by Olivia Jack
 - [Sema](https://sema.codes/about) - Live coding language design platform combined with Machine Learning
@@ -202,7 +202,7 @@ During the development of Mercury (both the playground and the full version) I f
 ## 📄 Licenses
 
 - Main Source - [The GNU GPL v.3 License](https://choosealicense.com/licenses/gpl-3.0/) (c) Timo Hoogland 2019
-- Sound Files - Individually licensed, listed under [media/README.md](/mercury_ide_0.9.9/media/README.md)
+- Sound Files - Individually licensed, listed under [media/README.md](https://github.com/tmhglnd/mercury/blob/master/mercury_ide/media/README.md)
 - Documentation - [The CC BY-SA 4.0 License](https://creativecommons.org/licenses/by-sa/4.0/) (c) Timo Hoogland 2019
 - Examples - [The CC BY-SA 4.0 License](https://creativecommons.org/licenses/by-sa/4.0/) (c) Timo Hoogland 2019
 
