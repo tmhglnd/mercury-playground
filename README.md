@@ -134,6 +134,46 @@ new synth triangle fx(reverb /extOSC/verbAmount) fx(filter low /extOSC/cutoff 0.
 
 **AND MANY MORE (TO COME...)**
 
+Currently the playground does not have the full functionality of the original Mercury environment.
+
+- [x] tempo
+- [ ] scale / root
+- [ ] highPass / lowPass
+- [x] randomSeed
+- [x] ring
+	- [x] spread / spreadInclusive / fill
+	- [x] random / coin / dice / choose / pick / drunk / urn / shuffle
+	- [x] sine / cosine
+	- [x] join / duplicate / merge / repeat / lace
+	- [x] merge / reverse / invert / palindrome
+	- [x] expand / stretch / clone / spray / unique / 
+	- [x] fibonacci / pisano / pell / lucas
+	- [x] euclidean / hexBeat
+	- [x] add / subtract / multiply / divide / modulo
+- [x] sample
+	- [x] type
+	- [x] time
+	- [x] shape
+	- [x] beat
+	- [x] gain
+	- [x] speed
+	- [x] pan
+	- [x] name
+	- [ ] fx
+- [ ] synth
+- [ ] polySynth
+- [ ] midi
+- [ ] osc
+- [ ] FX
+	- [ ] reverb
+	- [ ] filter
+	- [ ] envFilter
+	- [ ] drive
+	- [ ] chip
+	- [ ] delay
+	- [ ] lfo
+	- [ ] kink
+	
 ## 🔭 Vision / Goals
 
 This subset of Mercury was designed to use as a teaching environment for:
