@@ -173,7 +173,7 @@ Currently the playground does not have the full functionality of the original Me
 	- [ ] delay
 	- [ ] lfo
 	- [ ] kink
-	
+
 ## 🔭 Vision / Goals
 
 This subset of Mercury was designed to use as a teaching environment for:
@@ -206,6 +206,8 @@ It is now possible to code together in Mercury using the amazing [**Flok**](http
 `$ npm run build`
 
 `$ npm start`
+
+`$ open -a Google\ Chrome http://localhost:3000`
 
 While developing: `npm run watch`
 
