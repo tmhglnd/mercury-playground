@@ -6,11 +6,9 @@ Subset of the Mercury Live Coding Environment running in the browser
 
 [**🙏 Support Mercury by becoming a Patron**](https://www.patreon.com/bePatron?u=9649817) 
 
-[**💬 Join the Discord Community!**](https://discord.gg/vt59NYU)
+[**💬 Join the Discord Community**](https://discord.gg/vt59NYU)
 
-**🚀 Start sketching online:** 
-
-[mercury-sketch.glitch.me](https://mercury-sketch.glitch.me/)
+[**🚀 Start Sketching Online!**](https://mercury-sketch.glitch.me/)
 
 <!-- ![Livecoding Performance with Mercury (photo: Zuzanna Zgierska)](media/mercury-live.png) -->
 
@@ -156,17 +154,17 @@ It is now possible to code together in Mercury using the amazing [**Flok**](http
 
 - [Start coding together here](https://tmhglnd.github.io/mercury/collaborate.html)
 
-### 📖 Documentation
+## 📖 Documentation
 
 Full explanation of all the possibilities in Mercury:
 
 - [Open the documentation](https://tmhglnd.github.io/mercury/table-of-content.html)
 
-### 💻 System Requirements
+## 💻 System Requirements
 
 A computer that runs a browser like Chrome or Firefox.
 
-### 🎵 Sounds
+## 🎵 Sounds
 
 Many sounds in Mercury are downloaded from [freesound.org](http://www.freesound.org) and are licensed with Creative Commons Attribution or Creative Commons 0 licenses. If not downloaded from freesound it is made sure that the license allows to redistribute the sounds via the Mercury environment and that you can use them in your projects. A list of all the available sounds and the original sample can be found here:
 
@@ -183,7 +181,7 @@ Contributions to the Mercury environment are much appreciated in whatever form t
 
 ## 🙏 Thanks
 
-- The [SEMA/MIMIC project](https://mimicproject.com/about) team (Thor Magnusson, Chris Kiefer and Francesco Bernardo) for their awesome full week workshop at Sussex University in Brighton on designing a live coding language in the browser combined with machine learning
+- The [SEMA/MIMIC project](https://mimicproject.com/about) team (Thor Magnusson, Chris Kiefer and Francisco Bernardo) for their awesome full week workshop at Sussex University in Brighton on designing a live coding language in the browser combined with machine learning
 - Roald van Dillewijn for working together on osc and midi functionalities combined with his [Digilog modified guitar-pedals](https://roaldvandillewijn.nl/projects/digilog)
 - Guillem Gongora Moral for using Mercury as a composition tool and sharing valuable feedback in the process
 - Anne Veinberg for working with Mercury and a Mercury extensions for the [CodeKlavier](https://codeklavier.space/) project
