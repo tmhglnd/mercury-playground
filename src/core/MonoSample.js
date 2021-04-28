@@ -110,6 +110,7 @@ class MonoSample {
 
 				// set panning
 				let p = Util.randLookup(Util.lookup(this._pan, c));
+				p = (p === 'random')? Math.random() * 2 - 1 : p;
 				this.panner.pan.rampTo(p, Util.msToS(1));
 
 				// get the start position
