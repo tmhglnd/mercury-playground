@@ -1,14 +1,12 @@
 # 🌕 Mercury Live Coding Playground
 
-Subset of the Mercury Live Coding Environment running in the browser
+**A fun lite version of the Mercury Live Coding Environment running in the browser for quick experimentation and exploration.**
 
-**A minimal and human-readable language for the live coding of algorithmic electronic audiovisual performances.**
+[**🚀 Start Sketching Online!**](https://mercury-sketch.glitch.me/)
 
 [**🙏 Support Mercury by becoming a Patron**](https://www.patreon.com/bePatron?u=9649817) 
 
 [**💬 Join the Discord Community**](https://discord.gg/vt59NYU)
-
-[**🚀 Start Sketching Online!**](https://mercury-sketch.glitch.me/)
 
 ![The Mercury playground in the browser](media/screenshot.png)
 
@@ -153,6 +151,23 @@ This subset of Mercury was designed to use as a teaching environment for:
 It is now possible to code together in Mercury using the amazing [**Flok**](https://flok.clic.cf/) live coding environment in the browser.
 
 - [Start coding together here](https://tmhglnd.github.io/mercury/collaborate.html)
+
+## 🚀 Install
+
+😎 No need for installing! You can start coding immediately here:
+[**https://mercury-sketch.glitch.me/**](https://mercury-sketch.glitch.me/)
+
+🤓 If you want to run and develop the application locally:
+
+`$ git clone http://github.com/tmhglnd/mercury-playground`
+
+`$ npm install`
+
+`$ npm run build`
+
+`$ npm start`
+
+While developing: `npm run watch`
 
 ## 📖 Documentation
 
