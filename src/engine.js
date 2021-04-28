@@ -41,8 +41,8 @@ function resume(){
 // stop the transport end therefore playing the sounds
 function silence(){
 	try {
-		// Tone.Transport.stop();
 		Tone.Transport.pause();
+		// Tone.stop();
 	} catch {
 		console.error('error stopping sound');
 	}

@@ -21,16 +21,29 @@ function msToS(ms){
 	return ms / 1000.0;
 }
 
-// parse division formats to Tone Loop intervals
+// parse division formats to Tone Loop intervals in seconds
 function formatRatio(d, bpm){
 	if (String(d).match(/\d+\/\d+/)){
 		return eval(String(d)) * 4.0 * 60 / bpm;
 	} else if (!isNaN(Number(d))){
 		return Number(d) * 4.0 * 60 / bpm;
 	} else {
-		print(`${d} is not a valid time value`);
+		// print(`${d} is not a valid time value`);
+		console.log(`${d} is not a valid time value`);
 		return 60 / bpm;
 	}
 }
 
-module.exports = { lookup, randLookup, toArray, msToS, formatRatio }
+// convert division format to seconds based on bpm
+function divToS(d, bpm){
+	if (String(d).match(/\d+\/\d+/)){
+		return eval(String(d)) * 4.0 * 60 / bpm;
+	} else if (!isNaN(Number(d))){
+		return Number(d) / 1000;
+	} else {
+		console.log(`${d} is not a valid time value`);
+		return 100;
+	}
+}
+
+module.exports = { lookup, randLookup, toArray, msToS, formatRatio, divToS }

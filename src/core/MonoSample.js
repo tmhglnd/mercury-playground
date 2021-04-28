@@ -5,10 +5,10 @@ const fxMap = require('./Effects.js');
 // simple mono sample playback
 class MonoSample {
 	constructor(s='kick_min', engine){
-		// console.log('MonoSample()', this._bufs);
 		this._bufs = engine.getBuffers();
 		this._bpm = engine.getBPM();
-		console.log('=> MonoSample()', s, this._bufs, this._bpm);
+
+		console.log('=> MonoSample()', s);
 		
 		this._sound = s;
 		this._count = 0;
@@ -29,13 +29,14 @@ class MonoSample {
 		
 		this._pan = [[0], [0], [0]];
 
-		// this.attack = 0.1;
-		// this.decay = 0;
-		// this.release = 0.5;
+		this._att = [ 0 ];
+		this._sus = [ 0 ];
+		this._rel = [ 0 ];
 
 		this.sample;
 		this.seq;
 		this.panner;
+		this.adsr;
 		this._fx;
 
 		this.sound(this._sound);
@@ -46,7 +47,17 @@ class MonoSample {
 	makeSampler(){
 		this.panner = new Tone.Panner(0).toDestination();
 		// this.sample = new Tone.Player(buffers.get('kick_min')).toDestination();
-		this.sample = new Tone.Player().connect(this.panner);
+		this.adsr = new Tone.AmplitudeEnvelope({
+			attack: 0,
+			decay: 0,
+			sustain: 1,
+			release: 0.001,
+			attackCurve: "exponential",
+			releaseCurve: "exponential"
+		});
+		this.adsr.connect(this.panner);
+		this.sample = new Tone.Player().connect(this.adsr);
+		// this.sample = new Tone.Player().connect(this.panner);
 
 		// this.sample.load(this._sound);
 		this.sample.autostart = false;
@@ -62,7 +73,7 @@ class MonoSample {
 		let then = Tone.Time(this._offset).toSeconds();
 		// let then = this._offset * 2.0 * (60 / getBPM());
 
-		console.log('makeLoop()', this._time);
+		// console.log('makeLoop()', this._time);
 
 		// create new loop for synth
 		this._loop = new Tone.Loop((time) => {
@@ -106,11 +117,25 @@ class MonoSample {
 				// end position for playback
 				let e = this._time;
 
-				this.sample.fadeIn = 1 / 1000;
-				this.sample.fadeOut = 2 / 1000;
+				// set shape for playback (fade-in / out and length)
+				if (this._att){
+					let att = Util.divToS(Util.lookup(this._att, c), this._bpm);
+					let dec = Util.divToS(Util.lookup(this._sus, c), this._bpm);
+					let rel = Util.divToS(Util.lookup(this._rel, c), this._bpm);
+
+					this.adsr.attack = att;
+					this.adsr.decay = dec;
+					this.adsr.release = rel;
+					
+					e = Math.min(this._time, att + dec + rel);
+				}
+
 				// when sample is loaded, start
 				if (this.sample.loaded){
 					this.sample.start(time, o, e);
+					// calculate the release trigger time
+					let rt = Math.max(0.001, e - this.adsr.release);
+					this.adsr.triggerAttackRelease(rt, time);
 				}
 			}
 			// increment count for sequencing
@@ -192,8 +217,31 @@ class MonoSample {
 		this._pos = Util.toArray(o);
 	}
 
-	env(){
-		// placeholder
+	env(...e){
+		// set the fade-in, sustain and fade-out times
+		this._att = [ 0 ];
+		this._rel = [ 0 ];
+		this._sus = [ 0 ];
+
+		if (e[0] === 'off' || e[0] < 0){
+			this._att = null;
+		} else {
+			if (e.length === 1){
+				// one argument is release time
+				this._att = [ 1 ];
+				this._rel = Util.toArray(e[0]);
+			} else if (e.length === 2){
+				// two arguments is attack & release
+				this._att = Util.toArray(e[0]);
+				this._rel = Util.toArray(e[1]);
+			} else {
+				// three is attack stustain and release
+				this._att = Util.toArray(e[0]);
+				this._sus = Util.toArray(e[1]);
+				this._rel = Util.toArray(e[2]);
+			}
+		}
+		console.log('shape()', this._att, this._rel, this._sus);
 	}
 
 	stretch(){
