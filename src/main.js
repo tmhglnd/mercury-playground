@@ -13,7 +13,7 @@ fetch("/tutorial")
 		return response.json();
 	})
 	.then(function(data) {
-		// console.log(data);
+		console.log('tutorials', data);
 		cm.tutorialMenu(data);
 	})
 	.catch(function(error) {

@@ -23989,8 +23989,8 @@ class MonoSample {
 			decay: 0,
 			sustain: 1,
 			release: 0.001,
-			attackCurve: "exponential",
-			releaseCurve: "exponential"
+			attackCurve: "linear",
+			releaseCurve: "linear"
 		});
 		this.adsr.connect(this.panner);
 		this.sample = new Tone.Player().connect(this.adsr);
@@ -24179,7 +24179,7 @@ class MonoSample {
 				this._rel = Util.toArray(e[2]);
 			}
 		}
-		console.log('shape()', this._att, this._rel, this._sus);
+		// console.log('shape()', this._att, this._rel, this._sus);
 	}
 
 	stretch(){
@@ -24666,7 +24666,7 @@ fetch("/tutorial")
 		return response.json();
 	})
 	.then(function(data) {
-		// console.log(data);
+		console.log('tutorials', data);
 		cm.tutorialMenu(data);
 	})
 	.catch(function(error) {
