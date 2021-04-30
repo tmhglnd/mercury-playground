@@ -4,6 +4,8 @@ const Engine = require('./engine.js');
 const Editor = require('./editor.js');
 
 // the code Editor
+// also loads the parser and the worker
+// gets passed the Tone context and Engine
 let cm = new Editor({ context: Tone, engine: Engine });
 
 fetch("/tutorial")
@@ -11,13 +13,18 @@ fetch("/tutorial")
 		return response.json();
 	})
 	.then(function(data) {
-		// tutorials = data;
-		// console.log(tutorials);
+		// console.log(data);
 		cm.tutorialMenu(data);
 	})
 	.catch(function(error) {
 		console.log('Error loading tutorials:' + error);
 	});
+
+cm.controls();
+cm.themeMenu();
+cm.links();
+cm.hide();
+cm.clear();
 
 // WebMIDI Setup
 // WebMidi.enable(function (err) {

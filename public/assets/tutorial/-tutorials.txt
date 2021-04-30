@@ -1,0 +1,16 @@
+// Welcome to the Mercury Playground ^^
+// click "play" to execute the code
+// and adjust the code below:
+
+list kickBeat [1 0.01 0.1 1 0]
+new sample kick_house time(1/16) play(kickBeat)
+
+list hatBeat euclid(16 7)
+new sample hat_909 time(1/16) play(hatBeat) pan(0.5)
+
+new sample snare_hvy time(1 3/4)
+
+list positions sineFloat(16 6.523 0 0.6)
+list pitch repeat([2 1 1 0.84 0.94] 16)
+new sample chimes_l time(1/16) shape(1 70 5) name(stut)
+	set stut offset(positions) pan(random) gain(1) speed(pitch)

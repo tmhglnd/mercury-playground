@@ -114,12 +114,12 @@ const Editor = function({ context, engine }) {
 				'// and adjust the code below:\n' +
 				'\n' +
 				'list kickBeat [1 0.01 0.1 1 0]\n' +
-				'new sample kick_min time(1/16) play(kickBeat)\n' +
+				'new sample kick_house time(1/16) play(kickBeat)\n' +
 				'\n' +
 				'list hatBeat euclid(16 7)\n' +
-				'new sample hat_min time(1/16) play(hatBeat)\n' +
+				'new sample hat_909 time(1/16) play(hatBeat)\n' +
 				'\n' +
-				'new sample snare_min time(1 3/4)\n'
+				'new sample snare_hvy time(1 3/4)\n'
 			);
 	}
 
@@ -133,7 +133,7 @@ const Editor = function({ context, engine }) {
 
 	this.flash = function(){
 		let start = { line: this.cm.firstLine(), ch: 0 };
-		let end = { line: this.cm.lastLine(), ch: 0 };
+		let end = { line: this.cm.lastLine()+1, ch: 0 };
 		console.log(start, end);
 
 		let marker = this.cm.markText(start, end, { className: 'editorFlash' });
@@ -279,12 +279,11 @@ const Editor = function({ context, engine }) {
 
 		menu.value = defaultTheme;
 	}
-
-	this.controls();
-	this.themeMenu();
-	this.links();
-	this.hide();
-	this.clear();
+	// this.controls();
+	// this.themeMenu();
+	// this.links();
+	// this.hide();
+	// this.clear();
 }
 module.exports = Editor;
 
