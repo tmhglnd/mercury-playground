@@ -1,0 +1,8 @@
+// === TUTORIAL 03 ===
+// add multiple sounds simply by coding an extra line
+
+new sample kick_909 time(3/8)
+new sample hat_909 time(1/8)
+new sample snare_909 time(1/2)
+
+// now try some different time() values and add extra sounds

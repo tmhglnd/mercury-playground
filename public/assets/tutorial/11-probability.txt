@@ -1,0 +1,12 @@
+// === TUTORIAL 11 ===
+// instead of a 1 or 0 in the play method, 
+// we can also use a floating-point value that represents
+// a probability percentage that the sound will or will not play
+
+new sample hat_909 time(1/16) play(0.6)
+// plays 60% of the time
+
+new sample kick_909 time(1/4) play(0.9)
+// plays 90% of the time
+
+// now try some different percentages with values between 0 and 1

@@ -1,0 +1,8 @@
+// === TUTORIAL 05 ===
+// we can keep the time interval the same, but play 
+// sounds at a different offset with a second argument
+
+new sample pluck_c time(1)
+new sample pluck_e time(1 1/16)
+new sample pluck_g time(1 3/16)
+// now try different offsets like 5/8, 7/12, 1/32

@@ -1,0 +1,11 @@
+// === TUTORIAL 12 ===
+// it is also possible to add these probabilities to a list
+// in order to create more complex rhythms with slight variations
+
+list hatBeat [1 0.1 0.9 0.2]
+new sample hat_909 time(1/16) play(hatBeat)
+// plays 100%, 10%, 90% and 20% in a sequence
+
+list kickBeat [1 0.05]
+new sample kick_909 time(1/4) play(kickBeat)
+// plays 90% and then 5% of the time

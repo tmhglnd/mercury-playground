@@ -1,0 +1,10 @@
+// === TUTORIAL 19 ===
+// Of course we can also use a list with the panning 
+// or use the argument random to randomize the panning
+
+list panning [-1 -0.75 -0.5 -0.25 0 0.25 0.5 0.75 1]
+new sample tabla_mid time(1/16) pan(panning)
+// this sound will move from left to right
+
+new sample tabla_hi time(1) pan(random)
+// this sound will play at a random position in the stereofield

@@ -1,0 +1,10 @@
+// === TUTORIAL 04 ===
+// with the 'set' keyword you can change parameters like tempo
+
+set tempo 132
+
+new sample kick_909 time(3/8)
+new sample hat_909 time(1/16)
+new sample snare_909 time(1/2)
+
+// now try for example tempo 86 for HipHop, or 162 for Drum'n'Bass

@@ -24288,6 +24288,7 @@ const defaultTheme = 'moxer';
 
 let _rand;
 let examples = {};
+let tutorials = {};
 // get the example code files from server
 fetch("/examples")
 	.then(function(response) {
@@ -24441,7 +24442,7 @@ const Editor = function({ context, engine }) {
 		};
 		
 		let example = document.createElement('button');
-		example.innerHTML = 'example';
+		example.innerHTML = 'random';
 		example.onclick = () => {
 			// initialize editor with some code
 			let names = Object.keys(examples);
@@ -24463,7 +24464,7 @@ const Editor = function({ context, engine }) {
 
 	this.links = function(){
 		let urls = {
-			'tutorial': 'https://tmhglnd.github.io/mercury/tutorial.html',
+			// 'tutorial': 'https://tmhglnd.github.io/mercury/tutorial.html',
 			'sounds' : 'https://github.com/tmhglnd/mercury/blob/master/mercury_ide/media/README.md',
 			'documentation': 'https://tmhglnd.github.io/mercury/reference.html',
 			'full version': 'https://github.com/tmhglnd/mercury'
@@ -24473,6 +24474,11 @@ const Editor = function({ context, engine }) {
 		let p = document.createElement('p');
 		div.appendChild(p);
 
+		let menu = document.createElement('select');
+		menu.id = 'tutorials';
+		menu.onchange = () => { this.loadTutorial() }
+		p.appendChild(menu);
+
 		Object.keys(urls).forEach((k) => {
 			let btn = document.createElement('button');
 			btn.innerHTML = k;
@@ -24481,6 +24487,26 @@ const Editor = function({ context, engine }) {
 			}
 			p.appendChild(btn);
 		});
+	}
+
+	this.tutorials = {};
+
+	this.tutorialMenu = function(data){
+		this.tutorials = data;
+		let menu = document.getElementById('tutorials');
+
+		Object.keys(data).forEach((t) => {
+			let option = document.createElement('option');
+			option.value = t;
+			option.innerHTML = t.split('-').join(' ');
+			menu.appendChild(option);
+		});
+	}
+
+	this.loadTutorial = function(){
+		let t = document.getElementById('tutorials').value;
+		this.set(this.tutorials[t]);
+		this.evaluate();
 	}
 
 	this.menuHidden = false;
@@ -24633,6 +24659,19 @@ const Editor = require('./editor.js');
 
 // the code Editor
 let cm = new Editor({ context: Tone, engine: Engine });
+
+fetch("/tutorial")
+	.then(function(response) {
+		return response.json();
+	})
+	.then(function(data) {
+		// tutorials = data;
+		// console.log(tutorials);
+		cm.tutorialMenu(data);
+	})
+	.catch(function(error) {
+		console.log('Error loading tutorials:' + error);
+	});
 
 // WebMIDI Setup
 // WebMidi.enable(function (err) {

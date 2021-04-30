@@ -1,0 +1,8 @@
+// === TUTORIAL 06 ===
+// the list is a powerful tool in live coding to
+// make more complex patterns like a beat of 1's and 0's
+
+list hatBeat [1 0 1 0 0 1 0 1]
+new sample hat_909 time(1/16) play(hatBeat)
+// now try changing the values and length of the list 
+// with for example [1 0 1 1 0]

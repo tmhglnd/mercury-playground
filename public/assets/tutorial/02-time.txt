@@ -1,0 +1,6 @@
+// === TUTORIAL 02 ===
+// you can change the time interval
+// 1/4 means 4 times per measure
+
+new sample kick_909 time(3/16)
+// now try for example 1/8, 3/16, 1/50, 3a

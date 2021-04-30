@@ -1,0 +1,7 @@
+// === TUTORIAL 13 ===
+// the playback speed does not affect the tempo, but instead
+// affects the pitch of the sound (higher or lower)
+
+list pitch [1 0.5 0.25 1 2]
+new sample bamboo_a time(1/8) speed(pitch)
+// now try some different values like 0.3, 1.8, 3.14, 11.16

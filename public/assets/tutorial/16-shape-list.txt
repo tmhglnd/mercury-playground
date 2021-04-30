@@ -1,0 +1,6 @@
+// === TUTORIAL 16 ===
+// for this we can also use a list to change the lengths sequentially
+
+list length [20 20 20 100 20 500]
+new sample harp_down time(1/8) shape(2 length)
+// now try some different lengths and time

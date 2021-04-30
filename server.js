@@ -33,6 +33,14 @@ app.get("/examples", (request, response) => {
 });
 // fs.outputJSONSync('./data/samples.json', samples, { spaces: 2 });
 
+app.get("/tutorial", (request, response) => {
+	let tut = getFiles('public/assets/tutorial/**/*.txt');
+	Object.keys(tut).forEach((f) => {
+		tut[f] = fs.readFileSync(`./public/${tut[f]}`, 'utf-8');
+	});
+	response.json(tut); 
+});
+
 function getFiles(glob){
 	const fold = fg.sync(glob);
 	let files = {};

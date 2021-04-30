@@ -1,0 +1,9 @@
+// === TUTORIAL 09 ===
+// now we can combine a list of sounds with a list of beats
+// and add an extra sample on quarter notes to make a steady beat
+
+list sounds [hat_909 snare_909 hat_909 tabla_mid tabla_hi]
+list beat [1 0 1 0 1 1]
+new sample sounds time(1/16) play(beat)
+
+new sample kick_909 time(1/4)

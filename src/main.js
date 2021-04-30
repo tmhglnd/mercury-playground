@@ -6,6 +6,19 @@ const Editor = require('./editor.js');
 // the code Editor
 let cm = new Editor({ context: Tone, engine: Engine });
 
+fetch("/tutorial")
+	.then(function(response) {
+		return response.json();
+	})
+	.then(function(data) {
+		// tutorials = data;
+		// console.log(tutorials);
+		cm.tutorialMenu(data);
+	})
+	.catch(function(error) {
+		console.log('Error loading tutorials:' + error);
+	});
+
 // WebMIDI Setup
 // WebMidi.enable(function (err) {
 // 	if (err) {
