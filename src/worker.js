@@ -3,8 +3,9 @@ const Mercury = require('mercury-lang');
 const MonoSample = require('./core/MonoSample.js');
 
 // fade time in seconds
-let crossFade = 0.5;
+let crossFade = 0.25;
 // array with the insturments playing
+let _sounds = [];
 let sounds = [];
 
 // parse and evaluate the inputted code
@@ -53,8 +54,9 @@ function code({ file, engine }){
 		}
 	});
 
-	for (let s in sounds){
-		sounds[s].fadeOut(crossFade);
+	_sounds = sounds.slice();
+	for (let s in _sounds){
+		_sounds[s].fadeOut(crossFade);
 		// sounds[s].delete();
 	}
 	sounds = [];
@@ -126,6 +128,7 @@ function code({ file, engine }){
 	// start new loops;
 	for (let s in sounds){
 		sounds[s].makeLoop();
+		sounds[s].fadeIn(crossFade);
 	}
 }
 module.exports = code;

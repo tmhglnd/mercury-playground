@@ -52,7 +52,7 @@ class MonoSample {
 
 	makeSampler(){
 		this.panner = new Tone.Panner(0).toDestination();
-		this.gain = new Tone.Gain(1).connect(this.panner);
+		this.gain = new Tone.Gain(0).connect(this.panner);
 		// this.sample = new Tone.Player(buffers.get('kick_min')).toDestination();
 		this.adsr = new Tone.AmplitudeEnvelope({
 			attack: 0,
@@ -164,45 +164,53 @@ class MonoSample {
 		}, this._time).start(schedule);
 	}
 
+	fadeOut(t){
+		// fade out the sound upon evaluation of new code
+		this.gain.gain.rampTo(0, this._time);
+		setTimeout(() => {
+			this.delete();
+		}, this._time * 1000);
+	}
+
+	fadeIn(t){
+		// fade in the sound upon evaluation of code
+		this.gain.gain.rampTo(1, t);
+	}
+
 	delete(){
-		console.log('disposed');
 		// dispose loop
 		this._loop.dispose();
-		
 		// disconnect the sound dispose the player
-		this.panner.disconnect();
+		// this.panner.disconnect();
 		this.panner.dispose();
-		this.gain.disconnect();
+		// this.gain.disconnect();
 		this.gain.dispose();
-		this.adsr.disconnect();
+		// this.adsr.disconnect();
 		this.adsr.dispose();
-		this.sample.disconnect();
+		// this.sample.disconnect();
 		this.sample.dispose();
-
 		// remove all fx
 		// TODO: garbage collect and remove after fade out
 		this._fx.map((f) => f.dispose());
+		console.log('=> Disposed:', this._sound);
 	}
 
 	stop(){
 		// stop sequencer
 		this._loop.stop();
+		// TO DO: fade in/out of sounds on start/stop sequencer
+		// this.gain.gain.rampTo(0, 0.1);
 	}
 
 	start(){
 		// restart at offset
 		this._loop.start(this._offset);
+		// this.gain.gain.rampTo(1, 0.1);
 	}
 
 	sound(s){
 		// load all soundfiles and return as array
 		this._sound = this.checkBuffer(Util.toArray(s));
-	}
-
-	fadeOut(t){
-		// fade out the sound upon evaluation of new code
-		this.gain.gain.rampTo(0, t);
-		Tone.Transport.scheduleOnce(() => { this.delete() }, Tone.now() + t);
 	}
 
 	checkBuffer(a){
@@ -232,8 +240,8 @@ class MonoSample {
 
 	time(t, o=0){
 		// set the timing interval and offset
-		this._time = Util.formatRatio(t, this._bpm);
-		this._offset = Util.formatRatio(o, this._bpm);
+		this._time = Util.formatRatio(t, this._engine.getBPM());
+		this._offset = Util.formatRatio(o, this._engine.getBPM());
 	}
 
 	beat(b){
@@ -248,7 +256,6 @@ class MonoSample {
 
 	stretch(s){
 		// set the stretch loop bar length
-		console.log('set stretch', s);
 		this._stretch = Util.toArray(s);
 	}
 
