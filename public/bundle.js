@@ -23949,6 +23949,7 @@ class MonoSample {
 		
 		this._sound = s;
 		this._count = 0;
+		this._beatCount = 0;
 		
 		this._beat = [1];
 
@@ -24015,14 +24016,17 @@ class MonoSample {
 		// create new loop for synth
 		this._loop = new Tone.Loop((time) => {
 			// get the count value
-			let c = this._count;
+			// let c = this._count;
 			// get beat probability
-			let b = Util.randLookup(Util.lookup(this._beat, c));
+			let b = Util.randLookup(Util.lookup(this._beat, this._count));
 			
 			// get timing TODO?
 
 			// if random value is below probability, then play
 			if (Math.random() < b){
+				// get the count value
+				let c = this._beatCount;
+
 				// get the sample from array
 				let f = Util.randLookup(Util.lookup(this._sound, c));
 				if (this._bufs.has(f)){
@@ -24075,6 +24079,8 @@ class MonoSample {
 					let rt = Math.max(0.001, e - this.adsr.release);
 					this.adsr.triggerAttackRelease(rt, time);
 				}
+				// increment internal beat counter
+				this._beatCount++;
 			}
 			// increment count for sequencing
 			this._count++;
