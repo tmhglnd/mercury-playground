@@ -2,6 +2,9 @@ const Tone = require('tone');
 const Mercury = require('mercury-lang');
 const MonoSample = require('./core/MonoSample.js');
 
+// fade time in seconds
+let crossFade = 0.5;
+// array with the insturments playing
 let sounds = [];
 
 // parse and evaluate the inputted code
@@ -51,7 +54,8 @@ function code({ file, engine }){
 	});
 
 	for (let s in sounds){
-		sounds[s].delete();
+		sounds[s].fadeOut(crossFade);
+		// sounds[s].delete();
 	}
 	sounds = [];
 

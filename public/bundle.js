@@ -23959,7 +23959,9 @@ class MonoSample {
 
 		console.log('=> MonoSample()', s, this._bpm);
 		
-		this._sound = s;
+		this._sound;
+		this.sound(s);
+		
 		this._length = 0;
 		this._count = 0;
 		this._beatCount = 0;
@@ -23989,15 +23991,16 @@ class MonoSample {
 		this.sample;
 		this.panner;
 		this.adsr;
+		this.gain;
 		this._fx;
 
-		this.sound(this._sound);
 		this.makeSampler();
 		// this.makeLoop();
 	}
 
 	makeSampler(){
 		this.panner = new Tone.Panner(0).toDestination();
+		this.gain = new Tone.Gain(1).connect(this.panner);
 		// this.sample = new Tone.Player(buffers.get('kick_min')).toDestination();
 		this.adsr = new Tone.AmplitudeEnvelope({
 			attack: 0,
@@ -24007,7 +24010,8 @@ class MonoSample {
 			attackCurve: "linear",
 			releaseCurve: "linear"
 		});
-		this.adsr.connect(this.panner);
+		this.adsr.connect(this.gain);
+		// this.adsr.connect(this.panner);
 		this.sample = new Tone.Player().connect(this.adsr);
 		// this.sample = new Tone.Player().connect(this.panner);
 
@@ -24109,16 +24113,23 @@ class MonoSample {
 	}
 
 	delete(){
+		console.log('disposed');
 		// dispose loop
 		this._loop.dispose();
 		
 		// disconnect the sound dispose the player
-		// this.sample.disconnect();
-		// this.sample.dispose();
+		this.panner.disconnect();
+		this.panner.dispose();
+		this.gain.disconnect();
+		this.gain.dispose();
+		this.adsr.disconnect();
+		this.adsr.dispose();
+		this.sample.disconnect();
+		this.sample.dispose();
 
 		// remove all fx
 		// TODO: garbage collect and remove after fade out
-		// this._fx.map((f) => f.dispose());
+		this._fx.map((f) => f.dispose());
 	}
 
 	stop(){
@@ -24134,6 +24145,12 @@ class MonoSample {
 	sound(s){
 		// load all soundfiles and return as array
 		this._sound = this.checkBuffer(Util.toArray(s));
+	}
+
+	fadeOut(t){
+		// fade out the sound upon evaluation of new code
+		this.gain.gain.rampTo(0, t);
+		Tone.Transport.scheduleOnce(() => { this.delete() }, Tone.now() + t);
 	}
 
 	checkBuffer(a){
@@ -24949,6 +24966,9 @@ const Tone = require('tone');
 const Mercury = require('mercury-lang');
 const MonoSample = require('./core/MonoSample.js');
 
+// fade time in seconds
+let crossFade = 0.5;
+// array with the insturments playing
 let sounds = [];
 
 // parse and evaluate the inputted code
@@ -24998,7 +25018,8 @@ function code({ file, engine }){
 	});
 
 	for (let s in sounds){
-		sounds[s].delete();
+		sounds[s].fadeOut(crossFade);
+		// sounds[s].delete();
 	}
 	sounds = [];
 
