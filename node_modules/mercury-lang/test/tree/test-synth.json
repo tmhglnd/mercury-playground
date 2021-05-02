@@ -87,7 +87,7 @@
       ]
     },
     "objects": {
-      "TJD27BEE": {
+      "0V7ZQA2M": {
         "object": "synth",
         "type": [
           "sine",
@@ -142,11 +142,11 @@
             ]
           ],
           "name": [
-            "TJD27BEE"
+            "0V7ZQA2M"
           ]
         }
       },
-      "7PULZX73": {
+      "WAS31ZW6": {
         "object": "sample",
         "type": [
           "kick_min",
@@ -188,7 +188,7 @@
             ]
           ],
           "name": [
-            "7PULZX73"
+            "WAS31ZW6"
           ]
         }
       },
@@ -380,6 +380,7 @@
       {
         "@object": {
           "@set": {
+            "@name": "volume",
             "@functions": [
               {
                 "@number": 0.9
@@ -394,6 +395,7 @@
       {
         "@object": {
           "@set": {
+            "@name": "tempo",
             "@functions": [
               {
                 "@number": 143
@@ -405,6 +407,7 @@
       {
         "@object": {
           "@set": {
+            "@name": "randomSeed",
             "@functions": [
               {
                 "@number": 9123
@@ -416,6 +419,7 @@
       {
         "@object": {
           "@set": {
+            "@name": "scale",
             "@functions": [
               {
                 "@identifier": "minor_pentatonic"
@@ -430,6 +434,7 @@
       {
         "@object": {
           "@set": {
+            "@name": "highPass",
             "@functions": [
               {
                 "@number": 800
@@ -444,6 +449,7 @@
       {
         "@object": {
           "@set": {
+            "@name": "lowPass",
             "@functions": [
               {
                 "@number": 5000
@@ -572,6 +578,7 @@
       {
         "@object": {
           "@new": {
+            "@inst": "synth",
             "@type": {
               "@array": [
                 {
@@ -684,6 +691,7 @@
       {
         "@object": {
           "@new": {
+            "@inst": "sample",
             "@type": {
               "@array": [
                 {
@@ -738,6 +746,7 @@
       {
         "@object": {
           "@new": {
+            "@inst": "synth",
             "@type": {
               "@identifier": "sine"
             },
@@ -759,6 +768,7 @@
       {
         "@object": {
           "@set": {
+            "@name": "aSynth",
             "@functions": [
               {
                 "@function": {
@@ -826,6 +836,7 @@
       {
         "@object": {
           "@set": {
+            "@name": "aSynth",
             "@functions": [
               {
                 "@function": {
@@ -847,6 +858,7 @@
       {
         "@object": {
           "@set": {
+            "@name": "aSynth",
             "@functions": [
               {
                 "@function": {
@@ -897,6 +909,7 @@
       {
         "@object": {
           "@new": {
+            "@inst": "synth",
             "@type": {
               "@identifier": "saw"
             },
@@ -918,6 +931,7 @@
       {
         "@object": {
           "@set": {
+            "@name": "bSynth",
             "@functions": [
               {
                 "@function": {
@@ -975,6 +989,7 @@
       {
         "@object": {
           "@set": {
+            "@name": "bSynth",
             "@functions": [
               {
                 "@function": {
@@ -1006,6 +1021,7 @@
       {
         "@object": {
           "@set": {
+            "@name": "bSynth",
             "@functions": [
               {
                 "@function": {
@@ -1034,6 +1050,7 @@
       {
         "@object": {
           "@new": {
+            "@inst": "sample",
             "@type": {
               "@identifier": "kick_min"
             },
@@ -1055,6 +1072,7 @@
       {
         "@object": {
           "@set": {
+            "@name": "kck",
             "@functions": [
               {
                 "@function": {
@@ -1105,6 +1123,7 @@
       {
         "@object": {
           "@set": {
+            "@name": "all",
             "@functions": [
               {
                 "@function": {
@@ -1142,6 +1161,7 @@
       {
         "@object": {
           "@set": {
+            "@name": "sn",
             "@functions": [
               {
                 "@function": {
@@ -1166,6 +1186,7 @@
       {
         "@object": {
           "@set": {
+            "@name": "bass",
             "@functions": [
               {
                 "@function": {

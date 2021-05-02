@@ -7,7 +7,8 @@ const objects = {
 		'object' : '',
 		'type' : '',
 		'functions' : {
-			'group' : []
+			'group' : [],
+			'add_fx' : []
 		}
 	},
 	'synth' : {
@@ -36,6 +37,21 @@ const objects = {
 			'beat' : [ 1 ],
 			'amp' : [ 0.9 ],
 			'stretch': [0, 1, 1],
+			'add_fx' : [],
+		}
+	},
+	'loop' : {
+		'object' : '',
+		'type' : 'amen',
+		'functions' : {
+			'group' : [],
+			'time' : [ '1', 0 ],
+			'speed' : [ 1 ],
+			// 'note' : [ 0, 0 ],
+			'env' : [ -1 ],
+			'beat' : [ 1 ],
+			'amp' : [ 0.9 ],
+			'stretch': [1, 1, 1],
 			'add_fx' : [],
 		}
 	},

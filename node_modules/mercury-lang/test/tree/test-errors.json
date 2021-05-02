@@ -20,11 +20,6 @@
         3,
         4
       ],
-      "notes2": [
-        "notes",
-        "notes",
-        "notes"
-      ],
       "beat": [
         "euclid",
         8,
@@ -37,35 +32,16 @@
         1,
         0
       ],
-      "commaArr": [
-        3,
-        14,
-        6,
-        28,
-        3.14,
-        1.618
-      ],
       "val": [
         "the string name",
         "3.14 with/ ( [ ]) special, ;characters&"
-      ],
-      "theSeps": [
-        1,
-        23,
-        4.15,
-        6,
-        789.1011
       ]
     },
     "objects": {},
     "groups": {},
     "print": [
       "theArr",
-      [
-        "notes",
-        "notes",
-        "notes"
-      ],
+      "notes2",
       [
         "euclid",
         8,
@@ -78,14 +54,7 @@
         1,
         0
       ],
-      [
-        3,
-        14,
-        6,
-        28,
-        3.14,
-        1.618
-      ]
+      "commaArr"
     ],
     "comments": []
   },
@@ -119,24 +88,6 @@
               "@identifier": "theArr"
             }
           ]
-        }
-      },
-      {
-        "@list": {
-          "@name": "notes2",
-          "@params": {
-            "@function": {
-              "@name": "duplicate",
-              "@args": [
-                {
-                  "@identifier": "notes"
-                },
-                {
-                  "@number": 3
-                }
-              ]
-            }
-          }
         }
       },
       {
@@ -192,33 +143,6 @@
         }
       },
       {
-        "@list": {
-          "@name": "commaArr",
-          "@params": {
-            "@array": [
-              {
-                "@number": 3
-              },
-              {
-                "@number": 14
-              },
-              {
-                "@number": 6
-              },
-              {
-                "@number": 28
-              },
-              {
-                "@number": 3.14
-              },
-              {
-                "@number": 1.618
-              }
-            ]
-          }
-        }
-      },
-      {
         "@global": {
           "@print": [
             {
@@ -241,30 +165,6 @@
             ]
           }
         }
-      },
-      {
-        "@list": {
-          "@name": "theSeps",
-          "@params": {
-            "@array": [
-              {
-                "@number": 1
-              },
-              {
-                "@number": 23
-              },
-              {
-                "@number": 4.15
-              },
-              {
-                "@number": 6
-              },
-              {
-                "@number": 789.1011
-              }
-            ]
-          }
-        }
       }
     ]
   },
@@ -276,6 +176,9 @@
     "Syntax error at line 11: Unexpected newObject: new at list theArr [ 5 6 7 8 9 new<-",
     "Syntax error at line 14: Unexpected identifier: sample at newsample<-",
     "Syntax error at line 16: Unexpected identifier: spread at ring notes shuffle spread<-",
-    "Syntax error at line 23: Unexpected identifier: euclid at ring beat2 join( euclid 8 3) euclid<-"
+    "Syntax error at line 17: Unexpected lParam: ( at ring notes2 duplicate\t(<-",
+    "Syntax error at line 23: Unexpected identifier: euclid at ring beat2 join( euclid 8 3) euclid<-",
+    "Syntax error at line 25: Unexpected seperator: , at array commaArr [ 3,<-",
+    "Syntax error at line 30: Unexpected seperator: , at ring theSeps [1,<-"
   ]
 }

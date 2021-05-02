@@ -97,6 +97,7 @@
       {
         "@object": {
           "@set": {
+            "@name": "tempo",
             "@functions": [
               {
                 "@number": 140
@@ -129,6 +130,7 @@
       {
         "@object": {
           "@new": {
+            "@inst": "synth",
             "@type": {
               "@identifier": "saw"
             },
@@ -170,6 +172,7 @@
       {
         "@object": {
           "@set": {
+            "@name": "s1",
             "@functions": [
               {
                 "@function": {

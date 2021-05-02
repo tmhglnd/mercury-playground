@@ -106,31 +106,23 @@ var grammar = {
     {"name": "globalStatement", "symbols": [(lexer.has("print") ? {type: "print"} : print), "_", "objExpression"], "postprocess": (d) => { return { "@print" : d[2] }}},
     {"name": "objExpression", "symbols": ["paramElement"], "postprocess": (d) => [d[0]]},
     {"name": "objExpression", "symbols": ["paramElement", "__", "objExpression"], "postprocess": (d) => [d[0], d[2]].flat(Infinity)},
-    {"name": "function", "symbols": [(lexer.has("identifier") ? {type: "identifier"} : identifier), "_", "functionArguments"], "postprocess":  (d) => {
+    {"name": "function", "symbols": [(lexer.has("identifier") ? {type: "identifier"} : identifier), "functionArguments"], "postprocess":  (d) => {
         	return { 
         		//"@function": IR.bindFunction(d[0].value),
         		"@function": { 
         			"@name": IR.keyBind(d[0].value),
-        			"@args": d[2]
+        			"@args": d[1]
         		}
         	}
         }},
     {"name": "functionArguments$ebnf$1", "symbols": ["params"], "postprocess": id},
     {"name": "functionArguments$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
-    {"name": "functionArguments$ebnf$2", "symbols": [(lexer.has("rParam") ? {type: "rParam"} : rParam)], "postprocess": id},
-    {"name": "functionArguments$ebnf$2", "symbols": [], "postprocess": function(d) {return null;}},
-    {"name": "functionArguments", "symbols": [(lexer.has("lParam") ? {type: "lParam"} : lParam), "_", "functionArguments$ebnf$1", "_", "functionArguments$ebnf$2"], "postprocess": (d) => d[2]},
+    {"name": "functionArguments", "symbols": [(lexer.has("lParam") ? {type: "lParam"} : lParam), "_", "functionArguments$ebnf$1", "_", (lexer.has("rParam") ? {type: "rParam"} : rParam)], "postprocess": (d) => d[2]},
     {"name": "array$ebnf$1", "symbols": ["params"], "postprocess": id},
     {"name": "array$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
-    {"name": "array$ebnf$2", "symbols": [(lexer.has("rArray") ? {type: "rArray"} : rArray)], "postprocess": id},
-    {"name": "array$ebnf$2", "symbols": [], "postprocess": function(d) {return null;}},
-    {"name": "array", "symbols": [(lexer.has("lArray") ? {type: "lArray"} : lArray), "_", "array$ebnf$1", "_", "array$ebnf$2"], "postprocess": (d) => { return { "@array" : d[2] }}},
-    {"name": "params$ebnf$1", "symbols": [(lexer.has("seperator") ? {type: "seperator"} : seperator)], "postprocess": id},
-    {"name": "params$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
-    {"name": "params", "symbols": ["paramElement", "_", "params$ebnf$1"], "postprocess": (d) => [d[0]]},
-    {"name": "params$ebnf$2", "symbols": [(lexer.has("seperator") ? {type: "seperator"} : seperator)], "postprocess": id},
-    {"name": "params$ebnf$2", "symbols": [], "postprocess": function(d) {return null;}},
-    {"name": "params", "symbols": ["paramElement", "_", "params$ebnf$2", "_", "params"], "postprocess": (d) => [d[0], d[4]].flat(Infinity)},
+    {"name": "array", "symbols": [(lexer.has("lArray") ? {type: "lArray"} : lArray), "_", "array$ebnf$1", "_", (lexer.has("rArray") ? {type: "rArray"} : rArray)], "postprocess": (d) => { return { "@array" : d[2] }}},
+    {"name": "params", "symbols": ["paramElement"], "postprocess": (d) => [d[0]]},
+    {"name": "params", "symbols": ["paramElement", "_", "params"], "postprocess": (d) => [d[0], d[2]].flat(Infinity)},
     {"name": "paramElement", "symbols": [(lexer.has("number") ? {type: "number"} : number)], "postprocess": (d) => { return IR.num(d) }},
     {"name": "paramElement", "symbols": ["name"], "postprocess": (d) => d[0]},
     {"name": "paramElement", "symbols": ["array"], "postprocess": (d) => d[0]},

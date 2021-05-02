@@ -67,13 +67,13 @@
         0
       ],
       "grv": [
-        "hat",
-        "kick",
-        "kick",
-        "kick",
-        "hat",
         "snare",
         "snare",
+        "kick",
+        "snare",
+        "hat",
+        "hat",
+        "hat",
         "kick"
       ],
       "arpMel": [
@@ -136,10 +136,10 @@
         20
       ],
       "bsLine2": [
+        0,
         3,
         10,
         13,
-        0,
         6
       ],
       "bsLine3": [
@@ -168,7 +168,7 @@
       ]
     },
     "objects": {
-      "MR27OYSE": {
+      "ZFL852MP": {
         "object": "synth",
         "type": "saw",
         "functions": {
@@ -197,11 +197,11 @@
           ],
           "add_fx": [],
           "name": [
-            "MR27OYSE"
+            "ZFL852MP"
           ]
         }
       },
-      "77JK9TMB": {
+      "M5NNS1T9": {
         "object": "sample",
         "type": "hat_min",
         "functions": {
@@ -229,11 +229,11 @@
           ],
           "add_fx": [],
           "name": [
-            "77JK9TMB"
+            "M5NNS1T9"
           ]
         }
       },
-      "228WVFTX": {
+      "HM0EU609": {
         "object": "sample",
         "type": [
           "hat_min",
@@ -266,11 +266,11 @@
           ],
           "add_fx": [],
           "name": [
-            "228WVFTX"
+            "HM0EU609"
           ]
         }
       },
-      "IZE6P6CO": {
+      "8RTUCECO": {
         "object": "synth",
         "type": [
           "saw",
@@ -302,7 +302,7 @@
           ],
           "add_fx": [],
           "name": [
-            "IZE6P6CO"
+            "8RTUCECO"
           ]
         }
       },
@@ -1383,6 +1383,7 @@
       {
         "@object": {
           "@new": {
+            "@inst": "synth",
             "@type": {
               "@identifier": "saw"
             }
@@ -1392,6 +1393,7 @@
       {
         "@object": {
           "@new": {
+            "@inst": "sample",
             "@type": {
               "@identifier": "hat_min"
             }
@@ -1401,6 +1403,7 @@
       {
         "@object": {
           "@new": {
+            "@inst": "sample",
             "@type": {
               "@array": [
                 {
@@ -1423,6 +1426,7 @@
       {
         "@object": {
           "@new": {
+            "@inst": "synth",
             "@type": {
               "@array": [
                 {
@@ -1439,6 +1443,7 @@
       {
         "@object": {
           "@new": {
+            "@inst": "synth",
             "@type": {
               "@identifier": "saw"
             },
@@ -1486,6 +1491,7 @@
       {
         "@object": {
           "@new": {
+            "@inst": "sample",
             "@type": {
               "@array": [
                 {
@@ -1557,6 +1563,7 @@
       {
         "@object": {
           "@set": {
+            "@name": "tempo",
             "@functions": [
               {
                 "@number": 143
@@ -1571,6 +1578,7 @@
       {
         "@object": {
           "@set": {
+            "@name": "scale",
             "@functions": [
               {
                 "@identifier": "major"
@@ -1585,6 +1593,7 @@
       {
         "@object": {
           "@set": {
+            "@name": "bob",
             "@functions": [
               {
                 "@function": {

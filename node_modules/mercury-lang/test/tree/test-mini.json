@@ -31,7 +31,7 @@
       ]
     },
     "objects": {
-      "E9NVNAUE": {
+      "NJQ1JSTB": {
         "object": "synth",
         "type": "saw",
         "functions": {
@@ -85,7 +85,7 @@
             ]
           ],
           "name": [
-            "E9NVNAUE"
+            "NJQ1JSTB"
           ]
         }
       },
@@ -158,6 +158,7 @@
       {
         "@object": {
           "@set": {
+            "@name": "tempo",
             "@functions": [
               {
                 "@number": 143
@@ -197,6 +198,7 @@
       {
         "@object": {
           "@new": {
+            "@inst": "synth",
             "@type": {
               "@identifier": "saw"
             },
@@ -302,6 +304,7 @@
       {
         "@object": {
           "@new": {
+            "@inst": "sample",
             "@type": {
               "@identifier": "kick_min"
             },
@@ -359,6 +362,7 @@
       {
         "@object": {
           "@set": {
+            "@name": "kick",
             "@functions": [
               {
                 "@function": {

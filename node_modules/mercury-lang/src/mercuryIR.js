@@ -107,11 +107,13 @@ function deepCopy(o){
 }
 
 function traverseTreeIR(tree){
+	// deepcopy the syntax tree
+	let tmp = deepCopy(tree);
 	// deepcopy the code template
 	let ccode = deepCopy(code);
-	tree.map((t) => {
+	tmp.map((t) => {
 		// console.log(t);
-		tree = traverseTree(t, ccode);
+		tmp = traverseTree(t, ccode);
 	})
 	return ccode;
 }
@@ -235,13 +237,14 @@ function traverseTree(tree, code, level){
 			// console.log('@name', ccode, el, level);
 			let obj = el;
 			let inst;
-
+			
 			if (!instruments[obj]){
+				inst = deepCopy(instruments['empty']);
 				// console.error(`Unknown instrument type: ${obj}`);
 				ccode.errors.push(`Unknown instrument type: ${obj}`);
-				inst = deepCopy(instruments['empty']);
+			} else { 
+				inst = deepCopy(instruments[obj]);
 			}
-			inst = deepCopy(instruments[obj]);
 			inst.object = obj;
 
 			return inst;
@@ -296,7 +299,7 @@ function traverseTree(tree, code, level){
 				});
 			}
 			// console.log('@func', el, '@args', args, '@level', level);
-			if (tsIR[func]){
+			if (tsIR[func] && level !== '@object'){
 				if (args){
 					return tsIR[func](...args);
 				}

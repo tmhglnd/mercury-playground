@@ -2,7 +2,7 @@
   "name": "mercury-playground",
   "version": "1.0.0",
   "description": "",
-  "engines" : {
+  "engines": {
     "node": "12.x"
   },
   "main": "server.js",
@@ -21,13 +21,13 @@
     "express": "^4.17.1",
     "fast-glob": "^3.2.5",
     "fs-extra": "^9.1.0",
-    "mercury-lang": "^1.1.1",
+    "mercury-lang": "^1.2.0",
     "tone": "^14.7.77",
     "webmidi": "^2.5.2"
   },
   "devDependencies": {
     "browserify": "^17.0.0",
-    "terser": "^5.6.1",
+    "terser": "^5.7.0",
     "watchify": "^4.0.0"
   }
 }

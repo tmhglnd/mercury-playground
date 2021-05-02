@@ -67,7 +67,23 @@ function code({ file, engine }){
 				if (inst[a]){
 					inst[a](...args[a]);
 				} else {
-					print(`${a}() is not a function of sample`);
+					console.log(`${a}() is not a function of sample`);
+				}
+			});
+			return inst;
+		},
+		'loop' : (obj) => {
+			// console.log('make sample', obj);
+			let type = obj.type;
+			let args = obj.functions;			
+			let inst = new MonoSample(type, engine);
+
+			// apply arguments to instrument if part of instrument
+			Object.keys(args).forEach((a) => {
+				if (inst[a]){
+					inst[a](...args[a]);
+				} else {
+					console.log(`${a}() is not a function of sample`);
 				}
 			});
 			return inst;
@@ -83,7 +99,7 @@ function code({ file, engine }){
 				if (inst[a]){
 					inst[a](...args[a]);
 				} else {
-					print(`${a}() is not a function of midi`);
+					console.log(`${a}() is not a function of midi`);
 				}
 			});
 			return inst;
@@ -99,7 +115,7 @@ function code({ file, engine }){
 		if (objectMap[type]){
 			sounds.push(objectMap[type](tree.objects[o]));
 		} else {
-			print(`Instrument named '${type}' is not supported`);
+			console.log(`Instrument named '${type}' is not supported`);
 		}
 	});
 

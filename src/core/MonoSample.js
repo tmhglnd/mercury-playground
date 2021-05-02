@@ -7,17 +7,20 @@ class MonoSample {
 	constructor(s='kick_min', engine){
 		this._bufs = engine.getBuffers();
 		this._bpm = engine.getBPM();
+		this._engine = engine;
 
-		console.log('=> MonoSample()', s);
+		console.log('=> MonoSample()', s, this._bpm);
 		
 		this._sound = s;
+		this._length = 0;
 		this._count = 0;
 		this._beatCount = 0;
 		
-		this._beat = [1];
+		this._beat = [ 1 ];
 
 		//this._note = n;
-		this._speed = [1];
+		this._speed = [ 1 ];
+		this._stretch = [ 0 ];
 		
 		this._time = 1;
 		this._offset = 0;
@@ -28,14 +31,14 @@ class MonoSample {
 		// default gain value -6 dB
 		this._gain = [-6, 0];
 		
-		this._pan = [[0], [0], [0]];
+		this._pan = [ 0 ];
 
 		this._att = [ 0 ];
 		this._sus = [ 0 ];
 		this._rel = [ 0 ];
 
+		this._loop;
 		this.sample;
-		this.seq;
 		this.panner;
 		this.adsr;
 		this._fx;
@@ -70,9 +73,9 @@ class MonoSample {
 		if (this._loop){
 			this._loop.dispose();
 		}
-		let now = Tone.now();
-		let then = Tone.Time(this._offset).toSeconds();
-		// let then = this._offset * 2.0 * (60 / getBPM());
+		// let now = Tone.now();
+		let schedule = Tone.Time(this._offset).toSeconds();
+		// let schedule = this._offset * 2.0 * (60 / getBPM());
 
 		// console.log('makeLoop()', this._time);
 
@@ -105,7 +108,14 @@ class MonoSample {
 				let s = Util.randLookup(Util.lookup(this._speed, c));
 
 				this.sample.reverse = s < 0;
-				this.sample.playbackRate = Math.abs(s);
+
+				let l = Util.lookup(this._stretch, c);
+				let n = 1;
+				if (l){
+					n = dur / (60 * 4 / this._engine.getBPM()) / l;
+				}
+
+				this.sample.playbackRate = Math.abs(s) * n;
 				
 				// ramp volume
 				let g = Util.lookup(this._gain[0], c);
@@ -147,7 +157,7 @@ class MonoSample {
 			}
 			// increment count for sequencing
 			this._count++;
-		}, this._time).start(then);
+		}, this._time).start(schedule);
 	}
 
 	delete(){
@@ -219,6 +229,12 @@ class MonoSample {
 		this._speed = Util.toArray(s);
 	}
 
+	stretch(s){
+		// set the stretch loop bar length
+		console.log('set stretch', s);
+		this._stretch = Util.toArray(s);
+	}
+
 	offset(o){
 		// set the playback start position as an array
 		this._pos = Util.toArray(o);
@@ -249,10 +265,6 @@ class MonoSample {
 			}
 		}
 		// console.log('shape()', this._att, this._rel, this._sus);
-	}
-
-	stretch(){
-		// placeholder
 	}
 
 	name(n){

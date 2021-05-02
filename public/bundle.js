@@ -17843,7 +17843,8 @@ const objects = {
 		'object' : '',
 		'type' : '',
 		'functions' : {
-			'group' : []
+			'group' : [],
+			'add_fx' : []
 		}
 	},
 	'synth' : {
@@ -17872,6 +17873,21 @@ const objects = {
 			'beat' : [ 1 ],
 			'amp' : [ 0.9 ],
 			'stretch': [0, 1, 1],
+			'add_fx' : [],
+		}
+	},
+	'loop' : {
+		'object' : '',
+		'type' : 'amen',
+		'functions' : {
+			'group' : [],
+			'time' : [ '1', 0 ],
+			'speed' : [ 1 ],
+			// 'note' : [ 0, 0 ],
+			'env' : [ -1 ],
+			'beat' : [ 1 ],
+			'amp' : [ 0.9 ],
+			'stretch': [1, 1, 1],
 			'add_fx' : [],
 		}
 	},
@@ -18012,31 +18028,23 @@ var grammar = {
     {"name": "globalStatement", "symbols": [(lexer.has("print") ? {type: "print"} : print), "_", "objExpression"], "postprocess": (d) => { return { "@print" : d[2] }}},
     {"name": "objExpression", "symbols": ["paramElement"], "postprocess": (d) => [d[0]]},
     {"name": "objExpression", "symbols": ["paramElement", "__", "objExpression"], "postprocess": (d) => [d[0], d[2]].flat(Infinity)},
-    {"name": "function", "symbols": [(lexer.has("identifier") ? {type: "identifier"} : identifier), "_", "functionArguments"], "postprocess":  (d) => {
+    {"name": "function", "symbols": [(lexer.has("identifier") ? {type: "identifier"} : identifier), "functionArguments"], "postprocess":  (d) => {
         	return { 
         		//"@function": IR.bindFunction(d[0].value),
         		"@function": { 
         			"@name": IR.keyBind(d[0].value),
-        			"@args": d[2]
+        			"@args": d[1]
         		}
         	}
         }},
     {"name": "functionArguments$ebnf$1", "symbols": ["params"], "postprocess": id},
     {"name": "functionArguments$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
-    {"name": "functionArguments$ebnf$2", "symbols": [(lexer.has("rParam") ? {type: "rParam"} : rParam)], "postprocess": id},
-    {"name": "functionArguments$ebnf$2", "symbols": [], "postprocess": function(d) {return null;}},
-    {"name": "functionArguments", "symbols": [(lexer.has("lParam") ? {type: "lParam"} : lParam), "_", "functionArguments$ebnf$1", "_", "functionArguments$ebnf$2"], "postprocess": (d) => d[2]},
+    {"name": "functionArguments", "symbols": [(lexer.has("lParam") ? {type: "lParam"} : lParam), "_", "functionArguments$ebnf$1", "_", (lexer.has("rParam") ? {type: "rParam"} : rParam)], "postprocess": (d) => d[2]},
     {"name": "array$ebnf$1", "symbols": ["params"], "postprocess": id},
     {"name": "array$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
-    {"name": "array$ebnf$2", "symbols": [(lexer.has("rArray") ? {type: "rArray"} : rArray)], "postprocess": id},
-    {"name": "array$ebnf$2", "symbols": [], "postprocess": function(d) {return null;}},
-    {"name": "array", "symbols": [(lexer.has("lArray") ? {type: "lArray"} : lArray), "_", "array$ebnf$1", "_", "array$ebnf$2"], "postprocess": (d) => { return { "@array" : d[2] }}},
-    {"name": "params$ebnf$1", "symbols": [(lexer.has("seperator") ? {type: "seperator"} : seperator)], "postprocess": id},
-    {"name": "params$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
-    {"name": "params", "symbols": ["paramElement", "_", "params$ebnf$1"], "postprocess": (d) => [d[0]]},
-    {"name": "params$ebnf$2", "symbols": [(lexer.has("seperator") ? {type: "seperator"} : seperator)], "postprocess": id},
-    {"name": "params$ebnf$2", "symbols": [], "postprocess": function(d) {return null;}},
-    {"name": "params", "symbols": ["paramElement", "_", "params$ebnf$2", "_", "params"], "postprocess": (d) => [d[0], d[4]].flat(Infinity)},
+    {"name": "array", "symbols": [(lexer.has("lArray") ? {type: "lArray"} : lArray), "_", "array$ebnf$1", "_", (lexer.has("rArray") ? {type: "rArray"} : rArray)], "postprocess": (d) => { return { "@array" : d[2] }}},
+    {"name": "params", "symbols": ["paramElement"], "postprocess": (d) => [d[0]]},
+    {"name": "params", "symbols": ["paramElement", "_", "params"], "postprocess": (d) => [d[0], d[2]].flat(Infinity)},
     {"name": "paramElement", "symbols": [(lexer.has("number") ? {type: "number"} : number)], "postprocess": (d) => { return IR.num(d) }},
     {"name": "paramElement", "symbols": ["name"], "postprocess": (d) => d[0]},
     {"name": "paramElement", "symbols": ["array"], "postprocess": (d) => d[0]},
@@ -18172,11 +18180,13 @@ function deepCopy(o){
 }
 
 function traverseTreeIR(tree){
+	// deepcopy the syntax tree
+	let tmp = deepCopy(tree);
 	// deepcopy the code template
 	let ccode = deepCopy(code);
-	tree.map((t) => {
+	tmp.map((t) => {
 		// console.log(t);
-		tree = traverseTree(t, ccode);
+		tmp = traverseTree(t, ccode);
 	})
 	return ccode;
 }
@@ -18300,13 +18310,14 @@ function traverseTree(tree, code, level){
 			// console.log('@name', ccode, el, level);
 			let obj = el;
 			let inst;
-
+			
 			if (!instruments[obj]){
+				inst = deepCopy(instruments['empty']);
 				// console.error(`Unknown instrument type: ${obj}`);
 				ccode.errors.push(`Unknown instrument type: ${obj}`);
-				inst = deepCopy(instruments['empty']);
+			} else { 
+				inst = deepCopy(instruments[obj]);
 			}
-			inst = deepCopy(instruments[obj]);
 			inst.object = obj;
 
 			return inst;
@@ -18361,7 +18372,7 @@ function traverseTree(tree, code, level){
 				});
 			}
 			// console.log('@func', el, '@args', args, '@level', level);
-			if (tsIR[func]){
+			if (tsIR[func] && level !== '@object'){
 				if (args){
 					return tsIR[func](...args);
 				}
@@ -23944,17 +23955,20 @@ class MonoSample {
 	constructor(s='kick_min', engine){
 		this._bufs = engine.getBuffers();
 		this._bpm = engine.getBPM();
+		this._engine = engine;
 
-		console.log('=> MonoSample()', s);
+		console.log('=> MonoSample()', s, this._bpm);
 		
 		this._sound = s;
+		this._length = 0;
 		this._count = 0;
 		this._beatCount = 0;
 		
-		this._beat = [1];
+		this._beat = [ 1 ];
 
 		//this._note = n;
-		this._speed = [1];
+		this._speed = [ 1 ];
+		this._stretch = [ 0 ];
 		
 		this._time = 1;
 		this._offset = 0;
@@ -23965,14 +23979,14 @@ class MonoSample {
 		// default gain value -6 dB
 		this._gain = [-6, 0];
 		
-		this._pan = [[0], [0], [0]];
+		this._pan = [ 0 ];
 
 		this._att = [ 0 ];
 		this._sus = [ 0 ];
 		this._rel = [ 0 ];
 
+		this._loop;
 		this.sample;
-		this.seq;
 		this.panner;
 		this.adsr;
 		this._fx;
@@ -24007,9 +24021,9 @@ class MonoSample {
 		if (this._loop){
 			this._loop.dispose();
 		}
-		let now = Tone.now();
-		let then = Tone.Time(this._offset).toSeconds();
-		// let then = this._offset * 2.0 * (60 / getBPM());
+		// let now = Tone.now();
+		let schedule = Tone.Time(this._offset).toSeconds();
+		// let schedule = this._offset * 2.0 * (60 / getBPM());
 
 		// console.log('makeLoop()', this._time);
 
@@ -24042,7 +24056,14 @@ class MonoSample {
 				let s = Util.randLookup(Util.lookup(this._speed, c));
 
 				this.sample.reverse = s < 0;
-				this.sample.playbackRate = Math.abs(s);
+
+				let l = Util.lookup(this._stretch, c);
+				let n = 1;
+				if (l){
+					n = dur / (60 * 4 / this._engine.getBPM()) / l;
+				}
+
+				this.sample.playbackRate = Math.abs(s) * n;
 				
 				// ramp volume
 				let g = Util.lookup(this._gain[0], c);
@@ -24084,7 +24105,7 @@ class MonoSample {
 			}
 			// increment count for sequencing
 			this._count++;
-		}, this._time).start(then);
+		}, this._time).start(schedule);
 	}
 
 	delete(){
@@ -24156,6 +24177,12 @@ class MonoSample {
 		this._speed = Util.toArray(s);
 	}
 
+	stretch(s){
+		// set the stretch loop bar length
+		console.log('set stretch', s);
+		this._stretch = Util.toArray(s);
+	}
+
 	offset(o){
 		// set the playback start position as an array
 		this._pos = Util.toArray(o);
@@ -24186,10 +24213,6 @@ class MonoSample {
 			}
 		}
 		// console.log('shape()', this._att, this._rel, this._sus);
-	}
-
-	stretch(){
-		// placeholder
 	}
 
 	name(n){
@@ -24991,7 +25014,23 @@ function code({ file, engine }){
 				if (inst[a]){
 					inst[a](...args[a]);
 				} else {
-					print(`${a}() is not a function of sample`);
+					console.log(`${a}() is not a function of sample`);
+				}
+			});
+			return inst;
+		},
+		'loop' : (obj) => {
+			// console.log('make sample', obj);
+			let type = obj.type;
+			let args = obj.functions;			
+			let inst = new MonoSample(type, engine);
+
+			// apply arguments to instrument if part of instrument
+			Object.keys(args).forEach((a) => {
+				if (inst[a]){
+					inst[a](...args[a]);
+				} else {
+					console.log(`${a}() is not a function of sample`);
 				}
 			});
 			return inst;
@@ -25007,7 +25046,7 @@ function code({ file, engine }){
 				if (inst[a]){
 					inst[a](...args[a]);
 				} else {
-					print(`${a}() is not a function of midi`);
+					console.log(`${a}() is not a function of midi`);
 				}
 			});
 			return inst;
@@ -25023,7 +25062,7 @@ function code({ file, engine }){
 		if (objectMap[type]){
 			sounds.push(objectMap[type](tree.objects[o]));
 		} else {
-			print(`Instrument named '${type}' is not supported`);
+			console.log(`Instrument named '${type}' is not supported`);
 		}
 	});
 

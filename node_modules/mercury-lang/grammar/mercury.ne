@@ -161,31 +161,33 @@ objExpression ->
 
 function ->
 	# optional whitespace between name and (
-	%identifier _ functionArguments
+	%identifier functionArguments
 		{% (d) => {
 			return { 
 				//"@function": IR.bindFunction(d[0].value),
 				"@function": { 
 					"@name": IR.keyBind(d[0].value),
-					"@args": d[2]
+					"@args": d[1]
 				}
 			}
 		}%}
 
 functionArguments ->
-	%lParam _ params:? _ %rParam:?
+	%lParam _ params:? _ %rParam
 		{% (d) => d[2] %}
 
 array ->
-	%lArray _ params:? _ %rArray:?
+	%lArray _ params:? _ %rArray
 		{% (d) => { return { "@array" : d[2] }} %}
 
 params ->
-	paramElement _ %seperator:?
+	# paramElement _ %seperator:?
+	paramElement
 		{% (d) => [d[0]] %}
 	|
-	paramElement _ %seperator:? _ params
-		{% (d) => [d[0], d[4]].flat(Infinity) %}
+	# paramElement _ %seperator:? _ params
+	paramElement _ params
+		{% (d) => [d[0], d[2]].flat(Infinity) %}
 
 paramElement ->
 	%number
