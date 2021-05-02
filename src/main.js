@@ -3,6 +3,10 @@ const Tone = require('tone');
 const Engine = require('./engine.js');
 const Editor = require('./editor.js');
 
+// const Canvas = require('./canvas.js');
+// const p5 = require('p5');
+// let sketchP5 = new p5(Canvas);
+
 // the code Editor
 // also loads the parser and the worker
 // gets passed the Tone context and Engine
