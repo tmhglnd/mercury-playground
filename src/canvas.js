@@ -103,7 +103,7 @@ let hydraCanvas = function(c, u) {
 			console.log('Not a valid Hydra url-code');
 			this.clear();
 			let text = document.getElementById('hydra-code');
-			text.value = '<not a valid hydra url>'
+			text.value = '<paste hydra url>'
 		}
 	}
 
@@ -113,15 +113,16 @@ let hydraCanvas = function(c, u) {
 
 		let text = document.createElement('textarea');
 		text.id = 'hydra-code';
-		text.value = '<paste hydra url here>'
+		text.value = '<paste hydra url>'
 		text.onchange = () => { this.eval(text.value) };
 
-		// let btn = document.createElement('button');
-		// btn.innerHTML = 'run Hydra';
-		// p.appendChild(btn);
+		let btn = document.createElement('button');
+		btn.innerHTML = 'code with Hydra';
+		btn.onclick = () => { window.open('https://hydra.ojack.xyz/', '_blank'); }
 
-		p.appendChild(text);
-		div.appendChild(p);	
+		div.appendChild(text);
+		div.appendChild(btn);
+		// div.appendChild(p);	
 	}
 
 	this.engine = loop((dt) => {

@@ -30,16 +30,12 @@ p {
 }
 
 #menu {
-	background: rgb(0, 0, 0, 0.3);
+	/* background: rgb(0, 0, 0, 0.3); */
 	margin: 0 auto; 
 	width: 100%;
 	max-width: 100%;
 	/* height: auto; */
 	display: inline-block;
-}
-
-.menu {
-	background: rgb(0, 0, 0, 0.3);
 }
 
 button {
@@ -48,11 +44,9 @@ button {
 	font-family: inherit;
 	border-radius: 2px;
 	border-width: 0px;
-	/* border-color: rgb(180, 180, 180); */
 	border-color: rgb(255, 255, 255, 0.5);
-	/* background: rgb(20, 20, 20); */
-	background: rgb(255, 255, 255, 0.1);
-	/* background: rgb(0, 0, 0, 0.2); */
+	/* background: rgb(255, 255, 255, 0.1); */
+	background: rgb(0, 0, 0, 0.3);
 	color:  rgb(180, 180, 180);
 	width: 19%;
 	height: 25px;
@@ -65,7 +59,8 @@ button {
 }
 
 .hide button {
-	background: rgb(255, 255, 255, 0.05);
+	/* background: rgb(255, 255, 255, 0.05); */
+	background: rgb(0, 0, 0, 0.05);
 	color: rgb(255, 255, 255, 0.5);
 }
 
@@ -87,7 +82,8 @@ select {
 	border-width: 0px;
 	color:  rgb(180, 180, 180);
 	/* background: rgb(20, 20, 20); */
-	background: rgb(255, 255, 255, 0.1);
+	/* background: rgb(255, 255, 255, 0.1); */
+	background: rgb(0, 0, 0, 0.3);
 	border-radius: 2px;
 	width: 19%;
 	height: 25px;
@@ -103,6 +99,7 @@ textarea {
 	font-family: inherit;
 	/* border-color: darkgrey; */
 	border-width: 0px;
+	border-radius: 2px;
 	color: rgb(255, 255, 255, 0.5);
 	background: rgb(0, 0, 0, 0.3);
 	width: 100%;
@@ -135,6 +132,7 @@ textarea:focus {
 	font-family: inherit;
 	font-size: 1em;
 	line-height: 1.7 !important;
+	border-radius: 2px !important;
 }
 
 /* .CodeMirror-lines {
