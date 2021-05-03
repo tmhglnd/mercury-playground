@@ -227,6 +227,12 @@ Many sounds in Mercury are downloaded from [freesound.org](http://www.freesound.
 
 - [List of sounds and credits](https://github.com/tmhglnd/mercury/blob/master/mercury_ide/media/README.md)
 
+## ⚡️ Visuals
+
+Load your Hydra visuals by pasting the compressed url code in the textarea below the Editor. Removing the link will disable the visual rendering.
+
+![The Mercury playground in the browser](media/screenshot3.png)
+
 ## 📝 Contribute
 
 Contributions to the Mercury environment are much appreciated in whatever form they come! Please follow the [guidelines here](docs/contribute.md)

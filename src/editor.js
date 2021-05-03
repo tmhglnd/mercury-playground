@@ -281,11 +281,6 @@ const Editor = function({ context, engine }) {
 
 		menu.value = defaultTheme;
 	}
-	// this.controls();
-	// this.themeMenu();
-	// this.links();
-	// this.hide();
-	// this.clear();
 }
 module.exports = Editor;
 

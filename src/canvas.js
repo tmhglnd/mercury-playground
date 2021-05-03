@@ -88,7 +88,7 @@ let hydraCanvas = function(c, u) {
 		solid().out(o2);
 		solid().out(o3);
 		render(o0);
-		this.hydra.tick(1);
+		this.hydra.tick(60);
 		this.engine.stop();
 	}
 
