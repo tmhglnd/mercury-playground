@@ -29,28 +29,33 @@
 	<link rel="stylesheet" href="./style.css">
 </head>
 
+
 <body>
-	<!-- <h1>Mercury Playground</h1> -->
-	<div id="header">
-		<h1>MERCURY PLAYGROUND</h1>
-	</div>
-
-	<div id="menu"></div>
-	
-	<div id="settings">
-		<p id='bpm'></p>
-	</div>
-
-	<div id="code-editor"></div>
-	<!-- <div id="console"></div> -->
-	
-	<div id="links"></div>
-	
-	<div id="hide" class="hide"></div>
-
 	<script type="text/javascript" src="./bundle.js"></script>
-	
-	<!-- <script type="text/javascript" src="./bundle.min.js"></script> -->
 
+	<div id="p5-canvas" class="canvas"></div>
+	<canvas id="hydra-canvas" class="canvas"></canvas>
+
+	<div id="ui" class="ui">
+		<div id="header">
+			<h1>MERCURY PLAYGROUND</h1>
+		</div>
+
+		<div id="menu"></div>
+		
+		<div id="settings">
+			<p id='bpm'></p>
+		</div>
+
+		<div id="code-editor"></div>
+		<!-- <div id="console"></div> -->
+		
+		<div id="links"></div>
+		<div id="hide" class="hide"></div>
+		
+		<div id="hydra-ui"></div>
+	</div>
+
+	<!-- <script type="text/javascript" src="./bundle.min.js"></script> -->
 </body>
 </html>

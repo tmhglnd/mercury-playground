@@ -98,6 +98,8 @@ const Editor = function({ context, engine }) {
 
 	this.cm = CodeMirror.fromTextArea(text, this.options);
 
+	this.cm.markText({line: 0, ch: 0}, {line: 6, ch: 42}, {className: 'styled-background'})
+
 	this.set = function(v){
 		this.cm.setValue(v);
 	}
@@ -250,7 +252,7 @@ const Editor = function({ context, engine }) {
 		btn.onclick = () => {
 			this.menuHidden = !this.menuHidden;
 
-			let divs = ['header', 'settings', 'menu', 'links'];
+			let divs = ['header', 'settings', 'menu', 'links', 'hydra-ui'];
 			for (let i in divs){
 				let d = document.getElementById(divs[i]);
 				d.style.display = (this.menuHidden)? 'none' : 'inline';

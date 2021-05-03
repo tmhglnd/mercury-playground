@@ -55,9 +55,9 @@ function code({ file, engine }){
 	});
 
 	_sounds = sounds.slice();
-	for (let s in _sounds){
+	for (let s=0; s<_sounds.length; s++){
 		_sounds[s].fadeOut(crossFade);
-		// sounds[s].delete();
+		// _sounds[s].delete();
 	}
 	sounds = [];
 
@@ -126,7 +126,7 @@ function code({ file, engine }){
 	});
 
 	// start new loops;
-	for (let s in sounds){
+	for (let s=0; s<sounds.length; s++){
 		sounds[s].makeLoop();
 		sounds[s].fadeIn(crossFade);
 	}
