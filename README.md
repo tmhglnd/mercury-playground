@@ -229,7 +229,7 @@ Many sounds in Mercury are downloaded from [freesound.org](http://www.freesound.
 
 ## ⚡️ Visuals
 
-Load your Hydra visuals by pasting the compressed url code in the textarea below the Editor. Removing the link will disable the visual rendering.
+You can load Hydra visuals by pasting the compressed url code in the textarea below the Editor. Removing the link will disable the visual rendering. [Hydra](https://hydra.ojack.xyz/) is a Live coding visual synthesizer developed Olivia Jack.
 
 ![The Mercury playground in the browser](media/screenshot3.png)
 
