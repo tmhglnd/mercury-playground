@@ -89,12 +89,10 @@ class MonoSample {
 
 		// create new loop for synth
 		this._loop = new Tone.Loop((time) => {
-			// get the count value
-			// let c = this._count;
-			// get beat probability
+			// get beat probability for current count
 			let b = Util.randLookup(Util.lookup(this._beat, this._count));
 			
-			// get timing TODO?
+			// get timing TO-DO?
 
 			// if random value is below probability, then play
 			if (Math.random() < b){
@@ -140,7 +138,7 @@ class MonoSample {
 				// set panning
 				let p = Util.randLookup(Util.lookup(this._pan, c));
 				p = (p === 'random')? Math.random() * 2 - 1 : p;
-				this.panner.pan.rampTo(p, Util.msToS(0));
+				this.panner.pan.rampTo(p, Util.msToS(1));
 
 				// get the start position
 				let o = dur * Util.randLookup(Util.lookup(this._pos, c));
@@ -177,10 +175,10 @@ class MonoSample {
 
 	fadeOut(t){
 		// fade out the sound upon evaluation of new code
-		this.gain.gain.rampTo(0, this._time);
+		this.gain.gain.rampTo(0, t);
 		setTimeout(() => {
 			this.delete();
-		}, this._time * 1000);
+		}, t * 1000);
 	}
 
 	fadeIn(t){
@@ -315,13 +313,14 @@ class MonoSample {
 	}
 
 	pan(p){
+		// the panning position of the sound
 		this._pan = Util.toArray(p);
 	}
 
 	add_fx(...fx){
+		// the effects chain for the sound
 		this._fx = [];
 		// console.log('Effects currently disabled');
-		
 		fx.forEach((f) => {
 			if (fxMap[f[0]]){
 				let tmpF = fxMap[f[0]](f.slice(1));
@@ -330,12 +329,15 @@ class MonoSample {
 				console.log(`Effect ${f[0]} does not exist`);
 			}
 		});
-		// disconnect the panner
-		this.panner.disconnect();
-		// iterate over effects and get chain
-		this._ch = this._fx.map((f) => { return f.chain() });
-		// add all effects in chain and connect to Destination
-		this.panner.chain(...this._ch, Tone.Destination);
+		// if any fx working
+		if (this._fx){
+			// disconnect the panner
+			this.panner.disconnect();
+			// iterate over effects and get chain
+			this._ch = this._fx.map((f) => { return f.chain() });
+			// add all effects in chain and connect to Destination
+			this.panner.chain(...this._ch, Tone.Destination);
+		}
 	}
 }
 module.exports = MonoSample;

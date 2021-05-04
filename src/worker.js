@@ -3,7 +3,7 @@ const Mercury = require('mercury-lang');
 const MonoSample = require('./core/MonoSample.js');
 
 // fade time in seconds
-let crossFade = 0.25;
+let crossFade = 1;
 // array with the insturments playing
 let _sounds = [];
 let sounds = [];

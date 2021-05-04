@@ -12,20 +12,20 @@ const fxMap = {
 	'overdrive' : (params) => {
 		return new Drive(params);
 	},
-	'chip' : (params) => {
-		return new BitCrusher(params);
-	},
+	// 'chip' : (params) => {
+	// 	return new BitCrusher(params);
+	// },
 	'reverb' : (params) => {
 		return new Reverb(params);
 	}, 
-	/* 'delay' : (param) => {
-		// console.log('delay', param);
-		let t = (param[0] !== undefined)? param[0] : '3/16';
-		let fb = (param[1] !== undefined)? param[1] : 0.3;
-		let del = new Tone.PingPongDelay(formatRatio(t), fb);
+	// 'delay' : (param) => {
+	// 	// console.log('delay', param);
+	// 	let t = (param[0] !== undefined)? param[0] : '3/16';
+	// 	let fb = (param[1] !== undefined)? param[1] : 0.3;
+	// 	let del = new Tone.PingPongDelay(formatRatio(t), fb);
 
-		return del;
-	} */
+	// 	return del;
+	// }
 }
 module.exports = fxMap;
 
@@ -94,13 +94,13 @@ const Reverb = function(_params) {
 	// this._fx = new Tone.JCReverb();
 
 	// this._cutoff = 5000;
-	this._wet = (_params[0])? Util.toArray(_params[0]) : [0.4];
-	this._size = (_params[1])? Util.toArray(_params[1]) : [7];
+	this._wet = (_params[0])? Util.toArray(_params[0]) : [0.5];
+	this._size = (_params[1])? Util.toArray(_params[1]) : [1.5];
 
 	this.set = function(c){
 		// this._fltr.frequency.value = this._cutoff;
 		this._fx.decay = Math.min(10, Math.max(0.1, Util.lookup(this._size, c)));
-		this._fx.wet.value = Util.lookup(this._wet, c);
+		this._fx.wet.value = Math.min(1, Math.max(0, Util.lookup(this._wet, c)));
 		// this._fx.roomSize.value = Util.lookup(this._size, c);
 	}
 
