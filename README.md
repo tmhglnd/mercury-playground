@@ -159,16 +159,16 @@ Currently the playground does not have the full functionality of the original Me
 	- [x] speed
 	- [x] pan
 	- [x] name
-	- [ ] fx
+	- [x] fx
 - [ ] synth
 - [ ] polySynth
 - [ ] midi
 - [ ] osc
 - [ ] FX
-	- [ ] reverb
+	- [x] reverb
 	- [ ] filter
 	- [ ] envFilter
-	- [ ] drive
+	- [x] drive
 	- [ ] chip
 	- [ ] delay
 	- [ ] lfo
