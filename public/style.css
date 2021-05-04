@@ -42,12 +42,13 @@ button {
 	/* display: block; */
 	/* font-family: "Andale Mono"; */
 	font-family: inherit;
+	/* text-align: left; */
 	border-radius: 2px;
 	border-width: 0px;
 	border-color: rgb(255, 255, 255, 0.5);
 	/* background: rgb(255, 255, 255, 0.1); */
 	background: rgb(0, 0, 0, 0.3);
-	color:  rgb(180, 180, 180);
+	color:  rgb(255, 255, 255, 0.5);
 	width: 19%;
 	height: 25px;
 	margin: 2px;
@@ -80,7 +81,7 @@ select {
 	font-family: inherit;
 	border-color: darkgrey;
 	border-width: 0px;
-	color:  rgb(180, 180, 180);
+	color:  rgb(255, 255, 255, 0.5);
 	/* background: rgb(20, 20, 20); */
 	/* background: rgb(255, 255, 255, 0.1); */
 	background: rgb(0, 0, 0, 0.3);
@@ -100,7 +101,7 @@ textarea {
 	/* border-color: darkgrey; */
 	border-width: 0px;
 	border-radius: 2px;
-	color: rgb(255, 255, 255, 0.5);
+	color: rgb(255, 255, 255, 0.2);
 	background: rgb(0, 0, 0, 0.3);
 	width: 100%;
 	margin: 2px;

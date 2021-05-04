@@ -13,7 +13,7 @@ require('codemirror/mode/javascript/javascript.js');
 require('codemirror/addon/mode/simple.js');
 require('codemirror/addon/comment/comment.js');
 
-const defaultTheme = 'moxer';
+const defaultTheme = 'material-darker';
 
 let _rand;
 let examples = {};
@@ -252,7 +252,7 @@ const Editor = function({ context, engine }) {
 		btn.onclick = () => {
 			this.menuHidden = !this.menuHidden;
 
-			let divs = ['header', 'settings', 'menu', 'links', 'hydra-ui'];
+			let divs = [ 'header', 'settings', 'menu', 'links', 'hydra-ui' ];
 			for (let i in divs){
 				let d = document.getElementById(divs[i]);
 				d.style.display = (this.menuHidden)? 'none' : 'inline';
@@ -269,7 +269,7 @@ const Editor = function({ context, engine }) {
 		menu.id = 'themes';
 		menu.onchange = () => { this.changeTheme() };
 		
-		let themes = ['ayu-dark', 'base16-dark', 'material-darker', 'material-ocean', 'moxer'];
+		let themes = ['ayu-dark', 'base16-dark', 'material-darker', 'material-ocean', 'moxer', 'tomorrow-night-eighties'];
 
 		for (let t in themes){
 			let option = document.createElement('option');

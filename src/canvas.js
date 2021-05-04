@@ -1,5 +1,79 @@
+// Hydra Canvas
+const HydraSynth = require('hydra-synth');
+const loop = require('raf-loop');
 
-// a p5 Canvas
+let hydraCanvas = function(c, u) {
+	this.canvas = document.getElementById(c);
+	this.canvas.width = window.innerWidth;
+	this.canvas.height = window.innerHeight; 
+	this.canvas.style.width = '100%';
+	this.canvas.style.height = '100%';
+	this.canvas.style.display = 'none';
+	// this.canvas.style.imageRendering = 'pixelated';
+
+	this.div = document.getElementById(u);
+
+	this.hydra = new HydraSynth({ 
+		canvas: this.canvas, 
+		autoLoop : false,
+		precision: 'mediump',
+		detectAudio: false,
+		// makeGlobal: false 
+	});
+	// this.hydra.setResolution(this.canvas.width, this.canvas.height);
+
+	this.clear = function(){
+		solid().out();
+		solid().out(o1);
+		solid().out(o2);
+		solid().out(o3);
+		render(o0);
+		this.hydra.tick(60);
+		this.engine.stop();
+	}
+
+	this.eval = function(url){
+		let b64 = /\?code=(.+)/.exec(url);
+
+		try {
+			let decode = decodeURIComponent(atob(b64[1]));
+			eval(decode);
+			this.engine.start();
+			this.canvas.style.display = 'inline';
+		} catch (err) {
+			console.log('Not a valid Hydra url-code');
+			this.clear();
+			let text = document.getElementById('hydra-code');
+			text.value = '<paste hydra url>'
+			// not displaying the canvas when no visuals are rendered
+			this.canvas.style.display = 'none';
+		}
+	}
+
+	this.link = function(id){
+		let div = document.getElementById(id);
+		let p = document.createElement('p');
+
+		let text = document.createElement('textarea');
+		text.id = 'hydra-code';
+		text.value = '<paste hydra url>'
+		text.onchange = () => { this.eval(text.value) };
+
+		let btn = document.createElement('button');
+		btn.innerHTML = 'code with Hydra';
+		btn.onclick = () => { window.open('https://hydra.ojack.xyz/', '_blank'); }
+
+		div.appendChild(text);
+		div.appendChild(btn);
+		// div.appendChild(p);	
+	}
+
+	this.engine = loop((dt) => {
+		this.hydra.tick(dt)
+	}).start()
+}
+
+// p5 Canvas
 const p5Canvas = (p5, id) => {
 	// video variables
 	let capture;
@@ -60,73 +134,4 @@ const p5Canvas = (p5, id) => {
 	}
 }
 
-const HydraSynth = require('hydra-synth');
-const loop = require('raf-loop');
-
-let hydraCanvas = function(c, u) {
-	this.canvas = document.getElementById(c);
-	this.canvas.width = window.innerWidth;
-	this.canvas.height = window.innerHeight; 
-	this.canvas.style.width = '100%';
-	this.canvas.style.height = '100%';
-	// this.canvas.style.imageRendering = 'pixelated';
-
-	this.div = document.getElementById(u);
-
-	this.hydra = new HydraSynth({ 
-		canvas: this.canvas, 
-		autoLoop : false,
-		precision: 'mediump',
-		detectAudio: false,
-		// makeGlobal: false 
-	});
-	// this.hydra.setResolution(this.canvas.width, this.canvas.height);
-
-	this.clear = function(){
-		solid().out();
-		solid().out(o1);
-		solid().out(o2);
-		solid().out(o3);
-		render(o0);
-		this.hydra.tick(60);
-		this.engine.stop();
-	}
-
-	this.eval = function(url){
-		let b64 = /\?code=(.+)/.exec(url);
-
-		try {
-			let decode = decodeURIComponent(atob(b64[1]));
-			eval(decode);
-			this.engine.start();
-		} catch (err) {
-			console.log('Not a valid Hydra url-code');
-			this.clear();
-			let text = document.getElementById('hydra-code');
-			text.value = '<paste hydra url>'
-		}
-	}
-
-	this.link = function(id){
-		let div = document.getElementById(id);
-		let p = document.createElement('p');
-
-		let text = document.createElement('textarea');
-		text.id = 'hydra-code';
-		text.value = '<paste hydra url>'
-		text.onchange = () => { this.eval(text.value) };
-
-		let btn = document.createElement('button');
-		btn.innerHTML = 'code with Hydra';
-		btn.onclick = () => { window.open('https://hydra.ojack.xyz/', '_blank'); }
-
-		div.appendChild(text);
-		div.appendChild(btn);
-		// div.appendChild(p);	
-	}
-
-	this.engine = loop((dt) => {
-		this.hydra.tick(dt)
-	}).start()
-}
 module.exports = { p5Canvas, hydraCanvas };
