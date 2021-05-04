@@ -83,7 +83,7 @@ const functionMap = {
 	},
 	// generate the pisano periods from the fibonacci sequence
 	'pisano' : (...v) => {
-		// console.log(Algo.pisano(...v));
+		// console.log('pisano() =>', Algo.pisano(...v));
 		return Algo.pisano(...v);
 	},
 	// generate the numbers in the fibonacci sequence

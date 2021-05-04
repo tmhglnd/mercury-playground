@@ -44,6 +44,7 @@ class MonoSample {
 		this.panner;
 		this.adsr;
 		this.gain;
+		this.mono;
 		this._fx;
 
 		this.makeSampler();
@@ -64,6 +65,9 @@ class MonoSample {
 		});
 		this.adsr.connect(this.gain);
 		// this.adsr.connect(this.panner);
+		// this.mono = new Tone.Mono().connect(this.adsr);
+		// this.mono = new Tone.MidSideSplit().connect(this.adsr);
+		// this.sample = new Tone.Player().connect(this.mono);
 		this.sample = new Tone.Player().connect(this.adsr);
 		// this.sample = new Tone.Player().connect(this.panner);
 
@@ -97,6 +101,13 @@ class MonoSample {
 				// get the count value
 				let c = this._beatCount;
 
+				// set FX parameters
+				if (this._fx){
+					for (let f=0; f<this._fx.length; f++){
+						this._fx[f].set(c);
+					}
+				}
+
 				// get the sample from array
 				let f = Util.randLookup(Util.lookup(this._sound, c));
 				if (this._bufs.has(f)){
@@ -129,7 +140,7 @@ class MonoSample {
 				// set panning
 				let p = Util.randLookup(Util.lookup(this._pan, c));
 				p = (p === 'random')? Math.random() * 2 - 1 : p;
-				this.panner.pan.rampTo(p, Util.msToS(1));
+				this.panner.pan.rampTo(p, Util.msToS(0));
 
 				// get the start position
 				let o = dur * Util.randLookup(Util.lookup(this._pos, c));
@@ -191,7 +202,7 @@ class MonoSample {
 		this.sample.dispose();
 		// remove all fx
 		// TODO: garbage collect and remove after fade out
-		this._fx.map((f) => f.dispose());
+		// this._fx.map((f) => f.dispose());
 		console.log('=> Disposed:', this._sound);
 	}
 
@@ -309,17 +320,22 @@ class MonoSample {
 
 	add_fx(...fx){
 		this._fx = [];
-		console.log('Effects currently disabled');
-/*
+		// console.log('Effects currently disabled');
+		
 		fx.forEach((f) => {
 			if (fxMap[f[0]]){
-				this._fx.push(fxMap[f[0]](f.slice(1)));
+				let tmpF = fxMap[f[0]](f.slice(1));
+				this._fx.push(tmpF);
 			} else {
 				console.log(`Effect ${f[0]} does not exist`);
 			}
 		});
-
-		this.sample.chain(...this._fx, Tone.Destination);*/
+		// disconnect the panner
+		this.panner.disconnect();
+		// iterate over effects and get chain
+		this._ch = this._fx.map((f) => { return f.chain() });
+		// add all effects in chain and connect to Destination
+		this.panner.chain(...this._ch, Tone.Destination);
 	}
 }
 module.exports = MonoSample;

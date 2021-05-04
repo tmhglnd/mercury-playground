@@ -1,9 +1,12 @@
 // A small example for the Mercury parser
 set tempo 140
 
+print pisano(13)
+
 list myBeat euclidean(8 5 1)
+list drives add(pisano(11) 1)
 
 new synth saw time(1/8) play(myBeat) name(s1)
-	give s1 fx(reverb 0.9 7)
+	give s1 fx(reverb 0.9 7) fx(drive drives)
 
 list notes random 16 0 12)

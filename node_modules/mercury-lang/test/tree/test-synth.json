@@ -87,7 +87,7 @@
       ]
     },
     "objects": {
-      "0V7ZQA2M": {
+      "42PFAPPV": {
         "object": "synth",
         "type": [
           "sine",
@@ -142,11 +142,11 @@
             ]
           ],
           "name": [
-            "0V7ZQA2M"
+            "42PFAPPV"
           ]
         }
       },
-      "WAS31ZW6": {
+      "FEHC195E": {
         "object": "sample",
         "type": [
           "kick_min",
@@ -188,7 +188,7 @@
             ]
           ],
           "name": [
-            "WAS31ZW6"
+            "FEHC195E"
           ]
         }
       },

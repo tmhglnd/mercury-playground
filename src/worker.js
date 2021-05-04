@@ -24,10 +24,10 @@ function code({ file, engine }){
 
 	// handle .print
 	// document.querySelector('#console').innerHTML = '';
-	/*cEditor.setValue('');
+	// cEditor.setValue('');
 	tree.print.forEach((p) => {
-		print(p);
-	});*/
+		console.log(p);
+	});
 
 	const globalMap = {
 		'tempo' : (args) => {

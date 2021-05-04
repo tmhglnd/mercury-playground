@@ -26,6 +26,18 @@
         0,
         1,
         1
+      ],
+      "drives": [
+        1,
+        2,
+        2,
+        3,
+        4,
+        6,
+        9,
+        3,
+        11,
+        2
       ]
     },
     "objects": {
@@ -69,6 +81,21 @@
               "reverb",
               0.9,
               7
+            ],
+            [
+              "drive",
+              [
+                1,
+                2,
+                2,
+                3,
+                4,
+                6,
+                9,
+                3,
+                11,
+                2
+              ]
             ]
           ],
           "name": [
@@ -82,7 +109,38 @@
         "s1"
       ]
     },
-    "print": [],
+    "print": [
+      [
+        0,
+        1,
+        1,
+        2,
+        3,
+        5,
+        8,
+        0,
+        8,
+        8,
+        3,
+        11,
+        1,
+        12,
+        0,
+        12,
+        12,
+        11,
+        10,
+        8,
+        5,
+        0,
+        5,
+        5,
+        10,
+        2,
+        12,
+        1
+      ]
+    ],
     "comments": [
       "// A small example for the Mercury parser"
     ]
@@ -107,6 +165,22 @@
         }
       },
       {
+        "@global": {
+          "@print": [
+            {
+              "@function": {
+                "@name": "pisano",
+                "@args": [
+                  {
+                    "@number": 13
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
         "@list": {
           "@name": "myBeat",
           "@params": {
@@ -118,6 +192,31 @@
                 },
                 {
                   "@number": 5
+                },
+                {
+                  "@number": 1
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "@list": {
+          "@name": "drives",
+          "@params": {
+            "@function": {
+              "@name": "add",
+              "@args": [
+                {
+                  "@function": {
+                    "@name": "pisano",
+                    "@args": [
+                      {
+                        "@number": 11
+                      }
+                    ]
+                  }
                 },
                 {
                   "@number": 1
@@ -189,6 +288,19 @@
                     }
                   ]
                 }
+              },
+              {
+                "@function": {
+                  "@name": "add_fx",
+                  "@args": [
+                    {
+                      "@identifier": "drive"
+                    },
+                    {
+                      "@identifier": "drives"
+                    }
+                  ]
+                }
               }
             ]
           }
@@ -197,6 +309,6 @@
     ]
   },
   "errors": [
-    "Syntax error at line 9: Unexpected number: 16 at list notes random 16<-"
+    "Syntax error at line 12: Unexpected number: 16 at list notes random 16<-"
   ]
 }
