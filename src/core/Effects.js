@@ -38,7 +38,7 @@ const fxMap = {
 }
 module.exports = fxMap;
 
-const Drive = function(_params) {
+const Drive = function(_params){
 	console.log('FX => Drive()', _params);
 
 	this.args = (_params[0])? _params[0] : 1.5;
@@ -77,7 +77,7 @@ const Drive = function(_params) {
 // BitCrusher
 // Add a bitcrushing effect
 // 
-const BitCrusher = function(_params) {
+const BitCrusher = function(_params){
 	console.log('FX => BitCrusher()', _params);
 
 	this._fx = new Tone.BitCrusher(_params[0]);
@@ -99,7 +99,7 @@ const BitCrusher = function(_params) {
 // Reverb FX
 // Add a reverb to the sound to give it a feel of space
 // 
-const Reverb = function(_params) {
+const Reverb = function(_params){
 	console.log('FX => Reverb()', _params);
 
 	// this._fltr = new Tone.OnePoleFilter();
@@ -132,10 +132,10 @@ const Reverb = function(_params) {
 // PitchShift FX
 // Shift the pitch up or down with semitones
 // 
-const PitchShift = function(_params) {
+const PitchShift = function(_params){
 	console.log('FX => PitchShift()', _params);
 	// to-do: add wet/dry parameter
-	
+
 	this._fx = new Tone.PitchShift();
 
 	this._pitch = (_params[0])? Util.toArray(_params[0]) : [-12];
@@ -144,6 +144,32 @@ const PitchShift = function(_params) {
 	this.set = function(c){
 		this._fx.pitch = Util.getParam(this._pitch, c);
 		// this._fx.wet = Util.getParam(this._wet, c);
+	}
+
+	this.chain = function(){
+		return this._fx;
+	}
+
+	this.delete = function(){
+		this._fx.disconnect();
+		this._fx.dispose();
+	}
+}
+
+// LFO FX
+// a Low Frequency Oscillator effect, control tempo, type and depth
+//
+const LFO = function(_params){
+	console.log('FX => LFO()', _params);
+
+	this._fx = new Tone.LFO();
+
+	this._speed = (_params[0]) ? Util.toArray(_params[0]) : ['1/4'];
+	this._type;
+	this._depth;
+
+	this.set = function(c){
+		
 	}
 
 	this.chain = function(){
