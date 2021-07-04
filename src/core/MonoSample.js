@@ -22,6 +22,7 @@ class MonoSample {
 
 		//this._note = n;
 		this._speed = [ 1 ];
+		this._rev = false;
 		this._stretch = [ 0 ];
 		
 		this._time = 1;
@@ -90,7 +91,7 @@ class MonoSample {
 		// create new loop for synth
 		this._loop = new Tone.Loop((time) => {
 			// get beat probability for current count
-			let b = Util.randLookup(Util.lookup(this._beat, this._count));
+			let b = Util.getParam(this._beat, this._count);
 			
 			// get timing TO-DO?
 
@@ -107,7 +108,7 @@ class MonoSample {
 				}
 
 				// get the sample from array
-				let f = Util.randLookup(Util.lookup(this._sound, c));
+				let f = Util.getParam(this._sound, c);
 				if (this._bufs.has(f)){
 					this.sample.buffer = this._bufs.get(f);
 				} else {
@@ -118,9 +119,18 @@ class MonoSample {
 				let dur = this.sample.buffer.duration;
 
 				// get speed and if 2d array pick randomly
-				let s = Util.randLookup(Util.lookup(this._speed, c));
+				let s = Util.getParam(this._speed, c);
 
-				this.sample.reverse = s < 0;
+				// reversing seems to reverse every time the 
+				// value is set to true (so after 2 times reverse
+				// it becomes normal playback again) no fix yet
+				// this.sample.reverse = true;
+				/*if (this._rev !== (s < 0)){
+					this.sample.reverse = true;
+				} else {
+					this.sample.reverse = false;
+				}
+				this._rev = (s < 0);*/
 
 				let l = Util.lookup(this._stretch, c);
 				let n = 1;
@@ -131,17 +141,17 @@ class MonoSample {
 				this.sample.playbackRate = Math.abs(s) * n;
 				
 				// ramp volume
-				let g = Util.lookup(this._gain[0], c);
-				let r = Util.lookup(this._gain[1], c);
+				let g = Util.getParam(this._gain[0], c);
+				let r = Util.getParam(this._gain[1], c);
 				this.sample.volume.rampTo(g, r, time);
 
 				// set panning
-				let p = Util.randLookup(Util.lookup(this._pan, c));
+				let p = Util.getParam(this._pan, c);
 				p = (p === 'random')? Math.random() * 2 - 1 : p;
 				this.panner.pan.rampTo(p, Util.msToS(1));
 
 				// get the start position
-				let o = dur * Util.randLookup(Util.lookup(this._pos, c));
+				let o = dur * Util.getParam(this._pos, c);
 				// end position for playback
 				let e = this._time;
 

@@ -11,6 +11,11 @@ function randLookup(a){
 	return a;
 }
 
+// get parameter from 1 or 2d array
+function getParam(a, i){
+	return randLookup(lookup(a, i));
+}
+
 // convert to array if not an array
 function toArray(a){
 	return Array.isArray(a) ? a : [a];
@@ -46,4 +51,4 @@ function divToS(d, bpm){
 	}
 }
 
-module.exports = { lookup, randLookup, toArray, msToS, formatRatio, divToS }
+module.exports = { lookup, randLookup, getParam, toArray, msToS, formatRatio, divToS }

@@ -17,7 +17,16 @@ const fxMap = {
 	// },
 	'reverb' : (params) => {
 		return new Reverb(params);
-	}, 
+	},
+	'shift' : (params) => {
+		return new PitchShift(params);
+	},
+	'pitchShift' : (params) => {
+		return new PitchShift(params);
+	},
+	'tune' : (params) => {
+		return new PitchShift(params);
+	}
 	// 'delay' : (param) => {
 	// 	// console.log('delay', param);
 	// 	let t = (param[0] !== undefined)? param[0] : '3/16';
@@ -51,7 +60,7 @@ const Drive = function(_params) {
 	}
 	
 	this.set = function(c){
-		let d = Util.randLookup(Util.lookup(this._drive, c));
+		let d = Util.getParam(this._drive, c);
 		this.shaper(isNaN(d)? 1 : Math.max(1, d));
 	}
 
@@ -65,6 +74,9 @@ const Drive = function(_params) {
 	}
 }
 
+// BitCrusher
+// Add a bitcrushing effect
+// 
 const BitCrusher = function(_params) {
 	console.log('FX => BitCrusher()', _params);
 
@@ -84,6 +96,9 @@ const BitCrusher = function(_params) {
 	}
 }
 
+// Reverb FX
+// Add a reverb to the sound to give it a feel of space
+// 
 const Reverb = function(_params) {
 	console.log('FX => Reverb()', _params);
 
@@ -99,9 +114,36 @@ const Reverb = function(_params) {
 
 	this.set = function(c){
 		// this._fltr.frequency.value = this._cutoff;
-		this._fx.decay = Math.min(10, Math.max(0.1, Util.lookup(this._size, c)));
-		this._fx.wet.value = Math.min(1, Math.max(0, Util.lookup(this._wet, c)));
+		this._fx.decay = Math.min(10, Math.max(0.1, Util.getParam(this._size, c)));
+		this._fx.wet.value = Math.min(1, Math.max(0, Util.getParam(this._wet, c)));
 		// this._fx.roomSize.value = Util.lookup(this._size, c);
+	}
+
+	this.chain = function(){
+		return this._fx;
+	}
+
+	this.delete = function(){
+		this._fx.disconnect();
+		this._fx.dispose();
+	}
+}
+
+// PitchShift FX
+// Shift the pitch up or down with semitones
+// 
+const PitchShift = function(_params) {
+	console.log('FX => PitchShift()', _params);
+	// to-do: add wet/dry parameter
+	
+	this._fx = new Tone.PitchShift();
+
+	this._pitch = (_params[0])? Util.toArray(_params[0]) : [-12];
+	// this._wet = (_params[1])? Util.toArray(_params[1]) : [1];
+
+	this.set = function(c){
+		this._fx.pitch = Util.getParam(this._pitch, c);
+		// this._fx.wet = Util.getParam(this._wet, c);
 	}
 
 	this.chain = function(){
