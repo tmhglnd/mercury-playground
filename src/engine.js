@@ -10,7 +10,7 @@ fetch("/samples")
 	})
 	.then(function(data) {
 		samples = data;
-		console.log(samples)
+		// console.log('sample urls:', samples);
 
 		buffers = new Tone.ToneAudioBuffers({
 			urls: samples,

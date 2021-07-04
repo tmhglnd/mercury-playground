@@ -25,7 +25,7 @@ fetch("/examples")
 	})
 	.then(function(data) {
 		examples = data;
-		console.log(examples);
+		// console.log(examples);
 	})
 	.catch(function(error) {
 		console.log('Error loading examples:' + error);

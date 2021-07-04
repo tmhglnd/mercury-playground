@@ -1,6 +1,7 @@
 const Tone = require('tone');
 const Mercury = require('mercury-lang');
 const MonoSample = require('./core/MonoSample.js');
+const MonoMidi = require('./core/MonoMidi.js');
 
 // fade time in seconds
 let crossFade = 1;
