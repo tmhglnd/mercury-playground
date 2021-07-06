@@ -14,8 +14,8 @@ window.onload = () => {
 			console.log("error enabling WebMIDI", err);
 		} else {
 			console.log("webMidi enabled");
-			// console.log(WebMidi.inputs);
-	    	// console.log(WebMidi.outputs);
+			console.log('inputs: ', WebMidi.inputs);
+	    	console.log('outputs: ', WebMidi.outputs);
 		}
 	});
 

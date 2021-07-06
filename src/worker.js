@@ -99,7 +99,7 @@ function code({ file, engine }){
 			console.log('make midi', obj);
 			let device = obj.type;
 			let args = obj.functions;
-			let inst = new MonoMidi(device);
+			let inst = new MonoMidi(device, engine);
 
 			// apply arguments to instrument
 			Object.keys(args).forEach((a) => {

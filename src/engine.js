@@ -29,7 +29,6 @@ function resume(){
 	try {
 		Tone.start();
 		Tone.Transport.timeSignature = [4, 4];
-		// Tone.Transport.seconds = 0;
 		// Tone.Transport.swing = 0.5;
 		Tone.Transport.start();
 		console.log("Resumed Transport");

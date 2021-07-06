@@ -9,7 +9,7 @@ class MonoSample {
 		this._bpm = engine.getBPM();
 		this._engine = engine;
 
-		console.log('=> MonoSample()', s, this._bpm);
+		console.log('=> MonoSample()', s);
 		
 		this._sound;
 		this.sound(s);

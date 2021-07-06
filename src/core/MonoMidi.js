@@ -4,9 +4,11 @@ const fxMap = require('./Effects.js');
 
 // simple midi playback
 class MonoMidi {
-	constructor(d){
-		console.log('=> MonoMidi()', d);
+	constructor(d='default', engine){
+		this._bpm = engine.getBPM();
+		this._engine = engine;
 		
+		console.log('=> MonoMidi()', d);
 		// console.log('MonoSample init:', s, t, b);
 		this._device = WebMidi.getOutputByName(d);
 		if (d === 'default'){
@@ -47,7 +49,7 @@ class MonoMidi {
 			this._loop.dispose();
 		}
 		let schedule = Tone.Time(this._offset).toSeconds();
-		
+
 		// create new loop
 		this._loop = new Tone.Loop((time) => {
 			// get beat probability for current count
@@ -57,13 +59,24 @@ class MonoMidi {
 			if (Math.random() < b){
 				// get the count value
 				let c = this._beatCount;
-
-				// ramp volume
+				
+				// normalized velocity (0 - 1)
 				let g = Util.getParam(this._velocity[0], c);
+				
+				// get the duration
+				let d = Util.getParam(this._dur, c);
 
-				let dur = Util.getParam(this._dur, c);
+				// note as interval / octave coordinate
+				let i = Util.getParam(this._note[0], c);
+				let o = Util.getParam(this._note[1], c);
+				// reconstruct midi note value, (0, 0) = 36
+				let n = i + (o * 12) + 36;
 
-				this._device.playNote('C4', this._channel, { duration: dur, velocity: this._velocity})
+				// timing offset to sync WebMidi and WebAudio
+				let offset = WebMidi.time - Tone.context.currentTime * 1000;
+				let sync = time * 1000 + offset;
+
+				this._device.playNote(n, 10, { duration: d, velocity: g, time: sync });
 				// increment internal beat counter
 				this._beatCount++;
 			}
@@ -74,6 +87,8 @@ class MonoMidi {
 
 	fadeOut(t){
 		// fade out the sound upon evaluation of new code
+		// no fade out possible with midi-notes
+		this.delete();
 	}
 
 	fadeIn(t){
@@ -87,8 +102,8 @@ class MonoMidi {
 
 	time(t, o=0){
 		// set the timing interval and offset
-		// this._time = formatRatio(t);
-		// this._offset = formatRatio(o);
+		this._time = Util.formatRatio(t, this._engine.getBPM());
+		this._offset = Util.formatRatio(o, this._engine.getBPM());
 	}
 
 	beat(b){
@@ -96,12 +111,24 @@ class MonoMidi {
 		// this._beat = toArray(b);
 	}
 
-	note(){}
+	note(i=0, o=0){
+		// set the note as semitone interval and octave offset
+		// (0, 0) = MidiNote 36
+		this._note = [Util.toArray(i), Util.toArray(o)];
+	}
 
-	amp(){}
+	amp(g, r){
+		// set the gain and ramp time
+		g = Util.toArray(g);
+		r = (r !== undefined)? Util.toArray(r) : [ 0 ];
+		// convert amplitude to velocity range
+		this._velocity[0] = g.map(g => Math.min(1, Math.max(0, g*g)));
+		// this._velocity[0] = g.map(g => Math.floor(Math.min(127, Math.max(0, g * 127))));
+		this._velocity[1] = r;
+	}
 
 	env(d){
-		// this._dur = toArray(d);
+		this._dur = Util.toArray(d);
 	}
 
 	out(){}
