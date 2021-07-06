@@ -65,7 +65,7 @@ new sample tabla_hi time(1/8) play(hiBeat)
 Control external midi devices or send midi to other applications and use clock sync
 
 ```java
-new midi "Your Awesome Midi Device" time(1/16) note(7 1) length(100) gain(0.8) chord(off)
+new midi "Your Awesome Midi Device" time(1/16) note(7 1) length(1/16) gain(0.8) chord(off)
 ```
 
 <!-- Generate psuedorandom melodic content for a synthesizer in a range and set a scale
@@ -163,14 +163,14 @@ Currently the playground does not have the full functionality of the original Me
 - [x] midi
 - [ ] osc
 - [ ] FX
-	- [x] reverb
-	- [ ] filter
-	- [ ] envFilter
-	- [x] drive
 	- [ ] chip
 	- [ ] delay
-	- [ ] lfo
+	- [x] drive
+	- [ ] envFilter
+	- [ ] filter
 	- [ ] kink
+	- [ ] lfo
+	- [x] reverb
 	- [x] pitchShift
 
 ## 🔭 Vision / Goals
