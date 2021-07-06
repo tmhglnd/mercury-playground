@@ -155,6 +155,7 @@ Currently the playground does not have the full functionality of the original Me
 	- [x] beat
 	- [x] gain
 	- [x] speed
+		- [ ] reverse
 	- [x] pan
 	- [x] name
 	- [x] fx
