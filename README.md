@@ -162,6 +162,13 @@ Currently the playground does not have the full functionality of the original Me
 - [ ] synth
 - [ ] polySynth
 - [x] midi
+	- [x] device
+	- [x] time
+	- [x] length
+	- [x] gain
+	- [x] out
+	- [x] chord
+	- [x] name
 - [ ] osc
 - [ ] FX
 	- [ ] chip
