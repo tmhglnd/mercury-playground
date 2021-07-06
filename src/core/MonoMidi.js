@@ -32,6 +32,7 @@ class MonoMidi {
 		this._velocity = [ 127, 0 ];
 		this._dur = 0.1;
 
+		this._chord = false;
 		this._loop;
 		// this._midi;
 		// this.seq;
@@ -66,17 +67,30 @@ class MonoMidi {
 				// get the duration
 				let d = Util.getParam(this._dur, c);
 
+				// get the channel
+				let ch = Util.getParam(this._channel, c);
+
 				// note as interval / octave coordinate
-				let i = Util.getParam(this._note[0], c);
 				let o = Util.getParam(this._note[1], c);
-				// reconstruct midi note value, (0, 0) = 36
-				let n = i + (o * 12) + 36;
+				let n;
+				if (this._chord){
+					let i = Util.lookup(this._note[0], c);
+					// reconstruct midi note value, (0, 0) = 36
+					n = [];
+					for (let x=0; x<i.length; x++){
+						n[x] = i[x] + (o * 12) + 36;
+					}
+				} else {
+					let i = Util.getParam(this._note[0], c);
+					// reconstruct midi note value, (0, 0) = 36
+					n = i + (o * 12) + 36;
+				}
 
 				// timing offset to sync WebMidi and WebAudio
 				let offset = WebMidi.time - Tone.context.currentTime * 1000;
 				let sync = time * 1000 + offset;
 
-				this._device.playNote(n, 10, { duration: d, velocity: g, time: sync });
+				this._device.playNote(n, ch, { duration: d, velocity: g, time: sync });
 				// increment internal beat counter
 				this._beatCount++;
 			}
@@ -131,9 +145,16 @@ class MonoMidi {
 		this._dur = Util.toArray(d);
 	}
 
-	out(){}
+	out(c){
+		this._channel = Util.toArray(c);
+	}
 
-	chord(){}
+	chord(c){
+		this._chord = false;
+		if (c === 'on' || c === 1){
+			this._chord = true;
+		}
+	}
 
 	sync(){}
 
