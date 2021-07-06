@@ -62,6 +62,12 @@ new sample tabla_lo time(1/8) play(loBeat)
 new sample tabla_hi time(1/8) play(hiBeat)
 ```
 
+Control external midi devices or send midi to other applications and use clock sync
+
+```java
+new midi "Your Awesome Midi Device" time(1/16) note(7 1) length(100) gain(0.8) chord(off)
+```
+
 <!-- Generate psuedorandom melodic content for a synthesizer in a range and set a scale
 
 ```java
@@ -102,14 +108,6 @@ ring melody clone(melody 0 5 7 3)
 ring melody lace(melody melody)
 
 new synth triangle note(melody 1) shape(1 80) play(rhythm)
-```
-
-Control external midi devices or send midi to other applications and use clock sync
-
-```java
-set midi getPorts
-//=> prints the available devices to the console
-new midi "Your Awesome Midi Device" time(1/4) note(7 1) length(100) sync(on)
 ```
 
 Control other environments via OSC-messages
@@ -162,7 +160,7 @@ Currently the playground does not have the full functionality of the original Me
 	- [x] fx
 - [ ] synth
 - [ ] polySynth
-- [ ] midi
+- [x] midi
 - [ ] osc
 - [ ] FX
 	- [x] reverb
@@ -173,6 +171,7 @@ Currently the playground does not have the full functionality of the original Me
 	- [ ] delay
 	- [ ] lfo
 	- [ ] kink
+	- [x] pitchShift
 
 ## 🔭 Vision / Goals
 

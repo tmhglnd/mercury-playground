@@ -18,29 +18,22 @@ class MonoMidi {
 			this._device = WebMidi.outputs[0];
 		}
 
-		this._channel = 1;
-		
 		this._count = 0;
 		this._beatCount = 0;
 		
 		this._beat = [ 1 ];
 		this._note = [ 0, 0 ];
-
+		
 		this._time = 1;
 		this._offset = 0;
 		
 		this._velocity = [ 127, 0 ];
-		this._dur = 0.1;
-
+		this._dur = [ 100 ];
+		
+		this._channel = [ 1 ];
 		this._chord = false;
 		this._loop;
-		// this._midi;
-		// this.seq;
-		// this.panner;
-		// this._fx;
 
-		// this.sound(this._sound);
-		// this.makeSampler();
 		this.makeLoop();
 	}
 
@@ -65,7 +58,7 @@ class MonoMidi {
 				let g = Util.getParam(this._velocity[0], c);
 				
 				// get the duration
-				let d = Util.getParam(this._dur, c);
+				let d = Util.divToS(Util.getParam(this._dur, c), this._bpm) * 1000;
 
 				// get the channel
 				let ch = Util.getParam(this._channel, c);
@@ -112,6 +105,8 @@ class MonoMidi {
 	delete(){
 		// dispose loop
 		this._loop.dispose();
+
+		console.log('=> Disposed:', 'Midi', this._device);
 	}
 
 	time(t, o=0){
@@ -122,7 +117,7 @@ class MonoMidi {
 
 	beat(b){
 		// set the beat pattern as an array
-		// this._beat = toArray(b);
+		this._beat = Util.toArray(b);
 	}
 
 	note(i=0, o=0){
@@ -156,10 +151,22 @@ class MonoMidi {
 		}
 	}
 
-	sync(){}
+	sync(s){
+		// send out midiclock messages to sync external devices
+		// on this specific midi output and channel
+		// this._sync;
+	}
 
-	name(){}
+	name(n){
+		// placeholder function for name
+		// is not used besides when parsing in mercury-lang
+		this._name = n;
+	}
 
-	group(){}
+	group(g){
+		// placeholder function for group
+		// is not used besides when parsing in mercury-lang
+		this._group = g;
+	}
 }
 module.exports = MonoMidi;
