@@ -159,7 +159,7 @@ Currently the playground does not have the full functionality of the original Me
 	- [x] fibonacci / pisano / pell / lucas
 	- [x] euclidean / hexBeat
 	- [x] add / subtract / multiply / divide / modulo
-- [x] sample
+- [ ] sample
 	- [x] type
 	- [x] time
 	- [x] shape
@@ -170,9 +170,18 @@ Currently the playground does not have the full functionality of the original Me
 	- [x] pan
 	- [x] name
 	- [x] fx
-- [ ] synth
+- [x] synth
+	- [x] wave
+	- [x] time
+	- [x] shape
+	- [x] beat
+	- [x] gain
+	- [x] note
+	- [x] pan
+	- [x] name
+	- [x] fx
 - [ ] polySynth
-- [x] midi
+- [ ] midi
 	- [x] device
 	- [x] time
 	- [x] length
