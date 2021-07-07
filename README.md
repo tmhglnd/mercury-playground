@@ -62,6 +62,31 @@ new sample tabla_lo time(1/8) play(loBeat)
 new sample tabla_hi time(1/8) play(hiBeat)
 ```
 
+Design sounds with various effects
+
+```java
+new sample chimes time(2) speed(-0.25) fx(reverb 0.3 15) fx(drive 10) fx(shift 3 0.5)
+```
+
+Easily give multiple instruments the same effects
+
+```java
+new sample chimes time(2)
+new sample harp_down time(3)
+new sample gong_lo time(5)
+
+set all fx(reverb 0.5 11) fx(drive 1.5)
+```
+
+Sync audio loops to the tempo of your music
+
+```java
+set tempo 97
+
+new loop amen time(1)
+new sample kick_house time(1/4)
+```
+
 Control external midi devices or applications by sending midi and cc <!--and use clock sync-->
 
 ```java
@@ -79,22 +104,6 @@ set randomSeed 31415
 ring melody random(16 0 24)
 
 new synth saw note(melody) time(1/16) shape(4 100)
-```
-
-Design sounds with various effects
-
-```java
-new sample chimes time(2) speed(-0.25) fx(reverb 0.3 15) fx(drive 10) fx(lfo 1/8 sine)
-```
-
-Easily give multiple instruments the same effects
-
-```java
-new sample chimes time(2)
-new sample harp_down time(3)
-new sample gong_lo time(5)
-
-set all fx(lfo 1/16) fx(delay) fx(reverb 0.5 11)
 ```
 
 Generate sequences algorithmically to compose complex structures and choose from an extensive library of algorithms to work with
