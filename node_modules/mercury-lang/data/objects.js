@@ -57,15 +57,16 @@ const objects = {
 	},
 	'midi' : {
 		'object' : '',
-		'type' : 'undefined',
+		'type' : 'default',
 		'functions' : {
 			'group' : [],
 			'time' : [ '1/1', 0 ],
-			'note' : [0, 0],
+			'note' : [ 0, 0 ],
 			'env' : [ 100 ],
 			'out' : [ 1 ],
 			'chord' : 'off',
 			'sync' : 'off',
+			'add_fx' : []
 		}
 	}
 }

@@ -1,6 +1,7 @@
 # 🌕 Mercury Parser
 
-This Package does not generate any sound or visuals. This package only parses Mercury code and returns a JSON formatted parse tree. This is used in the [Mercury](https://github.com/tmhglnd/mercury) environment to translate the code to sound and visual objects. In a future version this will be used in a browser-based Mercury.
+This Package does not generate any sound or visuals. This package only parses Mercury code and returns a JSON formatted parse tree. This is used in the [Mercury](https://github.com/tmhglnd/mercury) environment to translate the code to sound and visual objects. This is also used in the [Mercury-Playground](https://github.com/tmhglnd/mercury-playground), a browser based lite version of the environment.
+
 ## 📟 Mercury? 
 
 **Mercury is a minimal and human-readable language for the live coding of algorithmic electronic music.** 

@@ -16,20 +16,25 @@
 	],
 
 	"amp" : [
+		"g",
 		"gain",
+		"a",
+		"amplitude",
+		"v",
 		"vol",
 		"volume",
-		"amplitude",
 		"velocity",
 		"vel"
 	],
 
 	"beat" : [
+		"b",
 		"rhythm",
 		"play"
 	],
 
 	"env" : [
+		"e",
 		"envelope",
 		"shape",
 		"transient",
@@ -39,10 +44,12 @@
 	],
 
 	"note" : [
+		"n",
 		"pitch"
 	],
 
 	"time" : [
+		"t",
 		"timing"
 	],
 
@@ -55,6 +62,7 @@
 	],
 
 	"pan" : [
+		"p",
 		"panning",
 		"spat",
 		"location"
@@ -67,6 +75,7 @@
 	],
 
 	"speed" : [
+		"s",
 		"rate",
 		"playback"
 	],
@@ -80,7 +89,9 @@
 		"withFX",
 		"addFX",
 		"effect",
-		"fx"
+		"fx",
+		"cc",
+		"change"
 	],
 
 	"res" : [
@@ -94,6 +105,7 @@
 	],
 
 	"wave2" : [
+		"w",
 		"osc2",
 		"add_osc"
 	],

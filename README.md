@@ -169,8 +169,11 @@ Currently the playground does not have the full functionality of the original Me
 	- [x] out
 	- [x] chord
 	- [x] name
+	- [x] change
+	- [ ] bend
+	- [ ] sync
 - [ ] osc
-- [ ] FX
+- [ ] fx
 	- [ ] chip
 	- [ ] delay
 	- [x] drive

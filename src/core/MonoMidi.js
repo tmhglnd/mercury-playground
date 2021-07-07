@@ -30,6 +30,7 @@ class MonoMidi {
 		this._velocity = [ 127, 0 ];
 		this._dur = [ 100 ];
 		
+		this._cc = [];
 		this._channel = [ 1 ];
 		this._chord = false;
 		this._loop;
@@ -83,7 +84,18 @@ class MonoMidi {
 				let offset = WebMidi.time - Tone.context.currentTime * 1000;
 				let sync = time * 1000 + offset;
 
+				// send control changes!
+				this._cc.forEach((cc) => {
+					let ctrl = Number(cc[0]);
+					let val = Util.getParam(cc[1], c);
+					val = Math.max(0, Math.min(127, val));
+					
+					this._device.sendControlChange(ctrl, val, ch, { time: sync });
+				});
+
+				// play the note!
 				this._device.playNote(n, ch, { duration: d, velocity: g, time: sync });
+
 				// increment internal beat counter
 				this._beatCount++;
 			}
@@ -149,6 +161,21 @@ class MonoMidi {
 		if (c === 'on' || c === 1){
 			this._chord = true;
 		}
+	}
+
+	add_fx(...cc){
+		// control parameters via control change midi messages
+		this._cc = [];
+		cc.forEach((c) => {
+			if (isNaN(c[0])){
+				console.log(`'${c[0]}' is not a valid CC number`);
+			} else {
+				let cc = [];
+				cc[0] = c[0];
+				cc[1] = Util.toArray(c[1]);
+				this._cc.push(cc);
+			}
+		});
 	}
 
 	sync(s){

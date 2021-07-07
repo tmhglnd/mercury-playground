@@ -5,3 +5,5 @@ new synth saw %(1/4 1/8) #(notes 1) ^(1 300) !(0.2) }(sn bass) ~(reverb 0.9 11) 
 
 new sample kick_min %(1/16) ^(1 1/32 2) @(kick) *(1.1)
 	set kick !(euclid(16 5)) ~(drive 4)
+
+new sample violin_g t(3/16) b(0.9) n(7 1) e(5 150) g(0.4) p(-0.3) s(0.5)
