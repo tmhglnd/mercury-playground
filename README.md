@@ -62,10 +62,12 @@ new sample tabla_lo time(1/8) play(loBeat)
 new sample tabla_hi time(1/8) play(hiBeat)
 ```
 
-Control external midi devices or send midi to other applications and use clock sync
+Control external midi devices or applications by sending midi and cc <!--and use clock sync-->
 
 ```java
-new midi "Your Awesome Midi Device" time(1/16) note(7 1) length(1/16) gain(0.8) chord(off)
+new midi "Your Awesome Midi Device" time(1/16) note(7 1) name(mDev)
+    set mDev length(1/16) gain(0.8) chord(off)
+    set mDev cc(10 [20 50 100])
 ```
 
 <!-- Generate psuedorandom melodic content for a synthesizer in a range and set a scale
