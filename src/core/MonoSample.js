@@ -14,10 +14,11 @@ class MonoSample {
 		this._sound;
 		this.sound(s);
 		
-		this._length = 0;
 		this._count = 0;
 		this._beatCount = 0;
 		
+		this._time = 1;
+		this._offset = 0;
 		this._beat = [ 1 ];
 
 		//this._note = n;
@@ -25,8 +26,6 @@ class MonoSample {
 		this._rev = false;
 		this._stretch = [ 0 ];
 		
-		this._time = 1;
-		this._offset = 0;
 
 		// playback start position
 		this._pos = [ 0 ];

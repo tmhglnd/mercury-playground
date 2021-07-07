@@ -2,6 +2,7 @@ const Tone = require('tone');
 const Mercury = require('mercury-lang');
 const MonoSample = require('./core/MonoSample.js');
 const MonoMidi = require('./core/MonoMidi.js');
+const MonoSynth = require('./core/MonoSynth.js');
 
 // fade time in seconds
 let crossFade = 1;
@@ -90,13 +91,29 @@ function code({ file, engine }){
 				if (inst[a]){
 					inst[a](...args[a]);
 				} else {
-					console.log(`${a}() is not a function of sample`);
+					console.log(`${a}() is not a function of loop`);
+				}
+			});
+			return inst;
+		},
+		'synth' : (obj) => {
+			console.log('make synth', obj);
+			let type = obj.type;
+			let args = obj.functions;			
+			let inst = new MonoSynth(type, engine);
+
+			// apply arguments to instrument if part of instrument
+			Object.keys(args).forEach((a) => {
+				if (inst[a]){
+					inst[a](...args[a]);
+				} else {
+					console.log(`${a}() is not a function of synth`);
 				}
 			});
 			return inst;
 		},
 		'midi' : (obj) => {
-			console.log('make midi', obj);
+			// console.log('make midi', obj);
 			let device = obj.type;
 			let args = obj.functions;
 			let inst = new MonoMidi(device, engine);

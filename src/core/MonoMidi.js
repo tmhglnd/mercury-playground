@@ -5,8 +5,8 @@ const fxMap = require('./Effects.js');
 // simple midi playback
 class MonoMidi {
 	constructor(d='default', engine){
-		this._bpm = engine.getBPM();
 		this._engine = engine;
+		this._bpm = engine.getBPM();
 		
 		console.log('=> MonoMidi()', d);
 		// console.log('MonoSample init:', s, t, b);
@@ -89,7 +89,7 @@ class MonoMidi {
 					let ctrl = Number(cc[0]);
 					let val = Util.getParam(cc[1], c);
 					val = Math.max(0, Math.min(127, val));
-					
+
 					this._device.sendControlChange(ctrl, val, ch, { time: sync });
 				});
 

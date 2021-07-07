@@ -62,6 +62,30 @@ new sample tabla_lo time(1/8) play(loBeat)
 new sample tabla_hi time(1/8) play(hiBeat)
 ```
 
+Generate psuedorandom melodic content for a synthesizer in a range <!-- and set a scale -->
+
+```java
+set randomSeed 31415
+
+ring melody random(16 0 24)
+
+new synth saw note(melody) time(1/16) shape(4 100)
+```
+
+Generate sequences algorithmically to compose complex structures and choose from an extensive library of algorithms to work with
+
+```java
+set tempo 132
+ring rhythm euclid(32 13)
+
+ring melody spread(5 0 24)
+ring melody palindrome(melody)
+ring melody clone(melody 0 5 7 3)
+ring melody lace(melody melody)
+
+new synth triangle time(1/16) note(melody 1) shape(1 80) play(rhythm)
+```
+
 Design sounds with various effects
 
 ```java
@@ -95,32 +119,7 @@ new midi "Your Awesome Midi Device" time(1/16) note(7 1) name(mDev)
     set mDev cc(10 [20 50 100])
 ```
 
-<!-- Generate psuedorandom melodic content for a synthesizer in a range and set a scale
-
-```java
-set scale minor d
-set randomSeed 31415
-
-ring melody random(16 0 24)
-
-new synth saw note(melody) time(1/16) shape(4 100)
-```
-
-Generate sequences algorithmically to compose complex structures and choose from an extensive library of algorithms to work with
-
-```java
-set scale minor a 
-
-ring rhythm euclidean(32 13)
-
-ring melody spread(5 0 24)
-ring melody palinedrome(melody)
-ring melody clone(melody 0 5 7 3)
-ring melody lace(melody melody)
-
-new synth triangle note(melody 1) shape(1 80) play(rhythm)
-```
-
+<!-- 
 Control other environments via OSC-messages
 
 ```java
@@ -139,7 +138,8 @@ Easily control parameters in Mercury via external OSC-messages
 
 ```java
 new synth triangle fx(reverb /extOSC/verbAmount) fx(filter low /extOSC/cutoff 0.4) time(1) shape(1 1000)
-``` -->
+```
+-->
 
 **AND MANY MORE (TO COME...)**
 
