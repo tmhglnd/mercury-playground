@@ -233,13 +233,11 @@ It is now possible to code together in Mercury using the amazing [**Flok**](http
 
 `$ npm install`
 
-`$ npm run build`
+`$ npm run build` or `$ npm run watch` while developing
 
 `$ npm start`
 
 `$ open -a Google\ Chrome http://localhost:3000`
-
-While developing: `npm run watch`
 
 ## 📖 Documentation
 
