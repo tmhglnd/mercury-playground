@@ -1,0 +1,7 @@
+// === TUTORIAL 21 ===
+// With a volume list we can change the amplitude 
+// over time to create dynamics in the sound
+
+list dynamics randomFloat(8 0.3 0.9)
+new sample [[tabla_hi tabla_hi_short tabla_mid]] time(1/16) gain(dynamics)
+// here a list of 8 random values between 0.3 and 0.9 creates a nice feel

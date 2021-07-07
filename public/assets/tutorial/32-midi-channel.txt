@@ -1,0 +1,5 @@
+// === TUTORIAL 32 ===
+// We can change the midi-channel with the out() method
+
+new midi default time(1/8) note(0 0) out(10)
+// channel 10 is the default drum channel in general midi
