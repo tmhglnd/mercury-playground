@@ -34,6 +34,7 @@ class MonoSynth {
 		this._beat = [ 1 ];
 		
 		this._note = [ 0, 0 ];
+		this._slide = [ 0 ];
 		
 		// default gain value -6 dB
 		this._gain = [ -6, 0 ];
@@ -94,7 +95,7 @@ class MonoSynth {
 				// set FX parameters
 				if (this._fx){
 					for (let f=0; f<this._fx.length; f++){
-						this._fx[f].set(c);
+						this._fx[f].set(c, time, this._bpm);
 					}
 				}
 
@@ -117,7 +118,8 @@ class MonoSynth {
 				// set panning
 				let p = Util.getParam(this._pan, c);
 				p = (p === 'random')? Math.random() * 2 - 1 : p;
-				this.panner.pan.rampTo(p, Util.msToS(1));
+				// this.panner.pan.rampTo(p, Util.msToS(1));
+				this.panner.pan.setValueAtTime(p, time);
 
 				// end position for playback
 				let e = this._time;
@@ -143,7 +145,14 @@ class MonoSynth {
 				let n = i + (o * 12) + 36;
 				// calculate frequency in 12-TET A4 = 440;
 				let f = Math.pow(2, (n - 69)/12) * 440;
-				this.synth.set({ frequency: f, portamento: 20 });
+				
+				// get the slide time for next note
+				let s = Util.divToS(Util.getParam(this._slide, c));
+				if (s > 0){
+					this.synth.frequency.rampTo(f, s, time);
+				} else {
+					this.synth.frequency.setValueAtTime(f, time);
+				}
 
 				// calculate the release trigger time
 				let rt = Math.max(0.001, e - this.adsr.release);
@@ -249,6 +258,10 @@ class MonoSynth {
 			}
 		}
 		// console.log('shape()', this._att, this._rel, this._sus);
+	}
+
+	slide(s){
+		this._slide = Util.toArray(s);
 	}
 
 	wave2(w){

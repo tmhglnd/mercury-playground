@@ -99,7 +99,7 @@ new sample chimes time(2)
 new sample harp_down time(3)
 new sample gong_lo time(5)
 
-set all fx(reverb 0.5 11) fx(drive 1.5)
+set all fx(reverb 0.5 11) fx(drive 1.5) fx(filter low 2000 0.6)
 ```
 
 Sync audio loops to the tempo of your music
@@ -180,6 +180,7 @@ Currently the playground does not have the full functionality of the original Me
 	- [x] pan
 	- [x] name
 	- [x] fx
+	- [x] slide
 - [ ] polySynth
 - [ ] midi
 	- [x] device
@@ -195,10 +196,11 @@ Currently the playground does not have the full functionality of the original Me
 - [ ] osc
 - [ ] fx
 	- [ ] chip
-	- [ ] delay
+	- [x] delay
 	- [x] drive
 	- [ ] envFilter
-	- [ ] filter
+	- [x] filter
+		- [ ] modulation
 	- [ ] kink
 	- [ ] lfo
 	- [x] reverb

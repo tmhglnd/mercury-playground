@@ -65,7 +65,6 @@ CodeMirror.defineSimpleMode("mercury", {
 
 const Editor = function({ context, engine }) {
 	// this._engine = engine;
-
 	console.log('=> Created Editor()');
 
 	// let container = document.createElement('div');

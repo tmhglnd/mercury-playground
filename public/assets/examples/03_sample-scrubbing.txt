@@ -14,6 +14,6 @@ ring pos1 randomFloat(16 0 0.2)
 ring pos2 randomFloat(16 0.2 0.3)
 ring play join(pos1 pos1 pos1 pos2)
 
-new sample harp_up time(1/16) shape(1 50 2) offset(play) gain(2)
+new sample harp_up time(1/16) shape(1 100) offset(play) gain(2)
 
 set all fx(reverb 0.5 11)

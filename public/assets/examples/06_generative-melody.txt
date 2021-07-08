@@ -12,5 +12,5 @@ ring section clone(phrase 0 5 9 7)
 new synth triangle name(arpy)
     set arpy time(1/16) shape(1 170) note(section 1)
 
-    // give the synth random panning
-    set arpy pan(random)
+    // give the synth random panning, a filter and a delay
+    set arpy pan(random) fx(filter low 2300 0.4) fx(delay 5/16 0.5)

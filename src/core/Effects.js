@@ -1,5 +1,7 @@
 const Tone = require('tone');
 const Util = require('./Util.js');
+// const Tuna = require('tunajs');
+// const TunaFX = new Tuna(Tone.getContext());
 
 // all the available effects
 const fxMap = {
@@ -26,15 +28,13 @@ const fxMap = {
 	},
 	'tune' : (params) => {
 		return new PitchShift(params);
+	},
+	'filter' : (params) => {
+		return new Filter(params);
+	},
+	'delay' : (params) => {
+		return new Delay(params);
 	}
-	// 'delay' : (param) => {
-	// 	// console.log('delay', param);
-	// 	let t = (param[0] !== undefined)? param[0] : '3/16';
-	// 	let fb = (param[1] !== undefined)? param[1] : 0.3;
-	// 	let del = new Tone.PingPongDelay(formatRatio(t), fb);
-
-	// 	return del;
-	// }
 }
 module.exports = fxMap;
 
@@ -77,7 +77,7 @@ const Drive = function(_params){
 // BitCrusher
 // Add a bitcrushing effect
 // 
-const BitCrusher = function(_params){
+/*const BitCrusher = function(_params){
 	console.log('FX => BitCrusher()', _params);
 
 	this._fx = new Tone.BitCrusher(_params[0]);
@@ -94,7 +94,7 @@ const BitCrusher = function(_params){
 		this._fx.disconnect();
 		this._fx.dispose();
 	}
-}
+}*/
 
 // Reverb FX
 // Add a reverb to the sound to give it a feel of space
@@ -102,21 +102,16 @@ const BitCrusher = function(_params){
 const Reverb = function(_params){
 	console.log('FX => Reverb()', _params);
 
-	// this._fltr = new Tone.OnePoleFilter();
 	this._fx = new Tone.Reverb();
-	// this._fx = new Tone.Gain(1).chain(this._rev, this._fltr);
-	// this._fx = new Tone.Freeverb();
-	// this._fx = new Tone.JCReverb();
 
-	// this._cutoff = 5000;
 	this._wet = (_params[0])? Util.toArray(_params[0]) : [0.5];
 	this._size = (_params[1])? Util.toArray(_params[1]) : [1.5];
 
-	this.set = function(c){
-		// this._fltr.frequency.value = this._cutoff;
+	this.set = function(c, time){
 		this._fx.decay = Math.min(10, Math.max(0.1, Util.getParam(this._size, c)));
-		this._fx.wet.value = Math.min(1, Math.max(0, Util.getParam(this._wet, c)));
-		// this._fx.roomSize.value = Util.lookup(this._size, c);
+
+		let wet = Math.min(1, Math.max(0, Util.getParam(this._wet, c)));
+		this._fx.wet.setValueAtTime(wet, time);
 	}
 
 	this.chain = function(){
@@ -159,7 +154,7 @@ const PitchShift = function(_params){
 // LFO FX
 // a Low Frequency Oscillator effect, control tempo, type and depth
 //
-const LFO = function(_params){
+/*const LFO = function(_params){
 	console.log('FX => LFO()', _params);
 
 	this._fx = new Tone.LFO();
@@ -170,6 +165,82 @@ const LFO = function(_params){
 
 	this.set = function(c){
 		
+	}
+
+	this.chain = function(){
+		return this._fx;
+	}
+
+	this.delete = function(){
+		this._fx.disconnect();
+		this._fx.dispose();
+	}
+}*/
+
+// A filter FX, choose between highpass, lowpass and bandpass
+// Set the cutoff frequency and Q factor
+//
+const Filter = function(_params){
+	console.log('FX => Filter()', _params);
+
+	this._fx = new Tone.Filter();
+
+	this._types = {
+		'lo' : 'lowpass',
+		'low' : 'lowpass',
+		'lowpass' : 'lowpass',
+		'hi' : 'highpass',
+		'high' : 'highpass',
+		'highpass' : 'highpass',
+		'band' : 'bandpass',
+		'bandpass': 'bandpass'
+	}
+	if (this._types[_params[0]]){
+		this._fx.set({ type: this._types[_params[0]] });
+	} else {
+		console.log(`'${_params[0]}' is not a valid filter type`);
+		this._fx.set({ type: 'lowpass' });
+	}
+	this._fx.set({ rolloff: -24 });
+
+	this._cutoff = (_params[1]) ? Util.toArray(_params[1]) : [ 1000 ];
+	this._q = (_params[2]) ? Util.toArray(_params[2]) : [ 0.5 ];
+
+	this.set = function(c, time){
+		let f = Util.getParam(this._cutoff, c);
+		let r = Util.getParam(this._q, c);
+		// this._fx.set({ frequency: f , Q: r });
+		this._fx.frequency.setValueAtTime(f, time);
+		this._fx.Q.setValueAtTime(r, time);
+	}
+
+	this.chain = function(){
+		return this._fx;
+	}
+
+	this.delete = function(){
+		this._fx.disconnect();
+		this._fx.dispose();
+	}
+}
+
+const Delay = function(_params){
+	console.log('FX => Delay()', _params);
+
+	this._fx = new Tone.PingPongDelay();
+	this._fx.set({ wet: 0.4 });
+
+	// console.log('delay', param);
+	this._dTime = (_params[0] !== undefined)? Util.toArray(_params[0]) : [ '3/16' ];
+	this._fb = (_params[1] !== undefined)? Util.toArray(_params[1]) : [ 0.3 ];
+	// let del = new Tone.PingPongDelay(formatRatio(t), fb);
+
+	this.set = function(c, time, bpm){
+		let t = Math.max(0, Util.formatRatio(Util.getParam(this._dTime, c), bpm));
+		let fb = Math.max(0, Math.min(0.99, Util.getParam(this._fb, c)));
+
+		this._fx.delayTime.setValueAtTime(t, time);
+		this._fx.feedback.setValueAtTime(fb, time);
 	}
 
 	this.chain = function(){

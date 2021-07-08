@@ -102,7 +102,7 @@ class MonoSample {
 				// set FX parameters
 				if (this._fx){
 					for (let f=0; f<this._fx.length; f++){
-						this._fx[f].set(c);
+						this._fx[f].set(c, time, this._bpm);
 					}
 				}
 
@@ -147,7 +147,7 @@ class MonoSample {
 				// set panning
 				let p = Util.getParam(this._pan, c);
 				p = (p === 'random')? Math.random() * 2 - 1 : p;
-				this.panner.pan.rampTo(p, Util.msToS(1));
+				this.panner.pan.setValueAtTime(p, time);
 
 				// get the start position
 				let o = dur * Util.getParam(this._pos, c);
