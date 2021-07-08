@@ -6,11 +6,11 @@ let buffers;
 // get the sample file paths from server
 fetch("/samples")
 	.then(function(response) {
+		console.log('loading sounds...');
 		return response.json();
 	})
 	.then(function(data) {
 		samples = data;
-		console.log('loading sounds...');
 
 		buffers = new Tone.ToneAudioBuffers({
 			urls: samples,
@@ -38,7 +38,7 @@ function resume(){
 		Tone.Transport.start();
 		console.log("Resumed Transport");
 	} catch {
-		console.error("error enabling ToneJS");
+		console.error("!! error enabling ToneJS");
 	}
 }
 

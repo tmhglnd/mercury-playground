@@ -47,10 +47,10 @@ window.onload = () => {
 	// Get the tutorials from the server
 	fetch("/tutorial")
 		.then(function(response) {
+			console.log('loading tutorials...');
 			return response.json();
 		})
 		.then(function(data) {
-			// console.log('tutorials', data);
 			console.log('=> tutorials loaded');
 			cm.tutorialMenu(data);
 		})

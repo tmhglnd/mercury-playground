@@ -21,14 +21,15 @@ let tutorials = {};
 // get the example code files from server
 fetch("/examples")
 	.then(function(response) {
+		console.log('loading examples...');
 		return response.json();
 	})
 	.then(function(data) {
 		examples = data;
-		// console.log(examples);
+		console.log('=> examples loaded');
 	})
 	.catch(function(error) {
-		console.log('Error loading examples:' + error);
+		console.log('!! Error loading examples:' + error);
 	});
 
 // the simple mode lexer for Mercury syntax-highlighting
