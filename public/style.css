@@ -161,3 +161,57 @@ textarea:focus {
 	margin: 20px;
 	z-index: 10;
 }
+
+.loadscreen {
+	opacity: 1; 
+	background: #000; 
+	width: 100%;
+	height: 100%; 
+	z-index: 999999;
+	top: 0; 
+	left: 0; 
+	position: fixed;
+	/* display: none; */
+}
+
+.loader {
+	border: 10px solid rgb(255, 255, 255, 0.2);
+	border-radius: 80%;
+	border-top: 10px solid rgb(255, 255, 255, 1);
+	width: 25px;
+	height: 25px;
+	-webkit-animation: spin 2s linear infinite; /* Safari */
+	animation: spin 2s linear infinite;
+
+	float: center;
+	z-index: 1000;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 50px;
+	/* margin-bottom: 50%; */
+}
+
+.loadText {
+	float: center;
+	/* text-align: center; */
+	z-index: 1000;
+	margin-left: 20px;
+	margin-top: 20px;
+	/* margin-right: auto; */
+	/* margin-top: 150px; */
+}
+
+.hideLoad {
+	display: none;
+}
+
+/* Safari */
+@-webkit-keyframes spin {
+	0% { -webkit-transform: rotate(0deg); }
+	100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+	0% { transform: rotate(0deg); }
+	100% { transform: rotate(360deg); }
+}

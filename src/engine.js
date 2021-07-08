@@ -10,13 +10,18 @@ fetch("/samples")
 	})
 	.then(function(data) {
 		samples = data;
-		// console.log('sample urls:', samples);
+		console.log('loading sounds...');
 
 		buffers = new Tone.ToneAudioBuffers({
 			urls: samples,
 			onload: function(){ 
-				console.log('buffers loaded');
+				console.log('=> sounds loaded');
 				// init();
+				// remove loading screen, because probably this
+				// is the last thing that is done
+				setTimeout(() => {
+					document.getElementById('load').className = 'hideLoad';
+				}, 2500);
 			}
 		});
 	})

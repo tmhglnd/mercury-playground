@@ -2,20 +2,40 @@
 // 
 
 window.onload = () => {
+	// load requires
 	const Tone = require('tone');
 	const Engine = require('./engine.js');
 	const Editor = require('./editor.js');	
 	const Canvas = require('./canvas.js');
 	const p5 = require('p5');
 
+	// console.log catch function
+	if (typeof console != "undefined"){ 
+		if (typeof console.log != 'undefined'){
+			console.olog = console.log;
+		} else {
+			console.olog = () => {};
+		}
+	}
+	console.log = (...message) => {
+		console.olog(...message);
+		document.getElementById('log').innerHTML += `${message}<br>`
+		// document.getElementById('console-log').innerHTML += `${message}<br>`
+	};
+	console.error = console.debug = console.info = console.log;
+
 	// WebMIDI Setup
 	WebMidi.enable(function (err) {
 		if (err) {
-			console.log("error enabling WebMIDI", err);
+			console.log("!! error enabling WebMIDI", err);
 		} else {
-			console.log("webMidi enabled");
-			// console.log('inputs: ', WebMidi.inputs);
-	    	// console.log('outputs: ', WebMidi.outputs);
+			console.log("=> webMidi enabled");
+			WebMidi.inputs.forEach((i) => {
+				console.log('- inputs: ', i.name);
+			});
+			WebMidi.outputs.forEach((i) => {
+				console.log('- outputs: ', i.name);
+			});
 		}
 	});
 
@@ -31,11 +51,11 @@ window.onload = () => {
 		})
 		.then(function(data) {
 			// console.log('tutorials', data);
-			console.log('tutorials loaded');
+			console.log('=> tutorials loaded');
 			cm.tutorialMenu(data);
 		})
 		.catch(function(error) {
-			console.log('Error loading tutorials:' + error);
+			console.log('!! Error loading tutorials:' + error);
 		});
 
 	// Load all the buttons/menus
