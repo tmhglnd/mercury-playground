@@ -15,12 +15,13 @@ body {
 
 h1 {
 	font-family: 'Major Mono Display', monospace;
+	/* text-align: right; */
 	/* font-weight: 'normal'; */
 	/* font-size: 36px; */
 	/* font-size: 6vw; */
-	font-size: 2em;
+	font-size: 1.5em;
 	/* color: rgb(180, 180, 180); */
-	color: rgb(255, 255, 255, 0.7);
+	color: rgb(255, 255, 255, 0.3);
 }
 
 p {
