@@ -145,6 +145,10 @@ const functionMap = {
 	'dice' : (...v) => {
 		return Rand.dice(v[0]);
 	},
+	// generate random clave patterns
+	'clave' : (...v) => {
+		return Rand.clave(...v);
+	},
 	// generate an array of twelveTone notes
 	'twelveTone' : () => {
 		return Rand.twelveTone();

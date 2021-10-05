@@ -3,7 +3,7 @@ set tempo 140
 
 print pisano(13)
 
-list myBeat euclidean(8 5 1)
+list myBeat clave(16 5 2)
 list drives add(pisano(11) 1)
 
 new synth saw time(1/8) play(myBeat) name(s1)
