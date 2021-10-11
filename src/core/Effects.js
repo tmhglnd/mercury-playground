@@ -290,7 +290,7 @@ const Filter = function(_params){
 
 	this.set = function(c, time){
 		let f = Util.getParam(this._cutoff, c);
-		let r = Util.getParam(this._q, c);
+		let r = 1 / (1 - Util.getParam(this._q, c));
 		// this._fx.set({ frequency: f , Q: r });
 		this._fx.frequency.setValueAtTime(f, time);
 		this._fx.Q.setValueAtTime(r, time);
