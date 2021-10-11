@@ -14,6 +14,12 @@ const fxMap = {
 	'overdrive' : (params) => {
 		return new Drive(params);
 	},
+	'squash' : (params) => {
+		return new Squash(params);
+	},
+	'compress' : (params) => {
+		return new Squash(params);
+	},
 	// 'chip' : (params) => {
 	// 	return new BitCrusher(params);
 	// },
@@ -61,6 +67,43 @@ const Drive = function(_params){
 	
 	this.set = function(c){
 		let d = Util.getParam(this._drive, c);
+		this.shaper(isNaN(d)? 1 : Math.max(1, d));
+	}
+
+	this.chain = function(){
+		return this._fx;
+	}
+
+	this.delete = function(){
+		this._fx.disconnect();
+		this._fx.dispose();
+	}
+}
+
+// squash/compress an incoming signal
+// based on algorithm by Peter McCulloch
+const Squash = function(_params){
+	console.log('FX => Squash()', _params);
+
+	this.args = (_params[0])? _params[0] : 1;
+	this._compress = Util.toArray(this.args);
+
+	this._fx = new Tone.WaveShaper();
+
+	this.shaper = function(amount){
+		// (a * c) / ((a * c)^2 * 0.28 + 1) / √c
+		// drive amount, minimum of 1
+		const c = amount;
+		// makeup gain
+		const m = 1.0 / Math.sqrt(c);
+		// set the waveshaper effect
+		this._fx.setMap((x) => {
+			return (x * c) / ((x * c) * (x * c) * 0.28 + 1) * m; 
+		});
+	}
+	
+	this.set = function(c){
+		let d = Util.getParam(this._compress, c);
 		this.shaper(isNaN(d)? 1 : Math.max(1, d));
 	}
 
