@@ -154,7 +154,7 @@ const Reverb = function(_params){
 	this.set = function(c, time){
 		let tmp = Math.min(10, Math.max(0.1, Util.getParam(this._size, c)));
 		if (this._fx.decay != tmp){
-			this._fx.decay.setValueAtTime(tmp, time); 
+			this._fx.decay = tmp; 
 		}
 
 		let wet = Math.min(1, Math.max(0, Util.getParam(this._wet, c)));
@@ -290,8 +290,8 @@ const Filter = function(_params){
 
 	this.set = function(c, time){
 		let f = Util.getParam(this._cutoff, c);
-		let r = 1 / (1 - Util.getParam(this._q, c));
-		// this._fx.set({ frequency: f , Q: r });
+		let r = 1 / Math.min(1, Math.max(0, (1 - Util.getParam(this._q, c))));
+
 		this._fx.frequency.setValueAtTime(f, time);
 		this._fx.Q.setValueAtTime(r, time);
 	}
