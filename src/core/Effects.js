@@ -50,8 +50,7 @@ module.exports = fxMap;
 const Drive = function(_params){
 	console.log('FX => Drive()', _params);
 
-	this.args = (_params[0])? _params[0] : 1.5;
-	this._drive = Util.toArray(this.args);
+	this._drive = (_params[0] !== undefined)? Util.toArray(_params[0]) : [1.5];
 
 	this._fx = new Tone.WaveShaper();
 
@@ -88,8 +87,7 @@ const Drive = function(_params){
 const Squash = function(_params){
 	console.log('FX => Squash()', _params);
 
-	this.args = (_params[0])? _params[0] : 1;
-	this._compress = Util.toArray(this.args);
+	this._compress = (_params[0] !== undefined)? Util.toArray(_params[0]) : [1];
 
 	this._fx = new Tone.WaveShaper();
 
@@ -150,8 +148,8 @@ const Reverb = function(_params){
 
 	this._fx = new Tone.Reverb();
 
-	this._wet = (_params[0])? Util.toArray(_params[0]) : [0.5];
-	this._size = (_params[1])? Util.toArray(_params[1]) : [1.5];
+	this._wet = (_params[0] !== undefined)? Util.toArray(_params[0]) : [ 0.5 ];
+	this._size = (_params[1] !== undefined)? Util.toArray(_params[1]) : [ 1.5 ];
 
 	this.set = function(c, time){
 		this._fx.decay = Math.min(10, Math.max(0.1, Util.getParam(this._size, c)));
@@ -179,12 +177,15 @@ const PitchShift = function(_params){
 
 	this._fx = new Tone.PitchShift();
 
-	this._pitch = (_params[0])? Util.toArray(_params[0]) : [-12];
-	// this._wet = (_params[1])? Util.toArray(_params[1]) : [1];
+	this._pitch = (_params[0] !== undefined)? Util.toArray(_params[0]) : [-12];
+	this._wet = (_params[1] !== undefined)? Util.toArray(_params[1]) : [1];
 
-	this.set = function(c){
-		this._fx.pitch = Util.getParam(this._pitch, c);
-		// this._fx.wet = Util.getParam(this._wet, c);
+	this.set = function(c, time){
+		let p = Util.getParam(this._pitch, c);
+		let w = Util.getParam(this._wet, c);
+
+		this._fx.pitch = p;
+		this._fx.wet.setValueAtTime(w, time);
 	}
 
 	this.chain = function(){
@@ -219,7 +220,7 @@ const LFO = function(_params){
 
 	this._speed = (_params[0]) ? Util.toArray(_params[0]) : ['8n'];
 	this._type = (_params[1]) ? Util.toArray(_params[1]) : ['sine'];
-	this._depth = (_params[2]) ? Util.toArray(_params[2]) : [ 1 ];
+	this._depth = (_params[2] !== undefined) ? Util.toArray(_params[2]) : [ 1 ];
 
 	this.set = function(c, time, bpm){
 		let w = Util.getParam(this._type, c);
@@ -236,9 +237,10 @@ const LFO = function(_params){
 
 		// let t = Util.formatRatio(s, bpm);
 		this._lfo.frequency.setValueAtTime(s, time);
-		// let a = Util.getParam(this._depth, c);
-		// this._lfo.min = 1 - Math.max(0.001, a);
 		
+		let a = Util.getParam(this._depth, c);
+		this._lfo.min = 1 - a;
+
 		this._lfo.start(Tone.now());
 	}
 
