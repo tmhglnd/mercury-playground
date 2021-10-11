@@ -152,7 +152,10 @@ const Reverb = function(_params){
 	this._size = (_params[1] !== undefined)? Util.toArray(_params[1]) : [ 1.5 ];
 
 	this.set = function(c, time){
-		this._fx.decay = Math.min(10, Math.max(0.1, Util.getParam(this._size, c)));
+		let tmp = Math.min(10, Math.max(0.1, Util.getParam(this._size, c)));
+		if (this._fx.decay != tmp){
+			this._fx.decay.setValueAtTime(tmp, time); 
+		}
 
 		let wet = Math.min(1, Math.max(0, Util.getParam(this._wet, c)));
 		this._fx.wet.setValueAtTime(wet, time);
@@ -237,7 +240,7 @@ const LFO = function(_params){
 
 		// let t = Util.formatRatio(s, bpm);
 		this._lfo.frequency.setValueAtTime(s, time);
-		
+
 		let a = Util.getParam(this._depth, c);
 		this._lfo.min = 1 - a;
 
