@@ -33,10 +33,16 @@ fetch("/samples")
 function resume(){
 	try {
 		Tone.start();
-		Tone.Transport.timeSignature = [4, 4];
-		// Tone.Transport.swing = 0.5;
-		Tone.Transport.start();
-		console.log("Resumed Transport");
+
+		if (Tone.Transport.state !== 'started'){
+			Tone.Transport.start();
+			
+			Tone.Transport.timeSignature = [4, 4];
+			// Tone.Transport.swing = 0.5;
+
+			Tone.getDestination().volume.rampTo(0, 0.1);
+			console.log("Resumed Transport");
+		}
 	} catch {
 		console.error("!! error enabling ToneJS");
 	}
@@ -46,6 +52,7 @@ function resume(){
 function silence(){
 	try {
 		Tone.Transport.pause();
+		Tone.getDestination().volume.rampTo(-Infinity, 1);
 		// Tone.stop();
 	} catch {
 		console.error('error stopping sound');

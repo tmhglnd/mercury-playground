@@ -46,6 +46,9 @@ class MonoSynth {
 
 		this._pan = [ 0 ];
 
+		this._voices = 1;
+		this._detune = 1;
+
 		this._loop;
 		this.synth;
 		this.panner;
@@ -72,7 +75,9 @@ class MonoSynth {
 		});
 		this.adsr.connect(this.gain);
 
-		this.synth = new Tone.OmniOscillator().connect(this.adsr);
+		// this.synth = new Tone.OmniOscillator().connect(this.adsr);
+		this.synth = new Tone.FatOscillator().connect(this.adsr);
+		this.synth.count = 1;
 		this.synth.start();
 	}
 
@@ -100,6 +105,15 @@ class MonoSynth {
 					}
 				}
 
+				// set voice amount for super synth
+				let v = Util.getParam(this._voices, c);
+				// this.synth.count = Math.max(1, Math.floor(v));
+
+				// set the detuning of the unison voices
+				let d = Util.getParam(this._detune, c);
+				d = Math.log2(d) * 1200;
+				// this.synth.spread = d;
+
 				// set wave to oscillator
 				let w = Util.getParam(this._wave, c);
 				if (this._waveMap[w]){
@@ -109,7 +123,9 @@ class MonoSynth {
 					// default wave if wave does not exist
 					w = 'sine';
 				}
-				this.synth.set({ type: w });
+				if (this.synth.type !== w){
+					this.synth.set({ type: w });
+				}
 				
 				// ramp volume
 				let g = Util.getParam(this._gain[0], c);
@@ -151,7 +167,6 @@ class MonoSynth {
 						i -= 48;
 					}
 				}
-
 				// reconstruct midi note value, (0, 0) = 36
 				let n = i + (o * 12) + 36;
 				// calculate frequency in 12-TET A4 = 440;
@@ -166,8 +181,12 @@ class MonoSynth {
 				}
 
 				// calculate the release trigger time
-				let rt = Math.max(0.001, e - this.adsr.release);
-				this.adsr.triggerAttackRelease(rt, time);
+				if (this._att){
+					let rt = Math.max(0.001, e - this.adsr.release);
+					this.adsr.triggerAttackRelease(rt, time);
+				} else {
+					this.adsr.triggerAttack(time);
+				}
 
 				// increment internal beat counter
 				this._beatCount++;
@@ -269,6 +288,14 @@ class MonoSynth {
 			}
 		}
 		// console.log('shape()', this._att, this._rel, this._sus);
+	}
+
+	super(d=[1.01], v=[3]){
+		// add unison voices and detune the spread
+		// first argument is the detune amount
+		// second argument changes the amount of voices
+		this._voices = Util.toArray(v);
+		this._detune = Util.toArray(d);
 	}
 
 	slide(s){
