@@ -107,12 +107,13 @@ class MonoSynth {
 
 				// set voice amount for super synth
 				let v = Util.getParam(this._voices, c);
-				// this.synth.count = Math.max(1, Math.floor(v));
+				this.synth.count = Math.max(1, Math.floor(v));
 
 				// set the detuning of the unison voices
+				// in semitone values from -48 to +48
 				let d = Util.getParam(this._detune, c);
-				d = Math.log2(d) * 1200;
-				// this.synth.spread = d;
+				// d = Math.log2(d) * 1200;
+				this.synth.spread = d * 100 * 2;
 
 				// set wave to oscillator
 				let w = Util.getParam(this._wave, c);
@@ -123,9 +124,7 @@ class MonoSynth {
 					// default wave if wave does not exist
 					w = 'sine';
 				}
-				if (this.synth.type !== w){
-					this.synth.set({ type: w });
-				}
+				this.synth.set({ type: w });
 				
 				// ramp volume
 				let g = Util.getParam(this._gain[0], c);
@@ -290,7 +289,7 @@ class MonoSynth {
 		// console.log('shape()', this._att, this._rel, this._sus);
 	}
 
-	super(d=[1.01], v=[3]){
+	super(d=[0.1], v=[3]){
 		// add unison voices and detune the spread
 		// first argument is the detune amount
 		// second argument changes the amount of voices
