@@ -20,6 +20,9 @@ const fxMap = {
 	'compress' : (params) => {
 		return new Squash(params);
 	},
+	'lfo' : (params) => {
+		return new LFO(params);
+	},
 	// 'chip' : (params) => {
 	// 	return new BitCrusher(params);
 	// },
@@ -197,17 +200,46 @@ const PitchShift = function(_params){
 // LFO FX
 // a Low Frequency Oscillator effect, control tempo, type and depth
 //
-/*const LFO = function(_params){
+const LFO = function(_params){
 	console.log('FX => LFO()', _params);
 
-	this._fx = new Tone.LFO();
+	this._waveMap = {
+		sine : 'sine',
+		saw : 'sawtooth',
+		square : 'square',
+		triangle : 'triangle',
+		tri : 'triangle',
+		rect : 'square',
+	}
 
-	this._speed = (_params[0]) ? Util.toArray(_params[0]) : ['1/4'];
-	this._type;
-	this._depth;
+	this._lfo = new Tone.LFO('8n', 0, 1);
+	this._fx = new Tone.Gain();
+	this._lfo.connect(this._fx.gain);
+	// this._fx = new Tone.Tremolo('8n').start();
 
-	this.set = function(c){
+	this._speed = (_params[0]) ? Util.toArray(_params[0]) : ['8n'];
+	this._type = (_params[1]) ? Util.toArray(_params[1]) : ['sine'];
+	this._depth = (_params[2]) ? Util.toArray(_params[2]) : [ 1 ];
+
+	this.set = function(c, time, bpm){
+		let w = Util.getParam(this._type, c);
+		if (this._waveMap[w]){
+			w = this._waveMap[w];
+		} else {
+			console.log(`'${w} is not a valid waveshape`);
+			// default wave if wave does not exist
+			w = 'sine';
+		}
+		this._lfo.set({ type: w });
 		
+		let s = Util.getParam(this._speed, c);
+
+		// let t = Util.formatRatio(s, bpm);
+		this._lfo.frequency.setValueAtTime(s, time);
+		// let a = Util.getParam(this._depth, c);
+		// this._lfo.min = 1 - Math.max(0.001, a);
+		
+		this._lfo.start(Tone.now());
 	}
 
 	this.chain = function(){
@@ -215,10 +247,12 @@ const PitchShift = function(_params){
 	}
 
 	this.delete = function(){
+		this._lfo.dispose();
+		this._lfo.disconnect();
 		this._fx.disconnect();
 		this._fx.dispose();
 	}
-}*/
+}
 
 // A filter FX, choose between highpass, lowpass and bandpass
 // Set the cutoff frequency and Q factor

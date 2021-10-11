@@ -1,6 +1,7 @@
 const Tone = require('tone');
 const Util = require('./Util.js');
 const fxMap = require('./Effects.js');
+const TL = require('total-serialism').Translate;
 
 // simple mono synth with sequencing and envelope
 class MonoSynth {
@@ -141,6 +142,16 @@ class MonoSynth {
 				// note as interval / octave coordinate
 				let o = Util.getParam(this._note[1], c);
 				let i = Util.getParam(this._note[0], c);
+				
+				if (isNaN(i)){
+					i = TL.noteToMidi(i);
+					if (!i){
+						i = 0;
+					} else {
+						i -= 48;
+					}
+				}
+
 				// reconstruct midi note value, (0, 0) = 36
 				let n = i + (o * 12) + 36;
 				// calculate frequency in 12-TET A4 = 440;
