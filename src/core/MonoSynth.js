@@ -46,8 +46,8 @@ class MonoSynth {
 
 		this._pan = [ 0 ];
 
-		this._voices = 1;
-		this._detune = 1;
+		this._voices = [ 1 ];
+		this._detune = [ 0 ];
 
 		this._loop;
 		this.synth;
