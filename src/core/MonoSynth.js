@@ -297,6 +297,11 @@ class MonoSynth {
 		this._detune = Util.toArray(d);
 	}
 
+	fat(...a){
+		// alias for super synth
+		this.super(...a);
+	}
+
 	slide(s){
 		this._slide = Util.toArray(s);
 	}
