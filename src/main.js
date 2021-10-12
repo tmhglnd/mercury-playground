@@ -8,6 +8,7 @@ window.onload = () => {
 	const Editor = require('./editor.js');	
 	const Canvas = require('./canvas.js');
 	const p5 = require('p5');
+	const WebMidi = require("webmidi");
 
 	// console.log catch function
 	if (typeof console != "undefined"){ 
