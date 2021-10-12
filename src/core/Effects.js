@@ -8,7 +8,7 @@ const fxMap = {
 	'drive' : (params) => {
 		return new Drive(params);
 	},
-	'distortion' : (params) => {
+	'distort' : (params) => {
 		return new Drive(params);
 	},
 	'overdrive' : (params) => {
