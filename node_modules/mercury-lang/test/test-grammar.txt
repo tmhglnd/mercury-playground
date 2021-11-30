@@ -84,6 +84,8 @@ list bsLine3 clone( spray( bassBt spread(5 0 17) ) )
 
 array notes palin([c4 e4 f4 d#4 gb5])
 
+list vals[1 2 3 4]
+
 new synth saw
 new sample hat_min
 
@@ -105,7 +107,6 @@ apply alice pitch([0 7 12 3] 2) shape(1 200) id(newname)
 
 // tempo(143 1000)
 // scale(minor_harmonic 23) hi_pass(800)
-// silence
 // set scale minor_harmonic c
 // tempo(125)
 // print(aRing)
@@ -115,3 +116,7 @@ apply alice pitch([0 7 12 3] 2) shape(1 200) id(newname)
 // tempo(143 15000) scale(minor-harmonic dis) random-seed(5372)
 // set tempo 143 15000 
 // set tempo(143)
+
+silence
+mute 
+killAll 

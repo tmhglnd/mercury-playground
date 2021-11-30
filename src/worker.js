@@ -35,8 +35,9 @@ function code({ file, engine }){
 		'tempo' : (args) => {
 			engine.setBPM(...args);
 		}, 
-		'silence' : () => {
-			// silence();
+		'silence' : (mute) => {
+			if (mute){ engine.silence(); }
+			else { engine.resume(); }
 		},
 		'scale' : () => {
 
