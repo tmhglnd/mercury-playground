@@ -21,13 +21,23 @@ function code({ file, engine }){
 	let c = file;
 	// console.log('evaluate', c);
 
-	let tree = Mercury(c).parseTree;
-	console.log('Syntax Tree', tree);
+	let parse = Mercury(c);
+	let tree = parse.parseTree;
+	let errors = parse.errors;
 
-	// handle .print
-	// document.querySelector('#console').innerHTML = '';
-	// cEditor.setValue('');
+	console.log('ParseTree', tree);
+	console.log('Errors', errors);
+
+	// handle .print and .errors
+	let l = document.getElementById('console-log');
+	l.innerHTML = '';
+	errors.forEach((e) => {
+		l.innerHTML += `${e}<br>`;
+		console.error(e);
+	});
+
 	tree.print.forEach((p) => {
+		l.innerHTML += `${p}<br>`;
 		console.log(p);
 	});
 

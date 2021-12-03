@@ -303,6 +303,7 @@ function date(){
 	let ss = String(now.getSeconds()).padStart(2, '0');
 	return `${yyyy}-${mm}-${dd}_${hh}.${mi}.${ss}`
 }
+
 // the codemirror editor
 // let editor = CodeMirror.fromTextArea(document.getElementById('code'), options);
 
