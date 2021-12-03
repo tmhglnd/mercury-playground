@@ -191,7 +191,8 @@ const Editor = function({ context, engine }) {
 		let save = document.createElement('button');
 		save.innerHTML = 'download';
 		save.onclick = () => {
-			saver.saveAs(new File([this.cm.getValue()], "testfile.txt", { type: 'text/plain;charset=utf-8' }));
+			let f = `mercury-sketch_${date()}.txt`
+			saver.saveAs(new File([this.cm.getValue()], f, { type: 'text/plain;charset=utf-8' }));
 		}
 
 		div.appendChild(play);
@@ -292,6 +293,16 @@ const Editor = function({ context, engine }) {
 }
 module.exports = Editor;
 
+function date(){
+	let now = new Date();
+	let dd = String(now.getDate()).padStart(2, '0');
+	let mm = String(now.getMonth()+1).padStart(2, '0');
+	let yyyy = now.getFullYear();
+	let hh = String(now.getHours()).padStart(2, '0');
+	let mi = String(now.getMinutes()).padStart(2, '0');
+	let ss = String(now.getSeconds()).padStart(2, '0');
+	return `${yyyy}-${mm}-${dd}_${hh}.${mi}.${ss}`
+}
 // the codemirror editor
 // let editor = CodeMirror.fromTextArea(document.getElementById('code'), options);
 
