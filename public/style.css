@@ -143,9 +143,9 @@ textarea:focus {
 }
 
 .CodeMirror-line span {
-    background-color: rgba(0, 0, 0, 0.7) !important;
-    /* transition: background-color 0.3s ease; */
-    /* color: #cccccc; */
+	padding-top: 4px;
+	padding-bottom: 4px;
+    background-color: rgba(0, 0, 0, 1) !important;
 }
 
 .CodeMirror-gutters {
