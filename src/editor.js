@@ -1,6 +1,7 @@
 
 const CodeMirror = require('codemirror');
 const code = require('./worker.js');
+const saver = require('file-saver');
 
 // require('codemirror/lib/codemirror.css');
 // require('codemirror/theme/ayu-dark.css');
@@ -173,7 +174,7 @@ const Editor = function({ context, engine }) {
 		};
 		
 		let example = document.createElement('button');
-		example.innerHTML = 'random';
+		example.innerHTML = 'example';
 		example.onclick = () => {
 			// initialize editor with some code
 			let names = Object.keys(examples);
@@ -187,10 +188,17 @@ const Editor = function({ context, engine }) {
 			this.evaluate();
 		};
 
+		let save = document.createElement('button');
+		save.innerHTML = 'download';
+		save.onclick = () => {
+			saver.saveAs(new File([this.cm.getValue()], "testfile.txt", { type: 'text/plain;charset=utf-8' }));
+		}
+
 		div.appendChild(play);
 		div.appendChild(stop);
 		div.appendChild(clear);
 		div.appendChild(example);
+		div.appendChild(save);
 	}
 
 	this.links = function(){

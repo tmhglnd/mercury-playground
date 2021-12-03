@@ -129,11 +129,12 @@ class MonoSynth {
 				// ramp volume
 				let g = Util.getParam(this._gain[0], c);
 				let r = Util.getParam(this._gain[1], c);
+				// g = (g === 'random')? Math.random(): g;
 				this.synth.volume.rampTo(g, r, time);
 
 				// set panning
 				let p = Util.getParam(this._pan, c);
-				p = (p === 'random')? Math.random() * 2 - 1 : p;
+				p = Util.isRandom(p, -1, 1);
 				// this.panner.pan.rampTo(p, Util.msToS(1));
 				this.panner.pan.setValueAtTime(p, time);
 

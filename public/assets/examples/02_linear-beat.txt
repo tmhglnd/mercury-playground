@@ -1,4 +1,4 @@
-// choose 15 random samples from a ring of
+// choose 15 random samples from a list of
 // predefined samplename. Play those samples 
 // sequentially for every time interval
 
@@ -8,8 +8,8 @@ set tempo 112
 // random values are the same
 set randomSeed 1234
 
-ring samples [tabla_lo tabla_hi tabla_mid tabla_hi_short]
-ring selection choose(15 samples)
+list samples [tabla_lo tabla_hi tabla_mid tabla_hi_short]
+list selection choose(15 samples)
 
 new sample selection time(1/16)
 new sample kick_house time(1/4)

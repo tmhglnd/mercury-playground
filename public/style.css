@@ -21,7 +21,7 @@ h1 {
 	/* font-size: 6vw; */
 	font-size: 1.5em;
 	/* color: rgb(180, 180, 180); */
-	color: rgb(255, 255, 255, 0.3);
+	color: rgb(255, 255, 255, 0.6);
 }
 
 p {
@@ -46,10 +46,11 @@ button {
 	/* text-align: left; */
 	border-radius: 2px;
 	border-width: 0px;
-	border-color: rgb(255, 255, 255, 0.5);
+	border-color: rgb(255, 255, 255, 0);
 	/* background: rgb(255, 255, 255, 0.1); */
-	background: rgb(0, 0, 0, 0.3);
-	color:  rgb(255, 255, 255, 0.5);
+	background: rgb(255, 255, 255, 0.1);
+	color:  rgb(255, 255, 255, 0.6);
+	/* color:  rgb(0, 0, 0, 1); */
 	width: 19%;
 	height: 25px;
 	margin: 2px;
@@ -68,12 +69,14 @@ button {
 
 button:hover {
 	/* background: black; */
-	/* background: rgb(50, 50, 50); */
-	background: rgb(255, 255, 255, 0.15);
+	color: white;
+	background: rgb(0, 0, 0, 0.6);
+	/* background: rgb(255, 255, 255, 0.15); */
 }
 
 button:active {
 	/* background: rgb(50, 50, 50); */
+	color: black;
 	background: rgb(255, 255, 255, 0.3);
 }
 
@@ -82,10 +85,10 @@ select {
 	font-family: inherit;
 	border-color: darkgrey;
 	border-width: 0px;
-	color:  rgb(255, 255, 255, 0.5);
+	color:  rgb(255, 255, 255, 0.6);
 	/* background: rgb(20, 20, 20); */
 	/* background: rgb(255, 255, 255, 0.1); */
-	background: rgb(0, 0, 0, 0.3);
+	background: rgb(255, 255, 255, 0.1);
 	border-radius: 2px;
 	width: 19%;
 	height: 25px;
@@ -94,7 +97,9 @@ select {
 
 select:hover {
 	/* background: rgb(50, 50, 50); */
-	background: rgb(255, 255, 255, 0.15);
+	color: white;
+	background: rgb(0, 0, 0, 0.6);
+	/* background: rgb(255, 255, 255, 0.15); */
 }
 
 textarea {

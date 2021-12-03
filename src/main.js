@@ -61,7 +61,7 @@ window.onload = () => {
 
 	// Load all the buttons/menus
 	cm.controls();
-	cm.themeMenu();
+	// cm.themeMenu();
 	cm.links();
 	cm.hide();
 	cm.clear();

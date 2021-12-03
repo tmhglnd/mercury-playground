@@ -4,10 +4,10 @@
 
 set tempo 98
 
-ring theme sine(16 5 0 24)
-ring variation invert(theme 0 24)
-ring phrase join(theme variation)
-ring section clone(phrase 0 5 9 7)
+list theme sine(16 5 0 24)
+list variation invert(theme 0 24)
+list phrase join(theme variation)
+list section clone(phrase 0 5 9 7)
 
 new synth triangle name(arpy)
     set arpy time(1/16) shape(1 170) note(section 1)

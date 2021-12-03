@@ -124,12 +124,12 @@ class MonoSample {
 				// value is set to true (so after 2 times reverse
 				// it becomes normal playback again) no fix yet
 				// this.sample.reverse = true;
-				/*if (this._rev !== (s < 0)){
-					this.sample.reverse = true;
-				} else {
-					this.sample.reverse = false;
-				}
-				this._rev = (s < 0);*/
+				// if (this._rev !== (s < 0)){
+				// 	this.sample.reverse = true;
+				// } else {
+				// 	this.sample.reverse = false;
+				// }
+				// this._rev = (s < 0);
 
 				let l = Util.lookup(this._stretch, c);
 				let n = 1;
@@ -137,7 +137,8 @@ class MonoSample {
 					n = dur / (60 * 4 / this._engine.getBPM()) / l;
 				}
 
-				this.sample.playbackRate = Math.abs(s) * n;
+				// playbackrate can not be 0 or negative
+				this.sample.playbackRate = Math.max(Math.abs(s) * n, 0.0001);
 				
 				// ramp volume
 				let g = Util.getParam(this._gain[0], c);
@@ -146,7 +147,7 @@ class MonoSample {
 
 				// set panning
 				let p = Util.getParam(this._pan, c);
-				p = (p === 'random')? Math.random() * 2 - 1 : p;
+				p = Util.isRandom(p, -1, 1);
 				this.panner.pan.setValueAtTime(p, time);
 
 				// get the start position

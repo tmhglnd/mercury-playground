@@ -11,6 +11,16 @@ function randLookup(a){
 	return a;
 }
 
+// is argument random?
+// return random value between lo and hi range
+// else return input
+function isRandom(a, l=0, h=1){
+	if (String(a).match(/rand(om)?/g)){
+		return Math.random() * (h - l) + l;
+	}
+	return a;
+}
+
 // get parameter from 1 or 2d array
 function getParam(a, i){
 	return randLookup(lookup(a, i));
@@ -51,4 +61,4 @@ function divToS(d, bpm){
 	}
 }
 
-module.exports = { lookup, randLookup, getParam, toArray, msToS, formatRatio, divToS }
+module.exports = { lookup, randLookup, isRandom, getParam, toArray, msToS, formatRatio, divToS }
