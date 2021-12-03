@@ -262,11 +262,11 @@ const Editor = function({ context, engine }) {
 			this.menuHidden = !this.menuHidden;
 
 			let divs = [ 'header', 'settings', 'menu', 'links', 'hydra-ui' ];
-			for (let i in divs){
+			for (let i=0; i<divs.length; i++){
 				let d = document.getElementById(divs[i]);
-				d.style.display = (this.menuHidden)? 'none' : 'inline';
-				btn.innerHTML = (this.menuHidden)? 'show menu' : 'hide menu';
+				d.style.display = this.menuHidden ? 'none' : 'inline';
 			}
+			btn.innerHTML = this.menuHidden ? 'show menu' : 'hide menu';
 		}
 		p.appendChild(btn);
 	}
