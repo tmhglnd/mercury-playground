@@ -51,6 +51,18 @@ list violinRhythm [1 0 0 1 0]
 new sample violin_c time(1/8) play(violinRhythm)
 ```
 
+## shape
+
+Change the length that the `sample` or `synth` will play (in milliseconds).
+
+```js
+// the choire_01 will play for 104 ms, with 2 ms fade-in en 2 ms fade-out
+new sample choir_01 time(1/8) shape(2 100 2)
+
+// the saw will play for 501 ms, with 1 ms fade-in en 500 ms fade-out
+new synth saw time(1/4) shape(1 500)
+```
+
 ## speed
 
 Change the playbackrate (speed) of the `sample`, this changes the pitch because it is played slower
