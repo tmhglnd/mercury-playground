@@ -91,3 +91,25 @@ new sample tabla_mid time(1/16) play(tRhythm2)
 ```
 
 Try functions like: `coin()`, `euclidean()`, `hexBeat()`, `clave()`
+
+## note lists
+
+Create lists for notes with functions like spread, choose, lookup and more.
+
+```js 
+list scale [0 2 3 5 7 9 11 12]
+list notes choose(7 scale)
+
+new synth triangle time(1/16) note(notes 1)
+```
+
+Try other functions like: `sine()`, `cosine()`, `lookup()`, `drunk()`
+
+## lists in general
+
+Basically any parameter can also be a list of values that will be iterated over. For example in `fx()`
+
+```js
+list drives [1 5 10]
+new sample kick_909 time(1/4) fx(drive drives)
+```
