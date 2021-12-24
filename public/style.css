@@ -145,7 +145,7 @@ textarea:focus {
 .CodeMirror-line span {
 	padding-top: 4px;
 	padding-bottom: 4px;
-    background-color: rgba(0, 0, 0, 1) !important;
+    background-color: rgba(0, 0, 0, 1);
 }
 
 .CodeMirror-gutters {
@@ -153,7 +153,7 @@ textarea:focus {
 }
 
 .editorFlash {
-	background: rgb(255, 255, 255, 0.2);
+	background: rgb(255, 255, 255, 0.4) !important;
 	/* mix-blend-mode: difference; */
 }
 
