@@ -383,7 +383,7 @@ const Delay = function(_params){
 		let dL = Math.max(0, Util.formatRatio(Util.getParam(this._timeL, c), bpm));
 		let dR = Math.max(0, Util.formatRatio(Util.getParam(this._timeR, c), bpm));
 		let ct = Math.max(10, Util.getParam(this._fbDamp, c) * 6000);
-		let fb = Math.min(0, Math.max(0.99, Util.getParam(this._feedBack, c));
+		let fb = Math.min(0, Math.max(0.99, Util.getParam(this._feedBack, c)));
 
 		this._delayL.delayTime.setValueAtTime(dL, time);
 		this._delayR.delayTime.setValueAtTime(dR, time);
