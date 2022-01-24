@@ -204,7 +204,9 @@ class MonoSample {
 		this.sample.dispose();
 		// remove all fx
 		// TODO: garbage collect and remove after fade out
-		// this._fx.map((f) => f.dispose());
+		// Or delete once sound has reached a bottom threshold
+		// Is this possible?
+		// this._fx.map((f) => f.delete());
 		console.log('=> Disposed:', this._sound);
 	}
 
