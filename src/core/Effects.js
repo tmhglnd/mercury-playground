@@ -360,10 +360,10 @@ const Delay = function(_params){
 		_params[1] = undefined;
 	}
 	// All params and defaults
-	this._timeL = (_params[0] !== undefined)? Util.toArray(_params[0]) : [ '3/16' ];
-	this._timeR = (_params[1] !== undefined)? Util.toArray(_params[1]) : [ '5/16' ];
-	this._feedBack = (_params[2] !== undefined)? Util.toArray(_params[2]) : [ 0.7 ];
-	this._fbDamp = (_params[3] !== undefined)? Util.toArray(_params[3]) : [ 0.5 ];
+	this._timeL = (_params[0] !== undefined)? Util.toArray(_params[0]) : [ '2/16' ];
+	this._timeR = (_params[1] !== undefined)? Util.toArray(_params[1]) : [ '3/16' ];
+	this._feedBack = (_params[2] !== undefined)? Util.toArray(_params[2]) : [ 0.6 ];
+	this._fbDamp = (_params[3] !== undefined)? Util.toArray(_params[3]) : [ 0.45 ];
 
 	// split the signal
 	this._fb.connect(this._split);
@@ -383,7 +383,7 @@ const Delay = function(_params){
 		let dL = Math.max(0, Util.formatRatio(Util.getParam(this._timeL, c), bpm));
 		let dR = Math.max(0, Util.formatRatio(Util.getParam(this._timeR, c), bpm));
 		let ct = Math.max(10, Util.getParam(this._fbDamp, c) * 6000);
-		let fb = Math.min(0, Math.max(0.99, Util.getParam(this._feedBack, c)));
+		let fb = Math.max(0, Math.min(0.99, Util.getParam(this._feedBack, c)));
 
 		this._delayL.delayTime.setValueAtTime(dL, time);
 		this._delayR.delayTime.setValueAtTime(dR, time);
