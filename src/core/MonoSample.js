@@ -336,13 +336,24 @@ class MonoSample {
 			}
 		});
 		// if any fx working
-		if (this._fx){
+		if (this._fx.length){
+			console.log(`Adding effect chain`, this._fx);
 			// disconnect the panner
 			this.panner.disconnect();
 			// iterate over effects and get chain
-			this._ch = this._fx.map((f) => { return f.chain() });
+			this._ch = [];
+			this._fx.map((f) => { this._ch.push(f.chain()) });
 			// add all effects in chain and connect to Destination
-			this.panner.chain(...this._ch, Tone.Destination);
+			// this.panner.chain(...this._ch, Tone.Destination);
+			let pfx = this._ch[0];
+			this.panner.connect(pfx.return);
+			for (let f=1; f<this._ch.length; f++){
+				if (pfx){
+					pfx.return.connect(this._ch[f].send);
+				}
+				pfx = this._ch[f];
+			}
+			pfx.return.connect(Tone.Destination);
 		}
 	}
 }

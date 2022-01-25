@@ -79,7 +79,7 @@ const Drive = function(_params){
 	}
 
 	this.chain = function(){
-		return this._fx;
+		return { 'send' : this._fx, 'return' : this._fx };
 	}
 
 	this.delete = function(){
@@ -115,7 +115,7 @@ const Squash = function(_params){
 	}
 
 	this.chain = function(){
-		return this._fx;
+		return { 'send' : this._fx, 'return' : this._fx };
 	}
 
 	this.delete = function(){
@@ -168,7 +168,7 @@ const Reverb = function(_params){
 	}
 
 	this.chain = function(){
-		return this._fx;
+		return { 'send' : this._fx, 'return' : this._fx };
 	}
 
 	this.delete = function(){
@@ -198,7 +198,7 @@ const PitchShift = function(_params){
 	}
 
 	this.chain = function(){
-		return this._fx;
+		return { 'send' : this._fx, 'return' : this._fx };
 	}
 
 	this.delete = function(){
@@ -254,7 +254,7 @@ const LFO = function(_params){
 	}
 
 	this.chain = function(){
-		return this._fx;
+		return { 'send' : this._fx, 'return' : this._fx };
 	}
 
 	this.delete = function(){
@@ -303,7 +303,7 @@ const Filter = function(_params){
 	}
 
 	this.chain = function(){
-		return this._fx;
+		return { 'send' : this._fx, 'return' : this._fx };
 	}
 
 	this.delete = function(){
@@ -333,7 +333,7 @@ const PingPongDelay = function(_params){
 	}
 
 	this.chain = function(){
-		return this._fx;
+		return { 'send' : this._fx, 'return' : this._fx };
 	}
 
 	this.delete = function(){
@@ -346,7 +346,8 @@ const PingPongDelay = function(_params){
 const Delay = function(_params){
 	console.log('FX => Delay()', _params);
 
-	this._fb = new Tone.Gain(0.9);
+	this._fx = new Tone.Gain(1);
+	this._fb = new Tone.Gain(0.5);
 	this._split = new Tone.Split(2);
 	this._merge = new Tone.Merge(2);
 
@@ -392,7 +393,7 @@ const Delay = function(_params){
 	}
 
 	this.chain = function(){
-		return this._fb;
+		return { 'send' : this._fb, 'return' : this._fb };
 	}
 
 	this.delete = function(){
@@ -404,3 +405,4 @@ const Delay = function(_params){
 		this._dl.dispose();
 	}
 }
+
