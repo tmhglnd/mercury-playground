@@ -258,10 +258,12 @@ const LFO = function(_params){
 	}
 
 	this.delete = function(){
-		this._lfo.dispose();
-		this._lfo.disconnect();
-		this._fx.disconnect();
-		this._fx.dispose();
+		let blocks = [ this._fx, this._lfo ];
+		
+		blocks.forEach((b) => {
+			b.disconnect();
+			b.dispose();
+		})
 	}
 }
 
@@ -348,12 +350,12 @@ const Delay = function(_params){
 
 	this._fx = new Tone.Gain(1);
 	this._fb = new Tone.Gain(0.5);
+	this._mix = new Tone.CrossFade(0.5);
 	this._split = new Tone.Split(2);
 	this._merge = new Tone.Merge(2);
 
 	this._delayL = new Tone.Delay({ maxDelay: 5 });
 	this._delayR = new Tone.Delay({ maxDelay: 5 });
-	// this._op = new Tone.OnePoleFilter();
 	this._flt = new Tone.Filter(1000, 'lowpass');
 
 	if (_params.length === 2){
@@ -367,6 +369,9 @@ const Delay = function(_params){
 	this._fbDamp = (_params[3] !== undefined)? Util.toArray(_params[3]) : [ 0.45 ];
 
 	// split the signal
+	this._fx.connect(this._mix.a);
+	this._fx.connect(this._fb);
+
 	this._fb.connect(this._split);
 	// the feedback node connects to the delay L + R
 	this._split.connect(this._delayL, 0, 0);
@@ -379,6 +384,8 @@ const Delay = function(_params){
 	this._merge.connect(this._flt);
 	// the output of the onepole is stored back in the gain for feedback
 	this._flt.connect(this._fb);
+	// connect the feedback also to the crossfade mix
+	this._fb.connect(this._mix.b);
 
 	this.set = function(c, time, bpm){
 		let dL = Math.max(0, Util.formatRatio(Util.getParam(this._timeL, c), bpm));
@@ -393,16 +400,16 @@ const Delay = function(_params){
 	}
 
 	this.chain = function(){
-		return { 'send' : this._fb, 'return' : this._fb };
+		return { 'send' : this._fx, 'return' : this._mix };
 	}
 
 	this.delete = function(){
-		this._fb.disconnect();
-		this._op.disconnect();
-		this._dl.disconnect();
-		this._fb.dispose();
-		this._op.dispose();
-		this._dl.dispose();
+		let blocks = [ this._fx, this._fb, this._mix, this._split, this._merge, this._delayL, this._delayR, this._flt ];
+
+		blocks.forEach((b) => {
+			b.disconnect();
+			b.dispose();
+		});
 	}
 }
 

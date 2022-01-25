@@ -61,8 +61,10 @@ class MonoSynth {
 	}
 
 	makeSynth(){
-		this.panner = new Tone.Panner(0).toDestination();
-		this.gain = new Tone.Gain(0).connect(this.panner);
+		this.gain = new Tone.Gain(0).toDestination();
+		this.panner = new Tone.Panner(0).connect(this.gain);
+		// this.panner = new Tone.Panner(0).toDestination();
+		// this.gain = new Tone.Gain(0).connect(this.panner);
 		// this.sample = new Tone.Player(buffers.get('kick_min')).toDestination();
 		this.adsr = new Tone.AmplitudeEnvelope({
 			attack: 0,
@@ -73,7 +75,7 @@ class MonoSynth {
 			decayCurve: "exponential",
 			releaseCurve: "linear"
 		});
-		this.adsr.connect(this.gain);
+		this.adsr.connect(this.panner);
 
 		// this.synth = new Tone.OmniOscillator().connect(this.adsr);
 		this.synth = new Tone.FatOscillator().connect(this.adsr);
@@ -223,8 +225,8 @@ class MonoSynth {
 		this.synth.dispose();
 		// remove all fx
 		// TODO: garbage collect and remove after fade out
-		// this._fx.map((f) => f.dispose());
-		console.log('=> Disposed:', this._wave);
+		this._fx.map((f) => f.delete());
+		console.log('=> Disposed:', this._wave, 'with FX:', this._fx);
 	}
 
 	stop(){
@@ -341,13 +343,26 @@ class MonoSynth {
 			}
 		});
 		// if any fx working
-		if (this._fx){
+		if (this._fx.length){
+			console.log(`Adding effect chain`, this._fx);
 			// disconnect the panner
 			this.panner.disconnect();
-			// iterate over effects and get chain
-			this._ch = this._fx.map((f) => { return f.chain() });
+			// iterate over effects and get chain (send/return)
+			this._ch = [];
+			this._fx.map((f) => { this._ch.push(f.chain()) });
 			// add all effects in chain and connect to Destination
-			this.panner.chain(...this._ch, Tone.Destination);
+			// every effect connects it's return to a send of the next
+			// allowing to chain multiple effects within one process
+			let pfx = this._ch[0];
+			this.panner.connect(pfx.send);
+			for (let f=1; f<this._ch.length; f++){
+				if (pfx){
+					pfx.return.connect(this._ch[f].send);
+				}
+				pfx = this._ch[f];
+			}
+			// pfx.return.connect(Tone.Destination);
+			pfx.return.connect(this.gain);
 		}
 	}
 }

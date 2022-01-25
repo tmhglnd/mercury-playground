@@ -52,8 +52,10 @@ class MonoSample {
 	}
 
 	makeSampler(){
-		this.panner = new Tone.Panner(0).toDestination();
-		this.gain = new Tone.Gain(0).connect(this.panner);
+		this.gain = new Tone.Gain(0).toDestination();
+		this.panner = new Tone.Panner(0).connect(this.gain);
+		// this.panner = new Tone.Panner(0).toDestination();
+		// this.gain = new Tone.Gain(0).connect(this.panner);
 		// this.sample = new Tone.Player(buffers.get('kick_min')).toDestination();
 		this.adsr = new Tone.AmplitudeEnvelope({
 			attack: 0,
@@ -63,8 +65,8 @@ class MonoSample {
 			attackCurve: "linear",
 			releaseCurve: "linear"
 		});
-		this.adsr.connect(this.gain);
-		// this.adsr.connect(this.panner);
+		// this.adsr.connect(this.gain);
+		this.adsr.connect(this.panner);
 		// this.mono = new Tone.Mono().connect(this.adsr);
 		// this.mono = new Tone.MidSideSplit().connect(this.adsr);
 		// this.sample = new Tone.Player().connect(this.mono);
@@ -206,8 +208,9 @@ class MonoSample {
 		// TODO: garbage collect and remove after fade out
 		// Or delete once sound has reached a bottom threshold
 		// Is this possible?
-		// this._fx.map((f) => f.delete());
-		console.log('=> Disposed:', this._sound);
+		this._fx.map((f) => f.delete());
+
+		console.log('=> Disposed:', this._sound, 'with FX:', this._fx);
 	}
 
 	stop(){
@@ -340,20 +343,22 @@ class MonoSample {
 			console.log(`Adding effect chain`, this._fx);
 			// disconnect the panner
 			this.panner.disconnect();
-			// iterate over effects and get chain
+			// iterate over effects and get chain (send/return)
 			this._ch = [];
 			this._fx.map((f) => { this._ch.push(f.chain()) });
 			// add all effects in chain and connect to Destination
-			// this.panner.chain(...this._ch, Tone.Destination);
+			// every effect connects it's return to a send of the next
+			// allowing to chain multiple effects within one process
 			let pfx = this._ch[0];
-			this.panner.connect(pfx.return);
+			this.panner.connect(pfx.send);
 			for (let f=1; f<this._ch.length; f++){
 				if (pfx){
 					pfx.return.connect(this._ch[f].send);
 				}
 				pfx = this._ch[f];
 			}
-			pfx.return.connect(Tone.Destination);
+			// pfx.return.connect(Tone.Destination);
+			pfx.return.connect(this.gain);
 		}
 	}
 }

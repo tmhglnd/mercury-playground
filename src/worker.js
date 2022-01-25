@@ -4,8 +4,8 @@ const MonoSample = require('./core/MonoSample.js');
 const MonoMidi = require('./core/MonoMidi.js');
 const MonoSynth = require('./core/MonoSynth.js');
 
-// fade time in seconds
-let crossFade = 1;
+// fade time in seconds TODO: Make this adjustable with code/setting
+let crossFade = 1.5;
 // array with the insturments playing
 let _sounds = [];
 let sounds = [];
