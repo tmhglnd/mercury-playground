@@ -159,14 +159,15 @@ Currently the playground does not have the full functionality of the original Me
 	- [x] fibonacci / pisano / pell / lucas
 	- [x] euclidean / hexBeat
 	- [x] add / subtract / multiply / divide / modulo
-- [ ] sample
+- [x] sample
 	- [x] type
 	- [x] time
 	- [x] shape
 	- [x] beat
 	- [x] gain
 	- [x] speed
-		- [ ] reverse
+		- [x] reverse
+	- [ ] note
 	- [x] pan
 	- [x] name
 	- [x] fx
@@ -181,7 +182,9 @@ Currently the playground does not have the full functionality of the original Me
 	- [x] name
 	- [x] fx
 	- [x] slide
+- [ ] sampler
 - [ ] polySynth
+- [ ] polySample
 - [ ] midi
 	- [x] device
 	- [x] time
@@ -195,16 +198,21 @@ Currently the playground does not have the full functionality of the original Me
 	- [ ] sync
 - [ ] osc
 - [ ] fx
-	- [ ] chip
+	- [ ] chip (downsampling)
 	- [x] delay
-	- [x] drive
+		- [x] stereo feedback delay with damping
+		- [ ] ping pong feedback delay
+	- [x] drive (softclipping distortion)
+	- [x] squash (compress/overdrive)
 	- [ ] envFilter
 	- [x] filter
 		- [ ] modulation
-	- [ ] kink
+	- [ ] kink (waveshaping)
 	- [ ] lfo
 	- [x] reverb
-	- [x] pitchShift
+		- [x] decaying noise convolution
+		- [ ] dattorro reverb algorithm
+	- [x] shift (pitchshift)
 
 ## 🔭 Vision / Goals
 
