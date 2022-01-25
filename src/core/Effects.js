@@ -314,7 +314,76 @@ const Filter = function(_params){
 	}
 }
 
-// Old delay implementation, just using the Tone.PingPongDelay()
+// Custom stereo delay implementation with lowpass filter in feedback loop
+const Delay = function(_params){
+	console.log('FX => Delay()', _params);
+
+	this._fx = new Tone.Gain(1);
+	this._fb = new Tone.Gain(0.5);
+	this._mix = new Tone.CrossFade(0.5);
+	this._split = new Tone.Split(2);
+	this._merge = new Tone.Merge(2);
+
+	this._delayL = new Tone.Delay({ maxDelay: 5 });
+	this._delayR = new Tone.Delay({ maxDelay: 5 });
+	this._flt = new Tone.Filter(1000, 'lowpass', '-12');
+
+	if (_params.length === 2){
+		_params[2] = _params[1];
+		_params[1] = _params[0];
+	}
+	// All params and defaults
+	this._timeL = (_params[0] !== undefined)? Util.toArray(_params[0]) : [ '2/16' ];
+	this._timeR = (_params[1] !== undefined)? Util.toArray(_params[1]) : [ '3/16' ];
+	this._feedBack = (_params[2] !== undefined)? Util.toArray(_params[2]) : [ 0.7 ];
+	this._fbDamp = (_params[3] !== undefined)? Util.toArray(_params[3]) : [ 0.6 ];
+
+	// split the signal
+	this._fx.connect(this._mix.a);
+	this._fx.connect(this._fb);
+
+	this._fb.connect(this._split);
+	// the feedback node connects to the delay L + R
+	this._split.connect(this._delayL, 0, 0);
+	this._split.connect(this._delayR, 1, 0);
+	// merge back
+	this._delayL.connect(this._merge, 0, 0);
+	this._delayR.connect(this._merge, 0, 1);
+	// the delay is the input chained to the sample and returned
+	// the delay also connects to the onepole filter
+	this._merge.connect(this._flt);
+	// the output of the onepole is stored back in the gain for feedback
+	this._flt.connect(this._fb);
+	// connect the feedback also to the crossfade mix
+	this._fb.connect(this._mix.b);
+
+	this.set = function(c, time, bpm){
+		let dL = Math.max(0, Util.formatRatio(Util.getParam(this._timeL, c), bpm));
+		let dR = Math.max(0, Util.formatRatio(Util.getParam(this._timeR, c), bpm));
+		let ct = Math.max(10, Util.getParam(this._fbDamp, c) * 5000);
+		let fb = Math.max(0, Math.min(0.99, Util.getParam(this._feedBack, c)));
+
+		this._delayL.delayTime.setValueAtTime(dL, time);
+		this._delayR.delayTime.setValueAtTime(dR, time);
+		this._flt.frequency.setValueAtTime(ct, time);
+		this._fb.gain.setValueAtTime(fb, time);
+	}
+
+	this.chain = function(){
+		return { 'send' : this._fx, 'return' : this._mix };
+	}
+
+	this.delete = function(){
+		let blocks = [ this._fx, this._fb, this._mix, this._split, this._merge, this._delayL, this._delayR, this._flt ];
+
+		blocks.forEach((b) => {
+			b.disconnect();
+			b.dispose();
+		});
+	}
+}
+
+// Old pingpong delay implementation, just using the Tone.PingPongDelay()
 const PingPongDelay = function(_params){
 	console.log('FX => PingPongDelay()', _params);
 
@@ -343,73 +412,3 @@ const PingPongDelay = function(_params){
 		this._fx.dispose();
 	}
 }
-
-// Custom stereo delay implementation with lowpass filter in feedback loop
-const Delay = function(_params){
-	console.log('FX => Delay()', _params);
-
-	this._fx = new Tone.Gain(1);
-	this._fb = new Tone.Gain(0.5);
-	this._mix = new Tone.CrossFade(0.5);
-	this._split = new Tone.Split(2);
-	this._merge = new Tone.Merge(2);
-
-	this._delayL = new Tone.Delay({ maxDelay: 5 });
-	this._delayR = new Tone.Delay({ maxDelay: 5 });
-	this._flt = new Tone.Filter(1000, 'lowpass');
-
-	if (_params.length === 2){
-		_params[2] = _params[1];
-		_params[1] = undefined;
-	}
-	// All params and defaults
-	this._timeL = (_params[0] !== undefined)? Util.toArray(_params[0]) : [ '2/16' ];
-	this._timeR = (_params[1] !== undefined)? Util.toArray(_params[1]) : [ '3/16' ];
-	this._feedBack = (_params[2] !== undefined)? Util.toArray(_params[2]) : [ 0.6 ];
-	this._fbDamp = (_params[3] !== undefined)? Util.toArray(_params[3]) : [ 0.45 ];
-
-	// split the signal
-	this._fx.connect(this._mix.a);
-	this._fx.connect(this._fb);
-
-	this._fb.connect(this._split);
-	// the feedback node connects to the delay L + R
-	this._split.connect(this._delayL, 0, 0);
-	this._split.connect(this._delayR, 1, 0);
-	// merge back
-	this._delayL.connect(this._merge, 0, 0);
-	this._delayR.connect(this._merge, 0, 1);
-	// the delay is the input chained to the sample and returned
-	// the delay also connects to the onepole filter
-	this._merge.connect(this._flt);
-	// the output of the onepole is stored back in the gain for feedback
-	this._flt.connect(this._fb);
-	// connect the feedback also to the crossfade mix
-	this._fb.connect(this._mix.b);
-
-	this.set = function(c, time, bpm){
-		let dL = Math.max(0, Util.formatRatio(Util.getParam(this._timeL, c), bpm));
-		let dR = Math.max(0, Util.formatRatio(Util.getParam(this._timeR, c), bpm));
-		let ct = Math.max(10, Util.getParam(this._fbDamp, c) * 6000);
-		let fb = Math.max(0, Math.min(0.99, Util.getParam(this._feedBack, c)));
-
-		this._delayL.delayTime.setValueAtTime(dL, time);
-		this._delayR.delayTime.setValueAtTime(dR, time);
-		this._flt.frequency.setValueAtTime(ct, time);
-		this._fb.gain.setValueAtTime(fb, time);
-	}
-
-	this.chain = function(){
-		return { 'send' : this._fx, 'return' : this._mix };
-	}
-
-	this.delete = function(){
-		let blocks = [ this._fx, this._fb, this._mix, this._split, this._merge, this._delayL, this._delayR, this._flt ];
-
-		blocks.forEach((b) => {
-			b.disconnect();
-			b.dispose();
-		});
-	}
-}
-
