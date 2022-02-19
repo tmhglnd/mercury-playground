@@ -10,6 +10,7 @@ fetch("/samples")
 		return response.json();
 	})
 	.then(function(data) {
+		// console.log('sample data', data);
 		samples = data;
 
 		buffers = new Tone.ToneAudioBuffers({

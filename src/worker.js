@@ -1,4 +1,5 @@
 const Tone = require('tone');
+const TL = require('total-serialism').Translate;
 const Mercury = require('mercury-lang');
 const MonoSample = require('./core/MonoSample.js');
 const MonoMidi = require('./core/MonoMidi.js');
@@ -49,8 +50,18 @@ function code({ file, engine }){
 			if (mute){ engine.silence(); }
 			else { engine.resume(); }
 		},
-		'scale' : () => {
-
+		'scale' : (args) => {
+			let s = TL.scaleNames();
+			if (s.indexOf(args[0]) > -1){
+				TL.setScale(args[0])
+			} else {
+				console.log(`${args[0]} is not a valid scale`);
+			}
+			if (args[1]){
+				TL.setRoot(args[1])
+			}
+			console.log('scale', args);
+			console.log(TL.getSettings());
 		},
 		'highPass' : () => {
 
