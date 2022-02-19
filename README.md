@@ -255,6 +255,8 @@ Full explanation of all the possibilities in Mercury:
 
 - [Open the documentation](https://tmhglnd.github.io/mercury/table-of-content.html)
 
+*NB: The Mercury Playground still lacks some functionalities, see the list above*
+
 ## 💻 System Requirements
 
 A computer that runs a browser like Chrome or Firefox.
@@ -264,6 +266,10 @@ A computer that runs a browser like Chrome or Firefox.
 Many sounds in Mercury are downloaded from [freesound.org](http://www.freesound.org) and are licensed with Creative Commons Attribution or Creative Commons 0 licenses. If not downloaded from freesound it is made sure that the license allows to redistribute the sounds via the Mercury environment and that you can use them in your projects. A list of all the available sounds and the original sample can be found here:
 
 - [List of sounds and credits](https://github.com/tmhglnd/mercury/blob/master/mercury_ide/media/README.md)
+
+### Use your own sounds
+
+If you like to include your own sounds you'll need to run the application locally. See [install](#-install) for instructions. You can then replace or add any sounds to the `public/assets/samples` folder and run `npm run build`, this creates a new database of soundfiles in `src/data/samples.json`.
 
 ## ⚡️ Visuals
 
