@@ -1,34 +1,20 @@
 const Tone = require('tone');
 
-let samples = {};
-let buffers;
-
-// get the sample file paths from server
-fetch("/samples")
-	.then(function(response) {
-		console.log('loading sounds...');
-		return response.json();
-	})
-	.then(function(data) {
-		// console.log('sample data', data);
-		samples = data;
-
-		buffers = new Tone.ToneAudioBuffers({
-			urls: samples,
-			onload: function(){ 
-				console.log('=> sounds loaded');
-				// init();
-				// remove loading screen, because probably this
-				// is the last thing that is done
-				setTimeout(() => {
-					document.getElementById('load').className = 'hideLoad';
-				}, 2500);
-			}
-		});
-	})
-	.catch(function(error) {
-		console.log('error:' + error);
-	});
+// get the sample file paths from json
+console.log('loading sounds...');
+let samples = require('./data/samples.json');
+let buffers = new Tone.ToneAudioBuffers({
+	urls: samples,
+	onload: function(){ 
+		console.log('=> sounds loaded');
+		// init();
+		// remove loading screen, because probably this
+		// is the last thing that is done
+		setTimeout(() => {
+			document.getElementById('load').className = 'hideLoad';
+		}, 2500);
+	}
+});
 
 // resume webaudio and transport for livecoding
 function resume(){

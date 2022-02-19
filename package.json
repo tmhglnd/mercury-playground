@@ -10,7 +10,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
     "watch": "watchify src/main.js -o public/bundle.js -v",
-    "build": "browserify src/main.js -o public/bundle.js && npm run uglify",
+    "build": "npm run data && npm run browserify && npm run uglify",
+    "data" : "node index.js",
+    "browserify" : "browserify src/main.js -o public/bundle.js", 
     "uglify": "terser public/bundle.js -o public/bundle.min.js -c -m --comments 'false'"
   },
   "keywords": [],
