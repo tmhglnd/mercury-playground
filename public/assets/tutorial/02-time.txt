@@ -1,6 +1,7 @@
 // === TUTORIAL 02 ===
-// you can change the time interval
+// You can change how often a sound is played
+// within one measure/bar.
 // 1/4 means 4 times per measure
 
-new sample kick_909 time(3/16)
-// now try for example 1/8, 3/16, 1/50, 3a
+new sample kick_909 time(1/4)
+// now try for example 1/8, 3/16, 5/32, 1/100

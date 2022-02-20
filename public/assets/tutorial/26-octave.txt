@@ -1,0 +1,10 @@
+// === TUTORIAL 26 ===
+// With a second argument in the note() function we can 
+// choose an octave offset. Stepping up one octave is 
+// equivalent to adding 12 to the semitone.
+
+set tempo 137
+
+list theMelody [0 7 5 3 7 5 2]
+list theOctaves [0 0 0 1 1 1 2 2]
+new synth triangle time(1/16) note(theMelody theOctaves)

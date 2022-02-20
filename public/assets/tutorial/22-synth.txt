@@ -1,0 +1,11 @@
+// === TUTORIAL 22 ===
+// Instead of playing samples we can also create 
+// a synthesizer (synth) that generates a sound 
+// based on various types of waveforms
+
+new synth saw
+// new synth sine
+// new synth square
+// new synth triangle
+
+// Try these different types of synths

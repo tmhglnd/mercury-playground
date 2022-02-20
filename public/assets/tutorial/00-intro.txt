@@ -1,11 +1,11 @@
 // === TUTORIAL 00 ===
 // Welcome to the Mercury tutorial ^^
-// These short files will teach you most of the basics of 
+// These short files will teach you all of the basics on 
 // what you can do with this language
 
-// Lines starting with '//' are comments and are not part of the code
-// You can (un)comment coded lines with Alt+/
+// Code starting with '//' are comments and are not part of the code
+// You can (un)comment coded lines with Alt+/ (or by removing the //)
 
-// Uncomment line 12 below and click 'play'
+// Uncomment the line below and click 'play'
 // new sample harp_up time(1)
 // Now comment the line and click 'play' again

@@ -1,8 +1,8 @@
 // === TUTORIAL 17 ===
-// for longer samples sometimes it is interesting to start 
+// For longer samples it is sometimes interesting to start 
 // the playback of the sound at a different position within the 
-// entire sample. you can do that with the offset() by giving a 
+// sample. You can do that with the start() by giving a 
 // value between 0 and 1 (0.5 is halfway through the sound)
 
 list positions [0 0.2 0.3 0.2 0.5 0.1]
-new sample chimes time(1/16) offset(positions)
+new sample choir_01 time(1/8) start(positions) shape(1 100 1)

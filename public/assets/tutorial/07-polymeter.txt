@@ -1,11 +1,12 @@
 // === TUTORIAL 07 ===
-// we can create multiple rythms for different
-// instruments of different lengths to create a 
-// composite rhythm
+// We can create multiple rythms for different instruments 
+// of different lengths to create a composite rhythm.
+// Here the rhythm of the hihat is 7 long, and the table 5.
 
 list hatBeat [1 0 1 0 0 1 0]
 new sample hat_909 time(1/16) play(hatBeat)
 
 list tablaBeat [1 0 1 1 0]
 new sample tabla_mid time(1/16) play(tablaBeat)
-// now try different rhythms combined with different times
+
+// Try different rhythms combined with different times

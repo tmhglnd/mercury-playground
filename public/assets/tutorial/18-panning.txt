@@ -1,9 +1,10 @@
 // === TUTORIAL 18 ===
-// we can make the sound more interesting by using the 
-// stereo field from our speakers, also called panning
-// we can pan a sound left with -1, right with 1 and center with 0.
+// We can make the composition more interesting by using the 
+// stereo field from our speakers (called panning).
+// We can pan a sound left with -1, right with 1 and center with 0
 
 new sample violin_c time(1) pan(-1)
 new sample pluck_e time(1 3/16) pan(1)
 new sample bamboo_g time(1 4/16) pan(0)
-// now try some different values for the panning between -1 and 1
+
+// Try some different values for the panning between -1 and 1

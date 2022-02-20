@@ -1,0 +1,10 @@
+// === TUTORIAL 25 ===
+// Similar to how we create a list for a beat we can
+// also create a list of notes to create a melody
+
+set tempo 137
+
+list theMelody [0 7 12 19 15 12 5 3 7 5 2]
+new synth triangle time(1/16) note(theMelody)
+
+// Try some different values for the list

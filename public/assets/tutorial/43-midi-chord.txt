@@ -1,0 +1,8 @@
+// === TUTORIAL 33 ===
+// By setting the chord() method to 'on' we can output
+// multiple notes at the same time to create a chord
+
+new midi default time(1) note([[0 3 7 11]] 2) chord(on)
+// here the chord is created by making a list on the first
+// place within another list (otherwise the notes would be 
+// played in order over time)

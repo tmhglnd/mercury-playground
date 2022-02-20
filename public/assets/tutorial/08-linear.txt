@@ -1,8 +1,9 @@
 // === TUTORIAL 08 ===
-// we can also make a list of sound names and play
-// them linearly in order
+// We can also use a list of sound names 
+// to let one sample play them sequencially
 
 list sounds [kick_909 hat_909 snare_909 hat_909]
 new sample sounds time(1/8)
-// now try adding or removing some sound names
+
+// Try adding or removing some sound names
 // for example add tabla_mid

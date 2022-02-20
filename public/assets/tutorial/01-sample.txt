@@ -1,8 +1,8 @@
 // === TUTORIAL 01 ===
-// you can play a soundfile with 'new sample' followed 
-// by the samplename, for example: kick_909
+// you can play a soundfile with 'new sample' 
+// followed by the samplename, for example: kick_909
 // start with 'play' or Alt+Enter
 // stop with 'silence' or Alt+.
 
 new sample kick_909
-// now try some other sounds like: hat_909, chimes, door
+// try some other sounds like: hat_909, chimes, kalimba_e

@@ -1,9 +1,10 @@
 // === TUTORIAL 14 ===
-// we can combine multiple sounds with different 
-// slow speeds to create some kind of soundscape
+// We can combine multiple sounds with different 
+// speeds to create a kind of soundscape
 
-new sample gong_hi time(4) speed(0.3)
-new sample bowl_hi time(3) speed(0.125)
-new sample drone_cymbal time(7) speed(0.5)
-// now experiment with different time and speed values
-// maybe even use lists for the speed to create some variation
+new sample gong_hi time(4) speed(-0.3)
+new sample bowl_hi time(3) speed(-0.125)
+new sample drone_cymbal time(7) speed(-0.5)
+
+// Experiment with different time and speed values
+// maybe even use lists for the speed to create variations
