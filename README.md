@@ -4,6 +4,10 @@
 
 [**🚀 Start Sketching Online!**](https://mercury-sketch.glitch.me/)
 
+**👾 Or code with the latest full version:** 
+
+[![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/tmhglnd/mercury)](https://github.com/tmhglnd/mercury/releases)
+
 [**🙏 Support Mercury by becoming a Patron**](https://www.patreon.com/bePatron?u=9649817) 
 
 [**💬 Join the Discord Community**](https://discord.gg/vt59NYU)
