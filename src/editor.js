@@ -17,21 +17,16 @@ require('codemirror/addon/comment/comment.js');
 const defaultTheme = 'material-darker';
 
 let _rand;
-let examples = {};
-let tutorials = {};
-// get the example code files from server
-fetch("/examples")
-	.then(function(response) {
-		console.log('loading examples...');
-		return response.json();
-	})
-	.then(function(data) {
-		examples = data;
-		console.log('=> examples loaded');
-	})
-	.catch(function(error) {
-		console.log('!! Error loading examples:' + error);
-	});
+
+// get the example code files
+console.log('loading examples...');
+let examples = require('./data/examples.json');
+console.log('=> examples loaded');
+
+// get the tutorial files
+console.log('loading tutorials...');
+let tutorials = require('./data/tutorials.json');
+console.log('=> tutorials loaded');
 
 // the simple mode lexer for Mercury syntax-highlighting
 CodeMirror.defineSimpleMode("mercury", {
@@ -229,13 +224,10 @@ const Editor = function({ context, engine }) {
 		});
 	}
 
-	this.tutorials = {};
-
-	this.tutorialMenu = function(data){
-		this.tutorials = data;
+	this.tutorialMenu = function(){
 		let menu = document.getElementById('tutorials');
 
-		Object.keys(data).forEach((t) => {
+		Object.keys(tutorials).forEach((t) => {
 			let option = document.createElement('option');
 			option.value = t;
 			option.innerHTML = t.split('-').join(' ');
@@ -245,7 +237,7 @@ const Editor = function({ context, engine }) {
 
 	this.loadTutorial = function(){
 		let t = document.getElementById('tutorials').value;
-		this.set(this.tutorials[t]);
+		this.set(tutorials[t]);
 		this.evaluate();
 	}
 
