@@ -1,0 +1,8 @@
+// === TUTORIAL 30 ===
+// We can modulate the cutoff frequency and the resonance
+// of the filter with lists
+
+list cutoffs [200 400 700 1000]
+list qs [0.3 0.3 0.3 0.3 0.8]
+
+new synth saw time(1/16) fx(filter low cutoffs qs)

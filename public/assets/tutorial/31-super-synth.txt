@@ -1,0 +1,8 @@
+// === TUTORIAL 31 ===
+// The super synth is a synth that uses multiple
+// waveforms at the same time with a small detuning
+
+new synth saw time(1/16) super(.142 3) shape(1 100)
+
+// Try different amount of voices: 3, 5, 11
+// Try different detunings: 1.021, 7.245, 12.032
