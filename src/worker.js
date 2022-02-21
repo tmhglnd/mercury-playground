@@ -78,11 +78,9 @@ function code({ file, engine }){
 		}
 	});
 
+	// copy current sounds over
 	_sounds = sounds.slice();
-	for (let s=0; s<_sounds.length; s++){
-		_sounds[s].fadeOut(crossFade);
-		// _sounds[s].delete();
-	}
+	// empty previous sounds
 	sounds = [];
 
 	const objectMap = {
@@ -169,6 +167,12 @@ function code({ file, engine }){
 	for (let s=0; s<sounds.length; s++){
 		sounds[s].makeLoop();
 		sounds[s].fadeIn(crossFade);
+	}
+
+	for (let s=0; s<_sounds.length; s++){
+		// fade out and delete
+		_sounds[s].fadeOut(crossFade);
+		// _sounds[s].delete();
 	}
 }
 module.exports = code;
