@@ -5,6 +5,14 @@ window.onload = () => {
 	// load requires
 	const Tone = require('tone');
 	
+	// latency reduces cpu load
+	Tone.context.lookAhead = 0.1;
+	// Tone.context.samplerate = 44100;
+
+	console.log('Tone settings:');
+	console.log(`latency: ${Tone.getContext().lookAhead * 1000}ms`);
+	console.log(`samplerate: ${Tone.getContext().samplerate}Hz`);
+	
 	// console.log catch function
 	if (typeof console != "undefined"){ 
 		if (typeof console.log != 'undefined'){
