@@ -1,6 +1,10 @@
 // === TUTORIAL 24 ===
-// Many of the functions from the sample can
-// also be applied to the synth, for example with 
-// the time() we can choose the time interval it is triggered at
+// To choose a note to play for the synth we use
+// the note() function. This function expects a number
+// as a semitone (half-step) on the piano-keyboard.
 
-new synth saw time(1/8)
+new synth saw time(1) note(0)
+new synth saw time(1 1/16) note(3)
+new synth saw time(1 3/16) note(7)
+
+// Try different note numbers like: -5, 12, 3.14
