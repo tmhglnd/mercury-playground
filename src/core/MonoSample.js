@@ -83,18 +83,17 @@ class MonoSample {
 		if (this._loop){
 			this._loop.dispose();
 		}
-		// let now = Tone.now();
 		let schedule = Tone.Time(this._offset).toSeconds();
-		// let schedule = this._offset * 2.0 * (60 / getBPM());
-
-		// console.log('makeLoop()', this._time);
 
 		// create new loop for synth
 		this._loop = new Tone.Loop((time) => {
 			// get beat probability for current count
 			let b = Util.getParam(this._beat, this._count);
 			
-			// get timing TO-DO?
+			// let t = Util.getParam(this._time, this._count);
+			// t = Util.formatRatio(t, this._engine.getBPM());
+			// console.log(t);
+			// this._loop.interval = t;
 
 			// if random value is below probability, then play
 			if (Math.random() < b){
@@ -156,6 +155,7 @@ class MonoSample {
 				let o = dur * Util.getParam(this._pos, c);
 				// end position for playback
 				let e = this._time;
+				// let e = t;
 
 				// set shape for playback (fade-in / out and length)
 				if (this._att){
@@ -168,6 +168,7 @@ class MonoSample {
 					this.adsr.release = rel;
 					
 					e = Math.min(this._time, att + dec + rel);
+					// e = Math.min(t, att + dec + rel);
 				}
 
 				// when sample is loaded, start
@@ -187,7 +188,7 @@ class MonoSample {
 
 	fadeOut(t){
 		// fade out the sound upon evaluation of new code
-		this.gain.gain.rampTo(0, t);
+		this.gain.gain.rampTo(0, t, Tone.now());
 		setTimeout(() => {
 			this.delete();
 		}, t * 1000);
@@ -195,7 +196,7 @@ class MonoSample {
 
 	fadeIn(t){
 		// fade in the sound upon evaluation of code
-		this.gain.gain.rampTo(1, t);
+		this.gain.gain.rampTo(1, t, Tone.now());
 	}
 
 	delete(){
@@ -264,6 +265,7 @@ class MonoSample {
 
 	time(t, o=0){
 		// set the timing interval and offset
+		// this._time = Util.toArray(t);
 		this._time = Util.formatRatio(t, this._engine.getBPM());
 		this._offset = Util.formatRatio(o, this._engine.getBPM());
 	}

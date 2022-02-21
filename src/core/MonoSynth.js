@@ -200,7 +200,7 @@ class MonoSynth {
 
 	fadeOut(t){
 		// fade out the sound upon evaluation of new code
-		this.gain.gain.rampTo(0, t);
+		this.gain.gain.rampTo(0, t, Tone.now());
 		setTimeout(() => {
 			this.delete();
 		}, t * 1000);
@@ -208,7 +208,7 @@ class MonoSynth {
 
 	fadeIn(t){
 		// fade in the sound upon evaluation of code
-		this.gain.gain.rampTo(1, t);
+		this.gain.gain.rampTo(1, t, Tone.now());
 	}
 
 	delete(){

@@ -27,7 +27,7 @@ function resume(){
 			Tone.Transport.timeSignature = [4, 4];
 			// Tone.Transport.swing = 0.5;
 
-			Tone.getDestination().volume.rampTo(0, 0.1);
+			Tone.getDestination().volume.rampTo(0, 0.01);
 			console.log("Resumed Transport");
 		}
 	} catch {
@@ -39,7 +39,7 @@ function resume(){
 function silence(){
 	try {
 		Tone.Transport.pause();
-		Tone.getDestination().volume.rampTo(-Infinity, 1);
+		Tone.getDestination().volume.rampTo(-Infinity, 0.5);
 		// Tone.stop();
 	} catch {
 		console.error('error stopping sound');
@@ -51,7 +51,7 @@ function silence(){
 // 
 function setBPM(bpm, ramp=0){
 	if (ramp === 0){
-		Tone.Transport.bpm.value = bpm;
+		Tone.Transport.bpm.setValueAtTime(bpm, Tone.now());
 	} else {
 		Tone.Transport.bpm.rampTo(bpm, ramp / 1000);
 	}
