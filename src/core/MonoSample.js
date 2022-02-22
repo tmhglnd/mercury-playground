@@ -173,6 +173,15 @@ class MonoSample {
 
 				// when sample is loaded, start
 				if (this.sample.loaded){
+					if (this.adsr.value > 0){
+						// fade-out running envelope over 5 ms
+						let tmp = this.adsr.release;
+						this.adsr.release = 0.005;
+						this.adsr.triggerRelease(time);
+						this.adsr.release = tmp;
+						time += 0.005;
+					}
+
 					this.sample.start(time, o, e);
 					// calculate the release trigger time
 					let rt = Math.max(0.001, e - this.adsr.release);

@@ -182,6 +182,15 @@ class MonoSynth {
 					this.synth.frequency.setValueAtTime(f, time);
 				}
 
+				// fade-out running envelope over 5 ms
+				if (this.adsr.value > 0){
+					let tmp = this.adsr.release;
+					this.adsr.release = 0.005;
+					this.adsr.triggerRelease(time);
+					this.adsr.release = tmp;
+					time += 0.005;
+				}
+
 				// calculate the release trigger time
 				if (this._att){
 					let rt = Math.max(0.001, e - this.adsr.release);
