@@ -151,7 +151,8 @@ Currently the playground does not have the full functionality of the original Me
 
 - [x] tempo
 - [ ] scale / root
-- [ ] highPass / lowPass
+- [x] volume
+- [x] lowPass / highPass
 - [x] randomSeed
 - [x] ring
 	- [x] spread / spreadInclusive / fill
