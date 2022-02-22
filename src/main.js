@@ -49,6 +49,9 @@ window.onload = () => {
 		}
 	});
 
+	// Initialize random BPM
+	Engine.randomBPM();
+
 	// the code Editor
 	// also loads the parser and the worker
 	// gets passed the Tone context and Engine

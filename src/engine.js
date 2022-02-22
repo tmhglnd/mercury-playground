@@ -12,7 +12,7 @@ let buffers = new Tone.ToneAudioBuffers({
 		// is the last thing that is done
 		setTimeout(() => {
 			document.getElementById('load').className = 'hideLoad';
-		}, 2500);
+		}, 1000);
 	}
 });
 
@@ -59,11 +59,18 @@ function setBPM(bpm, ramp=0){
 	console.log(`set bpm to ${bpm}`);
 }
 
-// return the bom of the global transport
+// return the bpm of the global transport
 function getBPM(){
 	return Tone.Transport.bpm.value;
 }
 
+// generate a random bpm between 75 and 150
+function randomBPM(){
+	// set initial BPM on pageload to random value
+	setBPM(Math.floor(Math.random() * 75) + 75);
+}
+
+// get all the contents of the buffers
 function getBuffers(){
 	return buffers;
 }
@@ -101,7 +108,4 @@ function setVolume(g, t=0){
 	}
 }
 
-module.exports = { resume, silence, setBPM, getBPM, getBuffers, setLowPass, setHiPass, setVolume };
-
-// set initial BPM on pageload to random value
-setBPM(Math.floor(Math.random() * 40) + 80);
+module.exports = { resume, silence, setBPM, getBPM, randomBPM, getBuffers, setLowPass, setHiPass, setVolume };
