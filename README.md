@@ -154,7 +154,7 @@ Currently the playground does not have the full functionality of the original Me
 - [x] volume
 - [x] lowPass / highPass
 - [x] randomSeed
-- [x] ring
+- [x] list
 	- [x] spread / spreadInclusive / fill
 	- [x] random / coin / dice / choose / pick / drunk / urn / shuffle
 	- [x] sine / cosine
