@@ -43,6 +43,10 @@ function code({ file, engine }){
 	});
 
 	const globalMap = {
+		'crossFade' : (args) => {
+			// set crossFade time in ms
+			crossFade = Number(args[0])/1000;
+		},
 		'tempo' : (args) => {
 			engine.setBPM(...args);
 		}, 
@@ -63,11 +67,14 @@ function code({ file, engine }){
 			console.log('scale', args);
 			console.log(TL.getSettings());
 		},
-		'highPass' : () => {
-
+		'amp' : (args) => {
+			engine.setVolume(...args);
 		},
-		'lowPass' : () => {
-
+		'highPass' : (args) => {
+			engine.setHiPass(...args);
+		},
+		'lowPass' : (args) => {
+			engine.setLowPass(...args);
 		}
 	}
 

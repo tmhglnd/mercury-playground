@@ -6,7 +6,9 @@ This Package does not generate any sound or visuals. This package only parses Me
 
 **Mercury is a minimal and human-readable language for the live coding of algorithmic electronic music.** 
 
-[**🚀 Go to the Mercury Project**](https://github.com/tmhglnd/mercury)
+[**🚀 Go to the full Mercury Project**](https://github.com/tmhglnd/mercury)
+
+[**👾 Or start sketching in the browser:**](https://mercury.timohoogland.com)
 
 [**🙏 Support Mercury by becoming a Patron**](https://www.patreon.com/bePatron?u=9649817) 
 

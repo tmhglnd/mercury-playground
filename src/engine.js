@@ -68,7 +68,40 @@ function getBuffers(){
 	return buffers;
 }
 
-module.exports = { resume, silence, setBPM, getBPM, getBuffers };
+// master effects chain for Tone
+const GN = new Tone.Gain(1);
+const LP = new Tone.Filter(18000, 'lowpass');
+const HP = new Tone.Filter(5, 'highpass');
+Tone.Destination.chain(LP, HP, GN);
+
+// set the lowpass frequency cutoff and ramptime
+function setLowPass(f, t=0){
+	if (t>0){
+		LP.frequency.rampTo(f, t/1000, Tone.now());
+	} else {
+		LP.frequency.setValueAtTime(f, Tone.now());
+	}
+}
+
+// set the highpass frequency cutoff and ramptime
+function setHiPass(f, t=0){
+	if (t>0){
+		HP.frequency.rampTo(f, t/1000, Tone.now());
+	} else {
+		HP.frequency.setValueAtTime(f, Tone.now());
+	}
+}
+
+// set the main volume
+function setVolume(g, t=0){
+	if (t>0){
+		GN.gain.rampTo(g, t/1000, Tone.now());
+	} else {
+		GN.gain.setValueAtTime(g, Tone.now());
+	}
+}
+
+module.exports = { resume, silence, setBPM, getBPM, getBuffers, setLowPass, setHiPass, setVolume };
 
 // set initial BPM on pageload to random value
 setBPM(Math.floor(Math.random() * 40) + 80);
