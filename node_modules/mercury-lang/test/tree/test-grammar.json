@@ -5,11 +5,11 @@
         0
       ],
       "highPass": [
-        20000,
+        5,
         0
       ],
       "lowPass": [
-        1,
+        18000,
         0
       ],
       "silence": true,
@@ -189,7 +189,7 @@
       ]
     },
     "objects": {
-      "5MJAR3TX": {
+      "KBTIP6DU": {
         "object": "synth",
         "type": "saw",
         "functions": {
@@ -218,11 +218,11 @@
           ],
           "add_fx": [],
           "name": [
-            "5MJAR3TX"
+            "KBTIP6DU"
           ]
         }
       },
-      "BJFNVVSH": {
+      "W217OUN3": {
         "object": "sample",
         "type": "hat_min",
         "functions": {
@@ -250,11 +250,11 @@
           ],
           "add_fx": [],
           "name": [
-            "BJFNVVSH"
+            "W217OUN3"
           ]
         }
       },
-      "WK8PXYLY": {
+      "QGSBHZZN": {
         "object": "sample",
         "type": [
           "hat_min",
@@ -287,11 +287,11 @@
           ],
           "add_fx": [],
           "name": [
-            "WK8PXYLY"
+            "QGSBHZZN"
           ]
         }
       },
-      "1834T1GW": {
+      "QZCMEL63": {
         "object": "synth",
         "type": [
           "saw",
@@ -323,7 +323,7 @@
           ],
           "add_fx": [],
           "name": [
-            "1834T1GW"
+            "QZCMEL63"
           ]
         }
       },

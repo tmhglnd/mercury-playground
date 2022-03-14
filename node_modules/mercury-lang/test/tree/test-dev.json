@@ -5,11 +5,11 @@
         0
       ],
       "highPass": [
-        20000,
+        5,
         0
       ],
       "lowPass": [
-        1,
+        18000,
         0
       ],
       "silence": true
@@ -18,10 +18,17 @@
     "objects": {},
     "groups": {},
     "print": [],
-    "comments": []
+    "comments": [
+      "//print scaleNames()"
+    ]
   },
   "syntaxTree": {
     "@main": [
+      {
+        "@global": {
+          "@comment": "//print scaleNames()"
+        }
+      },
       {
         "@global": {
           "@settings": {

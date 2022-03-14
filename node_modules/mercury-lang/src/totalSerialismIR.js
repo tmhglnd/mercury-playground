@@ -389,6 +389,9 @@ const functionMap = {
 		TL.setScale(...v);
 		return TL.getSettings().map;
 	},
+	'scaleNames' : (...v) => {
+		return TL.getScales();
+	},
 	'tuning' : (...v) => {
 		console.log('set tuning', v);
 	},

@@ -1,4 +1,6 @@
 
 list rtm [8n 16n 4n] 
 
+//print scaleNames()
+
 silence

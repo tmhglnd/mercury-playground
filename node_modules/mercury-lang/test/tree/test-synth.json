@@ -13,6 +13,10 @@
         100
       ],
       "silence": false,
+      "amp": [
+        0.9,
+        5000
+      ],
       "tempo": [
         143
       ],
@@ -84,7 +88,7 @@
       ]
     },
     "objects": {
-      "PD3MA255": {
+      "B1E4XYIU": {
         "object": "synth",
         "type": [
           "sine",
@@ -139,11 +143,11 @@
             ]
           ],
           "name": [
-            "PD3MA255"
+            "B1E4XYIU"
           ]
         }
       },
-      "96FVWDH9": {
+      "EQ5YLM4P": {
         "object": "sample",
         "type": [
           "kick_min",
@@ -185,7 +189,7 @@
             ]
           ],
           "name": [
-            "96FVWDH9"
+            "EQ5YLM4P"
           ]
         }
       },
@@ -1346,7 +1350,6 @@
     ]
   },
   "errors": [
-    "Unkown instrument or setting name: amp",
     "Unkown instrument or setting name: sn",
     "Unkown instrument or setting name: bass"
   ]

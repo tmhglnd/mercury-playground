@@ -5,11 +5,11 @@
         0
       ],
       "highPass": [
-        20000,
+        5,
         0
       ],
       "lowPass": [
-        1,
+        18000,
         0
       ],
       "silence": false

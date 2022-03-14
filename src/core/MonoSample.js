@@ -256,7 +256,7 @@ class MonoSample {
 			// error if soundfile does not exist
 			else if (!this._bufs.has(s)){
 				// set default (or an ampty soundfile?)
-				console.log(`sample ${s} not found`);
+				log(`sample ${s} not found`);
 				return 'kick_min';
 			}
 			return s;

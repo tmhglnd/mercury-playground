@@ -170,10 +170,13 @@ class MonoSynth {
 					}
 				}
 				// reconstruct midi note value, (0, 0) = 36
-				let n = i + (o * 12) + 36;
+				// let n = i + (o * 12) + 36;
+				let n = TL.toScale(i + o * 12 + 36);
+
 				// calculate frequency in 12-TET A4 = 440;
-				let f = Math.pow(2, (n - 69)/12) * 440;
-				
+				// let f = Math.pow(2, (n - 69)/12) * 440;
+				let f = TL.mtof(n);
+
 				// get the slide time for next note
 				let s = Util.divToS(Util.getParam(this._slide, c));
 				if (s > 0){

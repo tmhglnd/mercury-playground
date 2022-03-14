@@ -11,6 +11,13 @@ let crossFade = 1.5;
 let _sounds = [];
 let sounds = [];
 
+// log function to print to console in the window
+function log(...p){
+	let l = document.getElementById('console-log');
+	l.innerHTML += `${p}<br>`;
+	console.log(...p)
+}
+
 // parse and evaluate the inputted code
 function code({ file, engine }){
 	console.log('evaluate', file);
@@ -33,22 +40,25 @@ function code({ file, engine }){
 	let l = document.getElementById('console-log');
 	l.innerHTML = '';
 	errors.forEach((e) => {
-		l.innerHTML += `${e}<br>`;
-		console.error(e);
+		log(e);
 	});
 
 	tree.print.forEach((p) => {
-		l.innerHTML += `${p}<br>`;
-		console.log(p);
+		log(p);
 	});
 
 	const globalMap = {
 		'crossFade' : (args) => {
 			// set crossFade time in ms
 			crossFade = Number(args[0])/1000;
+			// log(`set crossfade time to ${args[0]} ms`);
 		},
 		'tempo' : (args) => {
 			engine.setBPM(...args);
+
+			let tmpB = Tone.Transport.bpm.value;
+			document.getElementById('bpm').innerHTML = `tempo = ${tmpB}`;
+			// log(`set bpm to ${bpm}`);
 		}, 
 		'silence' : (mute) => {
 			if (mute){ engine.silence(); }
@@ -56,25 +66,34 @@ function code({ file, engine }){
 		},
 		'scale' : (args) => {
 			let s = TL.scaleNames();
-			if (s.indexOf(args[0]) > -1){
-				TL.setScale(args[0])
+			let scl = Array.isArray(args[0])? args[0][0] : args[0];
+			let rt = Array.isArray(args[1])? args[1][0] : args[1];
+
+			if (s.indexOf(scl) > -1){
+				TL.setScale(scl)
 			} else {
-				console.log(`${args[0]} is not a valid scale`);
+				log(`${scl} is not a valid scale`);
 			}
-			if (args[1]){
-				TL.setRoot(args[1])
+			if (rt){
+				TL.setRoot(rt)
 			}
-			console.log('scale', args);
-			console.log(TL.getSettings());
+
+			let tmpS = TL.getScale().scale;
+			let tmpR = TL.getScale().root;
+			document.getElementById('scale').innerHTML = `scale = ${tmpR} ${tmpS}`;
+			// log(`set scale to ${tmpR} ${tmpS}`);
 		},
 		'amp' : (args) => {
 			engine.setVolume(...args);
+			// log(`set volume to ${args[0]}`);
 		},
 		'highPass' : (args) => {
 			engine.setHiPass(...args);
+			// log(`set bpm to ${args[0]} Hz`);
 		},
 		'lowPass' : (args) => {
 			engine.setLowPass(...args);
+			// log(`set bpm to ${args[0]} Hz`);
 		}
 	}
 
@@ -102,7 +121,7 @@ function code({ file, engine }){
 				if (inst[a]){
 					inst[a](...args[a]);
 				} else {
-					console.log(`${a}() is not a function of sample`);
+					log(`${a}() is not a function of sample`);
 				}
 			});
 			return inst;
@@ -118,7 +137,7 @@ function code({ file, engine }){
 				if (inst[a]){
 					inst[a](...args[a]);
 				} else {
-					console.log(`${a}() is not a function of loop`);
+					log(`${a}() is not a function of loop`);
 				}
 			});
 			return inst;
@@ -134,7 +153,7 @@ function code({ file, engine }){
 				if (inst[a]){
 					inst[a](...args[a]);
 				} else {
-					console.log(`${a}() is not a function of synth`);
+					log(`${a}() is not a function of synth`);
 				}
 			});
 			return inst;
@@ -150,7 +169,7 @@ function code({ file, engine }){
 				if (inst[a]){
 					inst[a](...args[a]);
 				} else {
-					console.log(`${a}() is not a function of midi`);
+					log(`${a}() is not a function of midi`);
 				}
 			});
 			return inst;
@@ -166,7 +185,7 @@ function code({ file, engine }){
 		if (objectMap[type]){
 			sounds.push(objectMap[type](tree.objects[o]));
 		} else {
-			console.log(`Instrument named '${type}' is not supported`);
+			log(`Instrument named '${type}' is not supported`);
 		}
 	});
 

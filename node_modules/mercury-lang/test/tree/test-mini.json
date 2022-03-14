@@ -5,11 +5,11 @@
         0
       ],
       "highPass": [
-        20000,
+        5,
         0
       ],
       "lowPass": [
-        1,
+        18000,
         0
       ],
       "silence": false,
@@ -32,7 +32,7 @@
       ]
     },
     "objects": {
-      "B5359QN8": {
+      "2S22QTEA": {
         "object": "synth",
         "type": "saw",
         "functions": {
@@ -86,7 +86,7 @@
             ]
           ],
           "name": [
-            "B5359QN8"
+            "2S22QTEA"
           ]
         }
       },
@@ -145,7 +145,7 @@
           ]
         }
       },
-      "3X8IZNYU": {
+      "WMI2LOAU": {
         "object": "sample",
         "type": "violin_g",
         "functions": {
@@ -180,7 +180,7 @@
             -0.3
           ],
           "name": [
-            "3X8IZNYU"
+            "WMI2LOAU"
           ]
         }
       }
