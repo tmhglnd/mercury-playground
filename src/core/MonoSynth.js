@@ -351,7 +351,7 @@ class MonoSynth {
 				let tmpF = fxMap[f[0]](f.slice(1));
 				this._fx.push(tmpF);
 			} else {
-				console.log(`Effect ${f[0]} does not exist`);
+				log(`Effect ${f[0]} does not exist`);
 			}
 		});
 		// if any fx working

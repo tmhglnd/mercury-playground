@@ -150,7 +150,7 @@ new synth triangle fx(reverb /extOSC/verbAmount) fx(filter low /extOSC/cutoff 0.
 Currently the playground does not have the full functionality of the original Mercury environment.
 
 - [x] tempo
-- [ ] scale / root
+- [x] scale
 - [x] volume
 - [x] lowPass / highPass
 - [x] randomSeed
@@ -178,11 +178,13 @@ Currently the playground does not have the full functionality of the original Me
 	- [x] fx
 - [x] synth
 	- [x] wave
+		- [x] super
 	- [x] time
 	- [x] shape
 	- [x] beat
 	- [x] gain
 	- [x] note
+		- [x] map to scale
 	- [x] pan
 	- [x] name
 	- [x] fx
@@ -209,15 +211,17 @@ Currently the playground does not have the full functionality of the original Me
 		- [ ] ping pong feedback delay
 	- [x] drive (softclipping distortion)
 	- [x] squash (compress/overdrive)
-	- [ ] envFilter
+	- [ ] kink (waveshaping)
 	- [x] filter
 		- [ ] modulation
-	- [ ] kink (waveshaping)
+	- [ ] envFilter
 	- [ ] lfo
 	- [x] reverb
 		- [x] decaying noise convolution
 		- [ ] dattorro reverb algorithm
 	- [x] shift (pitchshift)
+	- [ ] chorus
+		- [ ] double
 
 ## 🔭 Vision / Goals
 

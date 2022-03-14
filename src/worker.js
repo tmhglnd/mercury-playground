@@ -11,13 +11,6 @@ let crossFade = 1.5;
 let _sounds = [];
 let sounds = [];
 
-// log function to print to console in the window
-function log(...p){
-	let l = document.getElementById('console-log');
-	l.innerHTML += `${p}<br>`;
-	console.log(...p)
-}
-
 // parse and evaluate the inputted code
 function code({ file, engine }){
 	console.log('evaluate', file);

@@ -15,7 +15,7 @@ class MonoMidi {
 		if (d === 'default'){
 			this._device = WebMidi.outputs[0];
 		} else if (!this._device){
-			console.log('Not a valid MIDI Device name, set to default');
+			log('Not a valid MIDI Device name, set to default');
 			this._device = WebMidi.outputs[0];
 		}
 
@@ -169,7 +169,7 @@ class MonoMidi {
 		this._cc = [];
 		cc.forEach((c) => {
 			if (isNaN(c[0])){
-				console.log(`'${c[0]}' is not a valid CC number`);
+				log(`'${c[0]}' is not a valid CC number`);
 			} else {
 				let cc = [];
 				cc[0] = c[0];

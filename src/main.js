@@ -23,10 +23,16 @@ window.onload = () => {
 	}
 	console.log = (...message) => {
 		console.olog(...message);
-		document.getElementById('log').innerHTML += `${message}<br>`
+		document.getElementById('log').innerHTML += `${message}<br>`;
 		// document.getElementById('console-log').innerHTML += `${message}<br>`
 	};
 	console.error = console.debug = console.info = console.log;
+
+	// global log function for in-window console
+	window.log = (...print) => {
+		document.getElementById('console-log').innerHTML += `${print}<br>`;
+		console.log(...print);
+	}
 
 	const Engine = require('./engine.js');
 	const Editor = require('./editor.js');	
