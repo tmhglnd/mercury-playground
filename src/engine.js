@@ -7,6 +7,7 @@ let buffers = new Tone.ToneAudioBuffers({
 	urls: samples,
 	onload: function(){ 
 		console.log('=> sounds loaded');
+		// console.log(buffers);
 		// init();
 		// remove loading screen, because probably this
 		// is the last thing that is done
@@ -73,6 +74,26 @@ function getBuffers(){
 	return buffers;
 }
 
+function addBuffers(uploads){
+	// for every file from uploads
+	for (let f of uploads){
+		// remove extension 
+		let n = f.name.replace(/\.\w+/g, '');
+		// replace whitespace with _
+		n = n.replace(/[-\s]+/g, '_');
+		// remove leading/trailing whitespace and to lower case
+		n = n.toLowerCase().trim();
+		// add to ToneAudioBuffers
+		let url = URL.createObjectURL(f);
+		buffers.add(n, url, () => {
+			log(`${f.name} added as ${n}`);
+			URL.revokeObjectURL(url);
+		}, () => {
+			log(`error adding sound ${f.name}`);
+		});
+	}
+}
+
 // master effects chain for Tone
 const GN = new Tone.Gain(1);
 const LP = new Tone.Filter(18000, 'lowpass');
@@ -106,4 +127,4 @@ function setVolume(g, t=0){
 	}
 }
 
-module.exports = { resume, silence, setBPM, getBPM, randomBPM, getBuffers, setLowPass, setHiPass, setVolume };
+module.exports = { resume, silence, setBPM, getBPM, randomBPM, getBuffers, addBuffers, setLowPass, setHiPass, setVolume };

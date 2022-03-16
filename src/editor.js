@@ -26,6 +26,7 @@ console.log('=> examples loaded');
 // get the tutorial files
 console.log('loading tutorials...');
 let tutorials = require('./data/tutorials.json');
+const { ToneAudioBuffer } = require('tone');
 console.log('=> tutorials loaded');
 
 // the simple mode lexer for Mercury syntax-highlighting
@@ -201,7 +202,7 @@ const Editor = function({ context, engine }) {
 		let urls = {
 			// 'tutorial': 'https://tmhglnd.github.io/mercury/tutorial.html',
 			'sounds' : 'https://github.com/tmhglnd/mercury/blob/master/mercury_ide/media/README.md',
-			'documentation': 'https://tmhglnd.github.io/mercury/reference.html',
+			'help': 'https://tmhglnd.github.io/mercury/reference.html',
 			'full version': 'https://github.com/tmhglnd/mercury'
 		}
 
@@ -222,6 +223,22 @@ const Editor = function({ context, engine }) {
 			}
 			p.appendChild(btn);
 		});
+
+		let load = document.createElement('button');
+		load.innerHTML = 'add sounds';
+		load.onclick = () => {
+			input.click();
+		}
+		let input = document.createElement('input');
+		input.style.display = 'none';
+		input.type = 'file';
+		input.multiple = true;
+		input.onchange = (e) => {
+			if (e.target.files.length > 0){
+				engine.addBuffers(e.target.files);
+			}
+		}
+		p.appendChild(load);
 	}
 
 	this.tutorialMenu = function(){
