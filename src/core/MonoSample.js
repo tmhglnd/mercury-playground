@@ -114,12 +114,12 @@ class MonoSample {
 					this.sample.buffer.dispose();
 				}
 				if (this._bufs.has(f)){	
-					// this.sample.buffer = this._bufs.get(f);
-					this.sample.buffer = this._bufs.get(f).slice(0);
+					// this.sample.buffer(this._bufs.get(f));
+					this.sample.buffer(this._bufs.get(f).slice(0));
 				} else {
 					// default sample if file does not exist
-					// this.sample.buffer = this._bufs.get('kick_min');
-					this.sample.buffer = this._bufs.get('kick_min').slice(0);
+					// this.sample.buffer(this._bufs.get('kick_min'));
+					this.sample.buffer(this._bufs.get('kick_min').slice(0));
 				}
 				// the duration of the buffer in seconds
 				let dur = this.sample.buffer.duration;
@@ -130,7 +130,7 @@ class MonoSample {
 				// reversing seems to reverse every time the 
 				// value is set to true (so after 2 times reverse
 				// it becomes normal playback again) no fix yet
-				this.sample.reverse = s < 0.0;
+				// this.sample.reverse = s < 0.0;
 
 				let l = Util.lookup(this._stretch, c);
 				let n = 1;

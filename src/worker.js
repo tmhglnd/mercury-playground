@@ -13,7 +13,7 @@ let sounds = [];
 
 // parse and evaluate the inputted code
 function code({ file, engine }){
-	console.log('evaluate', file);
+	console.log('Evaluating');
 	// console.log('Eval at Transport:', Tone.Transport.position);
 	// resume();
 

@@ -74,6 +74,7 @@ function getBuffers(){
 	return buffers;
 }
 
+// add files to the buffer
 function addBuffers(uploads){
 	// for every file from uploads
 	for (let f of uploads){

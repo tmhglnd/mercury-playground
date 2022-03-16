@@ -78,7 +78,7 @@ const Editor = function({ context, engine }) {
 		theme: defaultTheme,
 		cursorHeight: 1,
 		indentUnit: 4,
-		firstLineNumber: 0,
+		firstLineNumber: 1,
 		undoDepth: 50,
 		cursorScrollMargin: 20,
 		mode: "mercury",
