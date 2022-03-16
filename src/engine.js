@@ -56,6 +56,7 @@ function setBPM(bpm, ramp=0){
 	} else {
 		Tone.Transport.bpm.rampTo(bpm, ramp / 1000);
 	}
+	document.getElementById('bpm').innerHTML = `tempo = ${bpm}`;
 }
 
 // return the bpm of the global transport

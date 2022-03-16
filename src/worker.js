@@ -48,9 +48,6 @@ function code({ file, engine }){
 		},
 		'tempo' : (args) => {
 			engine.setBPM(...args);
-
-			let tmpB = Tone.Transport.bpm.value;
-			document.getElementById('bpm').innerHTML = `tempo = ${tmpB}`;
 			// log(`set bpm to ${bpm}`);
 		}, 
 		'silence' : (mute) => {

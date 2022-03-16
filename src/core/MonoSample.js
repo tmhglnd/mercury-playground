@@ -114,12 +114,12 @@ class MonoSample {
 					this.sample.buffer.dispose();
 				}
 				if (this._bufs.has(f)){	
-					// this.sample.buffer(this._bufs.get(f));
-					this.sample.buffer(this._bufs.get(f).slice(0));
+					this.sample.buffer = this._bufs.get(f);
+					// this.sample.buffer = this._bufs.get(f).slice(0);
 				} else {
 					// default sample if file does not exist
-					// this.sample.buffer(this._bufs.get('kick_min'));
-					this.sample.buffer(this._bufs.get('kick_min').slice(0));
+					this.sample.buffer = this._bufs.get('kick_min');
+					// this.sample.buffer = this._bufs.get('kick_min').slice(0);
 				}
 				// the duration of the buffer in seconds
 				let dur = this.sample.buffer.duration;
