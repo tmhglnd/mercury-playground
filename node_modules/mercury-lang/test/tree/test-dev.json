@@ -12,33 +12,249 @@
         18000,
         0
       ],
-      "silence": true
+      "silence": false
     },
-    "variables": {},
+    "variables": {
+      "str": [
+        1,
+        1,
+        1,
+        2,
+        2,
+        2,
+        3,
+        3,
+        3,
+        4
+      ],
+      "str2": [
+        1,
+        1.3333333333333335,
+        1.6666666666666665,
+        2,
+        2.333333333333333,
+        2.6666666666666665,
+        3,
+        3.3333333333333335,
+        3.6666666666666665,
+        4
+      ],
+      "str3": [
+        1,
+        1.3333333333333335,
+        1.6666666666666665,
+        2,
+        2.333333333333333,
+        2.6666666666666665,
+        3,
+        3.3333333333333335,
+        3.6666666666666665,
+        4
+      ],
+      "str4": [
+        1,
+        4,
+        2,
+        3,
+        3,
+        2,
+        4,
+        1
+      ]
+    },
     "objects": {},
     "groups": {},
-    "print": [],
+    "print": [
+      [
+        1,
+        1,
+        1,
+        2,
+        2,
+        2,
+        3,
+        3,
+        3,
+        4
+      ],
+      [
+        1,
+        4,
+        2,
+        3,
+        3,
+        2,
+        4,
+        1
+      ]
+    ],
     "comments": [
-      "//print scaleNames()"
+      "//silence"
     ]
   },
   "syntaxTree": {
     "@main": [
       {
-        "@global": {
-          "@comment": "//print scaleNames()"
+        "@list": {
+          "@name": "str",
+          "@params": {
+            "@function": {
+              "@name": "stretch",
+              "@args": [
+                {
+                  "@array": [
+                    {
+                      "@number": 1
+                    },
+                    {
+                      "@number": 2
+                    },
+                    {
+                      "@number": 3
+                    },
+                    {
+                      "@number": 4
+                    }
+                  ]
+                },
+                {
+                  "@number": 10
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "@list": {
+          "@name": "str2",
+          "@params": {
+            "@function": {
+              "@name": "stretchFloat",
+              "@args": [
+                {
+                  "@array": [
+                    {
+                      "@number": 1
+                    },
+                    {
+                      "@number": 2
+                    },
+                    {
+                      "@number": 3
+                    },
+                    {
+                      "@number": 4
+                    }
+                  ]
+                },
+                {
+                  "@number": 10
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "@list": {
+          "@name": "str3",
+          "@params": {
+            "@function": {
+              "@name": "stretchF",
+              "@args": [
+                {
+                  "@array": [
+                    {
+                      "@number": 1
+                    },
+                    {
+                      "@number": 2
+                    },
+                    {
+                      "@number": 3
+                    },
+                    {
+                      "@number": 4
+                    }
+                  ]
+                },
+                {
+                  "@number": 10
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "@list": {
+          "@name": "str4",
+          "@params": {
+            "@function": {
+              "@name": "lace",
+              "@args": [
+                {
+                  "@array": [
+                    {
+                      "@number": 1
+                    },
+                    {
+                      "@number": 2
+                    },
+                    {
+                      "@number": 3
+                    },
+                    {
+                      "@number": 4
+                    }
+                  ]
+                },
+                {
+                  "@array": [
+                    {
+                      "@number": 4
+                    },
+                    {
+                      "@number": 3
+                    },
+                    {
+                      "@number": 2
+                    },
+                    {
+                      "@number": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          }
         }
       },
       {
         "@global": {
-          "@settings": {
-            "@identifier": "silence"
-          }
+          "@print": [
+            {
+              "@identifier": "str"
+            }
+          ]
+        }
+      },
+      {
+        "@global": {
+          "@print": [
+            {
+              "@identifier": "str4"
+            }
+          ]
+        }
+      },
+      {
+        "@global": {
+          "@comment": "//silence"
         }
       }
     ]
   },
-  "errors": [
-    "Error at line 2"
-  ]
+  "errors": []
 }

@@ -1,15 +1,14 @@
 // combine multiple effects modulated in time by lists
 // to create interesting synthesized sounds
-
 set tempo 132
+set scale minor c
 
 new synth saw note([0 1 [12 24 19 36]] 0) name(syn)
-	// modulate the length of the note with a cosine function
-	set syn shape(1 cosine(128 3.14 50 300)) time(1/16) 
+    // modulate the length of the note with a cosine function
+    set syn shape(1 cosine(128 3.14 50 300)) time(1/16) 
     // randomnes to the slide between notes and the overdrive fx
     set syn slide([[100 0] 0 0]) fx(drive random(4 2 15)) 
     // slowly rise the filter cutoff frequency
     set syn fx(filter low spread(32 200 3500) 0.6)
     // change delaytimes every 16 notes
-    set syn fx(delay repeat([1/32 3/16 7/16] 16) 0.5)
-    
+    set syn fx(delay repeat([1/32 3/16] 16) 1/8 0.8)

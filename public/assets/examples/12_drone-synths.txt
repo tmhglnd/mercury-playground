@@ -1,19 +1,18 @@
 // A synth that functions as bass drone 
 // Combined with a short high pitch synth with delay
 // Creating in a melody from a lookup scale list
-
 set tempo 124
-// define a scale
-list minor_harmonic [0 0 2 3 3 5 7 7 8 8 11 11]
+// set a scale
+set scale harmonic_minor c
 
 // some note numbers for bass synth
 list notes [3 7 5 8]
 new synth saw note(notes 0) time(4) name(drone)
-	set drone fat(0.1132 3) shape(off) fx(squash 5)
-    set drone fx(reverb 0.2 3) fx(filter low 1500 0.4)
- 
+    set drone fat(0.1132 3) shape(off) fx(squash 5)
+    set drone fx(reverb 0.6 5) fx(filter low 1500 0.4)
+
 // create a melody for the lead synth
-list melody lookup(cosine(16 5.32 0 12) minor_harmonic)
+list melody cosine(16 5.32 0 12)
 new synth sine note(melody 2) time(1/2) name(lead)
-	set lead shape(1 120) fat(0.021 3) fx(distort 10)
-    set lead fx(delay 3/16 0.7) fx(reverb 0.5 3)
+    set lead shape(1 120) fat(0.021 3) fx(distort 10)
+    set lead fx(delay 3/16 4/16 0.8) fx(reverb 0.5 3)

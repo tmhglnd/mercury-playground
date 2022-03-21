@@ -1,6 +1,11 @@
 
-list rtm [8n 16n 4n] 
+list str stretch([1 2 3 4] 10)
+list str2 stretchFloat([1 2 3 4] 10)
+list str3 stretchF([1 2 3 4] 10)
 
-//print scaleNames()
+list str4 lace([1 2 3 4] [4 3 2 1])
 
-silence
+print str
+print str4
+
+//silence

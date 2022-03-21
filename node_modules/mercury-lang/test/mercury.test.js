@@ -11,7 +11,7 @@ const util = require('util');
 
 let verbose = false;
 let entryPoint = "../index.js";
-// entryPoint = "../build/mercury.es5.min.js";
+entryPoint = "../build/mercury.es5.min.js";
 
 const Mercury = require(entryPoint);
 

@@ -1,7 +1,6 @@
 // multiple samples make up a beat
 // using a time offset as 
 // second argument
-
 set tempo 131
 
 new sample kick_909 time(1/4)
@@ -11,4 +10,4 @@ new sample hat_909_open time(1 15/16)
 new sample clap_909 time(5/16)
 
 // short slapback reverb
-set all fx(reverb 1 3)
+set all fx(reverb 0.5 2)

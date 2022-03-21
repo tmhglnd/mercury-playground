@@ -1,7 +1,6 @@
 // choose 15 random samples from a list of
 // predefined samplename. Play those samples 
 // sequentially for every time interval
-
 set tempo 112
 
 // randomseed makes sure every run the 

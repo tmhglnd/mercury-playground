@@ -1,12 +1,14 @@
 // 808 beats
 // change the tempo
 set tempo 115
-// try different numbers
+// try different numbers to create new random patterns
 set randomSeed 9832
 
 // various sounds in a list
 list manySounds [kick_808 hat_808 hat_808_semi maracas_808 snare_808 tom_808]
 // choose 16 names randomly from the list
 list pattern choose(16 manySounds)
-// play the sounds with a squash effect and random panning on left/right speaker
+
+// play the sounds with a squash effect and random panning 
+// on left/right speaker
 new sample pattern time(1/16) fx(squash 5) pan(random)

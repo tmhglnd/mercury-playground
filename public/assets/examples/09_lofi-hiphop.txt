@@ -1,6 +1,5 @@
 // A lo-fi beat with amenbreak chops and a pitchshifted 
 // rhodes sample on the offbeat
-
 set tempo 87
 set randomSeed 3210
 
@@ -12,5 +11,5 @@ new sample hat_808 time(1/16) pan(random) gain(0.5)
 new sample [kick_dub hat_808_open snare_rock hat_808_open] time(1/4)
 
 new sample rhodes_8bit name(rhodes)
-	set rhodes time(1/4 1/8) fx(shift repeat([0 3 7 2] 8))
+    set rhodes time(1/4 1/8) fx(shift repeat([0 3 7 2] 8))
     set rhodes shape(1 1/8 1) fx(reverb 0.3 7)

@@ -363,12 +363,15 @@ const functionMap = {
 	},
 	// stretch an array to a specified length, interpolating values
 	'stretch' : (...v) => {
+		return Util.trunc(functionMap['stretchFloat'](...v));
+	},
+	'stretchF' : (...v) => {
+		return functionMap['stretchFloat'](...v);
+	},
+	'stretchFloat' : (...v) => {
 		// swap because of implementation in total-serialism
 		v[0] = (Array.isArray(v[0])) ? v[0] : [v[0]];
 		v[1] = Math.max(2, (Array.isArray(v[1])) ? v[1][0] : v[1]);
-		return Util.trunc(Mod.stretch(...v));
-	},
-	'stretchFloat' : (...v) => {
 		return Mod.stretch(...v);
 	},
 	// remove duplicates from an array, leave order intact
