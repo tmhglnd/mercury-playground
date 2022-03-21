@@ -1,11 +1,11 @@
-// === TUTORIAL 10 ===
-// We can also create a polyrhythm with time()
-// a polyrhythm is a composite rhythm of different timing
-// intervals within a measure.
+// === TUTORIAL 10 Polyrhythm ===
+// We can also create a so called polyrhythm with time()
+// A polyrhythm is a composite rhythm of different timing
+// intervals within a measure
 
 new sample kalimba_e time(1)
 new sample kalimba_g time(1/3)
 new sample kalimba_cis time(1/2)
 new sample kalimba_a time(1/4)
 
-// Try changing some of the time values and play with the polyrhythm
+// Try changing some of the time values to play with the polyrhythm

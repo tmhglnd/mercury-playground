@@ -1,5 +1,5 @@
-// === TUTORIAL 09 ===
-// Now we can combine a list of sounds with a list of beats
+// === TUTORIAL 09: Linear Beat ===
+// We can now combine a list of sounds with a list of beats
 // and add an extra sample 1/4th of the time to make a steady beat
 
 set tempo 114
@@ -10,4 +10,5 @@ new sample sounds time(1/16) play(beat)
 
 new sample kick_909 time(1/4)
 
-// Try different combinations of beats, sounds, time
+// It gradually becomes more complex and interesting
+// Try different combinations of beats, sounds and time

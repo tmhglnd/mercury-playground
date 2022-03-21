@@ -1,9 +1,9 @@
-// === TUTORIAL 08 ===
-// We can also use a list of sound names 
-// to let one sample play them sequencially
+// === TUTORIAL 08: Linear ===
+// We can also create a list of sound names instead
+// to let one sample play the files sequencially
 
 list sounds [kick_909 hat_909 snare_909 hat_909]
 new sample sounds time(1/8)
 
 // Try adding or removing some sound names
-// for example add tabla_mid
+// For example add tabla_mid to the list

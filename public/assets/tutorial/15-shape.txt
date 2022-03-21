@@ -1,9 +1,9 @@
-// === TUTORIAL 15 ===
+// === TUTORIAL 15: Shape ===
 // Some samples sound quite long. We can make longer samples 
-// shorter with the shape() method, setting an fade-in 
+// shorter with the shape() method, setting a fade-in 
 // and fade-out time in milliseconds
 
-new sample harp_down time(1/3) shape(1 500)
+new sample harp_down time(1/3) shape(1 100)
 new sample bowl_hi time(1) shape(1000 2)
 
 // Try some different settings to hear the difference
