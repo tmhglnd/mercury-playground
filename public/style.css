@@ -42,6 +42,7 @@ p {
 	/* font-family: "courier new"; */
 	color: rgb(180, 180, 180);
 	-webkit-app-region: no-drag;
+	overflow-wrap: break-word;
 }
 
 #menu {

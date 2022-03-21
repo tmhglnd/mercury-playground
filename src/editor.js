@@ -108,18 +108,18 @@ const Editor = function({ context, engine }) {
 	this.clear = function(){
 		// this.cm.setValue('// start coding here ^^');
 		this.set(
-				'// Welcome to the Mercury Playground ^^\n' + 
-				'// click "play" to execute the code\n' +
-				'// and adjust the code below:\n' +
-				'\n' +
-				'list kickBeat [1 0.01 0.1 1 0]\n' +
-				'new sample kick_house time(1/16) play(kickBeat)\n' +
-				'\n' +
-				'list hatBeat euclid(16 7)\n' +
-				'new sample hat_909 time(1/16) play(hatBeat)\n' +
-				'\n' +
-				'new sample snare_hvy time(1 3/4)\n'
-			);
+			'// Welcome to the Mercury Playground ^^\n' + 
+			'// click "play" to start the sound and start coding\n' +
+			'// or open the tutorials or a random example\n' +
+			'\n' +
+			'list kickBeat [1 0.01 0.1 1 0]\n' +
+			'new sample kick_house time(1/16) play(kickBeat)\n' +
+			'new sample snare_hvy time(1/2 1/4)\n' +
+			'\n' +
+			'new synth saw time(1/16) shape(1 1/20) name(bass) note([0 3 7] 0)\n' +
+			'    set bass fx(filter low random(5 50 5000) 0.2)\n' +
+			'    set bass fx(delay 2/16 3/16 0.9) super(0.13212 5)\n'
+		);
 	}
 
 	this.evaluate = function(){

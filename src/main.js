@@ -29,8 +29,10 @@ window.onload = () => {
 	console.error = console.debug = console.info = console.log;
 
 	// global log function for in-window console
-	window.log = (...print) => {
-		document.getElementById('console-log').innerHTML += `${print}<br>`;
+	window.log = (print) => {
+		// console.log('printing', typeof print);
+		let p = JSON.stringify(print).replace(/\,/g, ' ').replace(/\"/g, '');
+		document.getElementById('console-log').innerHTML += `${p}<br>`;
 		console.log(...print);
 	}
 

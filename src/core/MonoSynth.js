@@ -122,7 +122,7 @@ class MonoSynth {
 				if (this._waveMap[w]){
 					w = this._waveMap[w];
 				} else {
-					console.log(`'${w} is not a valid waveshape`);
+					log(`${w} is not a valid waveshape`);
 					// default wave if wave does not exist
 					w = 'sine';
 				}
@@ -162,14 +162,12 @@ class MonoSynth {
 				let i = Util.getParam(this._note[0], c);
 				
 				if (isNaN(i)){
-					i = TL.noteToMidi(i);
-					if (!i){
+					let _i = TL.noteToMidi(i);
+					if (!_i){
 						log(`${i} is not a valid number or name`);
-					}
-					if (!i){
 						i = 0;
 					} else {
-						i -= 48;
+						i = _i - 48;
 					}
 				}
 				// reconstruct midi note value, (0, 0) = 36
