@@ -1,4 +1,4 @@
-// === TUTORIAL 07: Beat ===
+// === TUTORIAL 107: Beat ===
 // We can create multiple rhythms for different instruments 
 // with lists of various lengths to create an interesting beat
 // Here the rhythm of the hihat is 7 long, and the tabla 5

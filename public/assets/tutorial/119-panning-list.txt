@@ -1,4 +1,4 @@
-// === TUTORIAL 19 ===
+// === TUTORIAL 119: Panning List ===
 // Of course we can also use a list for the panning 
 // or use the argument random to randomize the panning
 

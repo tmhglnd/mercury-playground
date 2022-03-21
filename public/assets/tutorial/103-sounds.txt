@@ -1,4 +1,4 @@
-// === TUTORIAL 03: Sounds ===
+// === TUTORIAL 103: Sounds ===
 // You can use multiple sounds simply by coding
 // extra lines that each start with 'new sample'
 

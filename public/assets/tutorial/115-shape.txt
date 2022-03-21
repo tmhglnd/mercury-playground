@@ -1,4 +1,4 @@
-// === TUTORIAL 15: Shape ===
+// === TUTORIAL 115: Shape ===
 // Some samples sound quite long. We can make longer samples 
 // shorter with the shape() method, setting a fade-in 
 // and fade-out time in milliseconds

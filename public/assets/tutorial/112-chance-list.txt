@@ -1,4 +1,4 @@
-// === TUTORIAL 12: Chance List ===
+// === TUTORIAL 112: Chance List ===
 // It is also possible to add these chances in a list
 // This helps to create more complex rhythms with small variations
 

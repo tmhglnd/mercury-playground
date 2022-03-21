@@ -1,4 +1,4 @@
-// === TUTORIAL 13: Speed ===
+// === TUTORIAL 113: Speed ===
 // With the playback speed you do not affect the tempo, 
 // but instead the pitch of the sound (higher or lower)
 // You can use this to create melodic like patterns

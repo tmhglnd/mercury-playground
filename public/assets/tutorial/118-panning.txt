@@ -1,7 +1,7 @@
-// === TUTORIAL 18 ===
-// We can make the composition more interesting by using the 
+// === TUTORIAL 118: Panning ===
+// We can make the composition sound more interesting by using the 
 // stereo field from our speakers (called panning).
-// We can pan a sound left with -1, right with 1 and center with 0
+// We can place a sound left with -1, right with 1 and center with 0
 
 new sample violin_c time(1) pan(-1)
 new sample pluck_e time(1 3/16) pan(1)

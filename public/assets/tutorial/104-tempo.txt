@@ -1,4 +1,4 @@
-// === TUTORIAL 04: Tempo ===
+// === TUTORIAL 104: Tempo ===
 // We can change the tempo and other settings
 // with the 'set' keyword
 

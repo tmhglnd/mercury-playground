@@ -1,4 +1,4 @@
-// === TUTORIAL 11: Chance ===
+// === TUTORIAL 111: Chance ===
 // Instead of a 1 (100%) or 0 (0%) in the play method, 
 // we can also use a decimal-point value that represents
 // a percentage of chance that the sound will play

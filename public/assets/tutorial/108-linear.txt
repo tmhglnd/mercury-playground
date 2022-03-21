@@ -1,4 +1,4 @@
-// === TUTORIAL 08: Linear ===
+// === TUTORIAL 108: Linear ===
 // We can also create a list of sound names instead
 // to let one sample play the files sequencially
 

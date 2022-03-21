@@ -1,4 +1,4 @@
-// === TUTORIAL 02: Time ===
+// === TUTORIAL 102: Time ===
 // You can change how often a sound is played
 // in one measure/bar.
 // For example 1/4 means 4 times per measure

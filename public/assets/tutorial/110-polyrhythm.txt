@@ -1,4 +1,4 @@
-// === TUTORIAL 10 Polyrhythm ===
+// === TUTORIAL 110 Polyrhythm ===
 // We can also create a so called polyrhythm with time()
 // A polyrhythm is a composite rhythm of different timing
 // intervals within a measure

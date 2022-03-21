@@ -1,10 +1,10 @@
-// === TUTORIAL 17: Start Position ===
+// === TUTORIAL 117: Start Position ===
 // For longer samples it can be useful to start the playback 
 // of the sound at a different position within the sample
 // You can do that with the start() function by giving a 
 // value between 0 and 1 (0.5 is halfway through the sound)
 
-list positions [0 0.2 0.3 0.2 0.5 0.1]
+list positions [0.7 0.2 0.3 0.2 0.5 0.1]
 new sample choir_01 time(1/8) start(positions) shape(1 100 1)
 
 // The list contains different starting positions in % of 

@@ -1,4 +1,4 @@
-// === TUTORIAL 01: Sample ===
+// === TUTORIAL 101: Sample ===
 // You can play a soundfile with 'new sample' 
 // followed by the samplename, for example: kick_909
 // Start the code with 'play' or Alt+Enter

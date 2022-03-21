@@ -1,4 +1,4 @@
-// === TUTORIAL 16: Shape List ===
+// === TUTORIAL 116: Shape List ===
 // We can also use a list to change the length of fade-in 
 // and fade-out sequentially
 

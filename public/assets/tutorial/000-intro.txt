@@ -1,4 +1,4 @@
-// === TUTORIAL 00: Intro ===
+// === TUTORIAL 000: Intro ===
 // Welcome to the Mercury tutorial ^^
 // These short tutorials will teach you all everything 
 // that you can do with this environment

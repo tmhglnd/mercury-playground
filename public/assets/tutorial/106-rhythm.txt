@@ -1,4 +1,4 @@
-// === TUTORIAL 06: Rhythm ===
+// === TUTORIAL 106: Rhythm ===
 // With a list we can make more complex patterns 
 // like a beat of 1's and 0's
 // A list is just a collection of numbers (or words)

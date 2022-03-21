@@ -1,4 +1,4 @@
-// === TUTORIAL 09: Linear Beat ===
+// === TUTORIAL 109: Linear Beat ===
 // We can now combine a list of sounds with a list of beats
 // and add an extra sample 1/4th of the time to make a steady beat
 

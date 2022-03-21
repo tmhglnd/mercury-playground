@@ -1,4 +1,4 @@
-// === TUTORIAL 05: Offset ===
+// === TUTORIAL 105: Offset ===
 // We can keep the time interval the same, but play 
 // sounds at a different position in the bar by 
 // using a second argument for the offset
