@@ -1,0 +1,10 @@
+// === TUTORIAL 303: FX Reverb ===
+// With the reverb effect you can place the sound in a 
+// small room or big church
+
+new synth saw note(0 0) time(1) shape(1 1/4 1) fx(reverb 0.3 10)
+new synth saw note([0 3 7] 1) time(1/4) shape(1 1/32) fx(reverb 0.5 3)
+
+// The first decimal value determines the balance between original (dry)
+// and reverb sound (wet). The second argument is the reverb time in 
+// seconds

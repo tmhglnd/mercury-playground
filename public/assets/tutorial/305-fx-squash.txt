@@ -1,0 +1,9 @@
+// === TUTORIAL 305: Squash ===
+// The squash effect is also a type of distortion effect that
+// compresses the sound a bit
+set tempo 115
+
+list squashes [4 15 10 4 40]
+new sample kick_909 time(1/16) fx(squash squashes) shape(1 50)
+
+// Try some different values to hear the differences

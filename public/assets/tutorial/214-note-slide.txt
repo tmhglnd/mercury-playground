@@ -3,9 +3,10 @@
 // from one note to another (called portamento) in a specified
 // amount of time (division or milliseconds)
 
-set tempo 115
+set tempo 123
+set scale minor b
 
-list bassLine [3 3 3 3 2 2 2 2 0 0 0 0 -6 -6 -6 -7]
-new synth organ note(bassLine 1) shape(4 250) time(1/4) slide(1/4)
+list bassLine repeat([3 2 0 -7] 4)
+new synth saw note(bassLine 0) shape(2 250) time(1/4) slide(1/8)
 
 // Try some different values for both

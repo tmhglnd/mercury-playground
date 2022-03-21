@@ -1,0 +1,6 @@
+// === TUTORIAL 302: FX Distortion ===
+// With the distortion effect you can give the sound a crunchy
+// quality, like it is sound through a guitar amplifier
+
+set tempo 105
+new loop amen time(1) fx(drive 50)

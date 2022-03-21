@@ -1,0 +1,13 @@
+// === TUTORIAL 306: FX All ===
+// It is possible to give multiple sounds the same effects
+// by using the `set all` code
+
+new sample kick_909 time(1/2)
+new sample hat_909 time(1/4 1/8)
+new synth saw time(3/16) note(0 1) shape(1 1/8) super(3 0.0423)
+
+set all fx(shift -12 0.5) fx(squash 23) fx(reverb 0.5 1)
+
+// Note that this actually creates individual effects for all the 
+// sounds. Meaning they can all have individual modulation speeds
+// when using a list with arguments

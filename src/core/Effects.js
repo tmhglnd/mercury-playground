@@ -1,5 +1,6 @@
 const Tone = require('tone');
 const Util = require('./Util.js');
+const TL = require('total-serialism').Translate;
 // const Tuna = require('tunajs');
 // const TunaFX = new Tuna(Tone.getContext());
 
@@ -193,7 +194,8 @@ const PitchShift = function(_params){
 		let p = Util.getParam(this._pitch, c);
 		let w = Util.getParam(this._wet, c);
 
-		this._fx.pitch = p;
+		this._fx.pitch = TL.toScale(p);
+		// this._fx.pitch = p;
 		this._fx.wet.setValueAtTime(w, time);
 	}
 
@@ -323,9 +325,10 @@ const Delay = function(_params){
 	this._mix = new Tone.CrossFade(0.5);
 	this._split = new Tone.Split(2);
 	this._merge = new Tone.Merge(2);
+	this._maxDelay = 5;
 
-	this._delayL = new Tone.Delay({ maxDelay: 5 });
-	this._delayR = new Tone.Delay({ maxDelay: 5 });
+	this._delayL = new Tone.Delay({ maxDelay: this._maxDelay });
+	this._delayR = new Tone.Delay({ maxDelay: this._maxDelay });
 	this._flt = new Tone.Filter(1000, 'lowpass', '-12');
 
 	if (_params.length === 2){
@@ -358,10 +361,10 @@ const Delay = function(_params){
 	this._fb.connect(this._mix.b);
 
 	this.set = function(c, time, bpm){
-		let dL = Math.max(0, Util.formatRatio(Util.getParam(this._timeL, c), bpm));
-		let dR = Math.max(0, Util.formatRatio(Util.getParam(this._timeR, c), bpm));
+		let dL = Math.min(this._maxDelay, Math.max(0, Util.formatRatio(Util.getParam(this._timeL, c), bpm)));
+		let dR = Math.min(this._maxDelay, Math.max(0, Util.formatRatio(Util.getParam(this._timeR, c), bpm)));
 		let ct = Math.max(10, Util.getParam(this._fbDamp, c) * 5000);
-		let fb = Math.max(0, Math.min(0.99, Util.getParam(this._feedBack, c)));
+		let fb = Math.max(0, Math.min(0.99, Util.getParam(this._feedBack, c) * 0.707));
 
 		this._delayL.delayTime.setValueAtTime(dL, time);
 		this._delayR.delayTime.setValueAtTime(dR, time);
