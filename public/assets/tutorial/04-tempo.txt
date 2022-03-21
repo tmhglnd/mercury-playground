@@ -1,11 +1,13 @@
-// === TUTORIAL 04 ===
-// You can change global settings like tempo
+// === TUTORIAL 04: Tempo ===
+// We can change the tempo and other settings
 // with the 'set' keyword
 
-set tempo 86
+set tempo 115
 
 new sample kick_808_dist time(3/8)
 new sample hat_808 time(1/16)
 new sample snare_808 time(1/2)
 
-// Try for example tempo 86 for HipHop, or 162 for Drum'n'Bass
+// Some genres are defined by there own bpm range
+// Try for example tempo 86 for HipHop, 
+// or 162 for Drum'n'Bass styles

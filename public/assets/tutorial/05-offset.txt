@@ -1,10 +1,12 @@
-// === TUTORIAL 05 ===
-// we can keep the time interval the same, but play 
-// sounds at a different position in the bar
-// by using a second argument for the offset
+// === TUTORIAL 05: Offset ===
+// We can keep the time interval the same, but play 
+// sounds at a different position in the bar by 
+// using a second argument for the offset
 
 new sample kalimba_g time(1)
 new sample kalimba_a time(1 3/16)
 new sample kalimba_e time(1 3/8)
 
+// These sounds all play 1 time per measure
+// one starts at offset 0, one at 3/16 and one at 3/8
 // Try different offsets like 1/16, 3/4, 1/32
