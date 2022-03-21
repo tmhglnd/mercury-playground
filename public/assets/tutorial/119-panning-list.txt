@@ -1,10 +1,11 @@
 // === TUTORIAL 119: Panning List ===
-// Of course we can also use a list for the panning 
-// or use the argument random to randomize the panning
+// Is with many functions we've seen so far we can also 
+// use a list for the panning. Or use the argument 'random' 
+// to randomize the panning
 
 list panning [-1 -0.75 -0.5 -0.25 0 0.25 0.5 0.75 1]
-new sample tabla_mid time(1/16) pan(panning)
+new sample hat_808 time(1/16) pan(panning)
 // this sound will move from left to right
 
-new sample tabla_hi time(1/16) pan(random)
+new sample tabla_mid time(1/4) pan(random)
 // this sound will play at a random position in the stereofield
