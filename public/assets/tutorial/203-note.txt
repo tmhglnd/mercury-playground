@@ -1,7 +1,7 @@
-// === TUTORIAL 24 ===
-// To choose a note to play for the synth we use
-// the note() function. This function expects a number
-// as a semitone (half-step) on the piano-keyboard.
+// === TUTORIAL 203: Note ===
+// To choose a note to play for the synth we use the note() 
+// function. This function expects a number as a semitone (half-step)
+// on the piano-keyboard. The numbers can be positive or negative.
 
 new synth saw time(1) note(0)
 new synth saw time(1 1/16) note(3)

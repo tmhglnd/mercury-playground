@@ -1,0 +1,7 @@
+// === TUTORIAL 209: Synth Shape ===
+// The shape() method for the synth allows us to create a longer
+// or shorter sound with a fade-in/fade-out. We can also set 
+// the shape(off) resulting in a never stopping sound.
+
+new synth triangle time(1/4) shape(1 100) note(0 2)
+new synth triangle time(1) shape(off)

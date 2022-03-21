@@ -298,7 +298,7 @@ const Filter = function(_params){
 
 	this.set = function(c, time){
 		let f = Util.getParam(this._cutoff, c);
-		let r = 1 / Math.min(1, Math.max(0, (1 - Util.getParam(this._q, c))));
+		let r = 1 / (1 - Math.min(0.95, Math.max(0, Util.getParam(this._q, c))));
 
 		this._fx.frequency.setValueAtTime(f, time);
 		this._fx.Q.setValueAtTime(r, time);

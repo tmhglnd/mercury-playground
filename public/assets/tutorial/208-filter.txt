@@ -1,9 +1,0 @@
-// === TUTORIAL 29 ===
-// The sound of the synth is still very crude. Most synths 
-// therefore use a filter to change the color quality of the
-// resulting sound. This can be done with the fx(filter)
-
-new synth saw time(1/16) fx(filter low 1200 0.6)
-// This filter removes high frequencies above 800Hz (lowpass)
-// And has a little resonance on the cutoff frequency
-// Resonance results in a whistling quality

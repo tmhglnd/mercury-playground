@@ -1,0 +1,15 @@
+// === TUTORIAL 207: More Scales ===
+// There are many scales to choose from. If you like to see the 
+// complet entire list you can get it with scaleNames()
+// Then 'print' the list to the console
+
+list scales scaleNames()
+print scales
+
+set tempo 143
+set scale romanian_minor
+
+list melody [12 11 10 9 8 7 6 5 4 3 2 1 0]
+new synth square time(1/16) note(melody 1)
+
+// Try some names of the scales you see in the console

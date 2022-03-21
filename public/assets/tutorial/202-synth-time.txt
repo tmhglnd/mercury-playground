@@ -1,6 +1,9 @@
-// === TUTORIAL 23 ===
-// Many of the functions from the sample can
-// also be applied to the synth, for example with 
-// the time() we can choose the time interval it is triggered at
+// === TUTORIAL 202: Synth Time ===
+// Many of the functions from the 'sample' can also be 
+// applied to the synth, for example with the time()
+// we can choose the time interval it is triggered at
 
 new synth saw time(1/8)
+
+// Try also: play(), gain(), pan() combined with lists
+// See tutorials 106, 107, 110, 111, 112, 118, 120

@@ -1,0 +1,11 @@
+// === TUTORIAL 212: Filter ===
+// The sound of the synth is still very bright. Most synths 
+// therefore use a filter to change the color of the sound. 
+// This can be done with the `fx(filter)`, the `fx()` is an 
+// effect function that allows us to change the sound in 
+// various ways
+
+new synth saw time(1/16) fx(filter low 1200 0.6) shape(1 100)
+// This filter removes high frequencies above 1200Hz (lowpass)
+// And has a little resonance on the cutoff frequency
+// Resonance results in a whistling sounding effect

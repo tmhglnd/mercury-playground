@@ -1,6 +1,0 @@
-// === TUTORIAL 28 ===
-// Of course we can also use a list to modulate the length 
-// from the fade-in and fade-out times
-
-list fadeOut [50 50 100 10 200 500]
-new synth saw time(1/16) shape(1 fadeOut)

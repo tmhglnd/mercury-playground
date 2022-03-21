@@ -1,0 +1,12 @@
+// === TUTORIAL 208: Root ===
+// A scale starts at a specified note. This note is the root.
+// By default this root is a 'c', but you can choose other roots
+// like d, f#, gb etc. 
+
+set tempo 97
+set scale pentatonic_minor gb
+
+list melody [12 11 10 9 8 7 6 5 4 3 2 1 0]
+new synth square time(1/16) note(melody 1)
+
+// Try some of the different roots to hear the difference

@@ -164,6 +164,9 @@ class MonoSynth {
 				if (isNaN(i)){
 					i = TL.noteToMidi(i);
 					if (!i){
+						log(`${i} is not a valid number or name`);
+					}
+					if (!i){
 						i = 0;
 					} else {
 						i -= 48;
