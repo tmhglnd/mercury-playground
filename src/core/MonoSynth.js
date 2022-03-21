@@ -181,7 +181,7 @@ class MonoSynth {
 				let f = TL.mtof(n);
 
 				// get the slide time for next note
-				let s = Util.divToS(Util.getParam(this._slide, c));
+				let s = Util.divToS(Util.getParam(this._slide, c), this._bpm);
 				if (s > 0){
 					this.synth.frequency.rampTo(f, s, time);
 				} else {

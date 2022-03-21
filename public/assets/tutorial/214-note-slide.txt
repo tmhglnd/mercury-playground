@@ -1,0 +1,11 @@
+// === TUTORIAL 214: Note Slide ===
+// With the 'slide()' function we can slide the pitch 
+// from one note to another (called portamento) in a specified
+// amount of time (division or milliseconds)
+
+set tempo 115
+
+list bassLine [3 3 3 3 2 2 2 2 0 0 0 0 -6 -6 -6 -7]
+new synth organ note(bassLine 1) shape(4 250) time(1/4) slide(1/4)
+
+// Try some different values for both
