@@ -157,14 +157,14 @@ textarea:focus {
 	/* font-family: 'Ubuntu Mono', monospace; */
 	font-family: inherit;
 	font-size: 1em;
-	line-height: 1.7 !important;
+	line-height: 1.6 !important;
 
 	-webkit-app-region: no-drag;
 }
 
 .CodeMirror-line span {
-	padding-top: 4px;
-	padding-bottom: 4px;
+	padding-top: 1px;
+	padding-bottom: 1px;
     background-color: rgba(0, 0, 0, 1);
 }
 
@@ -172,8 +172,12 @@ textarea:focus {
 	background-color: rgb(0, 0, 0, 0.1) !important;
 }
 
+.CodeMirror-selected {
+	background-color: rgb(255, 255, 255, 0.2) !important;
+}
+
 .editorFlash {
-	background: rgb(255, 255, 255, 0.4) !important;
+	background: rgb(255, 255, 255, 0.3) !important;
 	/* mix-blend-mode: difference; */
 }
 

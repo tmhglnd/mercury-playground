@@ -74,14 +74,17 @@ const Editor = function({ context, engine }) {
 	this.options = {
 		// options for the editor
 		cursorHeight: 0.85,
+		cursorWidth: 0.5,
 		lineNumbers: true,
 		theme: defaultTheme,
 		cursorHeight: 1,
 		indentUnit: 4,
+		indentWithTabs: false,
 		firstLineNumber: 1,
 		undoDepth: 50,
 		cursorScrollMargin: 20,
 		mode: "mercury",
+		showCursorWhenSelecting: true,
 		// keymaps for execute/stopping/commenting code
 		extraKeys: {
 			'Ctrl-/': 'toggleComment',
@@ -90,6 +93,7 @@ const Editor = function({ context, engine }) {
 			'Alt-/': 'toggleComment',
 			'Alt-Enter': () => { this.evaluate() },
 			'Alt-.': () => { this.silence() },
+			'Tab': 'insertSoftTab',
 		}
 	}
 
