@@ -1,6 +1,7 @@
 const Tone = require('tone');
 const Util = require('./Util.js');
 const fxMap = require('./Effects.js');
+const { TicksClass } = require('tone');
 
 // simple mono sample playback
 class MonoSample {
@@ -87,6 +88,17 @@ class MonoSample {
 
 		// create new loop for synth
 		this._loop = new Tone.Loop((time) => {
+			// Work in Progress on reset after looplength
+			// let m = Tone.Transport.getTicksAtTime(time);
+			// let mTicks = Tone.Time('1m').toTicks();
+
+			// console.log(m, mTicks)
+			// if the bar is equal to the reset value of play
+			// if (m % mTicks === 0){
+			// 	console.log('reset');
+			// 	this._count = 0;
+			// }
+
 			// get beat probability for current count
 			let b = Util.getParam(this._beat, this._count);
 			

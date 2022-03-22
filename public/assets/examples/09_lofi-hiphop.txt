@@ -1,6 +1,7 @@
 // A lo-fi beat with amenbreak chops and a pitchshifted 
 // rhodes sample on the offbeat
 set tempo 87
+set scale minor c
 set randomSeed 3210
 
 // chopped amen break
