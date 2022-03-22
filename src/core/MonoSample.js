@@ -1,8 +1,140 @@
 const Tone = require('tone');
 const Util = require('./Util.js');
 const fxMap = require('./Effects.js');
-const { TicksClass } = require('tone');
+const Instrument = require('./Instrument.js');
 
+class MonoSample extends Instrument {
+	constructor(engine, s){
+		super(engine);
+		console.log('=> MonoSample2()');
+
+		this._bufs = this._engine.getBuffers();
+		this._sound;
+		this.sound(s);
+
+		// this.sample;
+		// sample variables
+		this._speed = [ 1 ];
+		this._rev = false;
+		this._stretch = [ 0 ];
+
+		// playback start position
+		this._pos = [ 0 ];
+
+		this.sample;
+		this.connectSource();
+	}
+
+	connectSource(){
+		this.sample = new Tone.Player().connect(this.channelStrip());
+		this.sample.autostart = false;
+		this.source = this.sample;
+	}
+
+	sourceEvent(c, e, time){
+		// get the sample from array
+		let f = Util.getParam(this._sound, c);
+
+		if (this.sample.buffer){
+			// clean-up previous buffer
+			this.sample.buffer.dispose();
+		}
+		if (this._bufs.has(f)){	
+			this.sample.buffer = this._bufs.get(f);
+			// this.sample.buffer = this._bufs.get(f).slice(0);
+		} else {
+			// default sample if file does not exist
+			this.sample.buffer = this._bufs.get('kick_min');
+			// this.sample.buffer = this._bufs.get('kick_min').slice(0);
+		}
+		// the duration of the buffer in seconds
+		let dur = this.sample.buffer.duration;
+
+		// get speed and if 2d array pick randomly
+		let s = Util.getParam(this._speed, c);
+
+		// reversing seems to reverse every time the 
+		// value is set to true (so after 2 times reverse
+		// it becomes normal playback again) no fix yet
+		// this.sample.reverse = s < 0.0;
+
+		let l = Util.lookup(this._stretch, c);
+		let n = 1;
+		if (l){
+			n = dur / (60 * 4 / this.bpm()) / l;
+		}
+		// playbackrate can not be 0 or negative
+		this.sample.playbackRate = Math.max(Math.abs(s) * n, 0.0001);
+
+		// get the start position
+		let o = dur * Util.getParam(this._pos, c);
+
+		// when sample is loaded, start
+		if (this.sample.loaded){
+			this.sample.start(time, o, e);
+		}
+	}
+
+	sound(s){
+		// load all soundfiles and return as array
+		this._sound = this.checkBuffer(Util.toArray(s));
+	}
+
+	checkBuffer(a){
+		// check if file is part of the loaded samples
+		return a.map((s) => {
+			if (Array.isArray(s)) {
+				return this.checkBuffer(s);
+			}
+			// error if soundfile does not exist
+			else if (!this._bufs.has(s)){
+				// set default (or an ampty soundfile?)
+				log(`sample ${s} not found`);
+				return 'kick_909';
+			}
+			return s;
+		});
+	}
+
+	speed(s){
+		// set the speed pattern as an array
+		this._speed = Util.toArray(s);
+	}
+
+	stretch(s){
+		// set the stretch loop bar length
+		this._stretch = Util.toArray(s);
+	}
+
+	offset(o){
+		// set the playback start position as an array
+		this._pos = Util.toArray(o);
+	}
+
+	delete(){
+		super.delete();
+		// dispose loop
+		// this._loop.dispose();
+		// disconnect the sound dispose the player
+		// this.panner.disconnect();
+		// this.panner.dispose();
+		// this.gain.disconnect();
+		// this.gain.dispose();
+		// this.adsr.disconnect();
+		// this.adsr.dispose();
+		// this.sample.disconnect();
+		this.sample.dispose();
+		// remove all fx
+		// TODO: garbage collect and remove after fade out
+		// Or delete once sound has reached a bottom threshold
+		// Is this possible?
+		// this._fx.map((f) => f.delete());
+
+		console.log('=> Disposed:', this._sound, 'with FX:', this._fx);
+	}
+}
+module.exports = MonoSample;
+/*
 // simple mono sample playback
 class MonoSample {
 	constructor(s='kick_min', engine){
@@ -392,3 +524,4 @@ class MonoSample {
 	}
 }
 module.exports = MonoSample;
+*/

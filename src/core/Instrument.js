@@ -1,0 +1,224 @@
+const Tone = require('tone');
+const Util = require('./Util.js');
+const fxMap = require('./Effects.js');
+const Sequencer = require('./Sequencer.js');
+
+// Basic class for all instruments
+class Instrument extends Sequencer {
+	constructor(engine){
+		super(engine);
+		console.log('=> class Instrument()');
+		// Synth or Sample specific parameters
+		// ???
+
+		this._gain = [-6, 0];		
+		this._pan = [ 0 ];
+		this._att = [ 0 ];
+		this._sus = [ 0 ];
+		this._rel = [ 0 ];
+
+		this.panner;
+		this.adsr;
+		this.gain;
+		this.amp;
+		this._fx;
+
+		// connect all nodes and initialize the type of instrument
+		this.source;
+		// this.makeSignalChain();
+		// this.makeLoop();
+	}
+
+	channelStrip(){
+		this.gain = new Tone.Gain(0).toDestination();
+		this.panner = new Tone.Panner(0).connect(this.gain);
+		
+		this.adsr = new Tone.AmplitudeEnvelope({
+			attack: 0,
+			decay: 0,
+			sustain: 1,
+			release: 0.001,
+			attackCurve: "linear",
+			releaseCurve: "linear"
+		});
+		
+		this.adsr.connect(this.panner);
+		return this.adsr;
+		
+		// this.source = new Tone.Oscillator(200, 'sawtooth').connect(this.adsr);
+		// this.source.start();
+
+		// Connect here to either Sampler or Synth or PolySynth/PolySample
+		// ???
+		// return this.adsr;
+		// then => Tone.Player().connect(this.makeSignalChain())?
+		// what if polyphonic for triggering adsr?
+
+		// this.sample = new Tone.Player().connect(this.panner);
+	}
+
+	event(c, time){
+		// console.log('=> Instrument()', c);
+
+		// set FX parameters
+		if (this._fx){
+			for (let f=0; f<this._fx.length; f++){
+				this._fx[f].set(c, time, this.bpm());
+			}
+		}
+		
+		// set panning
+		let p = Util.getParam(this._pan, c);
+		p = Util.isRandom(p, -1, 1);
+		this.panner.pan.setValueAtTime(p, time);
+
+		// ramp volume
+		let g = Util.getParam(this._gain[0], c);
+		let r = Util.getParam(this._gain[1], c);
+		this.source.volume.rampTo(g, r, time);
+
+		// end position for playback
+		let e = this._time;
+
+		this.sourceEvent(c, e, time);
+
+		// set shape for playback (fade-in / out and length)
+		if (this._att){
+			let att = Util.divToS(Util.lookup(this._att, c), this.bpm());
+			let dec = Util.divToS(Util.lookup(this._sus, c), this.bpm());
+			let rel = Util.divToS(Util.lookup(this._rel, c), this.bpm());
+
+			this.adsr.attack = att;
+			this.adsr.decay = dec;
+			this.adsr.release = rel;
+			
+			e = Math.min(this._time, att + dec + rel);
+			// e = Math.min(t, att + dec + rel);
+		}
+
+		if (this.adsr.value > 0){
+			// fade-out running envelope over 5 ms
+			let tmp = this.adsr.release;
+			this.adsr.release = 0.005;
+			this.adsr.triggerRelease(time);
+			this.adsr.release = tmp;
+			time += 0.005;
+		}
+
+		let rt = Math.max(0.001, e - this.adsr.release);
+		this.adsr.triggerAttackRelease(rt, time);
+	}
+
+	sourceEvent(c, time){
+		// trigger some events specifically for a source
+		// specified in more detail in the inheriting class
+		console.log('Instrument()', this._name, c);
+	}
+
+	fadeIn(t){
+		// fade in the sound upon evaluation of code
+		this.gain.gain.rampTo(1, t, Tone.now());
+	}
+
+	fadeOut(t){
+		// fade out the sound upon evaluation of new code
+		this.gain.gain.rampTo(0, t, Tone.now());
+		setTimeout(() => {
+			this.delete();
+		}, t * 1000);
+	}
+
+	delete(){
+		super.delete();
+		// dispose loop
+		// this._loop.dispose();
+		// disconnect the sound dispose the player
+		this.gain.dispose();
+		this.panner.dispose();
+		this.adsr.dispose();
+		// dispose Sample/Synth specific things
+		// ???
+
+		// remove all fx
+		this._fx.map((f) => f.delete());
+		// console.log('=> Disposed:', this._sound, 'with FX:', this._fx);
+	}
+
+	amp(g, r){
+		// set the gain and ramp time
+		g = Util.toArray(g);
+		r = (r !== undefined)? Util.toArray(r) : [ 0 ];
+		// convert amplitude to dBFullScale
+		this._gain[0] = g.map(g => 20 * Math.log(g * 0.707) );
+		this._gain[1] = r.map(r => Util.msToS(Math.max(0, r)) );
+	}
+
+	env(...e){
+		// set the fade-in, sustain and fade-out times
+		this._att = [ 0 ];
+		this._rel = [ 0 ];
+		this._sus = [ 0 ];
+
+		if (e[0] === 'off' || e[0] < 0){
+			this._att = null;
+		} else {
+			if (e.length === 1){
+				// one argument is release time
+				this._att = [ 1 ];
+				this._rel = Util.toArray(e[0]);
+			} else if (e.length === 2){
+				// two arguments is attack & release
+				this._att = Util.toArray(e[0]);
+				this._rel = Util.toArray(e[1]);
+			} else {
+				// three is attack stustain and release
+				this._att = Util.toArray(e[0]);
+				this._sus = Util.toArray(e[1]);
+				this._rel = Util.toArray(e[2]);
+			}
+		}
+		// console.log('shape()', this._att, this._rel, this._sus);
+	}
+
+	pan(p){
+		// the panning position of the sound
+		this._pan = Util.toArray(p);
+	}
+
+	add_fx(...fx){
+		// the effects chain for the sound
+		this._fx = [];
+		// console.log('Effects currently disabled');
+		fx.forEach((f) => {
+			if (fxMap[f[0]]){
+				let tmpF = fxMap[f[0]](f.slice(1));
+				this._fx.push(tmpF);
+			} else {
+				log(`Effect ${f[0]} does not exist`);
+			}
+		});
+		// if any fx working
+		if (this._fx.length){
+			console.log(`Adding effect chain`, this._fx);
+			// disconnect the panner
+			this.panner.disconnect();
+			// iterate over effects and get chain (send/return)
+			this._ch = [];
+			this._fx.map((f) => { this._ch.push(f.chain()) });
+			// add all effects in chain and connect to Destination
+			// every effect connects it's return to a send of the next
+			// allowing to chain multiple effects within one process
+			let pfx = this._ch[0];
+			this.panner.connect(pfx.send);
+			for (let f=1; f<this._ch.length; f++){
+				if (pfx){
+					pfx.return.connect(this._ch[f].send);
+				}
+				pfx = this._ch[f];
+			}
+			// pfx.return.connect(Tone.Destination);
+			pfx.return.connect(this.gain);
+		}
+	}
+}
+module.exports = Instrument;
