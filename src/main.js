@@ -11,7 +11,8 @@ window.onload = () => {
 
 	console.log('Tone settings:');
 	console.log(`latency: ${Tone.getContext().lookAhead * 1000}ms`);
-	console.log(`samplerate: ${Tone.getContext().samplerate}Hz`);
+	console.log(`samplerate: ${Tone.getContext().sampleRate}Hz`);
+	console.log(`PPQ: ${Tone.Transport.PPQ}`);
 	
 	// console.log catch function
 	if (typeof console != "undefined"){ 

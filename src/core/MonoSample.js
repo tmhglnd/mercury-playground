@@ -71,9 +71,9 @@ class MonoSample extends Instrument {
 		let o = dur * Util.getParam(this._pos, c);
 
 		// when sample is loaded, start
-		if (this.sample.loaded){
-			this.sample.start(time, o, e);
-		}
+		this.sample.start(time, o, e);
+		// if (this.sample.loaded){
+		// }
 	}
 
 	sound(s){
@@ -122,6 +122,7 @@ class MonoSample extends Instrument {
 	}
 }
 module.exports = MonoSample;
+
 /*
 // simple mono sample playback
 class MonoSample {

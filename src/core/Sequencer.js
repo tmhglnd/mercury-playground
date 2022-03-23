@@ -8,6 +8,7 @@ class Sequencer {
 		this._engine = engine;
 		
 		// Sequencer specific parameters
+		this._bbs = [ 0, 0, 0];
 		this._count = 0;
 		this._beatCount = 0;
 		this._time = 1;
@@ -35,15 +36,20 @@ class Sequencer {
 
 		// create new loop for synth
 		this._loop = new Tone.Loop((time) => {
-			// Work in Progress on reset after looplength
-			// let m = Tone.Transport.getTicksAtTime(time);
-			// let mTicks = Tone.Time('1m').toTicks();
 
-			// console.log(m, mTicks)
-			// if the bar is equal to the reset value of play
-			// if (m % mTicks === 0){
-				// this._count = 0;
-			// }
+			// convert transport time to Bars:Beats:Sixteenths
+			let t = Tone.Transport.getSecondsAtTime(time);
+			let bbs = Tone.Time(t).toBarsBeatsSixteenths().split(':');
+			// if reset per bar is greater than 0
+			if (this._reset > 0){
+				// if bars % reset === 0 and bar count is different then reset
+				if (!(Number(bbs[0]) % this._reset)){
+					if (bbs[0] !== this._bbs[0]){
+						this._count = 0;
+					}
+				}
+			}
+			this._bbs = bbs;
 
 			// get beat probability for current count
 			let b = Util.getParam(this._beat, this._count);
@@ -106,7 +112,10 @@ class Sequencer {
 	beat(b, r='off'){
 		// set the beat pattern as an array and reset time in bars
 		this._beat = Util.toArray(b);
-		this._reset = Array.isArray(r)? r[0] : r;
+		this._reset = Math.floor(r);
+		if (r === 'off' || r < 1){
+			this._reset = -1;
+		}
 	}
 
 	name(n){
