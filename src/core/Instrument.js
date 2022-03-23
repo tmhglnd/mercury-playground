@@ -6,33 +6,35 @@ const Sequencer = require('./Sequencer.js');
 // Basic class for all instruments
 class Instrument extends Sequencer {
 	constructor(engine){
+		// Inherit from Sequencer
 		super(engine);
-		console.log('=> class Instrument()');
-		// Synth or Sample specific parameters
-		// ???
 
+		// Instrument specific parameters
 		this._gain = [-6, 0];		
 		this._pan = [ 0 ];
 		this._att = [ 0 ];
 		this._sus = [ 0 ];
 		this._rel = [ 0 ];
 
+		// Instrument specific Tone Nodes
 		this.panner;
 		this.adsr;
 		this.gain;
 		this.amp;
 		this._fx;
 
-		// connect all nodes and initialize the type of instrument
+		// The source to be defined by inheriting class
 		this.source;
-		// this.makeSignalChain();
-		// this.makeLoop();
+
+		console.log('=> class Instrument()', this);
 	}
 
 	channelStrip(){
+		// gain => output
 		this.gain = new Tone.Gain(0).toDestination();
+		// panning => gain
 		this.panner = new Tone.Panner(0).connect(this.gain);
-		
+		// adsr => panning
 		this.adsr = new Tone.AmplitudeEnvelope({
 			attack: 0,
 			decay: 0,
@@ -40,21 +42,9 @@ class Instrument extends Sequencer {
 			release: 0.001,
 			attackCurve: "linear",
 			releaseCurve: "linear"
-		});
-		
-		this.adsr.connect(this.panner);
+		}).connect(this.panner);
+		// return Node to connect source => adsr
 		return this.adsr;
-		
-		// this.source = new Tone.Oscillator(200, 'sawtooth').connect(this.adsr);
-		// this.source.start();
-
-		// Connect here to either Sampler or Synth or PolySynth/PolySample
-		// ???
-		// return this.adsr;
-		// then => Tone.Player().connect(this.makeSignalChain())?
-		// what if polyphonic for triggering adsr?
-
-		// this.sample = new Tone.Player().connect(this.panner);
 	}
 
 	event(c, time){
@@ -129,19 +119,15 @@ class Instrument extends Sequencer {
 	}
 
 	delete(){
+		// delete super class
 		super.delete();
-		// dispose loop
-		// this._loop.dispose();
 		// disconnect the sound dispose the player
 		this.gain.dispose();
 		this.panner.dispose();
 		this.adsr.dispose();
-		// dispose Sample/Synth specific things
-		// ???
-
 		// remove all fx
 		this._fx.map((f) => f.delete());
-		// console.log('=> Disposed:', this._sound, 'with FX:', this._fx);
+		console.log('=> disposed Instrument() with FX:', this._fx);
 	}
 
 	amp(g, r){
@@ -177,7 +163,6 @@ class Instrument extends Sequencer {
 				this._rel = Util.toArray(e[2]);
 			}
 		}
-		// console.log('shape()', this._att, this._rel, this._sus);
 	}
 
 	pan(p){

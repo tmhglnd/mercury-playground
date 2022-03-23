@@ -4,23 +4,25 @@ const Util = require('./Util.js');
 // Basic Sequencer class for triggering events
 class Sequencer {
 	constructor(engine){
+		// The Tone engine
 		this._engine = engine;
-
-		console.log('=> class Sequencer()');
 		
+		// Sequencer specific parameters
 		this._count = 0;
 		this._beatCount = 0;
-		
 		this._time = 1;
 		this._offset = 0;
 		this._beat = [ 1 ];
 
-		// initialize looper
+		// Tone looper
 		this._loop;
 		this.makeLoop();
+
+		console.log('=> class Sequencer()', this);
 	}
 
 	bpm(){
+		// get the bpm value from Transport
 		return Tone.Transport.bpm.value;
 	}
 
@@ -66,7 +68,7 @@ class Sequencer {
 	event(c, time){
 		// specify some events to be triggered specifically for 
 		// the inheritting class
-		console.log('Sequencer()', this._name, c);
+		console.log('Sequencer()', this._name, c, time);
 	}
 
 	fadeIn(t){
@@ -81,6 +83,7 @@ class Sequencer {
 	delete(){
 		// dispose loop
 		this._loop.dispose();
+		console.log('=> disposed Sequencer()');
 	}
 
 	start(){

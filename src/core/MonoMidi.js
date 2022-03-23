@@ -1,6 +1,6 @@
 const Tone = require('tone');
 const Util = require('./Util.js');
-const fxMap = require('./Effects.js');
+// const fxMap = require('./Effects.js');
 const WebMidi = require("webmidi");
 
 // simple midi playback

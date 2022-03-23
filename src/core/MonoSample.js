@@ -1,12 +1,11 @@
 const Tone = require('tone');
 const Util = require('./Util.js');
-const fxMap = require('./Effects.js');
+// const fxMap = require('./Effects.js');
 const Instrument = require('./Instrument.js');
 
 class MonoSample extends Instrument {
 	constructor(engine, s){
 		super(engine);
-		console.log('=> MonoSample2()');
 
 		this._bufs = this._engine.getBuffers();
 		this._sound;
@@ -23,6 +22,8 @@ class MonoSample extends Instrument {
 
 		this.sample;
 		this.connectSource();
+
+		console.log('=> MonoSample()', this);
 	}
 
 	connectSource(){
@@ -112,25 +113,12 @@ class MonoSample extends Instrument {
 	}
 
 	delete(){
+		// delete super class
 		super.delete();
-		// dispose loop
-		// this._loop.dispose();
 		// disconnect the sound dispose the player
-		// this.panner.disconnect();
-		// this.panner.dispose();
-		// this.gain.disconnect();
-		// this.gain.dispose();
-		// this.adsr.disconnect();
-		// this.adsr.dispose();
-		// this.sample.disconnect();
 		this.sample.dispose();
-		// remove all fx
-		// TODO: garbage collect and remove after fade out
-		// Or delete once sound has reached a bottom threshold
-		// Is this possible?
-		// this._fx.map((f) => f.delete());
 
-		console.log('=> Disposed:', this._sound, 'with FX:', this._fx);
+		console.log('=> disposed MonoSample()', this._sound);
 	}
 }
 module.exports = MonoSample;
