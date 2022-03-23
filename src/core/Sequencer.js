@@ -18,7 +18,7 @@ class Sequencer {
 		this._loop;
 		this.makeLoop();
 
-		console.log('=> class Sequencer()', this);
+		console.log('=> class Sequencer()');
 	}
 
 	bpm(){

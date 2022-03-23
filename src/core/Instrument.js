@@ -26,7 +26,7 @@ class Instrument extends Sequencer {
 		// The source to be defined by inheriting class
 		this.source;
 
-		console.log('=> class Instrument()', this);
+		console.log('=> class Instrument()');
 	}
 
 	channelStrip(){
