@@ -36,7 +36,6 @@ class Sequencer {
 
 		// create new loop for synth
 		this._loop = new Tone.Loop((time) => {
-
 			// convert transport time to Bars:Beats:Sixteenths
 			let t = Tone.Transport.getSecondsAtTime(time);
 			let bbs = Tone.Time(t).toBarsBeatsSixteenths().split(':');
