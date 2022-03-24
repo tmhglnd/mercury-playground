@@ -41,6 +41,7 @@ class Instrument extends Sequencer {
 			sustain: 1,
 			release: 0.001,
 			attackCurve: "linear",
+			decayCurve: "linear",
 			releaseCurve: "linear"
 		}).connect(this.panner);
 		// return Node to connect source => adsr

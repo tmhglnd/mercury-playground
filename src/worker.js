@@ -4,8 +4,6 @@ const Mercury = require('mercury-lang');
 const MonoSample = require('./core/MonoSample.js');
 const MonoMidi = require('./core/MonoMidi.js');
 const MonoSynth = require('./core/MonoSynth.js');
-// const Sequencer = require('./core/Sequencer.js');
-// const Instrument = require('./core/Instrument.js');
 
 // fade time in seconds TODO: Make this adjustable with code/setting
 let crossFade = 1.5;
@@ -108,8 +106,6 @@ function code({ file, engine }){
 			let args = obj.functions;			
 			let inst = new MonoSample(engine, type);
 			// let inst = new MonoSample(type, engine);
-			// let inst = new Sequencer(engine);
-			// let inst = new Instrument(engine);
 
 			// apply arguments to instrument if part of instrument
 			Object.keys(args).forEach((a) => {
@@ -125,7 +121,8 @@ function code({ file, engine }){
 			// console.log('make sample', obj);
 			let type = obj.type;
 			let args = obj.functions;			
-			let inst = new MonoSample(type, engine);
+			let inst = new MonoSample(engine, type);
+			// let inst = new MonoSample(type, engine);
 
 			// apply arguments to instrument if part of instrument
 			Object.keys(args).forEach((a) => {
@@ -141,7 +138,8 @@ function code({ file, engine }){
 			console.log('make synth', obj);
 			let type = obj.type;
 			let args = obj.functions;			
-			let inst = new MonoSynth(type, engine);
+			let inst = new MonoSynth(engine, type);
+			// let inst = new MonoSynth(type, engine);
 
 			// apply arguments to instrument if part of instrument
 			Object.keys(args).forEach((a) => {

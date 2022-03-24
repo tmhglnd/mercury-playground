@@ -11,7 +11,6 @@ class MonoSample extends Instrument {
 		this._sound;
 		this.sound(s);
 
-		// this.sample;
 		// sample variables
 		this._speed = [ 1 ];
 		this._rev = false;
