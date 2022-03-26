@@ -18,7 +18,7 @@ async function code({ file, engine }){
 	let c = file;
 
 	let t = Tone.Transport.seconds;
-	let parser = new Promise((resolve, reject) => {
+	let parser = new Promise((resolve) => {
 		return resolve(Mercury(c));
 	});
 	let parse = await parser;
@@ -46,6 +46,9 @@ async function code({ file, engine }){
 		log(`Code not executed because of syntax error`);
 		return;
 	}
+
+	// set timer to check 
+	t = Tone.Transport.seconds;
 
 	const globalMap = {
 		'crossFade' : (args) => {
@@ -186,23 +189,22 @@ async function code({ file, engine }){
 		}
 	});
 
-	t = Tone.Transport.seconds;
-	console.log('Making loops');
-
 	sounds.map(async (s) => {
 		// start new loops;
 		await s.makeLoop();
 	});
-	console.log(`Done: ${((Tone.Transport.seconds - t) * 1000).toFixed(3)}ms`);
+	console.log(`Made instruments in: ${((Tone.Transport.seconds - t) * 1000).toFixed(3)}ms`);
 
 	sounds.map(async (s) => {
 		// fade in new sounds;
-		s.fadeIn(crossFade);
+		await s.fadeIn(crossFade);
 	});
 
 	_sounds.map(async (s) => {
 		// fade out and delete after fade
-		s.fadeOut(crossFade);
+		await s.fadeOut(crossFade);
 	});
+	// empty array to trigger garbage collection
+	_sounds = [];
 }
 module.exports = code;
