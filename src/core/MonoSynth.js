@@ -28,12 +28,12 @@ class MonoSynth extends Instrument {
 		this._detune = [ 0 ];
 
 		this.synth;
-		this.connectSource();
+		this.createSource();
 
 		console.log('=> MonoSynth()', this);
 	}
 
-	connectSource(){
+	createSource(){
 		this.synth = new Tone.FatOscillator().connect(this.channelStrip());
 		this.synth.count = 1;
 		this.synth.start();

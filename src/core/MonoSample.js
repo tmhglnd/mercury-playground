@@ -20,12 +20,12 @@ class MonoSample extends Instrument {
 		this._pos = [ 0 ];
 
 		this.sample;
-		this.connectSource();
+		this.createSource();
 
 		console.log('=> MonoSample()', this);
 	}
 
-	connectSource(){
+	createSource(){
 		this.sample = new Tone.Player().connect(this.channelStrip());
 		this.sample.autostart = false;
 		this.source = this.sample;

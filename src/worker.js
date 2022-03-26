@@ -4,6 +4,7 @@ const Mercury = require('mercury-lang');
 const MonoSample = require('./core/MonoSample.js');
 const MonoMidi = require('./core/MonoMidi.js');
 const MonoSynth = require('./core/MonoSynth.js');
+const PolyInstrument = require('./core/PolyInstrument.js');
 
 // fade time in seconds TODO: Make this adjustable with code/setting
 let crossFade = 1.5;
@@ -138,7 +139,8 @@ function code({ file, engine }){
 			console.log('make synth', obj);
 			let type = obj.type;
 			let args = obj.functions;			
-			let inst = new MonoSynth(engine, type);
+			let inst = new PolyInstrument(engine, type);
+			// let inst = new MonoSynth(engine, type);
 			// let inst = new MonoSynth(type, engine);
 
 			// apply arguments to instrument if part of instrument

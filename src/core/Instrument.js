@@ -17,10 +17,9 @@ class Instrument extends Sequencer {
 		this._rel = [ 0 ];
 
 		// Instrument specific Tone Nodes
-		this.panner;
 		this.adsr;
+		this.panner;
 		this.gain;
-		this.amp;
 		this._fx;
 
 		// The source to be defined by inheriting class
@@ -35,21 +34,28 @@ class Instrument extends Sequencer {
 		// panning => gain
 		this.panner = new Tone.Panner(0).connect(this.gain);
 		// adsr => panning
-		this.adsr = new Tone.AmplitudeEnvelope({
-			attack: 0,
-			decay: 0,
-			sustain: 1,
-			release: 0.001,
-			attackCurve: "linear",
-			decayCurve: "linear",
-			releaseCurve: "linear"
-		}).connect(this.panner);
+		this.adsr = this.envelope(this.panner);
 		// return Node to connect source => adsr
 		return this.adsr;
 	}
 
+	envelope(d){
+		// return an Envelope and connect to next node
+		return new Tone.AmplitudeEnvelope({
+			attack: 0,
+			attackCurve: "linear",
+			decay: 0,
+			decayCurve: "linear",
+			sustain: 1,
+			release: 0.001,
+			releaseCurve: "linear"
+		}).connect(d);
+	}
+
 	event(c, time){
 		// console.log('=> Instrument()', c);
+		// end position for playback
+		let e = this._time;
 
 		// set FX parameters
 		if (this._fx){
@@ -67,9 +73,6 @@ class Instrument extends Sequencer {
 		let g = Util.getParam(this._gain[0], c);
 		let r = Util.getParam(this._gain[1], c);
 		this.source.volume.rampTo(g, r, time);
-
-		// end position for playback
-		let e = this._time;
 
 		this.sourceEvent(c, e, time);
 
