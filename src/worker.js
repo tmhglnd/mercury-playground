@@ -12,20 +12,22 @@ let _sounds = [];
 let sounds = [];
 
 // parse and evaluate the inputted code
-function code({ file, engine }){
+// as an asyncronous function with promise
+async function code({ file, engine }){
 	console.log('Evaluating');
-	// console.log('Eval at Transport:', Tone.Transport.position);
-	// resume();
-
-	// let c = document.getElementById('code').value;
-	// let c = editor.getValue();
 	let c = file;
-	// console.log('evaluate', c);
 
-	let parse = Mercury(c);
+	let t = Tone.Transport.seconds;
+	let parser = new Promise((resolve, reject) => {
+		return resolve(Mercury(c));
+	});
+	let parse = await parser;
+	// let parse = Mercury(c);
+	console.log(`Done: ${((Tone.Transport.seconds - t) * 1000).toFixed(3)}ms`);
+
 	let tree = parse.parseTree;
 	let errors = parse.errors;
-
+	
 	console.log('ParseTree', tree);
 	console.log('Errors', errors);
 
@@ -35,10 +37,15 @@ function code({ file, engine }){
 	errors.forEach((e) => {
 		log(e);
 	});
-
 	tree.print.forEach((p) => {
 		log(p);
 	});
+
+	if (errors.length > 0){
+		// return if the code contains any syntax errors
+		log(`Code not executed because of syntax error`);
+		return;
+	}
 
 	const globalMap = {
 		'crossFade' : (args) => {
@@ -179,16 +186,23 @@ function code({ file, engine }){
 		}
 	});
 
-	// start new loops;
-	for (let s=0; s<sounds.length; s++){
-		sounds[s].makeLoop();
-		sounds[s].fadeIn(crossFade);
-	}
+	t = Tone.Transport.seconds;
+	console.log('Making loops');
 
-	for (let s=0; s<_sounds.length; s++){
-		// fade out and delete
-		_sounds[s].fadeOut(crossFade);
-		// _sounds[s].delete();
-	}
+	sounds.map(async (s) => {
+		// start new loops;
+		await s.makeLoop();
+	});
+	console.log(`Done: ${((Tone.Transport.seconds - t) * 1000).toFixed(3)}ms`);
+
+	sounds.map(async (s) => {
+		// fade in new sounds;
+		s.fadeIn(crossFade);
+	});
+
+	_sounds.map(async (s) => {
+		// fade out and delete after fade
+		s.fadeOut(crossFade);
+	});
 }
 module.exports = code;
