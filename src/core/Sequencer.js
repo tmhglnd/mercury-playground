@@ -8,7 +8,7 @@ class Sequencer {
 		this._engine = engine;
 		
 		// Sequencer specific parameters
-		this._bbs = [ 0, 0, 0];
+		this._bbs = [ 0, 0, 0 ];
 		this._count = 0;
 		this._beatCount = 0;
 		this._time = 1;

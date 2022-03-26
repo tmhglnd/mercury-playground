@@ -139,8 +139,8 @@ function code({ file, engine }){
 			console.log('make synth', obj);
 			let type = obj.type;
 			let args = obj.functions;			
-			let inst = new PolyInstrument(engine, type);
-			// let inst = new MonoSynth(engine, type);
+			let inst = new MonoSynth(engine, type);
+			// let inst = new PolyInstrument(engine, type);
 			// let inst = new MonoSynth(type, engine);
 
 			// apply arguments to instrument if part of instrument
