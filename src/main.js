@@ -40,7 +40,7 @@ window.onload = () => {
 	const Engine = require('./engine.js');
 	const Editor = require('./editor.js');	
 	const Canvas = require('./canvas.js');
-	const p5 = require('p5');
+	// const p5 = require('p5');
 	const WebMidi = require("webmidi");
 
 	// WebMIDI Setup

@@ -31,6 +31,7 @@ function resume(){
 			Tone.getDestination().volume.rampTo(0, 0.01);
 			console.log("Resumed Transport");
 		}
+		// record(true);
 	} catch {
 		console.error("!! error enabling ToneJS");
 	}
@@ -42,6 +43,7 @@ function silence(){
 		Tone.Transport.pause();
 		Tone.getDestination().volume.rampTo(-Infinity, 0.5);
 		// Tone.stop();
+		// record(false);
 	} catch {
 		console.error('error stopping sound');
 	}
@@ -134,4 +136,30 @@ function setVolume(g, t=0){
 	}
 }
 
-module.exports = { resume, silence, setBPM, getBPM, randomBPM, getBuffers, addBuffers, setLowPass, setHiPass, setVolume };
+// create a Tone Recording and connect to the final output Node
+const Recorder = new Tone.Recorder({ mimeType: 'audio/webm' });
+GN.connect(Recorder);
+
+async function record(start){
+	if (Recorder.state !== 'started' && start){
+		// start the recording process
+		// console.log(Recorder);
+		// Recorder.mimeType = 'audio/wav;';
+		Recorder.start();
+	}
+
+	if (Recorder.state === 'started' && !start){
+		// stop the recording process
+		// Recorder.stop();
+		// the recorded audio is returned as a blob
+		const recording = await Recorder.stop();
+		// download the recording by creating an anchor element and blob url
+		const url = URL.createObjectURL(recording);
+		const anchor = document.createElement("a");
+		anchor.download = "mercuryRecording.webm";
+		anchor.href = url;
+		anchor.click();
+	}
+}
+
+module.exports = { resume, silence, setBPM, getBPM, randomBPM, getBuffers, addBuffers, setLowPass, setHiPass, setVolume, record };

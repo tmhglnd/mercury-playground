@@ -126,12 +126,12 @@ const Editor = function({ context, engine }) {
 		);
 	}
 
-	this.evaluate = function(){
+	this.evaluate = async function(){
 		this.flash();
 
 		console.log('evaluating code...');
+		await code({ file: this.cm.getValue(), engine: engine });
 		engine.resume();
-		code({ file: this.cm.getValue(), engine: engine });
 	}
 
 	this.flash = function(){
@@ -175,14 +175,14 @@ const Editor = function({ context, engine }) {
 		
 		let example = document.createElement('button');
 		example.innerHTML = 'example';
-		example.onclick = () => {
+		example.onclick = async () => {
 			// initialize editor with some code
 			let names = Object.keys(examples);
 			let amount = names.length;
 			let rand = Math.floor(Math.random() * amount);
 			rand = (rand === _rand)? (rand + 1) % amount : rand;
 
-			this.set(examples[names[rand]]);
+			await this.set(examples[names[rand]]);
 			_rand = rand;
 
 			this.evaluate();
@@ -256,9 +256,9 @@ const Editor = function({ context, engine }) {
 		});
 	}
 
-	this.loadTutorial = function(){
+	this.loadTutorial = async function(){
 		let t = document.getElementById('tutorials').value;
-		this.set(tutorials[t]);
+		await this.set(tutorials[t]);
 		this.evaluate();
 	}
 

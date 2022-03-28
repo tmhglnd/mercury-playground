@@ -73,7 +73,7 @@ let hydraCanvas = function(c, u) {
 	}).start()
 }
 
-// p5 Canvas
+/*// p5 Canvas
 const p5Canvas = (p5, id) => {
 	// video variables
 	let capture;
@@ -133,5 +133,6 @@ const p5Canvas = (p5, id) => {
 		p5.image(capture, -w/2, -h/2, w, h);
 	}
 }
-
-module.exports = { p5Canvas, hydraCanvas };
+module.export = p5Canvas;
+*/
+module.exports = { hydraCanvas };

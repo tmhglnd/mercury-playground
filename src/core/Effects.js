@@ -1,8 +1,6 @@
 const Tone = require('tone');
 const Util = require('./Util.js');
 const TL = require('total-serialism').Translate;
-// const Tuna = require('tunajs');
-// const TunaFX = new Tuna(Tone.getContext());
 
 // all the available effects
 const fxMap = {
