@@ -55,7 +55,7 @@ const fxMap = {
 module.exports = fxMap;
 
 const Drive = function(_params){
-	console.log('FX => Drive()', _params);
+	// console.log('FX => Drive()', _params);
 
 	this._drive = (_params[0] !== undefined)? Util.toArray(_params[0]) : [1.5];
 
@@ -92,7 +92,7 @@ const Drive = function(_params){
 // squash/compress an incoming signal
 // based on algorithm by Peter McCulloch
 const Squash = function(_params){
-	console.log('FX => Squash()', _params);
+	// console.log('FX => Squash()', _params);
 
 	this._compress = (_params[0] !== undefined)? Util.toArray(_params[0]) : [1];
 
@@ -151,7 +151,7 @@ const Squash = function(_params){
 // Add a reverb to the sound to give it a feel of space
 // 
 const Reverb = function(_params){
-	console.log('FX => Reverb()', _params);
+	// console.log('FX => Reverb()', _params);
 
 	this._fx = new Tone.Reverb();
 
@@ -182,7 +182,7 @@ const Reverb = function(_params){
 // Shift the pitch up or down with semitones
 // 
 const PitchShift = function(_params){
-	console.log('FX => PitchShift()', _params);
+	// console.log('FX => PitchShift()', _params);
 	// to-do: add wet/dry parameter
 
 	this._fx = new Tone.PitchShift();
@@ -213,7 +213,7 @@ const PitchShift = function(_params){
 // a Low Frequency Oscillator effect, control tempo, type and depth
 //
 const LFO = function(_params){
-	console.log('FX => LFO()', _params);
+	// console.log('FX => LFO()', _params);
 
 	this._waveMap = {
 		sine : 'sine',
@@ -273,7 +273,7 @@ const LFO = function(_params){
 // Set the cutoff frequency and Q factor
 //
 const Filter = function(_params){
-	console.log('FX => Filter()', _params);
+	// console.log('FX => Filter()', _params);
 
 	this._fx = new Tone.Filter();
 
@@ -318,7 +318,7 @@ const Filter = function(_params){
 
 // Custom stereo delay implementation with lowpass filter in feedback loop
 const Delay = function(_params){
-	console.log('FX => Delay()', _params);
+	// console.log('FX => Delay()', _params);
 
 	this._fx = new Tone.Gain(1);
 	this._fb = new Tone.Gain(0.5);
@@ -388,7 +388,7 @@ const Delay = function(_params){
 
 // Old pingpong delay implementation, just using the Tone.PingPongDelay()
 const PingPongDelay = function(_params){
-	console.log('FX => PingPongDelay()', _params);
+	// console.log('FX => PingPongDelay()', _params);
 
 	this._fx = new Tone.PingPongDelay();
 	this._fx.set({ wet: 0.4 });

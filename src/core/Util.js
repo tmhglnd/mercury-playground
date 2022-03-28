@@ -57,7 +57,7 @@ function divToS(d, bpm){
 		return Number(d) / 1000;
 	} else {
 		console.log(`${d} is not a valid time value`);
-		return 100;
+		return 0.1;
 	}
 }
 

@@ -64,6 +64,11 @@ function getBPM(){
 	return Tone.Transport.bpm.value;
 }
 
+// return the PPQ (pulses per quarter note) of the transport
+function getPPQ(){
+	return Tone.Transport.PPQ;
+}
+
 // generate a random bpm between 75 and 150
 function randomBPM(){
 	// set initial BPM on pageload to random value
