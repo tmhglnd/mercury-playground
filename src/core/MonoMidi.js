@@ -1,136 +1,73 @@
 const Tone = require('tone');
 const Util = require('./Util.js');
-const fxMap = require('./Effects.js');
+const Sequencer = require('./Sequencer.js');
 const WebMidi = require("webmidi");
 
-// simple midi playback
-class MonoMidi {
-	constructor(d='default', engine){
-		this._engine = engine;
-		this._bpm = engine.getBPM();
-		
-		console.log('=> MonoMidi()', d);
-		// console.log('MonoSample init:', s, t, b);
+class MonoMidi extends Sequencer {
+	constructor(engine, d='default'){
+		super(engine);
+
+		// Set Midi Device Output
 		this._device = WebMidi.getOutputByName(d);
 		if (d === 'default'){
 			this._device = WebMidi.outputs[0];
 		} else if (!this._device){
-			log('Not a valid MIDI Device name, set to default');
+			log(`${d} is not a valid MIDI Device name, set to default`);
 			this._device = WebMidi.outputs[0];
 		}
 
-		this._count = 0;
-		this._beatCount = 0;
-		
-		this._beat = [ 1 ];
-		this._note = [ 0, 0 ];
-		
-		this._time = 1;
-		this._offset = 0;
-		
+		// Midi specific parameters
+		this._note = [ 0, 0 ];		
 		this._velocity = [ 127, 0 ];
 		this._dur = [ 100 ];
-		
 		this._cc = [];
 		this._channel = [ 1 ];
 		this._chord = false;
-		this._loop;
 
-		this.makeLoop();
+		console.log('=> class MonoMidi', this);
 	}
 
-	makeLoop(){
-		// dispose of previous loop if active
-		if (this._loop){
-			this._loop.dispose();
-		}
-		let schedule = Tone.Time(this._offset).toSeconds();
-
-		// create new loop
-		this._loop = new Tone.Loop((time) => {
-			// get beat probability for current count
-			let b = Util.getParam(this._beat, this._count);
-			
-			// if random value is below probability, then play
-			if (Math.random() < b){
-				// get the count value
-				let c = this._beatCount;
+	event(c, time){
+		// normalized velocity (0 - 1)
+		let g = Util.getParam(this._velocity[0], c);
 				
-				// normalized velocity (0 - 1)
-				let g = Util.getParam(this._velocity[0], c);
-				
-				// get the duration
-				let d = Util.divToS(Util.getParam(this._dur, c), this._bpm) * 1000;
+		// get the duration
+		let d = Util.divToS(Util.getParam(this._dur, c), this.bpm()) * 1000;
 
-				// get the channel
-				let ch = Util.getParam(this._channel, c);
+		// get the channel
+		let ch = Util.getParam(this._channel, c);
 
-				// note as interval / octave coordinate
-				let o = Util.getParam(this._note[1], c);
-				let n;
-				if (this._chord){
-					let i = Util.lookup(this._note[0], c);
-					// reconstruct midi note value, (0, 0) = 36
-					n = [];
-					for (let x=0; x<i.length; x++){
-						n[x] = i[x] + (o * 12) + 36;
-					}
-				} else {
-					let i = Util.getParam(this._note[0], c);
-					// reconstruct midi note value, (0, 0) = 36
-					n = i + (o * 12) + 36;
-				}
-
-				// timing offset to sync WebMidi and WebAudio
-				let offset = WebMidi.time - Tone.context.currentTime * 1000;
-				let sync = time * 1000 + offset;
-
-				// send control changes!
-				this._cc.forEach((cc) => {
-					let ctrl = Number(cc[0]);
-					let val = Util.getParam(cc[1], c);
-					val = Math.max(0, Math.min(127, val));
-
-					this._device.sendControlChange(ctrl, val, ch, { time: sync });
-				});
-
-				// play the note!
-				this._device.playNote(n, ch, { duration: d, velocity: g, time: sync });
-
-				// increment internal beat counter
-				this._beatCount++;
+		// note as interval / octave coordinate
+		let o = Util.getParam(this._note[1], c);
+		let n;
+		if (this._chord){
+			let i = Util.lookup(this._note[0], c);
+			// reconstruct midi note value, (0, 0) = 36
+			n = [];
+			for (let x=0; x<i.length; x++){
+				n[x] = i[x] + (o * 12) + 36;
 			}
-			// increment count for sequencing
-			this._count++;
-		}, this._time).start(schedule);
-	}
+		} else {
+			let i = Util.getParam(this._note[0], c);
+			// reconstruct midi note value, (0, 0) = 36
+			n = i + (o * 12) + 36;
+		}
 
-	fadeOut(t){
-		// fade out the sound upon evaluation of new code
-		// no fade out possible with midi-notes
-		this.delete();
-	}
+		// timing offset to sync WebMidi and WebAudio
+		let offset = WebMidi.time - Tone.context.currentTime * 1000;
+		let sync = time * 1000 + offset;
 
-	fadeIn(t){
-		// fade in the sound upon evaluation of code
-	}
+		// send control changes!
+		this._cc.forEach((cc) => {
+			let ctrl = Number(cc[0]);
+			let val = Util.getParam(cc[1], c);
+			val = Math.max(0, Math.min(127, val));
 
-	delete(){
-		// dispose loop
-		this._loop.dispose();
+			this._device.sendControlChange(ctrl, val, ch, { time: sync });
+		});
 
-		console.log('=> Disposed:', 'Midi', this._device);
-	}
-
-	time(t, o=0){
-		// set the timing interval and offset
-		this._time = Util.formatRatio(t, this._engine.getBPM());
-		this._offset = Util.formatRatio(o, this._engine.getBPM());
-	}
-
-	beat(b){
-		// set the beat pattern as an array
-		this._beat = Util.toArray(b);
+		// play the note!
+		this._device.playNote(n, ch, { duration: d, velocity: g, time: sync });
 	}
 
 	note(i=0, o=0){
@@ -183,18 +120,6 @@ class MonoMidi {
 		// send out midiclock messages to sync external devices
 		// on this specific midi output and channel
 		// this._sync;
-	}
-
-	name(n){
-		// placeholder function for name
-		// is not used besides when parsing in mercury-lang
-		this._name = n;
-	}
-
-	group(g){
-		// placeholder function for group
-		// is not used besides when parsing in mercury-lang
-		this._group = g;
-	}
+	}	
 }
 module.exports = MonoMidi;
