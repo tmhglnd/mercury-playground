@@ -203,14 +203,14 @@ async function code({ file, engine }){
 
 	sounds.map(async (s) => {
 		// fade in new sounds;
-		await s.fadeIn(crossFade);
+		s.fadeIn(crossFade);
 	});
 
 	_sounds.map(async (s) => {
 		// fade out and delete after fade
-		await s.fadeOut(crossFade);
+		s.fadeOut(crossFade);
 	});
 	// empty array to trigger garbage collection
-	_sounds = [];
+	_sounds = await [];
 }
 module.exports = code;
