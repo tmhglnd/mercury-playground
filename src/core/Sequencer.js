@@ -45,6 +45,7 @@ class Sequencer {
 				if (!(Number(bbs[0]) % this._reset)){
 					if (bbs[0] !== this._bbs[0]){
 						this._count = 0;
+						this._beatCount = 0;
 					}
 				}
 			}

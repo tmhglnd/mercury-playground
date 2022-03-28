@@ -73,7 +73,7 @@ class MonoSynth extends Instrument {
 				log(`${i} is not a valid number or name`);
 				i = 0;
 			} else {
-				i = _i - 48;
+				i = _i - 36;
 			}
 		}
 		// reconstruct midi note value, (0, 0) = 36
