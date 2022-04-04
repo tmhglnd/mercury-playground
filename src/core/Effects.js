@@ -22,6 +22,9 @@ const fxMap = {
 	'lfo' : (params) => {
 		return new LFO(params);
 	},
+	'tremolo' : (params) => {
+		return new LFO(params);
+	},
 	// 'chip' : (params) => {
 	// 	return new BitCrusher(params);
 	// },
@@ -217,9 +220,9 @@ const LFO = function(_params){
 		sine : 'sine',
 		saw : 'sawtooth',
 		square : 'square',
+		rect : 'square',
 		triangle : 'triangle',
 		tri : 'triangle',
-		rect : 'square',
 	}
 
 	this._lfo = new Tone.LFO('8n', 0, 1);
@@ -227,7 +230,7 @@ const LFO = function(_params){
 	this._lfo.connect(this._fx.gain);
 	// this._fx = new Tone.Tremolo('8n').start();
 
-	this._speed = (_params[0]) ? Util.toArray(_params[0]) : ['8n'];
+	this._speed = (_params[0]) ? Util.toArray(_params[0]) : ['1/8'];
 	this._type = (_params[1]) ? Util.toArray(_params[1]) : ['sine'];
 	this._depth = (_params[2] !== undefined) ? Util.toArray(_params[2]) : [ 1 ];
 
@@ -243,14 +246,15 @@ const LFO = function(_params){
 		this._lfo.set({ type: w });
 		
 		let s = Util.getParam(this._speed, c);
-
+		let f = Math.max(0.0001, Util.divToS(s, bpm));
+		console.log('LFO', s, f);
 		// let t = Util.formatRatio(s, bpm);
-		this._lfo.frequency.setValueAtTime(s, time);
+		this._lfo.frequency.setValueAtTime(1/f, time);
 
 		let a = Util.getParam(this._depth, c);
-		this._lfo.min = 1 - a;
+		this._lfo.min = Math.min(1, Math.max(0, 1 - a));
 
-		this._lfo.start(Tone.now());
+		this._lfo.start(time);
 	}
 
 	this.chain = function(){
@@ -263,7 +267,7 @@ const LFO = function(_params){
 		blocks.forEach((b) => {
 			b.disconnect();
 			b.dispose();
-		})
+		});
 	}
 }
 

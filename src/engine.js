@@ -39,7 +39,7 @@ function resume(){
 			Tone.Transport.timeSignature = [4, 4];
 			// Tone.Transport.swing = 0.5;
 			// a bit of latency for safety
-			Tone.Transport.start('+0.25');
+			Tone.Transport.start('+0.1');
 
 			Tone.getDestination().volume.rampTo(0, 0.01);
 			console.log("Resumed Transport");
