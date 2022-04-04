@@ -67,9 +67,8 @@ class Sequencer {
 				// on the current count and time
 				this.event(c, time);
 
-				// execute a visual event
+				// execute a visual event for Hydra
 				if (this._visual.length > 0){
-					// console.log('set visual', Util.getParam(this._visual, c));
 					this._canvas.eval(Util.getParam(this._visual, c));
 				}
 
