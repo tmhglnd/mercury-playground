@@ -32627,12 +32627,11 @@ let hydraCanvas = function(c, u) {
 	}
 
 	this.eval = function(code){
-		let b64 = /\?code=(.+)/.exec(code);
-
 		if (code === ''){
 			this.clear();
 		}
 		try {
+			let b64 = /\?code=(.+)/.exec(code);
 			let decode = decodeURIComponent(atob(b64[1]));
 			eval(decode);
 			this.engine.start();
@@ -33406,8 +33405,8 @@ const Sequencer = require('./Sequencer.js');
 const WebMidi = require("webmidi");
 
 class MonoMidi extends Sequencer {
-	constructor(engine, d='default'){
-		super(engine);
+	constructor(engine, d='default', canvas){
+		super(engine, canvas);
 
 		// Set Midi Device Output
 		this._device = WebMidi.getOutputByName(d);
@@ -33658,8 +33657,8 @@ const TL = require('total-serialism').Translate;
 const Instrument = require('./Instrument');
 
 class MonoSynth extends Instrument {
-	constructor(engine, t='saw'){
-		super(engine);
+	constructor(engine, t='saw', canvas){
+		super(engine, canvas);
 
 		this._wave = Util.toArray(t);
 		this._waveMap = {
@@ -34188,9 +34187,8 @@ class Sequencer {
 				// on the current count and time
 				this.event(c, time);
 
-				// execute a visual event
+				// execute a visual event for Hydra
 				if (this._visual.length > 0){
-					// console.log('set visual', Util.getParam(this._visual, c));
 					this._canvas.eval(Util.getParam(this._visual, c));
 				}
 
@@ -34687,6 +34685,7 @@ const Editor = function({ context, engine, canvas }) {
 	this.silence = async function(){
 		// console.log('silence code');
 		await engine.silence();
+		canvas.clear();
 	}
 
 	this.changeTheme = function(){

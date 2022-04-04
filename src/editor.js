@@ -147,6 +147,7 @@ const Editor = function({ context, engine, canvas }) {
 	this.silence = async function(){
 		// console.log('silence code');
 		await engine.silence();
+		canvas.clear();
 	}
 
 	this.changeTheme = function(){

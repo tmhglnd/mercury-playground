@@ -38,12 +38,11 @@ let hydraCanvas = function(c, u) {
 	}
 
 	this.eval = function(code){
-		let b64 = /\?code=(.+)/.exec(code);
-
 		if (code === ''){
 			this.clear();
 		}
 		try {
+			let b64 = /\?code=(.+)/.exec(code);
 			let decode = decodeURIComponent(atob(b64[1]));
 			eval(decode);
 			this.engine.start();

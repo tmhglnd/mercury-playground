@@ -4,8 +4,8 @@ const Sequencer = require('./Sequencer.js');
 const WebMidi = require("webmidi");
 
 class MonoMidi extends Sequencer {
-	constructor(engine, d='default'){
-		super(engine);
+	constructor(engine, d='default', canvas){
+		super(engine, canvas);
 
 		// Set Midi Device Output
 		this._device = WebMidi.getOutputByName(d);
