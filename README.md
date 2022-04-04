@@ -215,7 +215,7 @@ Currently the playground does not have the full functionality of the original Me
 	- [x] filter
 		- [ ] modulation
 	- [ ] envFilter
-	- [ ] lfo
+	- [x] lfo
 	- [x] reverb
 		- [x] decaying noise convolution
 		- [ ] dattorro reverb algorithm

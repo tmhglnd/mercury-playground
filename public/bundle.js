@@ -32975,8 +32975,6 @@ const LFO = function(_params){
 		
 		let s = Util.getParam(this._speed, c);
 		let f = Math.max(0.0001, Util.divToS(s, bpm));
-		console.log('LFO', s, f);
-		// let t = Util.formatRatio(s, bpm);
 		this._lfo.frequency.setValueAtTime(1/f, time);
 
 		let a = Util.getParam(this._depth, c);
@@ -33027,17 +33025,43 @@ const Filter = function(_params){
 
 	this._cutoff = (_params[1]) ? Util.toArray(_params[1]) : [ 1000 ];
 	this._q = (_params[2]) ? Util.toArray(_params[2]) : [ 0.5 ];
+	this._rt = (_params[3]) ? Util.toArray(_params[3]) : [ 0 ];
 
 	this.set = function(c, time){
 		let f = Util.getParam(this._cutoff, c);
 		let r = 1 / (1 - Math.min(0.95, Math.max(0, Util.getParam(this._q, c))));
+		let rt = Util.divToS(Util.getParam(this._rt, c));
 
-		this._fx.frequency.setValueAtTime(f, time);
+		if (rt > 0){
+			this._fx.frequency.rampTo(f, rt, time);
+		} else {
+			this._fx.frequency.setValueAtTime(f, time);
+		}
+
 		this._fx.Q.setValueAtTime(r, time);
 	}
 
 	this.chain = function(){
 		return { 'send' : this._fx, 'return' : this._fx };
+	}
+
+	this.delete = function(){
+		this._fx.disconnect();
+		this._fx.dispose();
+	}
+}
+
+const AutoFilter = function(_params){
+	console.log('FX => AutoFilter()', _params);
+
+	this._fx = new Tone.AutoFilter();
+
+	this.set = function(c, time, bpm){
+
+	}
+
+	this.chain = function(){
+		return { 'send' : this._fx, 'return' : this._fx }
 	}
 
 	this.delete = function(){
