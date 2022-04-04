@@ -14,7 +14,7 @@ let sounds = [];
 
 // parse and evaluate the inputted code
 // as an asyncronous function with promise
-async function code({ file, engine }){
+async function code({ file, engine, canvas }){
 	console.log('Evaluating');
 	let c = file;
 
@@ -115,7 +115,8 @@ async function code({ file, engine }){
 			// console.log('make sample', obj);
 			let type = obj.type;
 			let args = obj.functions;			
-			let inst = new MonoSample(engine, type);
+			let inst = new MonoSample(engine, type, canvas);
+			// let inst = new MonoSample(engine, type);
 			// let inst = new MonoSample(type, engine);
 
 			// apply arguments to instrument if part of instrument
@@ -132,7 +133,8 @@ async function code({ file, engine }){
 			// console.log('make sample', obj);
 			let type = obj.type;
 			let args = obj.functions;			
-			let inst = new MonoSample(engine, type);
+			let inst = new MonoSample(engine, type, canvas);
+			// let inst = new MonoSample(engine, type);
 			// let inst = new MonoSample(type, engine);
 
 			// apply arguments to instrument if part of instrument
@@ -149,7 +151,8 @@ async function code({ file, engine }){
 			console.log('make synth', obj);
 			let type = obj.type;
 			let args = obj.functions;			
-			let inst = new MonoSynth(engine, type);
+			let inst = new MonoSynth(engine, type, canvas);
+			// let inst = new MonoSynth(engine, type);
 			// let inst = new PolyInstrument(engine, type);
 			// let inst = new MonoSynth(type, engine);
 
@@ -167,7 +170,8 @@ async function code({ file, engine }){
 			// console.log('make midi', obj);
 			let device = obj.type;
 			let args = obj.functions;
-			let inst = new MonoMidi(engine, device);
+			let inst = new MonoMidi(engine, device, canvas);
+			// let inst = new MonoMidi(engine, device);
 			// let inst = new MonoMidi(device, engine);
 
 			// apply arguments to instrument

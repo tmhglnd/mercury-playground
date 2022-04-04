@@ -43,6 +43,12 @@ const fxMap = {
 	'filter' : (params) => {
 		return new Filter(params);
 	},
+	/*'autoFilter' : (params) => {
+		return new AutoFilter(params);
+	},
+	'wobble' : (params) => {
+		return fxMap.autoFilter(params);
+	},*/
 	'delay' : (params) => {
 		return new Delay(params);
 	},
@@ -323,10 +329,10 @@ const Filter = function(_params){
 	}
 }
 
-const AutoFilter = function(_params){
+/*const AutoFilter = function(_params){
 	console.log('FX => AutoFilter()', _params);
 
-	this._fx = new Tone.AutoFilter();
+	this._fx = new Tone.AutoFilter('8n', 100, 4000);
 
 	this.set = function(c, time, bpm){
 
@@ -340,7 +346,7 @@ const AutoFilter = function(_params){
 		this._fx.disconnect();
 		this._fx.dispose();
 	}
-}
+}*/
 
 // Custom stereo delay implementation with lowpass filter in feedback loop
 const Delay = function(_params){

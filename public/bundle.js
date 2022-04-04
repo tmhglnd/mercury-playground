@@ -32619,23 +32619,33 @@ let hydraCanvas = function(c, u) {
 		render(o0);
 		this.hydra.tick(60);
 		this.engine.stop();
+
+		// not displaying the canvas when no visuals are rendered
+		let text = document.getElementById('hydra-code');
+		text.value = '<paste hydra url>'
+		this.canvas.style.display = 'none';
 	}
 
-	this.eval = function(url){
-		let b64 = /\?code=(.+)/.exec(url);
+	this.eval = function(code){
+		let b64 = /\?code=(.+)/.exec(code);
 
+		if (code === ''){
+			this.clear();
+		}
 		try {
 			let decode = decodeURIComponent(atob(b64[1]));
 			eval(decode);
 			this.engine.start();
 			this.canvas.style.display = 'inline';
 		} catch (err) {
-			console.log('Not a valid Hydra url-code');
-			this.clear();
-			let text = document.getElementById('hydra-code');
-			text.value = '<paste hydra url>'
-			// not displaying the canvas when no visuals are rendered
-			this.canvas.style.display = 'none';
+			try {
+				eval(code);
+				this.engine.start();
+				this.canvas.style.display = 'inline';
+			} catch (err) {
+				console.log('Not a valid Hydra url-code');
+				this.clear();
+			}
 		}
 	}
 
@@ -32771,6 +32781,12 @@ const fxMap = {
 	'filter' : (params) => {
 		return new Filter(params);
 	},
+	/*'autoFilter' : (params) => {
+		return new AutoFilter(params);
+	},
+	'wobble' : (params) => {
+		return fxMap.autoFilter(params);
+	},*/
 	'delay' : (params) => {
 		return new Delay(params);
 	},
@@ -33051,10 +33067,10 @@ const Filter = function(_params){
 	}
 }
 
-const AutoFilter = function(_params){
+/*const AutoFilter = function(_params){
 	console.log('FX => AutoFilter()', _params);
 
-	this._fx = new Tone.AutoFilter();
+	this._fx = new Tone.AutoFilter('8n', 100, 4000);
 
 	this.set = function(c, time, bpm){
 
@@ -33068,7 +33084,7 @@ const AutoFilter = function(_params){
 		this._fx.disconnect();
 		this._fx.dispose();
 	}
-}
+}*/
 
 // Custom stereo delay implementation with lowpass filter in feedback loop
 const Delay = function(_params){
@@ -33177,9 +33193,9 @@ const Sequencer = require('./Sequencer.js');
 
 // Basic class for all instruments
 class Instrument extends Sequencer {
-	constructor(engine){
+	constructor(engine, canvas){
 		// Inherit from Sequencer
-		super(engine);
+		super(engine, canvas);
 
 		// Instrument specific parameters
 		this._gain = [-6, 0];		
@@ -33516,8 +33532,8 @@ const Util = require('./Util.js');
 const Instrument = require('./Instrument.js');
 
 class MonoSample extends Instrument {
-	constructor(engine, s){
-		super(engine);
+	constructor(engine, s, canvas){
+		super(engine, canvas);
 
 		this._bufs = this._engine.getBuffers();
 		this._sound;
@@ -34108,9 +34124,10 @@ const Util = require('./Util.js');
 
 // Basic Sequencer class for triggering events
 class Sequencer {
-	constructor(engine){
+	constructor(engine, canvas){
 		// The Tone engine
 		this._engine = engine;
+		this._canvas = canvas;
 		
 		// Sequencer specific parameters
 		this._bbs = [ 0, 0, 0 ];
@@ -34119,6 +34136,9 @@ class Sequencer {
 		this._time = 1;
 		this._offset = 0;
 		this._beat = [ 1 ];
+
+		// visual code
+		this._visual = [];
 
 		// Tone looper
 		this._loop;
@@ -34168,6 +34188,12 @@ class Sequencer {
 				// on the current count and time
 				this.event(c, time);
 
+				// execute a visual event
+				if (this._visual.length > 0){
+					// console.log('set visual', Util.getParam(this._visual, c));
+					this._canvas.eval(Util.getParam(this._visual, c));
+				}
+
 				// increment internal beat counter
 				this._beatCount++;
 			}
@@ -34180,6 +34206,10 @@ class Sequencer {
 		// specify some events to be triggered specifically for 
 		// the inheritting class
 		console.log('Sequencer()', this._name, c, time);
+	}
+
+	visual(v){
+		this._visual = Util.toArray(v);
 	}
 
 	fadeIn(t){
@@ -34570,7 +34600,7 @@ CodeMirror.defineSimpleMode("mercury", {
 	]
 });
 
-const Editor = function({ context, engine }) {
+const Editor = function({ context, engine, canvas }) {
 	// this._engine = engine;
 	console.log('=> Created Editor()');
 
@@ -34640,7 +34670,7 @@ const Editor = function({ context, engine }) {
 		this.flash();
 
 		// console.log('evaluating code...');
-		await code({ file: this.cm.getValue(), engine: engine });
+		await code({ file: this.cm.getValue(), engine: engine, canvas: canvas });
 		await engine.resume();
 	}
 
@@ -35076,10 +35106,14 @@ window.onload = () => {
 	// Initialize random BPM
 	Engine.randomBPM();
 
+	// Hydra sketch background loader
+	// let sketchP5 = new p5(Canvas.p5Canvas, document.getElementById('p5-canvas'));
+	const Hydra = new Canvas.hydraCanvas('hydra-canvas');
+
 	// the code Editor
 	// also loads the parser and the worker
 	// gets passed the Tone context and Engine
-	let cm = new Editor({ context: Tone, engine: Engine });
+	let cm = new Editor({ context: Tone, engine: Engine, canvas: Hydra });
 
 	// Load all the buttons/menus
 	cm.controls();
@@ -35089,9 +35123,7 @@ window.onload = () => {
 	cm.tutorialMenu();
 	cm.clear();
 	
-	// Hydra sketch background loader
-	// let sketchP5 = new p5(Canvas.p5Canvas, document.getElementById('p5-canvas'));
-	const Hydra = new Canvas.hydraCanvas('hydra-canvas');
+
 	Hydra.link('hydra-ui');
 }
 },{"./canvas.js":89,"./editor.js":101,"./engine.js":102,"tone":77,"webmidi":88}],104:[function(require,module,exports){
@@ -35111,7 +35143,7 @@ let sounds = [];
 
 // parse and evaluate the inputted code
 // as an asyncronous function with promise
-async function code({ file, engine }){
+async function code({ file, engine, canvas }){
 	console.log('Evaluating');
 	let c = file;
 
@@ -35212,7 +35244,8 @@ async function code({ file, engine }){
 			// console.log('make sample', obj);
 			let type = obj.type;
 			let args = obj.functions;			
-			let inst = new MonoSample(engine, type);
+			let inst = new MonoSample(engine, type, canvas);
+			// let inst = new MonoSample(engine, type);
 			// let inst = new MonoSample(type, engine);
 
 			// apply arguments to instrument if part of instrument
@@ -35229,7 +35262,8 @@ async function code({ file, engine }){
 			// console.log('make sample', obj);
 			let type = obj.type;
 			let args = obj.functions;			
-			let inst = new MonoSample(engine, type);
+			let inst = new MonoSample(engine, type, canvas);
+			// let inst = new MonoSample(engine, type);
 			// let inst = new MonoSample(type, engine);
 
 			// apply arguments to instrument if part of instrument
@@ -35246,7 +35280,8 @@ async function code({ file, engine }){
 			console.log('make synth', obj);
 			let type = obj.type;
 			let args = obj.functions;			
-			let inst = new MonoSynth(engine, type);
+			let inst = new MonoSynth(engine, type, canvas);
+			// let inst = new MonoSynth(engine, type);
 			// let inst = new PolyInstrument(engine, type);
 			// let inst = new MonoSynth(type, engine);
 
@@ -35264,7 +35299,8 @@ async function code({ file, engine }){
 			// console.log('make midi', obj);
 			let device = obj.type;
 			let args = obj.functions;
-			let inst = new MonoMidi(engine, device);
+			let inst = new MonoMidi(engine, device, canvas);
+			// let inst = new MonoMidi(engine, device);
 			// let inst = new MonoMidi(device, engine);
 
 			// apply arguments to instrument

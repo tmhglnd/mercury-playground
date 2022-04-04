@@ -60,7 +60,7 @@ CodeMirror.defineSimpleMode("mercury", {
 	]
 });
 
-const Editor = function({ context, engine }) {
+const Editor = function({ context, engine, canvas }) {
 	// this._engine = engine;
 	console.log('=> Created Editor()');
 
@@ -130,7 +130,7 @@ const Editor = function({ context, engine }) {
 		this.flash();
 
 		// console.log('evaluating code...');
-		await code({ file: this.cm.getValue(), engine: engine });
+		await code({ file: this.cm.getValue(), engine: engine, canvas: canvas });
 		await engine.resume();
 	}
 

@@ -30,23 +30,33 @@ let hydraCanvas = function(c, u) {
 		render(o0);
 		this.hydra.tick(60);
 		this.engine.stop();
+
+		// not displaying the canvas when no visuals are rendered
+		let text = document.getElementById('hydra-code');
+		text.value = '<paste hydra url>'
+		this.canvas.style.display = 'none';
 	}
 
-	this.eval = function(url){
-		let b64 = /\?code=(.+)/.exec(url);
+	this.eval = function(code){
+		let b64 = /\?code=(.+)/.exec(code);
 
+		if (code === ''){
+			this.clear();
+		}
 		try {
 			let decode = decodeURIComponent(atob(b64[1]));
 			eval(decode);
 			this.engine.start();
 			this.canvas.style.display = 'inline';
 		} catch (err) {
-			console.log('Not a valid Hydra url-code');
-			this.clear();
-			let text = document.getElementById('hydra-code');
-			text.value = '<paste hydra url>'
-			// not displaying the canvas when no visuals are rendered
-			this.canvas.style.display = 'none';
+			try {
+				eval(code);
+				this.engine.start();
+				this.canvas.style.display = 'inline';
+			} catch (err) {
+				console.log('Not a valid Hydra url-code');
+				this.clear();
+			}
 		}
 	}
 

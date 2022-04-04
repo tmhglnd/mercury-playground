@@ -3,9 +3,10 @@ const Util = require('./Util.js');
 
 // Basic Sequencer class for triggering events
 class Sequencer {
-	constructor(engine){
+	constructor(engine, canvas){
 		// The Tone engine
 		this._engine = engine;
+		this._canvas = canvas;
 		
 		// Sequencer specific parameters
 		this._bbs = [ 0, 0, 0 ];
@@ -14,6 +15,9 @@ class Sequencer {
 		this._time = 1;
 		this._offset = 0;
 		this._beat = [ 1 ];
+
+		// visual code
+		this._visual = [];
 
 		// Tone looper
 		this._loop;
@@ -63,6 +67,12 @@ class Sequencer {
 				// on the current count and time
 				this.event(c, time);
 
+				// execute a visual event
+				if (this._visual.length > 0){
+					// console.log('set visual', Util.getParam(this._visual, c));
+					this._canvas.eval(Util.getParam(this._visual, c));
+				}
+
 				// increment internal beat counter
 				this._beatCount++;
 			}
@@ -75,6 +85,10 @@ class Sequencer {
 		// specify some events to be triggered specifically for 
 		// the inheritting class
 		console.log('Sequencer()', this._name, c, time);
+	}
+
+	visual(v){
+		this._visual = Util.toArray(v);
 	}
 
 	fadeIn(t){

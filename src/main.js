@@ -52,10 +52,14 @@ window.onload = () => {
 	// Initialize random BPM
 	Engine.randomBPM();
 
+	// Hydra sketch background loader
+	// let sketchP5 = new p5(Canvas.p5Canvas, document.getElementById('p5-canvas'));
+	const Hydra = new Canvas.hydraCanvas('hydra-canvas');
+
 	// the code Editor
 	// also loads the parser and the worker
 	// gets passed the Tone context and Engine
-	let cm = new Editor({ context: Tone, engine: Engine });
+	let cm = new Editor({ context: Tone, engine: Engine, canvas: Hydra });
 
 	// Load all the buttons/menus
 	cm.controls();
@@ -65,8 +69,6 @@ window.onload = () => {
 	cm.tutorialMenu();
 	cm.clear();
 	
-	// Hydra sketch background loader
-	// let sketchP5 = new p5(Canvas.p5Canvas, document.getElementById('p5-canvas'));
-	const Hydra = new Canvas.hydraCanvas('hydra-canvas');
+
 	Hydra.link('hydra-ui');
 }

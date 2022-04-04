@@ -5,9 +5,9 @@ const Sequencer = require('./Sequencer.js');
 
 // Basic class for all instruments
 class Instrument extends Sequencer {
-	constructor(engine){
+	constructor(engine, canvas){
 		// Inherit from Sequencer
-		super(engine);
+		super(engine, canvas);
 
 		// Instrument specific parameters
 		this._gain = [-6, 0];		
