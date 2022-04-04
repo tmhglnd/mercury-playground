@@ -22085,7 +22085,7 @@ function keywordBindings(dict, obj){
 }
 
 // code accepted global parameters
-const globals = 'tempo signature amp scale root randomSeed highPass lowPass silence sound'.split(' ');
+const globals = 'tempo signature amp scale root randomSeed highPass lowPass silence sound crossFade'.split(' ');
 
 // code defaults
 let code = {
@@ -22441,7 +22441,7 @@ function mercuryParser(code){
 	for (let l in lines){
 		if (lines[l] !== ''){
 			// create a Parser object from our grammar
-			let parser = new nearley.Parser(nearley.Grammar.fromCompiled(grammar));
+			let parser = new nearley.Parser(nearley.Grammar.fromCompiled(grammar), { keepHistory: false });
 
 			try {
 				// parse something!
@@ -22457,9 +22457,11 @@ function mercuryParser(code){
 							console.log(parser.results[i]);
 						}
 					} else {
-						console.log(parser.results[0]);
+						// console.log(parser.results[0]);
 					}
 				}
+				// remove other results
+				parser.results.length = 1;
 				// build the tokenized syntax tree
 				syntaxTree['@main'].push(parser.results[0]);
 			} catch (e) {
@@ -34581,7 +34583,7 @@ const Editor = function({ context, engine }) {
 
 	this.cm.markText({line: 0, ch: 0}, {line: 6, ch: 42}, {className: 'styled-background'})
 
-	this.set = function(v){
+	this.set = async function(v){
 		this.cm.setValue(v);
 	}
 
@@ -34609,24 +34611,24 @@ const Editor = function({ context, engine }) {
 	this.evaluate = async function(){
 		this.flash();
 
-		console.log('evaluating code...');
+		// console.log('evaluating code...');
 		await code({ file: this.cm.getValue(), engine: engine });
-		engine.resume();
+		await engine.resume();
 	}
 
-	this.flash = function(){
+	this.flash = async function(){
 		let start = { line: this.cm.firstLine(), ch: 0 };
 		let end = { line: this.cm.lastLine()+1, ch: 0 };
-		console.log(start, end);
+		// console.log(start, end);
 
 		let marker = this.cm.markText(start, end, { className: 'editorFlash' });
 
 		setTimeout(() => marker.clear(), 250);
 	}
 
-	this.silence = function(){
-		console.log('silence code');
-		engine.silence();
+	this.silence = async function(){
+		// console.log('silence code');
+		await engine.silence();
 	}
 
 	this.changeTheme = function(){
@@ -34815,6 +34817,19 @@ function date(){
 },{"./data/examples.json":98,"./data/tutorials.json":100,"./worker.js":104,"codemirror":27,"codemirror/addon/comment/comment.js":25,"codemirror/addon/mode/simple.js":26,"codemirror/mode/javascript/javascript.js":28,"file-saver":30,"tone":77}],102:[function(require,module,exports){
 const Tone = require('tone');
 
+// latency reduces cpu load
+// Tone.context.latencyHint = 'playback';
+Tone.context.lookAhead = 0.1;
+// Tone.context.updateInterval = 0.5;
+// Tone.context.samplerate = 44100;
+
+console.log('=> Engine settings:');
+console.log(`latency: ${Tone.getContext().lookAhead * 1000}ms`);
+console.log(`updateInterval: ${Tone.getContext().updateInterval * 1000}ms`);
+console.log(`latencyHint: ${Tone.getContext().latencyHint}`);
+console.log(`samplerate: ${Tone.getContext().sampleRate}Hz`);
+console.log(`PPQ: ${Tone.Transport.PPQ}`);
+
 // get the sample file paths from json
 console.log('loading sounds...');
 let samples = require('./data/samples.json');
@@ -34838,10 +34853,10 @@ function resume(){
 		Tone.start();
 
 		if (Tone.Transport.state !== 'started'){
-			Tone.Transport.start();
-			
 			Tone.Transport.timeSignature = [4, 4];
 			// Tone.Transport.swing = 0.5;
+			// a bit of latency for safety
+			Tone.Transport.start('+0.25');
 
 			Tone.getDestination().volume.rampTo(0, 0.01);
 			console.log("Resumed Transport");
@@ -34986,15 +35001,6 @@ window.onload = () => {
 	// load requires
 	const Tone = require('tone');
 	
-	// latency reduces cpu load
-	Tone.context.lookAhead = 0.1;
-	// Tone.context.samplerate = 44100;
-
-	console.log('Tone settings:');
-	console.log(`latency: ${Tone.getContext().lookAhead * 1000}ms`);
-	console.log(`samplerate: ${Tone.getContext().sampleRate}Hz`);
-	console.log(`PPQ: ${Tone.Transport.PPQ}`);
-	
 	// console.log catch function
 	if (typeof console != "undefined"){ 
 		if (typeof console.log != 'undefined'){
@@ -35118,7 +35124,7 @@ async function code({ file, engine }){
 		'crossFade' : (args) => {
 			// set crossFade time in ms
 			crossFade = Number(args[0])/1000;
-			// log(`set crossfade time to ${args[0]} ms`);
+			log(`crossfade time is ${args[0]}ms`);
 		},
 		'tempo' : (args) => {
 			engine.setBPM(...args);
@@ -35174,7 +35180,7 @@ async function code({ file, engine }){
 	sounds = [];
 
 	const objectMap = {
-		'sample' : (obj) => {
+		'sample' : async (obj) => {
 			// console.log('make sample', obj);
 			let type = obj.type;
 			let args = obj.functions;			
@@ -35191,7 +35197,7 @@ async function code({ file, engine }){
 			});
 			return inst;
 		},
-		'loop' : (obj) => {
+		'loop' : async (obj) => {
 			// console.log('make sample', obj);
 			let type = obj.type;
 			let args = obj.functions;			
@@ -35208,7 +35214,7 @@ async function code({ file, engine }){
 			});
 			return inst;
 		},
-		'synth' : (obj) => {
+		'synth' : async (obj) => {
 			console.log('make synth', obj);
 			let type = obj.type;
 			let args = obj.functions;			
@@ -35226,7 +35232,7 @@ async function code({ file, engine }){
 			});
 			return inst;
 		},
-		'midi' : (obj) => {
+		'midi' : async (obj) => {
 			// console.log('make midi', obj);
 			let device = obj.type;
 			let args = obj.functions;
@@ -35245,18 +35251,15 @@ async function code({ file, engine }){
 		}
 	}
 
-	// let tmpS = [];
 	// handle .objects
-	Object.keys(tree.objects).forEach((o) => {
-		let type = tree.objects[o].object;
-		// if (globalMap[o])
-		// console.log('make instrument', o);
+	for (let o in tree.objects){
+		let type = tree.objects[o].object;;
 		if (objectMap[type]){
-			sounds.push(objectMap[type](tree.objects[o]));
+			sounds.push(await objectMap[type](tree.objects[o]));
 		} else {
 			log(`Instrument named '${type}' is not supported`);
 		}
-	});
+	}
 
 	sounds.map(async (s) => {
 		// start new loops;
@@ -35264,6 +35267,7 @@ async function code({ file, engine }){
 	});
 	console.log(`Made instruments in: ${((Tone.Transport.seconds - t) * 1000).toFixed(3)}ms`);
 
+	// when all loops started fade in the new sounds and fade out old
 	sounds.map(async (s) => {
 		// fade in new sounds;
 		s.fadeIn(crossFade);
@@ -35274,7 +35278,7 @@ async function code({ file, engine }){
 		s.fadeOut(crossFade);
 	});
 	// empty array to trigger garbage collection
-	_sounds = await [];
+	_sounds = [];
 }
 module.exports = code;
 },{"./core/MonoMidi.js":92,"./core/MonoSample.js":93,"./core/MonoSynth.js":94,"./core/PolyInstrument.js":95,"mercury-lang":55,"tone":77,"total-serialism":80}]},{},[103]);

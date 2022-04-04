@@ -101,7 +101,7 @@ const Editor = function({ context, engine }) {
 
 	this.cm.markText({line: 0, ch: 0}, {line: 6, ch: 42}, {className: 'styled-background'})
 
-	this.set = function(v){
+	this.set = async function(v){
 		this.cm.setValue(v);
 	}
 
@@ -129,24 +129,24 @@ const Editor = function({ context, engine }) {
 	this.evaluate = async function(){
 		this.flash();
 
-		console.log('evaluating code...');
+		// console.log('evaluating code...');
 		await code({ file: this.cm.getValue(), engine: engine });
-		engine.resume();
+		await engine.resume();
 	}
 
-	this.flash = function(){
+	this.flash = async function(){
 		let start = { line: this.cm.firstLine(), ch: 0 };
 		let end = { line: this.cm.lastLine()+1, ch: 0 };
-		console.log(start, end);
+		// console.log(start, end);
 
 		let marker = this.cm.markText(start, end, { className: 'editorFlash' });
 
 		setTimeout(() => marker.clear(), 250);
 	}
 
-	this.silence = function(){
-		console.log('silence code');
-		engine.silence();
+	this.silence = async function(){
+		// console.log('silence code');
+		await engine.silence();
 	}
 
 	this.changeTheme = function(){

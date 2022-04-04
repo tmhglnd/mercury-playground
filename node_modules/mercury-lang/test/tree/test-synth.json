@@ -88,7 +88,7 @@
       ]
     },
     "objects": {
-      "BNEFTDPV": {
+      "FVY4VFIK": {
         "object": "synth",
         "type": [
           "sine",
@@ -143,11 +143,11 @@
             ]
           ],
           "name": [
-            "BNEFTDPV"
+            "FVY4VFIK"
           ]
         }
       },
-      "9034EJIG": {
+      "4SBDMVZ7": {
         "object": "sample",
         "type": [
           "kick_min",
@@ -189,7 +189,7 @@
             ]
           ],
           "name": [
-            "9034EJIG"
+            "4SBDMVZ7"
           ]
         }
       },

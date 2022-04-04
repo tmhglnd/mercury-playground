@@ -15,7 +15,7 @@ entryPoint = "../build/mercury.es5.min.js";
 
 const Mercury = require(entryPoint);
 
-function parseFile(f){
+async function parseFile(f){
 	let file = fs.readFileSync(f, 'utf-8');
 	let name = path.parse(f).name;
 	console.log(`\nParsing: ${name}\n`);
@@ -23,7 +23,7 @@ function parseFile(f){
 	// start time of parsing
 	let time = Date.now();	
 	// store syntax tree result in variable
-	let result = Mercury(file);
+	let result = await Mercury(file);
 	// end time of parsing
 	time = Date.now() - time;
 	console.log(`\nParsed code succesful within: ${time} ms\n`);

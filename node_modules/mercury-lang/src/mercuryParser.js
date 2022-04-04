@@ -23,7 +23,7 @@ function mercuryParser(code){
 	for (let l in lines){
 		if (lines[l] !== ''){
 			// create a Parser object from our grammar
-			let parser = new nearley.Parser(nearley.Grammar.fromCompiled(grammar));
+			let parser = new nearley.Parser(nearley.Grammar.fromCompiled(grammar), { keepHistory: false });
 
 			try {
 				// parse something!
@@ -39,9 +39,11 @@ function mercuryParser(code){
 							console.log(parser.results[i]);
 						}
 					} else {
-						console.log(parser.results[0]);
+						// console.log(parser.results[0]);
 					}
 				}
+				// remove other results
+				parser.results.length = 1;
 				// build the tokenized syntax tree
 				syntaxTree['@main'].push(parser.results[0]);
 			} catch (e) {

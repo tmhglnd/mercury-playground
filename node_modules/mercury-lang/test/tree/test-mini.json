@@ -32,7 +32,7 @@
       ]
     },
     "objects": {
-      "56XRI962": {
+      "7ZW1CEYO": {
         "object": "synth",
         "type": "saw",
         "functions": {
@@ -86,7 +86,7 @@
             ]
           ],
           "name": [
-            "56XRI962"
+            "7ZW1CEYO"
           ]
         }
       },
@@ -145,7 +145,7 @@
           ]
         }
       },
-      "B3PRIDRT": {
+      "TJ95SJ26": {
         "object": "sample",
         "type": "violin_g",
         "functions": {
@@ -180,7 +180,7 @@
             -0.3
           ],
           "name": [
-            "B3PRIDRT"
+            "TJ95SJ26"
           ]
         }
       }

@@ -12,246 +12,627 @@
         18000,
         0
       ],
-      "silence": false
-    },
-    "variables": {
-      "str": [
-        1,
-        1,
-        1,
-        2,
-        2,
-        2,
-        3,
-        3,
-        3,
-        4
+      "silence": false,
+      "tempo": [
+        132
       ],
-      "str2": [
-        1,
-        1.3333333333333335,
-        1.6666666666666665,
-        2,
-        2.333333333333333,
-        2.6666666666666665,
-        3,
-        3.3333333333333335,
-        3.6666666666666665,
-        4
+      "crossFade": [
+        1000
       ],
-      "str3": [
-        1,
-        1.3333333333333335,
-        1.6666666666666665,
-        2,
-        2.333333333333333,
-        2.6666666666666665,
-        3,
-        3.3333333333333335,
-        3.6666666666666665,
-        4
-      ],
-      "str4": [
-        1,
-        4,
-        2,
-        3,
-        3,
-        2,
-        4,
-        1
+      "scale": [
+        "minor",
+        "c"
       ]
     },
-    "objects": {},
-    "groups": {},
-    "print": [
-      [
-        1,
-        1,
-        1,
-        2,
-        2,
-        2,
-        3,
-        3,
-        3,
-        4
-      ],
-      [
-        1,
-        4,
-        2,
-        3,
-        3,
-        2,
-        4,
-        1
+    "variables": {},
+    "objects": {
+      "syn": {
+        "object": "synth",
+        "type": "saw",
+        "functions": {
+          "group": [],
+          "time": [
+            "1/16"
+          ],
+          "note": [
+            [
+              0,
+              1,
+              [
+                12,
+                24,
+                19,
+                36
+              ]
+            ],
+            0
+          ],
+          "env": [
+            1,
+            [
+              300,
+              298,
+              294,
+              286,
+              276,
+              264,
+              250,
+              234,
+              216,
+              197,
+              178,
+              159,
+              140,
+              122,
+              105,
+              90,
+              77,
+              66,
+              58,
+              52,
+              50,
+              50,
+              53,
+              60,
+              68,
+              80,
+              94,
+              109,
+              126,
+              144,
+              163,
+              183,
+              202,
+              220,
+              237,
+              253,
+              267,
+              279,
+              288,
+              295,
+              299,
+              299,
+              297,
+              292,
+              284,
+              274,
+              261,
+              246,
+              229,
+              212,
+              193,
+              174,
+              154,
+              136,
+              118,
+              102,
+              87,
+              74,
+              64,
+              56,
+              51,
+              50,
+              51,
+              55,
+              61,
+              71,
+              83,
+              97,
+              113,
+              130,
+              149,
+              168,
+              187,
+              206,
+              224,
+              241,
+              257,
+              270,
+              281,
+              290,
+              296,
+              299,
+              299,
+              296,
+              291,
+              282,
+              271,
+              258,
+              242,
+              225,
+              207,
+              188,
+              169,
+              150,
+              131,
+              114,
+              98,
+              84,
+              72,
+              62,
+              55,
+              51,
+              50,
+              51,
+              56,
+              63,
+              74,
+              86,
+              101,
+              117,
+              135,
+              153,
+              173,
+              192,
+              211,
+              228,
+              245,
+              260,
+              273,
+              284,
+              292,
+              297,
+              299,
+              299,
+              295,
+              289,
+              280,
+              268
+            ]
+          ],
+          "beat": [
+            1
+          ],
+          "amp": [
+            0.7
+          ],
+          "wave2": [
+            "saw",
+            0
+          ],
+          "add_fx": [
+            [
+              "drive",
+              [
+                3,
+                3,
+                13,
+                4
+              ]
+            ],
+            [
+              "filter",
+              "low",
+              [
+                200,
+                303,
+                406,
+                509,
+                612,
+                715,
+                818,
+                921,
+                1025,
+                1128,
+                1231,
+                1334,
+                1437,
+                1540,
+                1643,
+                1746,
+                1850,
+                1953,
+                2056,
+                2159,
+                2262,
+                2365,
+                2468,
+                2571,
+                2675,
+                2778,
+                2881,
+                2984,
+                3087,
+                3190,
+                3293,
+                3396
+              ],
+              0.6
+            ],
+            [
+              "delay",
+              [
+                "1/32",
+                "1/32",
+                "1/32",
+                "1/32",
+                "1/32",
+                "1/32",
+                "1/32",
+                "1/32",
+                "1/32",
+                "1/32",
+                "1/32",
+                "1/32",
+                "1/32",
+                "1/32",
+                "1/32",
+                "1/32",
+                "3/16",
+                "3/16",
+                "3/16",
+                "3/16",
+                "3/16",
+                "3/16",
+                "3/16",
+                "3/16",
+                "3/16",
+                "3/16",
+                "3/16",
+                "3/16",
+                "3/16",
+                "3/16",
+                "3/16",
+                "3/16"
+              ],
+              "1/8",
+              0.8
+            ]
+          ],
+          "name": [
+            "syn"
+          ],
+          "slide": [
+            [
+              [
+                100,
+                0
+              ],
+              0,
+              0
+            ]
+          ]
+        }
+      }
+    },
+    "groups": {
+      "all": [
+        "syn"
       ]
-    ],
+    },
+    "print": [],
     "comments": [
-      "//silence"
+      "// combine multiple effects modulated in time by lists",
+      "// to create interesting synthesized sounds",
+      "// modulate the length of the note with a cosine function",
+      "// randomnes to the slide between notes and the overdrive fx",
+      "// slowly rise the filter cutoff frequency",
+      "// change delaytimes every 16 notes"
     ]
   },
   "syntaxTree": {
     "@main": [
       {
-        "@list": {
-          "@name": "str",
-          "@params": {
-            "@function": {
-              "@name": "stretch",
-              "@args": [
-                {
-                  "@array": [
-                    {
-                      "@number": 1
-                    },
-                    {
-                      "@number": 2
-                    },
-                    {
-                      "@number": 3
-                    },
-                    {
-                      "@number": 4
-                    }
-                  ]
-                },
-                {
-                  "@number": 10
-                }
-              ]
-            }
+        "@global": {
+          "@comment": "// combine multiple effects modulated in time by lists"
+        }
+      },
+      {
+        "@global": {
+          "@comment": "// to create interesting synthesized sounds"
+        }
+      },
+      {
+        "@object": {
+          "@set": {
+            "@name": "tempo",
+            "@functions": [
+              {
+                "@number": 132
+              }
+            ]
           }
         }
       },
       {
-        "@list": {
-          "@name": "str2",
-          "@params": {
-            "@function": {
-              "@name": "stretchFloat",
-              "@args": [
-                {
-                  "@array": [
-                    {
-                      "@number": 1
-                    },
-                    {
-                      "@number": 2
-                    },
-                    {
-                      "@number": 3
-                    },
-                    {
-                      "@number": 4
-                    }
-                  ]
-                },
-                {
-                  "@number": 10
-                }
-              ]
-            }
+        "@object": {
+          "@set": {
+            "@name": "crossFade",
+            "@functions": [
+              {
+                "@number": 1000
+              }
+            ]
           }
         }
       },
       {
-        "@list": {
-          "@name": "str3",
-          "@params": {
-            "@function": {
-              "@name": "stretchF",
-              "@args": [
-                {
-                  "@array": [
-                    {
-                      "@number": 1
-                    },
-                    {
-                      "@number": 2
-                    },
-                    {
-                      "@number": 3
-                    },
-                    {
-                      "@number": 4
-                    }
-                  ]
-                },
-                {
-                  "@number": 10
-                }
-              ]
-            }
+        "@object": {
+          "@set": {
+            "@name": "scale",
+            "@functions": [
+              {
+                "@identifier": "minor"
+              },
+              {
+                "@note": "c"
+              }
+            ]
           }
         }
       },
       {
-        "@list": {
-          "@name": "str4",
-          "@params": {
-            "@function": {
-              "@name": "lace",
-              "@args": [
-                {
-                  "@array": [
+        "@object": {
+          "@new": {
+            "@inst": "synth",
+            "@type": {
+              "@identifier": "saw"
+            },
+            "@functions": [
+              {
+                "@function": {
+                  "@name": "note",
+                  "@args": [
                     {
-                      "@number": 1
+                      "@array": [
+                        {
+                          "@number": 0
+                        },
+                        {
+                          "@number": 1
+                        },
+                        {
+                          "@array": [
+                            {
+                              "@number": 12
+                            },
+                            {
+                              "@number": 24
+                            },
+                            {
+                              "@number": 19
+                            },
+                            {
+                              "@number": 36
+                            }
+                          ]
+                        }
+                      ]
                     },
                     {
-                      "@number": 2
-                    },
-                    {
-                      "@number": 3
-                    },
-                    {
-                      "@number": 4
-                    }
-                  ]
-                },
-                {
-                  "@array": [
-                    {
-                      "@number": 4
-                    },
-                    {
-                      "@number": 3
-                    },
-                    {
-                      "@number": 2
-                    },
-                    {
-                      "@number": 1
+                      "@number": 0
                     }
                   ]
                 }
-              ]
-            }
+              },
+              {
+                "@function": {
+                  "@name": "name",
+                  "@args": [
+                    {
+                      "@identifier": "syn"
+                    }
+                  ]
+                }
+              }
+            ]
           }
         }
       },
       {
         "@global": {
-          "@print": [
-            {
-              "@identifier": "str"
-            }
-          ]
+          "@comment": "// modulate the length of the note with a cosine function"
+        }
+      },
+      {
+        "@object": {
+          "@set": {
+            "@name": "syn",
+            "@functions": [
+              {
+                "@function": {
+                  "@name": "env",
+                  "@args": [
+                    {
+                      "@number": 1
+                    },
+                    {
+                      "@function": {
+                        "@name": "cosine",
+                        "@args": [
+                          {
+                            "@number": 128
+                          },
+                          {
+                            "@number": 3.14
+                          },
+                          {
+                            "@number": 50
+                          },
+                          {
+                            "@number": 300
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "@function": {
+                  "@name": "time",
+                  "@args": [
+                    {
+                      "@division": "1/16"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
         }
       },
       {
         "@global": {
-          "@print": [
-            {
-              "@identifier": "str4"
-            }
-          ]
+          "@comment": "// randomnes to the slide between notes and the overdrive fx"
+        }
+      },
+      {
+        "@object": {
+          "@set": {
+            "@name": "syn",
+            "@functions": [
+              {
+                "@function": {
+                  "@name": "slide",
+                  "@args": [
+                    {
+                      "@array": [
+                        {
+                          "@array": [
+                            {
+                              "@number": 100
+                            },
+                            {
+                              "@number": 0
+                            }
+                          ]
+                        },
+                        {
+                          "@number": 0
+                        },
+                        {
+                          "@number": 0
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "@function": {
+                  "@name": "add_fx",
+                  "@args": [
+                    {
+                      "@identifier": "drive"
+                    },
+                    {
+                      "@function": {
+                        "@name": "random",
+                        "@args": [
+                          {
+                            "@number": 4
+                          },
+                          {
+                            "@number": 2
+                          },
+                          {
+                            "@number": 15
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
         }
       },
       {
         "@global": {
-          "@comment": "//silence"
+          "@comment": "// slowly rise the filter cutoff frequency"
+        }
+      },
+      {
+        "@object": {
+          "@set": {
+            "@name": "syn",
+            "@functions": [
+              {
+                "@function": {
+                  "@name": "add_fx",
+                  "@args": [
+                    {
+                      "@identifier": "filter"
+                    },
+                    {
+                      "@identifier": "low"
+                    },
+                    {
+                      "@function": {
+                        "@name": "spread",
+                        "@args": [
+                          {
+                            "@number": 32
+                          },
+                          {
+                            "@number": 200
+                          },
+                          {
+                            "@number": 3500
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "@number": 0.6
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "@global": {
+          "@comment": "// change delaytimes every 16 notes"
+        }
+      },
+      {
+        "@object": {
+          "@set": {
+            "@name": "syn",
+            "@functions": [
+              {
+                "@function": {
+                  "@name": "add_fx",
+                  "@args": [
+                    {
+                      "@identifier": "delay"
+                    },
+                    {
+                      "@function": {
+                        "@name": "repeat",
+                        "@args": [
+                          {
+                            "@array": [
+                              {
+                                "@division": "1/32"
+                              },
+                              {
+                                "@division": "3/16"
+                              }
+                            ]
+                          },
+                          {
+                            "@number": 16
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "@division": "1/8"
+                    },
+                    {
+                      "@number": 0.8
+                    }
+                  ]
+                }
+              }
+            ]
+          }
         }
       }
     ]

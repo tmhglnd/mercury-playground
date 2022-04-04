@@ -55,7 +55,7 @@ async function code({ file, engine }){
 		'crossFade' : (args) => {
 			// set crossFade time in ms
 			crossFade = Number(args[0])/1000;
-			// log(`set crossfade time to ${args[0]} ms`);
+			log(`crossfade time is ${args[0]}ms`);
 		},
 		'tempo' : (args) => {
 			engine.setBPM(...args);
@@ -111,7 +111,7 @@ async function code({ file, engine }){
 	sounds = [];
 
 	const objectMap = {
-		'sample' : (obj) => {
+		'sample' : async (obj) => {
 			// console.log('make sample', obj);
 			let type = obj.type;
 			let args = obj.functions;			
@@ -128,7 +128,7 @@ async function code({ file, engine }){
 			});
 			return inst;
 		},
-		'loop' : (obj) => {
+		'loop' : async (obj) => {
 			// console.log('make sample', obj);
 			let type = obj.type;
 			let args = obj.functions;			
@@ -145,7 +145,7 @@ async function code({ file, engine }){
 			});
 			return inst;
 		},
-		'synth' : (obj) => {
+		'synth' : async (obj) => {
 			console.log('make synth', obj);
 			let type = obj.type;
 			let args = obj.functions;			
@@ -163,7 +163,7 @@ async function code({ file, engine }){
 			});
 			return inst;
 		},
-		'midi' : (obj) => {
+		'midi' : async (obj) => {
 			// console.log('make midi', obj);
 			let device = obj.type;
 			let args = obj.functions;
@@ -182,18 +182,15 @@ async function code({ file, engine }){
 		}
 	}
 
-	// let tmpS = [];
 	// handle .objects
-	Object.keys(tree.objects).forEach((o) => {
-		let type = tree.objects[o].object;
-		// if (globalMap[o])
-		// console.log('make instrument', o);
+	for (let o in tree.objects){
+		let type = tree.objects[o].object;;
 		if (objectMap[type]){
-			sounds.push(objectMap[type](tree.objects[o]));
+			sounds.push(await objectMap[type](tree.objects[o]));
 		} else {
 			log(`Instrument named '${type}' is not supported`);
 		}
-	});
+	}
 
 	sounds.map(async (s) => {
 		// start new loops;
@@ -201,6 +198,7 @@ async function code({ file, engine }){
 	});
 	console.log(`Made instruments in: ${((Tone.Transport.seconds - t) * 1000).toFixed(3)}ms`);
 
+	// when all loops started fade in the new sounds and fade out old
 	sounds.map(async (s) => {
 		// fade in new sounds;
 		s.fadeIn(crossFade);
@@ -211,6 +209,6 @@ async function code({ file, engine }){
 		s.fadeOut(crossFade);
 	});
 	// empty array to trigger garbage collection
-	_sounds = await [];
+	_sounds = [];
 }
 module.exports = code;

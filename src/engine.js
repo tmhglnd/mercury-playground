@@ -1,5 +1,18 @@
 const Tone = require('tone');
 
+// latency reduces cpu load
+// Tone.context.latencyHint = 'playback';
+Tone.context.lookAhead = 0.1;
+// Tone.context.updateInterval = 0.5;
+// Tone.context.samplerate = 44100;
+
+console.log('=> Engine settings:');
+console.log(`latency: ${Tone.getContext().lookAhead * 1000}ms`);
+console.log(`updateInterval: ${Tone.getContext().updateInterval * 1000}ms`);
+console.log(`latencyHint: ${Tone.getContext().latencyHint}`);
+console.log(`samplerate: ${Tone.getContext().sampleRate}Hz`);
+console.log(`PPQ: ${Tone.Transport.PPQ}`);
+
 // get the sample file paths from json
 console.log('loading sounds...');
 let samples = require('./data/samples.json');
@@ -23,10 +36,10 @@ function resume(){
 		Tone.start();
 
 		if (Tone.Transport.state !== 'started'){
-			Tone.Transport.start();
-			
 			Tone.Transport.timeSignature = [4, 4];
 			// Tone.Transport.swing = 0.5;
+			// a bit of latency for safety
+			Tone.Transport.start('+0.25');
 
 			Tone.getDestination().volume.rampTo(0, 0.01);
 			console.log("Resumed Transport");

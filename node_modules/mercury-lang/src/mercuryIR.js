@@ -80,7 +80,7 @@ function keywordBindings(dict, obj){
 }
 
 // code accepted global parameters
-const globals = 'tempo signature amp scale root randomSeed highPass lowPass silence sound'.split(' ');
+const globals = 'tempo signature amp scale root randomSeed highPass lowPass silence sound crossFade'.split(' ');
 
 // code defaults
 let code = {
