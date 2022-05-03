@@ -16,9 +16,9 @@ const objects = {
 		'type' : 'saw',
 		'functions' : {
 			'group' : [],
-			'time' : [ '1', 0 ],
+			'time' : [ '1/1', 0 ],
 			'note' : [ 0, 0 ],
-			'env' : [ 5, 500 ],
+			'env' : [ 1, 250 ],
 			'beat' : [ 1 ],
 			'amp' : [ 0.7 ],
 			'wave2' : [ 'saw', 0 ],
@@ -30,7 +30,7 @@ const objects = {
 		'type' : 'kick_909',
 		'functions' : {
 			'group' : [],
-			'time' : [ '1', 0 ],
+			'time' : [ '1/1', 0 ],
 			'speed' : [ 1 ],
 			// 'note' : [ 0, 0 ],
 			'env' : [ -1 ],
@@ -45,7 +45,7 @@ const objects = {
 		'type' : 'amen',
 		'functions' : {
 			'group' : [],
-			'time' : [ '1', 0 ],
+			'time' : [ '1/1', 0 ],
 			'speed' : [ 1 ],
 			// 'note' : [ 0, 0 ],
 			'env' : [ -1 ],

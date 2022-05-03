@@ -10,4 +10,4 @@ new synth saw time(1/8) play(myBeat) name(s1)
 	give s1 fx(reverb 0.9 7) fx(drive drives)
 	give s1 note([c3 gb3])
 
-list notes random 16 0 12)
+// list notes random 16 0 12)
