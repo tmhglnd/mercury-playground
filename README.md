@@ -90,7 +90,7 @@ ring melody lace(melody melody)
 new synth triangle time(1/16) note(melody 1) shape(1 80) play(rhythm)
 ```
 
-Design sounds with various effects
+Design sounds with various effects (and upload your own sounds to use)
 
 ```java
 new sample chimes time(2) speed(-0.25) fx(reverb 0.3 15) fx(drive 10) fx(shift 3 0.5)
@@ -123,6 +123,13 @@ new midi "Your Awesome Midi Device" time(1/16) note(7 1) name(mDev)
     set mDev cc(10 [20 50 100])
 ```
 
+Sequence Hyrda visuals with instruments (experimental)
+
+```java
+list hydras ['osc(10,0.1,2).out()' 'osc(20,-0.5,5).out()' 'osc(5,1,12).out()']
+
+new sample kick_min time(1/16) play([1 0 0 1 0]) visual(hydras)
+```
 <!-- 
 Control other environments via OSC-messages
 
