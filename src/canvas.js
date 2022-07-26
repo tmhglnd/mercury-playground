@@ -33,7 +33,7 @@ let hydraCanvas = function(c, u) {
 
 		// not displaying the canvas when no visuals are rendered
 		let text = document.getElementById('hydra-code');
-		text.value = '<paste hydra url>'
+		text.value = '<paste hydra>'
 		this.canvas.style.display = 'none';
 	}
 
@@ -49,11 +49,13 @@ let hydraCanvas = function(c, u) {
 			this.canvas.style.display = 'inline';
 		} catch (err) {
 			try {
+				console.log(code);
 				eval(code);
 				this.engine.start();
 				this.canvas.style.display = 'inline';
 			} catch (err) {
 				console.log('Not a valid Hydra url-code');
+				console.log(err);
 				this.clear();
 			}
 		}
@@ -65,7 +67,7 @@ let hydraCanvas = function(c, u) {
 
 		let text = document.createElement('textarea');
 		text.id = 'hydra-code';
-		text.value = '<paste hydra url>'
+		text.value = '<paste hydra>'
 		text.onchange = () => { this.eval(text.value) };
 
 		let btn = document.createElement('button');
@@ -82,66 +84,78 @@ let hydraCanvas = function(c, u) {
 	}).start()
 }
 
-/*// p5 Canvas
-const p5Canvas = (p5, id) => {
-	// video variables
-	let capture;
+// p5 Canvas
+const p5Canvas = function(c) {
+	this.div = document.getElementById(c);
+	this.div.style.display = 'none';
 
-	let constraints = {
-		audio: false,
-		video: {
-			facingMode: {
-				exact: 'user'
-				// exact: 'environment'
-			},
-			// mandatory: {
-				// 	minWidth: 1280,
-				// 	minHeight: 720
-				// },
-			// optional: [{ 
-			// 	maxFrameRate: 60,
-			// }]
+	this.display = function(d) {
+		this.div.style.display = 'inline';
+		// this.sketch.loop();
+	}
+
+	this.hide = function() {
+		this.div.style.display = 'none';
+		// this.sketch.noLoop();
+	}
+
+	this.sketch = new p5((p) => {
+		p.WRAP = true;
+		p.values = [];
+
+		p.setup = (id) => {
+			console.log('=> P5.js initialized');
+			let cnv = p.createCanvas(p.windowWidth, p.windowHeight);
+			cnv.parent(id);
+			p.noLoop();
 		}
-	};
-	// this.cam = this.constraints;
-	let cam = 'VIDEO'; //enable while debugging
-
-	p5.setup = (id) => {
-		console.log('=> P5.js initialized');
-		let cnv = p5.createCanvas(p5.windowWidth, p5.windowHeight);
-		cnv.parent(id);
-
-		capture = p5.createCapture(cam);
-		capture.hide();
-	}
-
-	p5.windowResized = () => {
-		p5.resizeCanvas(p5.windowWidth, p5.windowHeight);
-		
-		capture = p5.createCapture(cam);
-		capture.hide();
-	}
-
-	p5.draw = () => {
-		// p5.background(20, 70, 90);
-		p5.background(0);
-		p5.translate(p5.width/2, p5.height/2);
-
-		let w;
-		let h;
-
-		let aspect = p5.width / p5.height;
-
-		if (aspect < capture.width / capture.height){
-			w = p5.height * capture.width / capture.height;
-			h = p5.height;
-		} else {
-			w = p5.width;
-			h = p5.width * capture.height / capture.width;
+	
+		p.windowResized = () => {
+			p.resizeCanvas(p.windowWidth, p.windowHeight);
+			p.fillCanvas(p.values);
 		}
-		p5.image(capture, -w/2, -h/2, w, h);
-	}
+
+		p.fillCanvas = (a) => {
+			p.values = a;
+
+			let l = a.length;
+			if (l > 0){
+				p.background(0);
+
+				let w = Math.ceil(Math.sqrt(l*p.width/p.height));
+				let h = Math.ceil(l / w);
+
+				for (let i=0; i<l; i++){
+					let r1 = p.width/w;
+					let r2 = p.height/h;
+
+					p.noStroke();
+					let v = p.values[i];
+
+					if (Array.isArray(v)){
+						p.colorMode(p.RGB)
+						p.fill(v[0], v[1], v[2]);
+					} else {
+						p.fill(v);
+					}
+
+					if (p.WRAP){
+						let x = i % w;
+						let y = Math.floor(i / w);
+	
+						p.rect(x*r1-0.5, y*r2-0.5, r1+1, r2+1);
+					} else {
+						p.rect(i*p.width/l, 0, p.width/l+0.5, p.height); 
+					}
+				}
+			}
+		}
+	
+		p.draw = () => {
+			// p.background(0);
+		}
+	}, c);
+	// bind the listview to the global window for use in Hydra
+	window.listView = this.sketch.canvas;
 }
-module.export = p5Canvas;
-*/
-module.exports = { hydraCanvas };
+module.exports = { hydraCanvas, p5Canvas };

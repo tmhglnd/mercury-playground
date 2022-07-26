@@ -1,4 +1,5 @@
 const Tone = require('tone');
+const Util = require('total-serialism').Utility;
 const TL = require('total-serialism').Translate;
 const Mercury = require('mercury-lang');
 const MonoSample = require('./core/MonoSample.js');
@@ -14,7 +15,7 @@ let sounds = [];
 
 // parse and evaluate the inputted code
 // as an asyncronous function with promise
-async function code({ file, engine, canvas }){
+async function code({ file, engine, canvas, p5canvas }){
 	console.log('Evaluating');
 	let c = file;
 
@@ -38,15 +39,25 @@ async function code({ file, engine, canvas }){
 	errors.forEach((e) => {
 		log(e);
 	});
+	if (errors.length > 0){
+		// return if the code contains any syntax errors
+		log(`Could not run because of syntax error`);
+		return;
+	}
+
 	tree.print.forEach((p) => {
 		log(p);
 	});
 
-	if (errors.length > 0){
-		// return if the code contains any syntax errors
-		log(`Code not executed because of syntax error`);
-		return;
-	}
+	// hide canvas and noLoop
+	p5canvas.hide();
+	// handle .display to p5
+	tree.display.forEach((p) => {
+		// restart canvas if view is used
+		let n = Util.mul(Util.normalize(p), 255);
+		p5canvas.sketch.fillCanvas(n);
+		p5canvas.display();
+	});
 
 	// set timer to check 
 	t = Tone.Transport.seconds;

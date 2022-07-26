@@ -21883,7 +21883,8 @@ const lexer = moo.compile({
 						list: ['ring', 'array', 'list'],
 						newObject: ['new', 'make'],
 						setObject: ['set', 'apply', 'give'],
-						print: ['print', 'post', 'log']
+						print: ['print', 'post', 'log'],
+						display: ['display', 'view']
 						// global: ['silence']
 					})
 				},
@@ -21947,6 +21948,7 @@ var grammar = {
         } },
     {"name": "globalStatement", "symbols": [(lexer.has("comment") ? {type: "comment"} : comment)], "postprocess": (d) => { return { "@comment" : d[0].value }}},
     {"name": "globalStatement", "symbols": [(lexer.has("print") ? {type: "print"} : print), "objExpression"], "postprocess": (d) => { return { "@print" : d[1] }}},
+    {"name": "globalStatement", "symbols": [(lexer.has("display") ? {type: "display"} : display), "objExpression"], "postprocess": (d) => { return { "@display" : d[1] }}},
     {"name": "globalStatement", "symbols": ["name"], "postprocess": (d) => { return { "@settings" : d[0] }}},
     {"name": "objExpression", "symbols": ["paramElement"], "postprocess": (d) => [d[0]]},
     {"name": "objExpression", "symbols": ["paramElement", "objExpression"], "postprocess": (d) => [d[0], d[1]].flat(Infinity)},
@@ -22190,6 +22192,7 @@ let code = {
 		'all' : []
 	},
 	'print' : [],
+	'display' : [],
 	'comments' : [],
 	'errors' : []
 }
@@ -22232,6 +22235,10 @@ function traverseTree(tree, code, level, obj){
 					ccode.print.push(p);
 				});
 			});
+			return ccode;
+		},
+		'@display' : (el, ccode) => {
+			ccode.display.push(traverseTree(el, ccode));
 			return ccode;
 		},
 		'@settings' : (el, ccode) => {
@@ -32604,7 +32611,7 @@ let hydraCanvas = function(c, u) {
 
 		// not displaying the canvas when no visuals are rendered
 		let text = document.getElementById('hydra-code');
-		text.value = '<paste hydra url>'
+		text.value = '<paste hydra>'
 		this.canvas.style.display = 'none';
 	}
 
@@ -32620,11 +32627,13 @@ let hydraCanvas = function(c, u) {
 			this.canvas.style.display = 'inline';
 		} catch (err) {
 			try {
+				console.log(code);
 				eval(code);
 				this.engine.start();
 				this.canvas.style.display = 'inline';
 			} catch (err) {
 				console.log('Not a valid Hydra url-code');
+				console.log(err);
 				this.clear();
 			}
 		}
@@ -32636,7 +32645,7 @@ let hydraCanvas = function(c, u) {
 
 		let text = document.createElement('textarea');
 		text.id = 'hydra-code';
-		text.value = '<paste hydra url>'
+		text.value = '<paste hydra>'
 		text.onchange = () => { this.eval(text.value) };
 
 		let btn = document.createElement('button');
@@ -32653,69 +32662,81 @@ let hydraCanvas = function(c, u) {
 	}).start()
 }
 
-/*// p5 Canvas
-const p5Canvas = (p5, id) => {
-	// video variables
-	let capture;
+// p5 Canvas
+const p5Canvas = function(c) {
+	this.div = document.getElementById(c);
+	this.div.style.display = 'none';
 
-	let constraints = {
-		audio: false,
-		video: {
-			facingMode: {
-				exact: 'user'
-				// exact: 'environment'
-			},
-			// mandatory: {
-				// 	minWidth: 1280,
-				// 	minHeight: 720
-				// },
-			// optional: [{ 
-			// 	maxFrameRate: 60,
-			// }]
+	this.display = function(d) {
+		this.div.style.display = 'inline';
+		// this.sketch.loop();
+	}
+
+	this.hide = function() {
+		this.div.style.display = 'none';
+		// this.sketch.noLoop();
+	}
+
+	this.sketch = new p5((p) => {
+		p.WRAP = true;
+		p.values = [];
+
+		p.setup = (id) => {
+			console.log('=> P5.js initialized');
+			let cnv = p.createCanvas(p.windowWidth, p.windowHeight);
+			cnv.parent(id);
+			p.noLoop();
 		}
-	};
-	// this.cam = this.constraints;
-	let cam = 'VIDEO'; //enable while debugging
-
-	p5.setup = (id) => {
-		console.log('=> P5.js initialized');
-		let cnv = p5.createCanvas(p5.windowWidth, p5.windowHeight);
-		cnv.parent(id);
-
-		capture = p5.createCapture(cam);
-		capture.hide();
-	}
-
-	p5.windowResized = () => {
-		p5.resizeCanvas(p5.windowWidth, p5.windowHeight);
-		
-		capture = p5.createCapture(cam);
-		capture.hide();
-	}
-
-	p5.draw = () => {
-		// p5.background(20, 70, 90);
-		p5.background(0);
-		p5.translate(p5.width/2, p5.height/2);
-
-		let w;
-		let h;
-
-		let aspect = p5.width / p5.height;
-
-		if (aspect < capture.width / capture.height){
-			w = p5.height * capture.width / capture.height;
-			h = p5.height;
-		} else {
-			w = p5.width;
-			h = p5.width * capture.height / capture.width;
+	
+		p.windowResized = () => {
+			p.resizeCanvas(p.windowWidth, p.windowHeight);
+			p.fillCanvas(p.values);
 		}
-		p5.image(capture, -w/2, -h/2, w, h);
-	}
+
+		p.fillCanvas = (a) => {
+			p.values = a;
+
+			let l = a.length;
+			if (l > 0){
+				p.background(0);
+
+				let w = Math.ceil(Math.sqrt(l*p.width/p.height));
+				let h = Math.ceil(l / w);
+
+				for (let i=0; i<l; i++){
+					let r1 = p.width/w;
+					let r2 = p.height/h;
+
+					p.noStroke();
+					let v = p.values[i];
+
+					if (Array.isArray(v)){
+						p.colorMode(p.RGB)
+						p.fill(v[0], v[1], v[2]);
+					} else {
+						p.fill(v);
+					}
+
+					if (p.WRAP){
+						let x = i % w;
+						let y = Math.floor(i / w);
+	
+						p.rect(x*r1-0.5, y*r2-0.5, r1+1, r2+1);
+					} else {
+						p.rect(i*p.width/l, 0, p.width/l+0.5, p.height); 
+					}
+				}
+			}
+		}
+	
+		p.draw = () => {
+			// p.background(0);
+		}
+	}, c);
+	// bind the listview to the global window for use in Hydra
+	window.listView = this.sketch.canvas;
 }
-module.export = p5Canvas;
-*/
-module.exports = { hydraCanvas };
+module.exports = { hydraCanvas, p5Canvas };
 },{"hydra-synth":32,"raf-loop":65}],90:[function(require,module,exports){
 const Tone = require('tone');
 const Util = require('./Util.js');
@@ -34515,7 +34536,10 @@ module.exports={
   "503-midi-channel": "// === TUTORIAL 32 ===\n// We can change the midi-channel with the out() method\n\nnew midi default time(1/8) note(0 0) out(10)\n// channel 10 is the default drum channel in general midi\n",
   "504-midi-chord": "// === TUTORIAL 33 ===\n// By setting the chord() method to 'on' we can output\n// multiple notes at the same time to create a chord\n\nnew midi default time(1) note([[0 3 7 11]] 2) chord(on)\n// here the chord is created by making a list on the first\n// place within another list (otherwise the notes would be \n// played in order over time)",
   "505-midi-control": "// === TUTORIAL 34 ===\n// With the cc() method we can send control change messages\n// to the same device, to control other parameters\n// Add multiple cc() methods to make different messages\n\nnew midi default time(1/16) note(0 0) name(myMidi)\n\tset myMidi cc(10 [50 100]) cc(20 random(4 0 127))\n// Above are two cc() methods, one to control number 10, and \n// one to 20, both with different values to change. ",
-  "601-hydra-visuals": "// === TUTORIAL 601: Hydra Visuals ===\n// We can store hydra sketches as a string in a list\n// By creating a list of multiple sketches the instrument\n// will cycle through them for every trigger\n\nlist hydras ['osc(10,0.1,2).out()' 'osc(20,-0.5,5).out()' 'osc(5,1,12).out()']\n\nnew sample kick_min time(1/16) play([1 0 0 1 0]) visual(hydras)"
+  "601-hydra-visuals": "// === TUTORIAL 601: Hydra Visuals ===\n// We can store hydra sketches as a string in a list\n// By creating a list of multiple sketches the instrument\n// will cycle through them for every trigger\n\nlist hydras ['osc(10,0.1,2).out()' 'osc(20,-0.5,5).out()' 'osc(5,1,12).out()']\n\nnew sample kick_min time(1/16) play([1 0 0 1 0]) visual(hydras)",
+  "602-view-list": "// === TUTORIAL 602: View List ===\n// It is possible to view the content of a list in a\n// visual manner. By using 'view' the list will be \n// normalized (0-1) and displayed as grayscale values\n// across the screen. The length of the list will\n// determine the amount of squares displayed\n\nlist myVals mod(repeat(palin(spreadF(46 1 0)) 3) 0.15)\n\nview myVals\n",
+  "603-view-list-rgb": "// === TUTORIAL 603: View List RGB ===\n// If you merge() three lists you can display Red,\n// Green and Blue values seperately. Make sure the lists\n// have the same length in order to fill all pixels equally\n// All lists are normalized together, so if one list has very large\n// numbers, the other lists will become very dark\n\nlist cos mod(cosine(3034 50 0 7) 3)\nlist sin mod(sine(3034 40 0 7) 3)\nlist cos2 mod(cosine(3034 20 0 20) 3)\n\nview merge(cos sin cos2)",
+  "604-view-with-hydra": "// === TUTORIAL 604: View & Hydra ===\n// You can access the canvas of the displayed list by\n// initializing a hydra source: s0.init({src: listView})\n\nlist cos mod(cosine(2000 60 20) 2)\nview cos\n\nlist hydraVisual ['s0.init({src: listView}); src(s0).modulate(noise([2,5,10]), [0.05, 0.1]).out()']\nnew sample hat_909 time(1/4) visual(hydraVisual)\n"
 }
 
 },{}],101:[function(require,module,exports){
@@ -34559,9 +34583,9 @@ CodeMirror.defineSimpleMode("mercury", {
 		// string
 		{ regex: /["'`](?:\\["\\]|[^\n"'``])*["'`]/, token: "string" },
 		// keywords
-		{ regex: /(?:new |make |add |ring |list |array |set |apply |give )\b/, token: "keyword", next: "object" },
+		{ regex: /(?:new|make|ring|list|array|set|apply|give)\b/, token: "keyword", next: "object" },
 		// global
-		{ regex: /(?:print|post|log|audio|record|silence|mute|killAll|default)\b/, token: "variable-2" },
+		{ regex: /(?:print|post|log|display|view|audio|record|silence|mute|killAll|default)\b/, token: "operator" },
 		// numbers
 		{ regex: /0x[a-f\d]+|[-+]?(?:\.\d+|\d+\.?\d*)(?:e[-+]?\d+)?/i, token: "number" },
 		// comments
@@ -34581,7 +34605,7 @@ CodeMirror.defineSimpleMode("mercury", {
 	]
 });
 
-const Editor = function({ context, engine, canvas }) {
+const Editor = function({ context, engine, canvas, p5canvas }) {
 	// this._engine = engine;
 	console.log('=> Created Editor()');
 
@@ -34614,7 +34638,7 @@ const Editor = function({ context, engine, canvas }) {
 			'Alt-/': 'toggleComment',
 			'Alt-Enter': () => { this.evaluate() },
 			'Alt-.': () => { this.silence() },
-			'Tab': 'insertSoftTab',
+			'Tab': 'insertSoftTab'
 		}
 	}
 
@@ -34651,7 +34675,7 @@ const Editor = function({ context, engine, canvas }) {
 		this.flash();
 
 		// console.log('evaluating code...');
-		await code({ file: this.cm.getValue(), engine: engine, canvas: canvas });
+		await code({ file: this.cm.getValue(), engine: engine, canvas: canvas, p5canvas: p5canvas });
 		await engine.resume();
 	}
 
@@ -35089,13 +35113,14 @@ window.onload = () => {
 	Engine.randomBPM();
 
 	// Hydra sketch background loader
-	// let sketchP5 = new p5(Canvas.p5Canvas, document.getElementById('p5-canvas'));
 	const Hydra = new Canvas.hydraCanvas('hydra-canvas');
+	// const sketchP5 = new p5(Canvas.p5Canvas, 'p5-canvas');
+	const sketchP5 = new Canvas.p5Canvas('p5-canvas');
 
 	// the code Editor
 	// also loads the parser and the worker
 	// gets passed the Tone context and Engine
-	let cm = new Editor({ context: Tone, engine: Engine, canvas: Hydra });
+	let cm = new Editor({ context: Tone, engine: Engine, canvas: Hydra, p5canvas: sketchP5 });
 
 	// Load all the buttons/menus
 	cm.controls();
@@ -35105,11 +35130,11 @@ window.onload = () => {
 	cm.tutorialMenu();
 	cm.clear();
 	
-
 	Hydra.link('hydra-ui');
 }
 },{"./canvas.js":89,"./editor.js":101,"./engine.js":102,"tone":77,"webmidi":88}],104:[function(require,module,exports){
 const Tone = require('tone');
+const Util = require('total-serialism').Utility;
 const TL = require('total-serialism').Translate;
 const Mercury = require('mercury-lang');
 const MonoSample = require('./core/MonoSample.js');
@@ -35125,7 +35150,7 @@ let sounds = [];
 
 // parse and evaluate the inputted code
 // as an asyncronous function with promise
-async function code({ file, engine, canvas }){
+async function code({ file, engine, canvas, p5canvas }){
 	console.log('Evaluating');
 	let c = file;
 
@@ -35149,15 +35174,25 @@ async function code({ file, engine, canvas }){
 	errors.forEach((e) => {
 		log(e);
 	});
+	if (errors.length > 0){
+		// return if the code contains any syntax errors
+		log(`Could not run because of syntax error`);
+		return;
+	}
+
 	tree.print.forEach((p) => {
 		log(p);
 	});
 
-	if (errors.length > 0){
-		// return if the code contains any syntax errors
-		log(`Code not executed because of syntax error`);
-		return;
-	}
+	// hide canvas and noLoop
+	p5canvas.hide();
+	// handle .display to p5
+	tree.display.forEach((p) => {
+		// restart canvas if view is used
+		let n = Util.mul(Util.normalize(p), 255);
+		p5canvas.sketch.fillCanvas(n);
+		p5canvas.display();
+	});
 
 	// set timer to check 
 	t = Tone.Transport.seconds;

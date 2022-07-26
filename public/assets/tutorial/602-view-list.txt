@@ -1,0 +1,10 @@
+// === TUTORIAL 602: View List ===
+// It is possible to view the content of a list in a
+// visual manner. By using 'view' the list will be 
+// normalized (0-1) and displayed as grayscale values
+// across the screen. The length of the list will
+// determine the amount of squares displayed
+
+list myVals mod(repeat(palin(spreadF(46 1 0)) 3) 0.15)
+
+view myVals
