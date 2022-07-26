@@ -40,7 +40,7 @@ CodeMirror.defineSimpleMode("mercury", {
 		// keywords
 		{ regex: /(?:new|make|ring|list|array|set|apply|give)\b/, token: "keyword", next: "object" },
 		// global
-		{ regex: /(?:print|post|log|audio|record|silence|mute|killAll|default)\b/, token: "operator" },
+		{ regex: /(?:print|post|log|display|view|audio|record|silence|mute|killAll|default)\b/, token: "operator" },
 		// numbers
 		{ regex: /0x[a-f\d]+|[-+]?(?:\.\d+|\d+\.?\d*)(?:e[-+]?\d+)?/i, token: "number" },
 		// comments

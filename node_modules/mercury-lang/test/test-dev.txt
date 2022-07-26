@@ -1,9 +1,23 @@
 
-// new sample kick name(myKick) 
-new sample kick gain(randomFloat(5 0 1))
-set all play(clave(8))
+list vals random(4 0 12)
+
+print vals
+
+display [1 2 3]
+display 'hello world'
+
+print reverse(vals)
+
+new sample kick name(myKick) 
+
+display vals
+display shuffle(vals)
+
+// new sample kick gain(randomFloat(5 0 1))
+// set all play(clave(8))
 // set myKick shape(1/8 5/4)
 // new sample kick name(myKick) time(1/16) play([1 0 1 1 0]) gain(0.3) 
 // list myList join(coin(8) spread(5) random(5 20 100) choose(4 [100 200 300]))
 // set volume join(randomFloat(1 0.1 1.5) random(1 50 5000))
 // print join(coin(8) spread(5) random(5 20 100) choose(4 [100 200 300]))
+// list a1 [0 1 2 3]

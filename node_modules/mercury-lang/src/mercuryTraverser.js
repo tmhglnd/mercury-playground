@@ -40,6 +40,7 @@ let code = {
 		'all' : []
 	},
 	'print' : [],
+	'display' : [],
 	'comments' : [],
 	'errors' : []
 }
@@ -82,6 +83,10 @@ function traverseTree(tree, code, level, obj){
 					ccode.print.push(p);
 				});
 			});
+			return ccode;
+		},
+		'@display' : (el, ccode) => {
+			ccode.display.push(traverseTree(el, ccode));
 			return ccode;
 		},
 		'@settings' : (el, ccode) => {

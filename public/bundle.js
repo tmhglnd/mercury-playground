@@ -21883,7 +21883,8 @@ const lexer = moo.compile({
 						list: ['ring', 'array', 'list'],
 						newObject: ['new', 'make'],
 						setObject: ['set', 'apply', 'give'],
-						print: ['print', 'post', 'log']
+						print: ['print', 'post', 'log'],
+						display: ['display', 'view']
 						// global: ['silence']
 					})
 				},
@@ -21947,6 +21948,7 @@ var grammar = {
         } },
     {"name": "globalStatement", "symbols": [(lexer.has("comment") ? {type: "comment"} : comment)], "postprocess": (d) => { return { "@comment" : d[0].value }}},
     {"name": "globalStatement", "symbols": [(lexer.has("print") ? {type: "print"} : print), "objExpression"], "postprocess": (d) => { return { "@print" : d[1] }}},
+    {"name": "globalStatement", "symbols": [(lexer.has("display") ? {type: "display"} : display), "objExpression"], "postprocess": (d) => { return { "@display" : d[1] }}},
     {"name": "globalStatement", "symbols": ["name"], "postprocess": (d) => { return { "@settings" : d[0] }}},
     {"name": "objExpression", "symbols": ["paramElement"], "postprocess": (d) => [d[0]]},
     {"name": "objExpression", "symbols": ["paramElement", "objExpression"], "postprocess": (d) => [d[0], d[1]].flat(Infinity)},
@@ -22190,6 +22192,7 @@ let code = {
 		'all' : []
 	},
 	'print' : [],
+	'display' : [],
 	'comments' : [],
 	'errors' : []
 }
@@ -22232,6 +22235,10 @@ function traverseTree(tree, code, level, obj){
 					ccode.print.push(p);
 				});
 			});
+			return ccode;
+		},
+		'@display' : (el, ccode) => {
+			ccode.display.push(traverseTree(el, ccode));
 			return ccode;
 		},
 		'@settings' : (el, ccode) => {
@@ -34580,7 +34587,7 @@ CodeMirror.defineSimpleMode("mercury", {
 		// keywords
 		{ regex: /(?:new|make|ring|list|array|set|apply|give)\b/, token: "keyword", next: "object" },
 		// global
-		{ regex: /(?:print|post|log|audio|record|silence|mute|killAll|default)\b/, token: "operator" },
+		{ regex: /(?:print|post|log|display|view|audio|record|silence|mute|killAll|default)\b/, token: "operator" },
 		// numbers
 		{ regex: /0x[a-f\d]+|[-+]?(?:\.\d+|\d+\.?\d*)(?:e[-+]?\d+)?/i, token: "number" },
 		// comments
@@ -35162,7 +35169,7 @@ async function code({ file, engine, canvas, p5canvas }){
 
 	let tree = parse.parseTree;
 	let errors = parse.errors;
-	let variables = tree.variables;
+	// let variables = tree.variables;
 	
 	console.log('ParseTree', tree);
 	console.log('Errors', errors);
@@ -35176,15 +35183,12 @@ async function code({ file, engine, canvas, p5canvas }){
 	tree.print.forEach((p) => {
 		log(p);
 	});
-
-	Object.keys(variables).forEach((v) => {
-		console.log(v);
-		if (v === 'displayList'){
-			let n = Util.mul(Util.normalize(variables[v]), 255);
-			p5canvas.sketch.fillCanvas(n);
-			p5canvas.display();
-		}
-	})
+	// handle .display to p5
+	tree.display.forEach((p) => {
+		let n = Util.mul(Util.normalize(p), 255);
+		p5canvas.sketch.fillCanvas(n);
+		p5canvas.display();
+	});
 
 	if (errors.length > 0){
 		// return if the code contains any syntax errors

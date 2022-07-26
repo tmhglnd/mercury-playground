@@ -32,7 +32,7 @@ async function code({ file, engine, canvas, p5canvas }){
 
 	let tree = parse.parseTree;
 	let errors = parse.errors;
-	let variables = tree.variables;
+	// let variables = tree.variables;
 	
 	console.log('ParseTree', tree);
 	console.log('Errors', errors);
@@ -46,15 +46,12 @@ async function code({ file, engine, canvas, p5canvas }){
 	tree.print.forEach((p) => {
 		log(p);
 	});
-
-	Object.keys(variables).forEach((v) => {
-		console.log(v);
-		if (v === 'displayList'){
-			let n = Util.mul(Util.normalize(variables[v]), 255);
-			p5canvas.sketch.fillCanvas(n);
-			p5canvas.display();
-		}
-	})
+	// handle .display to p5
+	tree.display.forEach((p) => {
+		let n = Util.mul(Util.normalize(p), 255);
+		p5canvas.sketch.fillCanvas(n);
+		p5canvas.display();
+	});
 
 	if (errors.length > 0){
 		// return if the code contains any syntax errors
