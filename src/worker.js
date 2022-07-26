@@ -16,9 +16,6 @@ let sounds = [];
 // parse and evaluate the inputted code
 // as an asyncronous function with promise
 async function code({ file, engine, canvas, p5canvas }){
-	// hide canvas and noLoop
-	p5canvas.hide();
-
 	console.log('Evaluating');
 	let c = file;
 
@@ -32,7 +29,6 @@ async function code({ file, engine, canvas, p5canvas }){
 
 	let tree = parse.parseTree;
 	let errors = parse.errors;
-	// let variables = tree.variables;
 	
 	console.log('ParseTree', tree);
 	console.log('Errors', errors);
@@ -43,21 +39,25 @@ async function code({ file, engine, canvas, p5canvas }){
 	errors.forEach((e) => {
 		log(e);
 	});
+	if (errors.length > 0){
+		// return if the code contains any syntax errors
+		log(`Could not run because of syntax error`);
+		return;
+	}
+
 	tree.print.forEach((p) => {
 		log(p);
 	});
+
+	// hide canvas and noLoop
+	p5canvas.hide();
 	// handle .display to p5
 	tree.display.forEach((p) => {
+		// restart canvas if view is used
 		let n = Util.mul(Util.normalize(p), 255);
 		p5canvas.sketch.fillCanvas(n);
 		p5canvas.display();
 	});
-
-	if (errors.length > 0){
-		// return if the code contains any syntax errors
-		log(`Code not executed because of syntax error`);
-		return;
-	}
 
 	// set timer to check 
 	t = Tone.Transport.seconds;

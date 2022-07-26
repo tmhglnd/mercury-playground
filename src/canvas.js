@@ -102,17 +102,12 @@ const p5Canvas = function(c) {
 	this.sketch = new p5((p) => {
 		p.WRAP = true;
 		p.values = [];
-		// p.pg;
 
 		p.setup = (id) => {
 			console.log('=> P5.js initialized');
 			let cnv = p.createCanvas(p.windowWidth, p.windowHeight);
 			cnv.parent(id);
-			
-			// p.frameRate(5);
-			// p.pixelDensity(1);
 			p.noLoop();
-			// p.pg = p.createGraphics(1, 1);
 		}
 	
 		p.windowResized = () => {
@@ -126,7 +121,6 @@ const p5Canvas = function(c) {
 			let l = a.length;
 			if (l > 0){
 				p.background(0);
-				// p.pg = p.createGraphics(p.width, p.height);
 
 				let w = Math.ceil(Math.sqrt(l*p.width/p.height));
 				let h = Math.ceil(l / w);
@@ -139,7 +133,6 @@ const p5Canvas = function(c) {
 					let v = p.values[i];
 
 					if (Array.isArray(v)){
-						// console.log(v);
 						p.colorMode(p.RGB)
 						p.fill(v[0], v[1], v[2]);
 					} else {
@@ -160,12 +153,9 @@ const p5Canvas = function(c) {
 	
 		p.draw = () => {
 			// p.background(0);
-			// p.image(p.pg, 0, 0, p.width, p.height);
-			// p.texture(p.pg);
 		}
 	}, c);
-	// bind the listview p5 sketch to the global window for
-	// use in Hydra
+	// bind the listview to the global window for use in Hydra
 	window.listView = this.sketch.canvas;
 }
 module.exports = { hydraCanvas, p5Canvas };
