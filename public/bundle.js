@@ -32653,69 +32653,88 @@ let hydraCanvas = function(c, u) {
 	}).start()
 }
 
-/*// p5 Canvas
-const p5Canvas = (p5, id) => {
-	// video variables
-	let capture;
+// p5 Canvas
+const p5Canvas = function(c) {
+	this.canvas = document.getElementById(c);
+	this.canvas.style.display = 'none';
 
-	let constraints = {
-		audio: false,
-		video: {
-			facingMode: {
-				exact: 'user'
-				// exact: 'environment'
-			},
-			// mandatory: {
-				// 	minWidth: 1280,
-				// 	minHeight: 720
-				// },
-			// optional: [{ 
-			// 	maxFrameRate: 60,
-			// }]
+	this.display = function(d) {
+		this.canvas.style.display = 'inline';
+		this.sketch.loop();
+	}
+
+	this.hide = function() {
+		this.canvas.style.display = 'none';
+		this.sketch.noLoop();
+	}
+
+	this.sketch = new p5((p) => {
+		p.WRAP = true;
+		p.values = [];
+		// p.pg;
+
+		p.setup = (id) => {
+			console.log('=> P5.js initialized');
+			let cnv = p.createCanvas(p.windowWidth, p.windowHeight);
+			cnv.parent(id);
+			
+			// p.frameRate(5);
+			// p.pixelDensity(1);
+			p.noLoop();
+			// p.pg = p.createGraphics(1, 1);
 		}
-	};
-	// this.cam = this.constraints;
-	let cam = 'VIDEO'; //enable while debugging
-
-	p5.setup = (id) => {
-		console.log('=> P5.js initialized');
-		let cnv = p5.createCanvas(p5.windowWidth, p5.windowHeight);
-		cnv.parent(id);
-
-		capture = p5.createCapture(cam);
-		capture.hide();
-	}
-
-	p5.windowResized = () => {
-		p5.resizeCanvas(p5.windowWidth, p5.windowHeight);
-		
-		capture = p5.createCapture(cam);
-		capture.hide();
-	}
-
-	p5.draw = () => {
-		// p5.background(20, 70, 90);
-		p5.background(0);
-		p5.translate(p5.width/2, p5.height/2);
-
-		let w;
-		let h;
-
-		let aspect = p5.width / p5.height;
-
-		if (aspect < capture.width / capture.height){
-			w = p5.height * capture.width / capture.height;
-			h = p5.height;
-		} else {
-			w = p5.width;
-			h = p5.width * capture.height / capture.width;
+	
+		p.windowResized = () => {
+			p.resizeCanvas(p.windowWidth, p.windowHeight);
+			p.fillCanvas(p.values);
 		}
-		p5.image(capture, -w/2, -h/2, w, h);
-	}
+
+		p.fillCanvas = (a) => {
+			p.values = a;
+
+			let l = a.length;
+			if (l > 0){
+				p.background(0);
+				// p.pg = p.createGraphics(p.width, p.height);
+
+				let w = Math.ceil(Math.sqrt(l*p.width/p.height));
+				let h = Math.ceil(l / w);
+
+				for (let i=0; i<l; i++){
+					let r1 = p.width/w;
+					let r2 = p.height/h;
+
+					p.noStroke();
+					let v = p.values[i];
+
+					if (Array.isArray(v)){
+						// console.log(v);
+						p.colorMode(p.RGB)
+						p.fill(v[0], v[1], v[2]);
+					} else {
+						p.fill(v);
+					}
+
+					if (p.WRAP){
+						let x = i % w;
+						let y = Math.floor(i / w);
+	
+						p.rect(x*r1-0.5, y*r2-0.5, r1+1, r2+1);
+					} else {
+						p.rect(i*p.width/l, 0, p.width/l+0.5, p.height); 
+					}
+				}
+			}
+		}
+	
+		p.draw = () => {
+			// p.background(0);
+			// p.image(p.pg, 0, 0, p.width, p.height);
+			// p.texture(p.pg);
+		}
+	}, c);
 }
-module.export = p5Canvas;
-*/
-module.exports = { hydraCanvas };
+module.exports = { hydraCanvas, p5Canvas };
 },{"hydra-synth":32,"raf-loop":65}],90:[function(require,module,exports){
 const Tone = require('tone');
 const Util = require('./Util.js');
@@ -34559,9 +34578,9 @@ CodeMirror.defineSimpleMode("mercury", {
 		// string
 		{ regex: /["'`](?:\\["\\]|[^\n"'``])*["'`]/, token: "string" },
 		// keywords
-		{ regex: /(?:new |make |add |ring |list |array |set |apply |give )\b/, token: "keyword", next: "object" },
+		{ regex: /(?:new|make|ring|list|array|set|apply|give)\b/, token: "keyword", next: "object" },
 		// global
-		{ regex: /(?:print|post|log|audio|record|silence|mute|killAll|default)\b/, token: "variable-2" },
+		{ regex: /(?:print|post|log|audio|record|silence|mute|killAll|default)\b/, token: "operator" },
 		// numbers
 		{ regex: /0x[a-f\d]+|[-+]?(?:\.\d+|\d+\.?\d*)(?:e[-+]?\d+)?/i, token: "number" },
 		// comments
@@ -34581,7 +34600,7 @@ CodeMirror.defineSimpleMode("mercury", {
 	]
 });
 
-const Editor = function({ context, engine, canvas }) {
+const Editor = function({ context, engine, canvas, p5canvas }) {
 	// this._engine = engine;
 	console.log('=> Created Editor()');
 
@@ -34614,7 +34633,7 @@ const Editor = function({ context, engine, canvas }) {
 			'Alt-/': 'toggleComment',
 			'Alt-Enter': () => { this.evaluate() },
 			'Alt-.': () => { this.silence() },
-			'Tab': 'insertSoftTab',
+			'Tab': 'insertSoftTab'
 		}
 	}
 
@@ -34651,7 +34670,7 @@ const Editor = function({ context, engine, canvas }) {
 		this.flash();
 
 		// console.log('evaluating code...');
-		await code({ file: this.cm.getValue(), engine: engine, canvas: canvas });
+		await code({ file: this.cm.getValue(), engine: engine, canvas: canvas, p5canvas: p5canvas });
 		await engine.resume();
 	}
 
@@ -35089,13 +35108,14 @@ window.onload = () => {
 	Engine.randomBPM();
 
 	// Hydra sketch background loader
-	// let sketchP5 = new p5(Canvas.p5Canvas, document.getElementById('p5-canvas'));
 	const Hydra = new Canvas.hydraCanvas('hydra-canvas');
+	// const sketchP5 = new p5(Canvas.p5Canvas, 'p5-canvas');
+	const sketchP5 = new Canvas.p5Canvas('p5-canvas');
 
 	// the code Editor
 	// also loads the parser and the worker
 	// gets passed the Tone context and Engine
-	let cm = new Editor({ context: Tone, engine: Engine, canvas: Hydra });
+	let cm = new Editor({ context: Tone, engine: Engine, canvas: Hydra, p5canvas: sketchP5 });
 
 	// Load all the buttons/menus
 	cm.controls();
@@ -35105,11 +35125,11 @@ window.onload = () => {
 	cm.tutorialMenu();
 	cm.clear();
 	
-
 	Hydra.link('hydra-ui');
 }
 },{"./canvas.js":89,"./editor.js":101,"./engine.js":102,"tone":77,"webmidi":88}],104:[function(require,module,exports){
 const Tone = require('tone');
+const Util = require('total-serialism').Utility;
 const TL = require('total-serialism').Translate;
 const Mercury = require('mercury-lang');
 const MonoSample = require('./core/MonoSample.js');
@@ -35125,7 +35145,10 @@ let sounds = [];
 
 // parse and evaluate the inputted code
 // as an asyncronous function with promise
-async function code({ file, engine, canvas }){
+async function code({ file, engine, canvas, p5canvas }){
+	// hide canvas and noLoop
+	p5canvas.hide();
+
 	console.log('Evaluating');
 	let c = file;
 
@@ -35139,6 +35162,7 @@ async function code({ file, engine, canvas }){
 
 	let tree = parse.parseTree;
 	let errors = parse.errors;
+	let variables = tree.variables;
 	
 	console.log('ParseTree', tree);
 	console.log('Errors', errors);
@@ -35152,6 +35176,15 @@ async function code({ file, engine, canvas }){
 	tree.print.forEach((p) => {
 		log(p);
 	});
+
+	Object.keys(variables).forEach((v) => {
+		console.log(v);
+		if (v === 'displayList'){
+			let n = Util.mul(Util.normalize(variables[v]), 255);
+			p5canvas.sketch.fillCanvas(n);
+			p5canvas.display();
+		}
+	})
 
 	if (errors.length > 0){
 		// return if the code contains any syntax errors

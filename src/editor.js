@@ -38,9 +38,9 @@ CodeMirror.defineSimpleMode("mercury", {
 		// string
 		{ regex: /["'`](?:\\["\\]|[^\n"'``])*["'`]/, token: "string" },
 		// keywords
-		{ regex: /(?:new |make |add |ring |list |array |set |apply |give )\b/, token: "keyword", next: "object" },
+		{ regex: /(?:new|make|ring|list|array|set|apply|give)\b/, token: "keyword", next: "object" },
 		// global
-		{ regex: /(?:print|post|log|audio|record|silence|mute|killAll|default)\b/, token: "variable-2" },
+		{ regex: /(?:print|post|log|audio|record|silence|mute|killAll|default)\b/, token: "operator" },
 		// numbers
 		{ regex: /0x[a-f\d]+|[-+]?(?:\.\d+|\d+\.?\d*)(?:e[-+]?\d+)?/i, token: "number" },
 		// comments
@@ -60,7 +60,7 @@ CodeMirror.defineSimpleMode("mercury", {
 	]
 });
 
-const Editor = function({ context, engine, canvas }) {
+const Editor = function({ context, engine, canvas, p5canvas }) {
 	// this._engine = engine;
 	console.log('=> Created Editor()');
 
@@ -93,7 +93,7 @@ const Editor = function({ context, engine, canvas }) {
 			'Alt-/': 'toggleComment',
 			'Alt-Enter': () => { this.evaluate() },
 			'Alt-.': () => { this.silence() },
-			'Tab': 'insertSoftTab',
+			'Tab': 'insertSoftTab'
 		}
 	}
 
@@ -130,7 +130,7 @@ const Editor = function({ context, engine, canvas }) {
 		this.flash();
 
 		// console.log('evaluating code...');
-		await code({ file: this.cm.getValue(), engine: engine, canvas: canvas });
+		await code({ file: this.cm.getValue(), engine: engine, canvas: canvas, p5canvas: p5canvas });
 		await engine.resume();
 	}
 
