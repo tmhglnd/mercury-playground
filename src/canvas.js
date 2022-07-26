@@ -33,7 +33,7 @@ let hydraCanvas = function(c, u) {
 
 		// not displaying the canvas when no visuals are rendered
 		let text = document.getElementById('hydra-code');
-		text.value = '<paste hydra url>'
+		text.value = '<paste hydra>'
 		this.canvas.style.display = 'none';
 	}
 
@@ -49,11 +49,13 @@ let hydraCanvas = function(c, u) {
 			this.canvas.style.display = 'inline';
 		} catch (err) {
 			try {
+				console.log(code);
 				eval(code);
 				this.engine.start();
 				this.canvas.style.display = 'inline';
 			} catch (err) {
 				console.log('Not a valid Hydra url-code');
+				console.log(err);
 				this.clear();
 			}
 		}
@@ -65,7 +67,7 @@ let hydraCanvas = function(c, u) {
 
 		let text = document.createElement('textarea');
 		text.id = 'hydra-code';
-		text.value = '<paste hydra url>'
+		text.value = '<paste hydra>'
 		text.onchange = () => { this.eval(text.value) };
 
 		let btn = document.createElement('button');
@@ -84,17 +86,17 @@ let hydraCanvas = function(c, u) {
 
 // p5 Canvas
 const p5Canvas = function(c) {
-	this.canvas = document.getElementById(c);
-	this.canvas.style.display = 'none';
+	this.div = document.getElementById(c);
+	this.div.style.display = 'none';
 
 	this.display = function(d) {
-		this.canvas.style.display = 'inline';
-		this.sketch.loop();
+		this.div.style.display = 'inline';
+		// this.sketch.loop();
 	}
 
 	this.hide = function() {
-		this.canvas.style.display = 'none';
-		this.sketch.noLoop();
+		this.div.style.display = 'none';
+		// this.sketch.noLoop();
 	}
 
 	this.sketch = new p5((p) => {
@@ -162,5 +164,8 @@ const p5Canvas = function(c) {
 			// p.texture(p.pg);
 		}
 	}, c);
+	// bind the listview p5 sketch to the global window for
+	// use in Hydra
+	window.listView = this.sketch.canvas;
 }
 module.exports = { hydraCanvas, p5Canvas };
