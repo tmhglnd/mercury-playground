@@ -6,6 +6,7 @@ const MonoSample = require('./core/MonoSample.js');
 const MonoMidi = require('./core/MonoMidi.js');
 const MonoSynth = require('./core/MonoSynth.js');
 const PolyInstrument = require('./core/PolyInstrument.js');
+const Tempos = require('./data/genre-tempos.json');
 
 // fade time in seconds TODO: Make this adjustable with code/setting
 let crossFade = 1.5;
@@ -69,6 +70,15 @@ async function code({ file, engine, canvas, p5canvas }){
 			log(`crossfade time is ${args[0]}ms`);
 		},
 		'tempo' : (args) => {
+			let t = args[0];
+			if (isNaN(t)){
+				t = Tempos[args[0].toLowerCase()];
+				if (t === undefined){
+					log(`tempo ${args[0]} is not a valid genre or number`);
+					return;
+				}
+				args[0] = t;
+			}
 			engine.setBPM(...args);
 			// log(`set bpm to ${bpm}`);
 		}, 

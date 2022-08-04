@@ -34351,6 +34351,27 @@ module.exports={
 
 },{}],99:[function(require,module,exports){
 module.exports={
+	"uptempo" : 10,
+	"downtempo" : 10,
+	"reggae" : 70,
+	"rnb" : 80,
+	"hiphop" : 90,
+	"triphop" : 100,
+	"pop" : 110,
+	"funk" : 120,
+	"house" : 120,
+	"rock" : 130,
+	"techno" : 130,
+	"trance" : 135,
+	"acid" : 140,
+	"metal" : 140,
+	"hardstyle" : 150,
+	"jungle" : 160,
+	"dnb" : 170,
+	"neurofunk" : 180
+}
+},{}],100:[function(require,module,exports){
+module.exports={
   "noise_a": "assets/samples/noise/noise_a.wav",
   "drone_cymbal": "assets/samples/ambient/cymbal/drone_cymbal.wav",
   "drone_cymbal_01": "assets/samples/ambient/cymbal/drone_cymbal_01.wav",
@@ -34486,7 +34507,7 @@ module.exports={
   "pluck_g": "assets/samples/string/plucked/violin/pluck_g.wav"
 }
 
-},{}],100:[function(require,module,exports){
+},{}],101:[function(require,module,exports){
 module.exports={
   "-tutorials": "// Welcome to the Mercury Playground ^^\n// click \"play\" to execute the code\n// and adjust the code below:\n\nlist kickBeat [1 0.01 0.1 1 0]\nnew sample kick_house time(1/16) play(kickBeat)\n\nlist hatBeat euclid(16 7)\nnew sample hat_909 time(1/16) play(hatBeat) pan(0.5)\n\nnew sample snare_hvy time(1 3/4)\n\nlist positions sineFloat(16 6.523 0 0.6)\nlist pitch repeat([2 1 1 0.84 0.94] 16)\nnew sample chimes_l time(1/16) shape(1 70 5) name(stut)\n\tset stut offset(positions) pan(random) gain(1) speed(pitch)\n",
   "000-intro": "// === TUTORIAL 000: Intro ===\n// Welcome to the Mercury tutorial ^^\n// These short tutorials will teach you all everything \n// that you can do with this environment\n\n// Lines starting with '//' are comments and are not part of the code\n// You can (un)comment coded lines with Option+/ (or by deleting the //)\n\n// Uncomment the line below and click 'play' above\n// new sample harp_up time(1)\n// Now comment the line and click 'play' again",
@@ -34542,7 +34563,7 @@ module.exports={
   "604-view-with-hydra": "// === TUTORIAL 604: View & Hydra ===\n// You can access the canvas of the displayed list by\n// initializing a hydra source: s0.init({src: listView})\n\nlist cos mod(cosine(2000 60 20) 2)\nview cos\n\nlist hydraVisual ['s0.init({src: listView}); src(s0).modulate(noise([2,5,10]), [0.05, 0.1]).out()']\nnew sample hat_909 time(1/4) visual(hydraVisual)\n"
 }
 
-},{}],101:[function(require,module,exports){
+},{}],102:[function(require,module,exports){
 
 const CodeMirror = require('codemirror');
 const code = require('./worker.js');
@@ -34878,7 +34899,7 @@ function date(){
 // 	editor.setOption('theme', t);
 // 	cEditor.setOption('theme', t);
 // }
-},{"./data/examples.json":98,"./data/tutorials.json":100,"./worker.js":104,"codemirror":27,"codemirror/addon/comment/comment.js":25,"codemirror/addon/mode/simple.js":26,"codemirror/mode/javascript/javascript.js":28,"file-saver":30,"tone":77}],102:[function(require,module,exports){
+},{"./data/examples.json":98,"./data/tutorials.json":101,"./worker.js":105,"codemirror":27,"codemirror/addon/comment/comment.js":25,"codemirror/addon/mode/simple.js":26,"codemirror/mode/javascript/javascript.js":28,"file-saver":30,"tone":77}],103:[function(require,module,exports){
 const Tone = require('tone');
 
 // latency reduces cpu load
@@ -35057,7 +35078,7 @@ async function record(start){
 }
 
 module.exports = { resume, silence, setBPM, getBPM, randomBPM, getBuffers, addBuffers, setLowPass, setHiPass, setVolume, record };
-},{"./data/samples.json":99,"tone":77}],103:[function(require,module,exports){
+},{"./data/samples.json":100,"tone":77}],104:[function(require,module,exports){
 // The Mercury Playground main code loader
 // 
 
@@ -35132,7 +35153,7 @@ window.onload = () => {
 	
 	Hydra.link('hydra-ui');
 }
-},{"./canvas.js":89,"./editor.js":101,"./engine.js":102,"tone":77,"webmidi":88}],104:[function(require,module,exports){
+},{"./canvas.js":89,"./editor.js":102,"./engine.js":103,"tone":77,"webmidi":88}],105:[function(require,module,exports){
 const Tone = require('tone');
 const Util = require('total-serialism').Utility;
 const TL = require('total-serialism').Translate;
@@ -35141,6 +35162,7 @@ const MonoSample = require('./core/MonoSample.js');
 const MonoMidi = require('./core/MonoMidi.js');
 const MonoSynth = require('./core/MonoSynth.js');
 const PolyInstrument = require('./core/PolyInstrument.js');
+const Tempos = require('./data/genre-tempos.json');
 
 // fade time in seconds TODO: Make this adjustable with code/setting
 let crossFade = 1.5;
@@ -35204,6 +35226,15 @@ async function code({ file, engine, canvas, p5canvas }){
 			log(`crossfade time is ${args[0]}ms`);
 		},
 		'tempo' : (args) => {
+			let t = args[0];
+			if (isNaN(t)){
+				t = Tempos[args[0].toLowerCase()];
+				if (t === undefined){
+					log(`tempo ${args[0]} is not a valid genre or number`);
+					return;
+				}
+				args[0] = t;
+			}
 			engine.setBPM(...args);
 			// log(`set bpm to ${bpm}`);
 		}, 
@@ -35362,4 +35393,4 @@ async function code({ file, engine, canvas, p5canvas }){
 	_sounds = [];
 }
 module.exports = code;
-},{"./core/MonoMidi.js":92,"./core/MonoSample.js":93,"./core/MonoSynth.js":94,"./core/PolyInstrument.js":95,"mercury-lang":54,"tone":77,"total-serialism":80}]},{},[103]);
+},{"./core/MonoMidi.js":92,"./core/MonoSample.js":93,"./core/MonoSynth.js":94,"./core/PolyInstrument.js":95,"./data/genre-tempos.json":99,"mercury-lang":54,"tone":77,"total-serialism":80}]},{},[104]);

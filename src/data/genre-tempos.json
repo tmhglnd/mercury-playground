@@ -1,0 +1,20 @@
+{
+	"uptempo" : 10,
+	"downtempo" : 10,
+	"reggae" : 70,
+	"rnb" : 80,
+	"hiphop" : 90,
+	"triphop" : 100,
+	"pop" : 110,
+	"funk" : 120,
+	"house" : 120,
+	"rock" : 130,
+	"techno" : 130,
+	"trance" : 135,
+	"acid" : 140,
+	"metal" : 140,
+	"hardstyle" : 150,
+	"jungle" : 160,
+	"dnb" : 170,
+	"neurofunk" : 180
+}
