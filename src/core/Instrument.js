@@ -76,6 +76,15 @@ class Instrument extends Sequencer {
 
 		this.sourceEvent(c, e, time);
 
+		// fade-out running envelope over 5 ms
+		if (this.adsr.value > 0){
+			let tmp = this.adsr.release;
+			this.adsr.release = 0.005;
+			this.adsr.triggerRelease(time);
+			this.adsr.release = tmp;
+			time += 0.005;
+		}
+
 		// set shape for playback (fade-in / out and length)
 		if (this._att){
 			let att = Util.divToS(Util.lookup(this._att, c), this.bpm());
@@ -88,19 +97,13 @@ class Instrument extends Sequencer {
 			
 			e = Math.min(this._time, att + dec + rel);
 			// e = Math.min(t, att + dec + rel);
-		}
 
-		if (this.adsr.value > 0){
-			// fade-out running envelope over 5 ms
-			let tmp = this.adsr.release;
-			this.adsr.release = 0.005;
-			this.adsr.triggerRelease(time);
-			this.adsr.release = tmp;
-			time += 0.005;
+			let rt = Math.max(0.001, e - this.adsr.release);
+			this.adsr.triggerAttackRelease(rt, time);
+		} else {
+			// if shape is 'off' only trigger attack
+			this.adsr.triggerAttack(time);
 		}
-
-		let rt = Math.max(0.001, e - this.adsr.release);
-		this.adsr.triggerAttackRelease(rt, time);
 	}
 
 	sourceEvent(c, time){
@@ -147,7 +150,7 @@ class Instrument extends Sequencer {
 		// set the fade-in, sustain and fade-out times
 		this._att = [ 0 ];
 		this._rel = [ 0 ];
-		this._sus = [ 0 ];
+		this._sus = [ 1 ];
 
 		if (e[0] === 'off' || e[0] < 0){
 			this._att = null;
