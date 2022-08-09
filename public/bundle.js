@@ -34936,6 +34936,8 @@ let buffers = new Tone.ToneAudioBuffers({
 	urls: samples,
 	onload: function(){ 
 		console.log('=> sounds loaded');
+		// remove the logging function to the innerHTML from here on
+		console.log = console.olog;
 		// console.log(buffers);
 		// init();
 		// remove loading screen, because probably this
