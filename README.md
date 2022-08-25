@@ -2,11 +2,18 @@
 
 **A fun lite version of the Mercury Live Coding Environment running in the browser for quick experimentation and exploration.**
 
+Mercury currently has 2 versions:
+
+* Web version running in the browser (Windows/Mac/Linux) (you're in the right place)
+* Full version running in Max8 (Windows/Mac only) [go to this repo](https://github.com/tmhglnd/mercury)
+
 [**🚀 Start Sketching Online!**](https://mercury-sketch.glitch.me/)
 
 **👾 Or code with the latest full version:** 
 
 [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/tmhglnd/mercury)](https://github.com/tmhglnd/mercury/releases)
+
+[**📟 Build a local app from the browser version with Electron:**](https://github.com/tmhglnd/mercury-app)
 
 [**🙏 Support Mercury by becoming a Patron**](https://www.patreon.com/bePatron?u=9649817) 
 
