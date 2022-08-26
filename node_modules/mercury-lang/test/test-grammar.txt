@@ -78,4 +78,6 @@ set hipass 500 3000
 set lopass 2000 500
 set crossFade 100
 
+set tempo hiphop uptempo
+
 silence

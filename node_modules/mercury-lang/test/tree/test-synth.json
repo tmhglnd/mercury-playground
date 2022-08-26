@@ -88,7 +88,7 @@
    ]
   },
   "objects": {
-   "RETB7V6E": {
+   "D2AMELXI": {
     "object": "synth",
     "type": [
      "sine",
@@ -143,11 +143,11 @@
       ]
      ],
      "name": [
-      "RETB7V6E"
+      "D2AMELXI"
      ]
     }
    },
-   "KNAADKDC": {
+   "TPT5F0HO": {
     "object": "sample",
     "type": [
      "kick_min",
@@ -189,7 +189,7 @@
       ]
      ],
      "name": [
-      "KNAADKDC"
+      "TPT5F0HO"
      ]
     }
    },

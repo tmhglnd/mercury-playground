@@ -23,42 +23,21 @@
    ]
   },
   "objects": {
-   "myKick": {
-    "object": "sample",
-    "type": "kick",
+   "chordSaw": {
+    "object": "polySynth",
+    "type": "saw",
     "functions": {
      "group": [],
-     "time": [
-      "1/1",
-      0
-     ],
-     "speed": [
-      1
-     ],
-     "env": [
-      -1
-     ],
-     "beat": [
-      1
-     ],
-     "amp": [
-      0.9
-     ],
-     "stretch": [
-      0,
-      1,
-      1
-     ],
      "add_fx": [],
      "name": [
-      "myKick"
+      "chordSaw"
      ]
     }
    }
   },
   "groups": {
    "all": [
-    "myKick"
+    "chordSaw"
    ]
   },
   "print": [
@@ -81,21 +60,11 @@
     2,
     3
    ],
-   "hello world",
-   [
-    9,
-    5,
-    6,
-    0
-   ],
-   [
-    5,
-    9,
-    0,
-    6
-   ]
+   "hello world"
   ],
   "comments": [
+   "// display vals",
+   "// display shuffle(vals)",
    "// new sample kick gain(randomFloat(5 0 1))",
    "// set all play(clave(8))",
    "// set myKick shape(1/8 5/4)",
@@ -185,9 +154,9 @@
    {
     "@object": {
      "@new": {
-      "@inst": "sample",
+      "@inst": "polySynth",
       "@type": {
-       "@identifier": "kick"
+       "@identifier": "saw"
       },
       "@functions": [
        {
@@ -195,7 +164,7 @@
          "@name": "name",
          "@args": [
           {
-           "@identifier": "myKick"
+           "@identifier": "chordSaw"
           }
          ]
         }
@@ -206,27 +175,12 @@
    },
    {
     "@global": {
-     "@display": [
-      {
-       "@identifier": "vals"
-      }
-     ]
+     "@comment": "// display vals"
     }
    },
    {
     "@global": {
-     "@display": [
-      {
-       "@function": {
-        "@name": "shuffle",
-        "@args": [
-         {
-          "@identifier": "vals"
-         }
-        ]
-       }
-      }
-     ]
+     "@comment": "// display shuffle(vals)"
     }
    },
    {
@@ -271,5 +225,7 @@
    }
   ]
  },
- "errors": []
+ "errors": [
+  "Unknown instrument type: polySynth"
+ ]
 }

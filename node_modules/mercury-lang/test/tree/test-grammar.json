@@ -14,8 +14,8 @@
    ],
    "silence": true,
    "tempo": [
-    143,
-    1000
+    "hiphop",
+    "uptempo"
    ],
    "scale": [
     "major",
@@ -90,14 +90,14 @@
     1
    ],
    "grv": [
+    "kick",
     "hat",
     "hat",
     "snare",
     "snare",
-    "hat",
     "hat",
     "kick",
-    "hat"
+    "snare"
    ],
    "arpMel": [
     0,
@@ -143,16 +143,16 @@
    ],
    "join": [
     [
+     13,
+     17,
      19,
-     11,
-     10,
-     16
+     10
     ],
     [
-     9,
+     5,
+     3,
      7,
-     10,
-     1
+     2
     ]
    ],
    "notes": [
@@ -169,7 +169,7 @@
    ]
   },
   "objects": {
-   "C8RGANQP": {
+   "7HET92XU": {
     "object": "synth",
     "type": "saw",
     "functions": {
@@ -204,11 +204,11 @@
       ]
      ],
      "name": [
-      "C8RGANQP"
+      "7HET92XU"
      ]
     }
    },
-   "W5KWZ5ZY": {
+   "97LK0PGV": {
     "object": "sample",
     "type": "hat",
     "functions": {
@@ -242,11 +242,11 @@
       ]
      ],
      "name": [
-      "W5KWZ5ZY"
+      "97LK0PGV"
      ]
     }
    },
-   "XKUYZXXU": {
+   "ANF3V1LF": {
     "object": "midi",
     "type": "default",
     "functions": {
@@ -275,11 +275,11 @@
       ]
      ],
      "name": [
-      "XKUYZXXU"
+      "ANF3V1LF"
      ]
     }
    },
-   "IXW5629Y": {
+   "0W886QHZ": {
     "object": "loop",
     "type": "amen",
     "functions": {
@@ -313,11 +313,11 @@
       ]
      ],
      "name": [
-      "IXW5629Y"
+      "0W886QHZ"
      ]
     }
    },
-   "LY3MH03I": {
+   "EAP90ZNW": {
     "object": "polySynth",
     "type": "sine",
     "functions": {
@@ -330,11 +330,11 @@
       ]
      ],
      "name": [
-      "LY3MH03I"
+      "EAP90ZNW"
      ]
     }
    },
-   "HSS9QFEU": {
+   "V44J03GF": {
     "object": "polySample",
     "type": "kick",
     "functions": {
@@ -347,11 +347,11 @@
       ]
      ],
      "name": [
-      "HSS9QFEU"
+      "V44J03GF"
      ]
     }
    },
-   "XRF4RJP3": {
+   "356KQVUQ": {
     "object": "osc",
     "type": "address",
     "functions": {
@@ -364,11 +364,11 @@
       ]
      ],
      "name": [
-      "XRF4RJP3"
+      "356KQVUQ"
      ]
     }
    },
-   "OH1C8JCT": {
+   "4USLNMQM": {
     "object": "sample",
     "type": [
      "hat",
@@ -406,11 +406,11 @@
       ]
      ],
      "name": [
-      "OH1C8JCT"
+      "4USLNMQM"
      ]
     }
    },
-   "YJ6MTP2P": {
+   "9NEXR793": {
     "object": "synth",
     "type": [
      "saw",
@@ -449,7 +449,7 @@
       ]
      ],
      "name": [
-      "YJ6MTP2P"
+      "9NEXR793"
      ]
     }
    },
@@ -549,7 +549,7 @@
      ]
     }
    },
-   "1CP0RVEU": {
+   "3SN9CUV1": {
     "object": "synth",
     "type": "square",
     "functions": {
@@ -600,7 +600,7 @@
       ]
      ],
      "name": [
-      "1CP0RVEU"
+      "3SN9CUV1"
      ]
     }
    }
@@ -1868,6 +1868,21 @@
       "@functions": [
        {
         "@number": 100
+       }
+      ]
+     }
+    }
+   },
+   {
+    "@object": {
+     "@set": {
+      "@name": "tempo",
+      "@functions": [
+       {
+        "@identifier": "hiphop"
+       },
+       {
+        "@identifier": "uptempo"
        }
       ]
      }

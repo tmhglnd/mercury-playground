@@ -8,10 +8,10 @@ display 'hello world'
 
 print reverse(vals)
 
-new sample kick name(myKick) 
+new polySynth saw name(chordSaw) 
 
-display vals
-display shuffle(vals)
+// display vals
+// display shuffle(vals)
 
 // new sample kick gain(randomFloat(5 0 1))
 // set all play(clave(8))
