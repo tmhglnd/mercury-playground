@@ -35262,7 +35262,7 @@ async function code({ file, engine, canvas, p5canvas }){
 			let type = obj.type;
 			let args = obj.functions;			
 			let inst = new MonoSample(engine, type, canvas);
-			
+
 			objectMap.applyFunctions(args, inst, type);
 			return inst;
 		},
@@ -35323,19 +35323,19 @@ async function code({ file, engine, canvas, p5canvas }){
 		}
 	}
 
-	sounds.map(async (s) => {
+	sounds.map((s) => {
 		// start new loops;
-		await s.makeLoop();
+		s.makeLoop();
 	});
 	console.log(`Made instruments in: ${((Tone.Transport.seconds - t) * 1000).toFixed(3)}ms`);
 
 	// when all loops started fade in the new sounds and fade out old
-	sounds.map(async (s) => {
+	sounds.map((s) => {
 		// fade in new sounds;
 		s.fadeIn(crossFade);
 	});
 
-	_sounds.map(async (s) => {
+	_sounds.map((s) => {
 		// fade out and delete after fade
 		s.fadeOut(crossFade);
 	});
