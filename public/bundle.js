@@ -33796,34 +33796,34 @@ const Tone = require('tone');
 const Util = require('./Util.js');
 const fxMap = require('./Effects.js');
 const TL = require('total-serialism').Translate;
-const Instrument = require('./Instrument.js');
-// const Sequencer = require('./Sequencer.js');
+const Sequencer = require('./Sequencer.js');
+// const Instrument = require('./Instrument.js');
 
-// Basic class for all instruments
-class PolyInstrument extends Instrument {
+// Basic class for a poly-instrument
+class PolyInstrument extends Sequencer {
 	constructor(engine){
 		// Inherit from Sequencer
 		super(engine);
 
 		// Instrument specific parameters
-		// this._gain = [-6, 0];		
-		// this._pan = [ 0 ];
-		// this._att = [ 0 ];
-		// this._sus = [ 0 ];
-		// this._rel = [ 0 ];
+		this._gain = [-6, 0];		
+		this._pan = [ 0 ];
+		this._att = [ 0 ];
+		this._sus = [ 0 ];
+		this._rel = [ 0 ];
 
 		// Instrument specific Tone Nodes
-		// this.panner;
 		// this.adsr;
-		// this.gain;
 		// this.amp;
-		// this._fx;
+		this.panner;
+		this.gain;
+		this._fx;
 
 		// The source to be defined by inheriting class
 		// this.source;
 
 		// PolyInstrument specific parameters
-		this.numVoices = 8;
+		this.numVoices = 4;
 		this.sources = [];
 		this.adsrs = [];
 		this.busymap = [];
@@ -34013,8 +34013,6 @@ class PolyInstrument extends Instrument {
 
 		this.adsrs.map((a) => a.dispose());
 		this.sources.map((s) => s.dispose());
-
-		// this.adsr.dispose();
 		// remove all fx
 		this._fx.map((f) => f.delete());
 		console.log('=> disposed PolyInstrument() with FX:', this._fx);
@@ -34124,7 +34122,7 @@ module.exports = PolyInstrument;
 
 // }
 // module.exports = Voice;
-},{"./Effects.js":90,"./Instrument.js":91,"./Util.js":97,"tone":77,"total-serialism":80}],96:[function(require,module,exports){
+},{"./Effects.js":90,"./Sequencer.js":96,"./Util.js":97,"tone":77,"total-serialism":80}],96:[function(require,module,exports){
 const Tone = require('tone');
 const Util = require('./Util.js');
 
