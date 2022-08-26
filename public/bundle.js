@@ -35097,6 +35097,10 @@ module.exports = { resume, silence, setBPM, getBPM, randomBPM, getBuffers, addBu
 // 
 
 window.onload = () => {
+	document.getElementById('switch').onclick = () => {
+		switchTheme((localStorage.getItem('theme') === 'darkmode')? 'lightmode' : 'darkmode');
+	}
+
 	// load requires
 	const Tone = require('tone');
 	
@@ -35167,6 +35171,14 @@ window.onload = () => {
 	
 	Hydra.link('hydra-ui');
 }
+
+// switch theme in css
+switchTheme = (t) => {
+	localStorage.setItem('theme', t);
+	document.documentElement.className = t;
+}
+// initial dark mode theme on startup
+switchTheme('darkmode');
 },{"./canvas.js":89,"./editor.js":102,"./engine.js":103,"tone":77,"webmidi":88}],105:[function(require,module,exports){
 const Tone = require('tone');
 const Util = require('total-serialism').Utility;

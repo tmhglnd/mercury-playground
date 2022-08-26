@@ -2,6 +2,10 @@
 // 
 
 window.onload = () => {
+	document.getElementById('switch').onclick = () => {
+		switchTheme((localStorage.getItem('theme') === 'darkmode')? 'lightmode' : 'darkmode');
+	}
+
 	// load requires
 	const Tone = require('tone');
 	
@@ -72,3 +76,11 @@ window.onload = () => {
 	
 	Hydra.link('hydra-ui');
 }
+
+// switch theme in css
+switchTheme = (t) => {
+	localStorage.setItem('theme', t);
+	document.documentElement.className = t;
+}
+// initial dark mode theme on startup
+switchTheme('darkmode');
