@@ -6,6 +6,7 @@ const Instrument = require('./Instrument');
 
 class MonoSynth extends Instrument {
 	constructor(engine, t='saw', canvas){
+		// Inherit from Instrument
 		super(engine, canvas);
 
 		this._wave = Util.toArray(t);
@@ -21,7 +22,7 @@ class MonoSynth extends Instrument {
 			pwm: 'pwm',
 			organ: 'sine4',
 		}
-		// synth specific variables;
+		// // synth specific variables;
 		this._note = [ 0, 0 ];
 		this._slide = [ 0 ];
 		this._voices = [ 1 ];
@@ -125,10 +126,12 @@ class MonoSynth extends Instrument {
 		// delete super class
 		super.delete();
 		// dispose the sound source
+		// this.source.delete();
+		this.adsr.dispose();
 		this.synth.dispose();
 		this.source.dispose();
 		
-		console.log('disposed MonoSynth()', this._source);
+		console.log('disposed MonoSynth()', this._wave);
 	}
 }
 module.exports = MonoSynth;

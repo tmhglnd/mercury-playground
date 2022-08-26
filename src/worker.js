@@ -5,7 +5,8 @@ const Mercury = require('mercury-lang');
 const MonoSample = require('./core/MonoSample.js');
 const MonoMidi = require('./core/MonoMidi.js');
 const MonoSynth = require('./core/MonoSynth.js');
-const PolyInstrument = require('./core/PolyInstrument.js');
+const PolySynth = require('./core/PolySynth.js');
+// const PolyInstrument = require('./core/PolyInstrument.js');
 const Tempos = require('./data/genre-tempos.json');
 
 // fade time in seconds TODO: Make this adjustable with code/setting
@@ -137,8 +138,6 @@ async function code({ file, engine, canvas, p5canvas }){
 			let type = obj.type;
 			let args = obj.functions;			
 			let inst = new MonoSample(engine, type, canvas);
-			// let inst = new MonoSample(engine, type);
-			// let inst = new MonoSample(type, engine);
 
 			// apply arguments to instrument if part of instrument
 			Object.keys(args).forEach((a) => {
@@ -155,8 +154,6 @@ async function code({ file, engine, canvas, p5canvas }){
 			let type = obj.type;
 			let args = obj.functions;			
 			let inst = new MonoSample(engine, type, canvas);
-			// let inst = new MonoSample(engine, type);
-			// let inst = new MonoSample(type, engine);
 
 			// apply arguments to instrument if part of instrument
 			Object.keys(args).forEach((a) => {
@@ -172,10 +169,8 @@ async function code({ file, engine, canvas, p5canvas }){
 			console.log('make synth', obj);
 			let type = obj.type;
 			let args = obj.functions;			
-			let inst = new MonoSynth(engine, type, canvas);
-			// let inst = new MonoSynth(engine, type);
-			// let inst = new PolyInstrument(engine, type);
-			// let inst = new MonoSynth(type, engine);
+			// let inst = new MonoSynth(engine, type, canvas);
+			let inst = new PolySynth(engine, type, canvas);
 
 			// apply arguments to instrument if part of instrument
 			Object.keys(args).forEach((a) => {

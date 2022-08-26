@@ -131,7 +131,7 @@ class Instrument extends Sequencer {
 		// disconnect the sound dispose the player
 		this.gain.dispose();
 		this.panner.dispose();
-		this.adsr.dispose();
+		// this.adsr.dispose();
 		// remove all fx
 		this._fx.map((f) => f.delete());
 		console.log('=> disposed Instrument() with FX:', this._fx);

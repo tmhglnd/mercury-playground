@@ -33187,7 +33187,7 @@ const PingPongDelay = function(_params){
 		this._fx.dispose();
 	}
 }
-},{"./Util.js":97,"tone":77,"total-serialism":80}],91:[function(require,module,exports){
+},{"./Util.js":98,"tone":77,"total-serialism":80}],91:[function(require,module,exports){
 const Tone = require('tone');
 const Util = require('./Util.js');
 const fxMap = require('./Effects.js');
@@ -33321,7 +33321,7 @@ class Instrument extends Sequencer {
 		// disconnect the sound dispose the player
 		this.gain.dispose();
 		this.panner.dispose();
-		this.adsr.dispose();
+		// this.adsr.dispose();
 		// remove all fx
 		this._fx.map((f) => f.delete());
 		console.log('=> disposed Instrument() with FX:', this._fx);
@@ -33404,7 +33404,7 @@ class Instrument extends Sequencer {
 	}
 }
 module.exports = Instrument;
-},{"./Effects.js":90,"./Sequencer.js":96,"./Util.js":97,"tone":77}],92:[function(require,module,exports){
+},{"./Effects.js":90,"./Sequencer.js":97,"./Util.js":98,"tone":77}],92:[function(require,module,exports){
 const Tone = require('tone');
 const Util = require('./Util.js');
 const Sequencer = require('./Sequencer.js');
@@ -33530,7 +33530,7 @@ class MonoMidi extends Sequencer {
 	}	
 }
 module.exports = MonoMidi;
-},{"./Sequencer.js":96,"./Util.js":97,"tone":77,"webmidi":88}],93:[function(require,module,exports){
+},{"./Sequencer.js":97,"./Util.js":98,"tone":77,"webmidi":88}],93:[function(require,module,exports){
 const Tone = require('tone');
 const Util = require('./Util.js');
 // const fxMap = require('./Effects.js');
@@ -33656,7 +33656,7 @@ class MonoSample extends Instrument {
 	}
 }
 module.exports = MonoSample;
-},{"./Instrument.js":91,"./Util.js":97,"tone":77}],94:[function(require,module,exports){
+},{"./Instrument.js":91,"./Util.js":98,"tone":77}],94:[function(require,module,exports){
 const Tone = require('tone');
 const Util = require('./Util.js');
 // const fxMap = require('./Effects.js');
@@ -33665,6 +33665,7 @@ const Instrument = require('./Instrument');
 
 class MonoSynth extends Instrument {
 	constructor(engine, t='saw', canvas){
+		// Inherit from Instrument
 		super(engine, canvas);
 
 		this._wave = Util.toArray(t);
@@ -33680,7 +33681,7 @@ class MonoSynth extends Instrument {
 			pwm: 'pwm',
 			organ: 'sine4',
 		}
-		// synth specific variables;
+		// // synth specific variables;
 		this._note = [ 0, 0 ];
 		this._slide = [ 0 ];
 		this._voices = [ 1 ];
@@ -33784,53 +33785,40 @@ class MonoSynth extends Instrument {
 		// delete super class
 		super.delete();
 		// dispose the sound source
+		// this.source.delete();
+		this.adsr.dispose();
 		this.synth.dispose();
 		this.source.dispose();
 		
-		console.log('disposed MonoSynth()', this._source);
+		console.log('disposed MonoSynth()', this._wave);
 	}
 }
 module.exports = MonoSynth;
-},{"./Instrument":91,"./Util.js":97,"tone":77,"total-serialism":80}],95:[function(require,module,exports){
+},{"./Instrument":91,"./Util.js":98,"tone":77,"total-serialism":80}],95:[function(require,module,exports){
 const Tone = require('tone');
 const Util = require('./Util.js');
 const fxMap = require('./Effects.js');
 const TL = require('total-serialism').Translate;
-const Sequencer = require('./Sequencer.js');
-// const Instrument = require('./Instrument.js');
+// const Sequencer = require('./Sequencer.js');
+const Instrument = require('./Instrument.js');
 
 // Basic class for a poly-instrument
-class PolyInstrument extends Sequencer {
-	constructor(engine){
-		// Inherit from Sequencer
-		super(engine);
-
-		// Instrument specific parameters
-		this._gain = [-6, 0];		
-		this._pan = [ 0 ];
-		this._att = [ 0 ];
-		this._sus = [ 0 ];
-		this._rel = [ 0 ];
-
-		// Instrument specific Tone Nodes
-		// this.adsr;
-		// this.amp;
-		this.panner;
-		this.gain;
-		this._fx;
+class PolyInstrument extends Instrument {
+	constructor(engine, canvas){
+		// Inherit from Instrument
+		super(engine, canvas);
 
 		// The source to be defined by inheriting class
-		// this.source;
+		this.sources = [];
 
 		// PolyInstrument specific parameters
-		this.numVoices = 4;
-		this.sources = [];
+		this.numVoices = 6;
 		this.adsrs = [];
 		this.busymap = [];
+		this.steal = false;
 
 		this.channelStrip();
 		this.createVoices();
-		this.createSources();
 
 		console.log('=> class PolyInstrument()');
 	}
@@ -33844,34 +33832,13 @@ class PolyInstrument extends Sequencer {
 	}
 
 	createVoices(){
+		// create adsrs and busymap states for every voice
 		for (let i=0; i<this.numVoices; i++){
 			this.adsrs[i] = this.envelope(this.panner);
 			this.busymap[i] = false;
 		}
 	}
-
-	createSources(){
-		for (let i=0; i<this.numVoices; i++){
-			this.sources[i] = new Tone.OmniOscillator();
-			this.sources[i].type = 'sawtooth';
-			this.sources[i].connect(this.adsrs[i]);
-			this.sources[i].start();
-		}
-	}
-
-	envelope(d){
-		// return an Envelope and connect to next node
-		return new Tone.AmplitudeEnvelope({
-			attack: 0,
-			attackCurve: "linear",
-			decay: 0,
-			decayCurve: "linear",
-			sustain: 1,
-			release: 0.001,
-			releaseCurve: "linear"
-		}).connect(d);
-	}
-
+	
 	event(c, time){
 		// console.log('=> Instrument()', c);
 		// end position for playback
@@ -33891,49 +33858,13 @@ class PolyInstrument extends Sequencer {
 
 		// use notes from array to trigger multiple voices
 		// check which voice is playing and trigger a new voice
-		// voice includes:
-		// sound source (synth, sample)
-		// envelope
-		// parameters to be set for source and envelope
-		// set all parameters for that voice
-		
-		// this.sourceEvent(c, e, time);
 		this.manageVoices(c, e, time);
 	}
 
 	sourceEvent(c, time, v){
-		// trigger some events specifically for a source
+		// trigger some events specifically for a source at index v
 		// specified in more detail in the inheriting class
-		// console.log('Instrument()', this._name, c);
-
-		// ramp volume
-		let g = Util.getParam(this._gain[0], c);
-		let r = Util.getParam(this._gain[1], c);
-		this.sources[v].volume.rampTo(g, r, time);
-
-		// set the frequency based on the selected note
-		// note as interval / octave coordinate
-		let o = Util.getParam(this._note[1], c);
-		let i = Util.getParam(this._note[0], c);
-		
-		if (isNaN(i)){
-			let _i = TL.noteToMidi(i);
-			if (!_i){
-				log(`${i} is not a valid number or name`);
-				i = 0;
-			} else {
-				i = _i - 48;
-			}
-		}
-		// reconstruct midi note value, (0, 0) = 36
-		// let n = i + (o * 12) + 36;
-		let n = TL.toScale(i + o * 12 + 36);
-
-		// calculate frequency in 12-TET A4 = 440;
-		// let f = Math.pow(2, (n - 69)/12) * 440;
-		let f = TL.mtof(n);
-
-		this.sources[v].frequency.setValueAtTime(f, time);
+		console.log('PolyInstrument()', this._name, c, v);
 	}
 
 	manageVoices(c, e, time){
@@ -33985,144 +33916,123 @@ class PolyInstrument extends Sequencer {
 		}
 	}
 
+	delete(){
+		// delete super class
+		super.delete();
+		// disconnect the sound dispose the player
+		// this.gain.dispose();
+		// this.panner.dispose();
+
+		this.adsrs.map((a) => a.dispose());
+		this.sources.map((s) => s.dispose());
+		// remove all fx
+		// this._fx.map((f) => f.delete());
+		console.log('=> disposed PolyInstrument() with FX:', this._fx);
+	}
+}
+module.exports = PolyInstrument;
+},{"./Effects.js":90,"./Instrument.js":91,"./Util.js":98,"tone":77,"total-serialism":80}],96:[function(require,module,exports){
+const Tone = require('tone');
+const Util = require('./Util.js');
+const PolyInstrument = require('./PolyInstrument');
+
+class PolySynth extends PolyInstrument {
+	constructor(engine, t='saw', canvas){
+		// Inherit from PolyInstrument
+		super(engine, canvas);
+
+		// synth specific variables;
+		this._wave = Util.toArray(t);
+		this._note = [ 0, 0 ];
+		this._slide = [ 0 ];
+		this._voices = [ 1 ];
+		this._detune = [ 0 ];
+
+		this.createSources();
+
+		console.log('=> PolySynth()', this);
+	}
+
+	createSources(){
+		for (let i=0; i<this.numVoices; i++){
+			this.sources[i] = new Tone.FatOscillator().connect(this.adsrs[i]);
+			this.sources[i].count = 1;
+			this.sources[i].start();
+		}
+	}
+
+	sourceEvent(c, time, id){
+		// ramp volume
+		let g = Util.getParam(this._gain[0], c);
+		let r = Util.getParam(this._gain[1], c);
+		this.sources[id].volume.rampTo(g, r, time);
+
+		// set voice amount for super synth
+		let v = Util.getParam(this._voices, c);
+		this.sources[id].count = Math.max(1, Math.floor(v));
+
+		// set the detuning of the unison voices
+		// in semitone values from -48 to +48
+		let d = Util.getParam(this._detune, c);
+		// d = Math.log2(d) * 1200;
+		this.sources[id].spread = d * 100 * 2;
+
+		// set wave to oscillator
+		let w = Util.getParam(this._wave, c);
+		this.sources[id].set({ type: Util.assureWave(w) });
+
+		// set the frequency based on the selected note
+		// note as interval / octave coordinate
+		let o = Util.getParam(this._note[1], c);
+		let i = Util.getParam(this._note[0], c);
+		let f = Util.noteToFreq(i, o);
+
+		// get the slide time for next note and set the frequency
+		let s = Util.divToS(Util.getParam(this._slide, c), this.bpm());
+		if (s > 0){
+			this.sources[id].frequency.rampTo(f, s, time);
+		} else {
+			this.sources[id].frequency.setValueAtTime(f, time);
+		}
+	}
+
 	note(i=0, o=0){
 		// set the note as semitone interval and octave offset
 		// (0, 0) = MidiNote 36
 		this._note = [Util.toArray(i), Util.toArray(o)];
 	}
 
-	fadeIn(t){
-		// fade in the sound upon evaluation of code
-		this.gain.gain.rampTo(1, t, Tone.now());
+	super(d=[0.1], v=[3]){
+		// add unison voices and detune the spread
+		// first argument is the detune amount
+		// second argument changes the amount of voices
+		this._voices = Util.toArray(v);
+		this._detune = Util.toArray(d);
 	}
 
-	fadeOut(t){
-		// fade out the sound upon evaluation of new code
-		this.gain.gain.rampTo(0, t, Tone.now());
-		setTimeout(() => {
-			this.delete();
-		}, t * 1000);
+	fat(...a){
+		// alias for super synth
+		this.super(...a);
+	}
+
+	slide(s){
+		// portamento from one note to another
+		this._slide = Util.toArray(s);
+	}
+
+	wave2(w){
+		// placeholder function for wave2
 	}
 
 	delete(){
 		// delete super class
 		super.delete();
-		// disconnect the sound dispose the player
-		this.gain.dispose();
-		this.panner.dispose();
-
-		this.adsrs.map((a) => a.dispose());
-		this.sources.map((s) => s.dispose());
-		// remove all fx
-		this._fx.map((f) => f.delete());
-		console.log('=> disposed PolyInstrument() with FX:', this._fx);
-	}
-
-	amp(g, r){
-		// set the gain and ramp time
-		g = Util.toArray(g);
-		r = (r !== undefined)? Util.toArray(r) : [ 0 ];
-		// convert amplitude to dBFullScale
-		this._gain[0] = g.map(g => 20 * Math.log(g * 0.707) );
-		this._gain[1] = r.map(r => Util.msToS(Math.max(0, r)) );
-	}
-
-	env(...e){
-		// set the fade-in, sustain and fade-out times
-		this._att = [ 0 ];
-		this._rel = [ 0 ];
-		this._sus = [ 0 ];
-
-		if (e[0] === 'off' || e[0] < 0){
-			this._att = null;
-		} else {
-			if (e.length === 1){
-				// one argument is release time
-				this._att = [ 1 ];
-				this._rel = Util.toArray(e[0]);
-			} else if (e.length === 2){
-				// two arguments is attack & release
-				this._att = Util.toArray(e[0]);
-				this._rel = Util.toArray(e[1]);
-			} else {
-				// three is attack stustain and release
-				this._att = Util.toArray(e[0]);
-				this._sus = Util.toArray(e[1]);
-				this._rel = Util.toArray(e[2]);
-			}
-		}
-	}
-
-	pan(p){
-		// the panning position of the sound
-		this._pan = Util.toArray(p);
-	}
-
-	add_fx(...fx){
-		// the effects chain for the sound
-		this._fx = [];
-		// console.log('Effects currently disabled');
-		fx.forEach((f) => {
-			if (fxMap[f[0]]){
-				let tmpF = fxMap[f[0]](f.slice(1));
-				this._fx.push(tmpF);
-			} else {
-				log(`Effect ${f[0]} does not exist`);
-			}
-		});
-		// if any fx working
-		if (this._fx.length){
-			console.log(`Adding effect chain`, this._fx);
-			// disconnect the panner
-			this.panner.disconnect();
-			// iterate over effects and get chain (send/return)
-			this._ch = [];
-			this._fx.map((f) => { this._ch.push(f.chain()) });
-			// add all effects in chain and connect to Destination
-			// every effect connects it's return to a send of the next
-			// allowing to chain multiple effects within one process
-			let pfx = this._ch[0];
-			this.panner.connect(pfx.send);
-			for (let f=1; f<this._ch.length; f++){
-				if (pfx){
-					pfx.return.connect(this._ch[f].send);
-				}
-				pfx = this._ch[f];
-			}
-			// pfx.return.connect(Tone.Destination);
-			pfx.return.connect(this.gain);
-		}
+		
+		console.log('disposed MonoSynth()', this._wave);
 	}
 }
-module.exports = PolyInstrument;
-
-// class Voice {
-// 	constructor(destination){
-// 		this._busy = false;
-		
-// 		this.source = new Tone.OmniOscillator('sawtooth');
-// 		this.adsr = new Tone.AmplitudeEnvelope({
-// 			attack: 0,
-// 			attackCurve: "linear",
-// 			decay: 0,
-// 			decayCurve: "linear",
-// 			sustain: 1,
-// 			release: 0.001,
-// 			releaseCurve: "linear"
-// 		});
-
-// 		this.source.connect(this.adsr);
-// 		this.adsr.connect(destination);
-// 	}
-
-// 	busy(){
-// 		return this.busy;
-// 	}
-
-
-// }
-// module.exports = Voice;
-},{"./Effects.js":90,"./Sequencer.js":96,"./Util.js":97,"tone":77,"total-serialism":80}],96:[function(require,module,exports){
+module.exports = PolySynth;
+},{"./PolyInstrument":95,"./Util.js":98,"tone":77}],97:[function(require,module,exports){
 const Tone = require('tone');
 const Util = require('./Util.js');
 
@@ -34269,7 +34179,9 @@ class Sequencer {
 	}
 }
 module.exports = Sequencer;
-},{"./Util.js":97,"tone":77}],97:[function(require,module,exports){
+},{"./Util.js":98,"tone":77}],98:[function(require,module,exports){
+const TL = require('total-serialism').Translate;
+
 // lookup a value from array with wrap index
 function lookup(a, i){
 	return a[i % a.length];
@@ -34333,8 +34245,51 @@ function divToS(d, bpm){
 	}
 }
 
-module.exports = { lookup, randLookup, isRandom, getParam, toArray, msToS, formatRatio, divToS }
-},{}],98:[function(require,module,exports){
+// convert note value to a frequency 
+function noteToFreq(i, o){
+	if (isNaN(i)){
+		let _i = TL.noteToMidi(i);
+		if (!_i){
+			log(`${i} is not a valid number or name`);
+			i = 0;
+		} else {
+			i = _i - 48;
+		}
+	}
+	// reconstruct midi note value, (0, 0) = 36
+	// let n = i + (o * 12) + 36;
+	let n = TL.toScale(i + o * 12 + 36);
+
+	// calculate frequency in 12-TET A4 = 440;
+	// let f = Math.pow(2, (n - 69)/12) * 440;
+	return TL.mtof(n);
+}
+
+function assureWave(w){
+	let waveMap = {
+		sine : 'sine',
+		saw : 'sawtooth',
+		square : 'square',
+		triangle : 'triangle',
+		tri : 'triangle',
+		rect : 'square',
+		fm: 'fmsine',
+		am: 'amsine',
+		pwm: 'pwm',
+		organ: 'sine4',
+	}
+	if (waveMap[w]){
+		w = waveMap[w];
+	} else {
+		log(`${w} is not a valid waveshape`);
+		// default wave if wave does not exist
+		w = 'sine';
+	}
+	return w;
+}
+
+module.exports = { lookup, randLookup, isRandom, getParam, toArray, msToS, formatRatio, divToS, noteToFreq, assureWave }
+},{"total-serialism":80}],99:[function(require,module,exports){
 module.exports={
   "00_sample-and-time": "// play different samples\n// at different time intervals\nset tempo 95\n\nnew sample piano_a time(1)\nnew sample piano_c time(1/2)\nnew sample piano_f time(1/3)\nnew sample piano_g time(1/4)\n\n// add reverb fx to all samples\nset all fx(reverb 0.4 3)",
   "01_offset-in-time": "// multiple samples make up a beat\n// using a time offset as \n// second argument\nset tempo 131\n\nnew sample kick_909 time(1/4)\nnew sample snare_909 time(1/2 1/4)\nnew sample hat_909 time(1/4 1/8)\nnew sample hat_909_open time(1 15/16)\nnew sample clap_909 time(5/16)\n\n// short slapback reverb\nset all fx(reverb 0.5 2)",
@@ -34351,7 +34306,7 @@ module.exports={
   "12_drone-synths": "// A synth that functions as bass drone \n// Combined with a short high pitch synth with delay\n// Creating in a melody from a lookup scale list\nset tempo 124\n// set a scale\nset scale harmonic_minor c\n\n// some note numbers for bass synth\nlist notes [3 7 5 8]\nnew synth saw note(notes 0) time(4) name(drone)\n    set drone fat(0.1132 3) shape(off) fx(squash 5)\n    set drone fx(reverb 0.6 5) fx(filter low 1500 0.4)\n\n// create a melody for the lead synth\nlist melody cosine(16 5.32 0 12)\nnew synth sine note(melody 2) time(1/2) name(lead)\n    set lead shape(1 120) fat(0.021 3) fx(distort 10)\n    set lead fx(delay 3/16 4/16 0.8) fx(reverb 0.5 3)"
 }
 
-},{}],99:[function(require,module,exports){
+},{}],100:[function(require,module,exports){
 module.exports={
 	"uptempo" : 10,
 	"downtempo" : 10,
@@ -34372,7 +34327,7 @@ module.exports={
 	"dnb" : 170,
 	"neurofunk" : 180
 }
-},{}],100:[function(require,module,exports){
+},{}],101:[function(require,module,exports){
 module.exports={
   "noise_a": "assets/samples/noise/noise_a.wav",
   "drone_cymbal": "assets/samples/ambient/cymbal/drone_cymbal.wav",
@@ -34519,7 +34474,7 @@ module.exports={
   "pluck_g": "assets/samples/string/plucked/violin/pluck_g.wav"
 }
 
-},{}],101:[function(require,module,exports){
+},{}],102:[function(require,module,exports){
 module.exports={
   "-tutorials": "// Welcome to the Mercury Playground ^^\n// click \"play\" to execute the code\n// and adjust the code below:\n\nlist kickBeat [1 0.01 0.1 1 0]\nnew sample kick_house time(1/16) play(kickBeat)\n\nlist hatBeat euclid(16 7)\nnew sample hat_909 time(1/16) play(hatBeat) pan(0.5)\n\nnew sample snare_hvy time(1 3/4)\n\nlist positions sineFloat(16 6.523 0 0.6)\nlist pitch repeat([2 1 1 0.84 0.94] 16)\nnew sample chimes_l time(1/16) shape(1 70 5) name(stut)\n\tset stut offset(positions) pan(random) gain(1) speed(pitch)\n",
   "000-intro": "// === TUTORIAL 000: Intro ===\n// Welcome to the Mercury tutorial ^^\n// These short tutorials will teach you all everything \n// that you can do with this environment\n\n// Lines starting with '//' are comments and are not part of the code\n// You can (un)comment coded lines with Option+/ (or by deleting the //)\n\n// Uncomment the line below and click 'play' above\n// new sample harp_up time(1)\n// Now comment the line and click 'play' again",
@@ -34575,7 +34530,7 @@ module.exports={
   "604-view-with-hydra": "// === TUTORIAL 604: View & Hydra ===\n// You can access the canvas of the displayed list by\n// initializing a hydra source: s0.init({src: listView})\n\nlist cos mod(cosine(2000 60 20) 2)\nview cos\n\nlist hydraVisual ['s0.init({src: listView}); src(s0).modulate(noise([2,5,10]), [0.05, 0.1]).out()']\nnew sample hat_909 time(1/4) visual(hydraVisual)\n"
 }
 
-},{}],102:[function(require,module,exports){
+},{}],103:[function(require,module,exports){
 
 const CodeMirror = require('codemirror');
 const code = require('./worker.js');
@@ -34911,7 +34866,7 @@ function date(){
 // 	editor.setOption('theme', t);
 // 	cEditor.setOption('theme', t);
 // }
-},{"./data/examples.json":98,"./data/tutorials.json":101,"./worker.js":105,"codemirror":27,"codemirror/addon/comment/comment.js":25,"codemirror/addon/mode/simple.js":26,"codemirror/mode/javascript/javascript.js":28,"file-saver":30,"tone":77}],103:[function(require,module,exports){
+},{"./data/examples.json":99,"./data/tutorials.json":102,"./worker.js":106,"codemirror":27,"codemirror/addon/comment/comment.js":25,"codemirror/addon/mode/simple.js":26,"codemirror/mode/javascript/javascript.js":28,"file-saver":30,"tone":77}],104:[function(require,module,exports){
 const Tone = require('tone');
 
 // latency reduces cpu load
@@ -35092,7 +35047,7 @@ async function record(start){
 }
 
 module.exports = { resume, silence, setBPM, getBPM, randomBPM, getBuffers, addBuffers, setLowPass, setHiPass, setVolume, record };
-},{"./data/samples.json":100,"tone":77}],104:[function(require,module,exports){
+},{"./data/samples.json":101,"tone":77}],105:[function(require,module,exports){
 // The Mercury Playground main code loader
 // 
 
@@ -35167,7 +35122,7 @@ window.onload = () => {
 	
 	Hydra.link('hydra-ui');
 }
-},{"./canvas.js":89,"./editor.js":102,"./engine.js":103,"tone":77,"webmidi":88}],105:[function(require,module,exports){
+},{"./canvas.js":89,"./editor.js":103,"./engine.js":104,"tone":77,"webmidi":88}],106:[function(require,module,exports){
 const Tone = require('tone');
 const Util = require('total-serialism').Utility;
 const TL = require('total-serialism').Translate;
@@ -35175,7 +35130,8 @@ const Mercury = require('mercury-lang');
 const MonoSample = require('./core/MonoSample.js');
 const MonoMidi = require('./core/MonoMidi.js');
 const MonoSynth = require('./core/MonoSynth.js');
-const PolyInstrument = require('./core/PolyInstrument.js');
+const PolySynth = require('./core/PolySynth.js');
+// const PolyInstrument = require('./core/PolyInstrument.js');
 const Tempos = require('./data/genre-tempos.json');
 
 // fade time in seconds TODO: Make this adjustable with code/setting
@@ -35307,8 +35263,6 @@ async function code({ file, engine, canvas, p5canvas }){
 			let type = obj.type;
 			let args = obj.functions;			
 			let inst = new MonoSample(engine, type, canvas);
-			// let inst = new MonoSample(engine, type);
-			// let inst = new MonoSample(type, engine);
 
 			// apply arguments to instrument if part of instrument
 			Object.keys(args).forEach((a) => {
@@ -35325,8 +35279,6 @@ async function code({ file, engine, canvas, p5canvas }){
 			let type = obj.type;
 			let args = obj.functions;			
 			let inst = new MonoSample(engine, type, canvas);
-			// let inst = new MonoSample(engine, type);
-			// let inst = new MonoSample(type, engine);
 
 			// apply arguments to instrument if part of instrument
 			Object.keys(args).forEach((a) => {
@@ -35342,10 +35294,8 @@ async function code({ file, engine, canvas, p5canvas }){
 			console.log('make synth', obj);
 			let type = obj.type;
 			let args = obj.functions;			
-			let inst = new MonoSynth(engine, type, canvas);
-			// let inst = new MonoSynth(engine, type);
-			// let inst = new PolyInstrument(engine, type);
-			// let inst = new MonoSynth(type, engine);
+			// let inst = new MonoSynth(engine, type, canvas);
+			let inst = new PolySynth(engine, type, canvas);
 
 			// apply arguments to instrument if part of instrument
 			Object.keys(args).forEach((a) => {
@@ -35407,4 +35357,4 @@ async function code({ file, engine, canvas, p5canvas }){
 	_sounds = [];
 }
 module.exports = code;
-},{"./core/MonoMidi.js":92,"./core/MonoSample.js":93,"./core/MonoSynth.js":94,"./core/PolyInstrument.js":95,"./data/genre-tempos.json":99,"mercury-lang":54,"tone":77,"total-serialism":80}]},{},[104]);
+},{"./core/MonoMidi.js":92,"./core/MonoSample.js":93,"./core/MonoSynth.js":94,"./core/PolySynth.js":96,"./data/genre-tempos.json":100,"mercury-lang":54,"tone":77,"total-serialism":80}]},{},[105]);
