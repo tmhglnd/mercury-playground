@@ -6,7 +6,6 @@ const MonoSample = require('./core/MonoSample.js');
 const MonoMidi = require('./core/MonoMidi.js');
 const MonoSynth = require('./core/MonoSynth.js');
 const PolySynth = require('./core/PolySynth.js');
-// const PolyInstrument = require('./core/PolyInstrument.js');
 const Tempos = require('./data/genre-tempos.json');
 
 // fade time in seconds TODO: Make this adjustable with code/setting
@@ -133,72 +132,59 @@ async function code({ file, engine, canvas, p5canvas }){
 	sounds = [];
 
 	const objectMap = {
-		'sample' : async (obj) => {
+		'sample' : (obj) => {
+			// console.log('make sample', obj);
+			let type = obj.type;
+			let args = obj.functions;			
+			let inst = new MonoSample(engine, type, canvas);
+			
+			objectMap.applyFunctions(args, inst, type);
+			return inst;
+		},
+		'loop' : (obj) => {
 			// console.log('make sample', obj);
 			let type = obj.type;
 			let args = obj.functions;			
 			let inst = new MonoSample(engine, type, canvas);
 
-			// apply arguments to instrument if part of instrument
-			Object.keys(args).forEach((a) => {
-				if (inst[a]){
-					inst[a](...args[a]);
-				} else {
-					log(`${a}() is not a function of sample`);
-				}
-			});
+			objectMap.applyFunctions(args, inst, type);
 			return inst;
 		},
-		'loop' : async (obj) => {
-			// console.log('make sample', obj);
+		'synth' : (obj) => {
+			// console.log('make synth', obj);
 			let type = obj.type;
 			let args = obj.functions;			
-			let inst = new MonoSample(engine, type, canvas);
+			let inst = new MonoSynth(engine, type, canvas);
 
-			// apply arguments to instrument if part of instrument
-			Object.keys(args).forEach((a) => {
-				if (inst[a]){
-					inst[a](...args[a]);
-				} else {
-					log(`${a}() is not a function of loop`);
-				}
-			});
+			objectMap.applyFunctions(args, inst, type);
 			return inst;
 		},
-		'synth' : async (obj) => {
-			console.log('make synth', obj);
+		'polySynth' : (obj) => {
 			let type = obj.type;
-			let args = obj.functions;			
-			// let inst = new MonoSynth(engine, type, canvas);
+			let args = obj.functions;
 			let inst = new PolySynth(engine, type, canvas);
 
-			// apply arguments to instrument if part of instrument
-			Object.keys(args).forEach((a) => {
-				if (inst[a]){
-					inst[a](...args[a]);
-				} else {
-					log(`${a}() is not a function of synth`);
-				}
-			});
+			objectMap.applyFunctions(args, inst, type);
 			return inst;
 		},
-		'midi' : async (obj) => {
+		'midi' : (obj) => {
 			// console.log('make midi', obj);
 			let device = obj.type;
 			let args = obj.functions;
 			let inst = new MonoMidi(engine, device, canvas);
-			// let inst = new MonoMidi(engine, device);
-			// let inst = new MonoMidi(device, engine);
 
-			// apply arguments to instrument
+			objectMap.applyFunctions(args, inst, type);
+			return inst;
+		},
+		'applyFunctions' : (args, inst, type) => {
+			// apply arguments to instrument if part of instrument
 			Object.keys(args).forEach((a) => {
 				if (inst[a]){
 					inst[a](...args[a]);
 				} else {
-					log(`${a}() is not a function of midi`);
+					log(`${a}() is not a function of ${type}`);
 				}
 			});
-			return inst;
 		}
 	}
 
@@ -206,7 +192,7 @@ async function code({ file, engine, canvas, p5canvas }){
 	for (let o in tree.objects){
 		let type = tree.objects[o].object;;
 		if (objectMap[type]){
-			sounds.push(await objectMap[type](tree.objects[o]));
+			sounds.push(objectMap[type](tree.objects[o]));
 		} else {
 			log(`Instrument named '${type}' is not supported`);
 		}
