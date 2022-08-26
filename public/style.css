@@ -7,6 +7,73 @@
 	display: none;
 }
 
+.darkmode {
+	--bg: black;
+	--accent: white;
+	--primary: rgb(180, 180, 180);
+	--secundary: rgb(255, 255, 255, 0.6);
+
+	--button-bg: rgb(255, 255, 255, 0.15);
+
+	--textarea: rgb(0, 0, 0, 0.3);
+	--transparant: rgb(0, 0, 0, 0);
+
+	--cm-line: rgb(0, 0, 0, 1);
+	--cm-flash: rgb(255, 255, 255, 0.3);
+	--cm-gutter: var(--transparant);
+	--cm-select: rgb(255, 255, 255, 0.2);
+}
+
+.lightmode {
+	--bg: rgb(230, 230, 230);
+	--accent: black;
+	--primary: rgb(75, 75, 75);
+	--secundary: rgb(0, 0, 0, 0.6);
+
+	--button-bg: rgb(0, 0, 0, 0.2);
+
+	--textarea: rgb(0, 0, 0, 0.1);
+	--transparant: rgb(0, 0, 0, 0);
+
+	--cm-line: var(--bg);
+	--cm-flash: rgb(255, 255, 255, 0.5);
+	--cm-gutter: var(--transparant);
+	--cm-select: rgba(0, 0, 0, 0.3);
+}
+
+.colormode {
+	--bg: #6917d0;
+	--accent: #17ffee;
+	--primary: #17ffc4;
+	--secundary: #ff1791;
+
+	--button-bg: #cc17ff;
+
+	--textarea: var(--transparant);
+	--transparant: rgb(0, 0, 0, 0);
+
+	--cm-line: rgb(0, 0, 0, 1);
+	--cm-flash: rgb(255, 255, 255, 0.3);
+	--cm-gutter: var(--transparant);
+	--cm-select: rgba(0, 0, 0, 0.2);
+}
+
+.themeswitch {
+	position: absolute;
+	/* float: right; */
+	bottom: 12px;
+	right: 12px;
+	background: var(--button-bg);
+	width: 20px;
+	height: 20px;
+	border-radius: 2px;
+	margin: 4px;
+}
+
+.themeswitch:hover {
+	background: var(--accent);
+}
+
 /* Hide scrollbar for IE, Edge and Firefox */
 * {
 	-ms-overflow-style: none;  /* IE and Edge */
@@ -16,7 +83,7 @@
 
 body {
 	/* background: rgb(20, 20, 20); */
-	background: black;
+	background: var(--bg);
 	/* background: rgb(0, 0, 0, 0); */
 	/* font-family: "Andale Mono"; */
 	font-family: 'Ubuntu Mono', monospace;
@@ -33,14 +100,14 @@ h1 {
 	/* font-size: 6vw; */
 	font-size: 1.5em;
 	/* color: rgb(180, 180, 180); */
-	color: rgb(255, 255, 255, 0.6);
+	color: var(--secundary);
 	-webkit-app-region: no-drag;
 }
 
 p {
 	/* font-family: "Andale Mono"; */
 	/* font-family: "courier new"; */
-	color: rgb(180, 180, 180);
+	color: var(--primary);
 	-webkit-app-region: no-drag;
 	overflow-wrap: break-word;
 }
@@ -61,10 +128,10 @@ button {
 	/* text-align: left; */
 	border-radius: 2px;
 	border-width: 0px;
-	border-color: rgb(255, 255, 255, 0);
+	/* border-color: rgb(255, 255, 255, 0); */
 	/* background: rgb(255, 255, 255, 0.1); */
-	background: rgb(255, 255, 255, 0.1);
-	color:  rgb(255, 255, 255, 0.6);
+	background: var(--button-bg);
+	color:  var(--secundary);
 	/* color:  rgb(0, 0, 0, 1); */
 	width: 19%;
 	height: 25px;
@@ -83,32 +150,32 @@ button {
 
 .hide button {
 	/* background: rgb(255, 255, 255, 0.05); */
-	background: rgb(0, 0, 0, 0.05);
-	color: rgb(255, 255, 255, 0.5);
+	background: var(--transparant);
+	color: var(--secundary);
 }
 
 button:hover {
 	/* background: black; */
-	color: white;
-	background: rgb(0, 0, 0, 0.6);
+	color: var(--accent);
+	background: var(--transparant);
 	/* background: rgb(255, 255, 255, 0.15); */
 }
 
 button:active {
 	/* background: rgb(50, 50, 50); */
-	color: black;
-	background: rgb(255, 255, 255, 0.3);
+	color: var(--bg);
+	background: var(----secundary);
 }
 
 select {
 	/* display: block; */
 	font-family: inherit;
-	border-color: darkgrey;
+	border-color: var(--secundary);
 	border-width: 0px;
-	color:  rgb(255, 255, 255, 0.6);
+	color: var(--secundary);
 	/* background: rgb(20, 20, 20); */
 	/* background: rgb(255, 255, 255, 0.1); */
-	background: rgb(255, 255, 255, 0.1);
+	background: var(--button-bg);
 	border-radius: 2px;
 	width: 19%;
 	height: 25px;
@@ -118,8 +185,8 @@ select {
 
 select:hover {
 	/* background: rgb(50, 50, 50); */
-	color: white;
-	background: rgb(0, 0, 0, 0.6);
+	color: var(--accent);
+	background: var(--transparant);
 	/* background: rgb(255, 255, 255, 0.15); */
 }
 
@@ -128,8 +195,8 @@ textarea {
 	/* border-color: darkgrey; */
 	border-width: 0px;
 	border-radius: 2px;
-	color: rgb(255, 255, 255, 0.2);
-	background: rgb(0, 0, 0, 0.3);
+	color: var(--button-bg);
+	background: var(--textarea);
 	width: 100%;
 	margin: 2px;
 	overflow: hidden;
@@ -138,7 +205,7 @@ textarea {
 
 textarea:focus {
 	outline: none !important;
-	border-color: black;
+	border-color: var(--bg);
 }
 
 .bottom-ui {
@@ -152,7 +219,7 @@ textarea:focus {
 
 .CodeMirror {
 	/* background: transparent; */
-	background-color: rgb(0, 0, 0, 0) !important;
+	background-color: var(--transparant) !important;
 	/* background-color: transparent !important; */
 	/* border: 1px solid black; */
 	font-size: 16px;
@@ -169,19 +236,19 @@ textarea:focus {
 .CodeMirror-line span {
 	padding-top: 1px;
 	padding-bottom: 1px;
-    background-color: rgba(0, 0, 0, 1);
+    background-color: var(--cm-line);
 }
 
 .CodeMirror-gutters {
-	background-color: rgb(0, 0, 0, 0.1) !important;
+	background-color: var(--cm-gutter) !important;
 }
 
 .CodeMirror-selected {
-	background-color: rgb(255, 255, 255, 0.2) !important;
+	background-color: var(--cm-select) !important;
 }
 
 .editorFlash {
-	background: rgb(255, 255, 255, 0.3) !important;
+	background: var(--cm-flash) !important;
 	/* mix-blend-mode: difference; */
 }
 
@@ -200,7 +267,7 @@ textarea:focus {
 
 .loadscreen {
 	opacity: 1; 
-	background: #000; 
+	background: var(--bg); 
 	width: 100%;
 	height: 100%; 
 	z-index: 999999;
@@ -211,9 +278,9 @@ textarea:focus {
 }
 
 .loader {
-	border: 10px solid rgb(255, 255, 255, 0.2);
+	border: 10px solid var(--secundary);
 	border-radius: 80%;
-	border-top: 10px solid rgb(255, 255, 255, 1);
+	border-top: 10px solid var(--accent);
 	width: 25px;
 	height: 25px;
 	-webkit-animation: spin 2s linear infinite; /* Safari */

@@ -33796,34 +33796,34 @@ const Tone = require('tone');
 const Util = require('./Util.js');
 const fxMap = require('./Effects.js');
 const TL = require('total-serialism').Translate;
-const Instrument = require('./Instrument.js');
-// const Sequencer = require('./Sequencer.js');
+const Sequencer = require('./Sequencer.js');
+// const Instrument = require('./Instrument.js');
 
-// Basic class for all instruments
-class PolyInstrument extends Instrument {
+// Basic class for a poly-instrument
+class PolyInstrument extends Sequencer {
 	constructor(engine){
 		// Inherit from Sequencer
 		super(engine);
 
 		// Instrument specific parameters
-		// this._gain = [-6, 0];		
-		// this._pan = [ 0 ];
-		// this._att = [ 0 ];
-		// this._sus = [ 0 ];
-		// this._rel = [ 0 ];
+		this._gain = [-6, 0];		
+		this._pan = [ 0 ];
+		this._att = [ 0 ];
+		this._sus = [ 0 ];
+		this._rel = [ 0 ];
 
 		// Instrument specific Tone Nodes
-		// this.panner;
 		// this.adsr;
-		// this.gain;
 		// this.amp;
-		// this._fx;
+		this.panner;
+		this.gain;
+		this._fx;
 
 		// The source to be defined by inheriting class
 		// this.source;
 
 		// PolyInstrument specific parameters
-		this.numVoices = 8;
+		this.numVoices = 4;
 		this.sources = [];
 		this.adsrs = [];
 		this.busymap = [];
@@ -34013,8 +34013,6 @@ class PolyInstrument extends Instrument {
 
 		this.adsrs.map((a) => a.dispose());
 		this.sources.map((s) => s.dispose());
-
-		// this.adsr.dispose();
 		// remove all fx
 		this._fx.map((f) => f.delete());
 		console.log('=> disposed PolyInstrument() with FX:', this._fx);
@@ -34124,7 +34122,7 @@ module.exports = PolyInstrument;
 
 // }
 // module.exports = Voice;
-},{"./Effects.js":90,"./Instrument.js":91,"./Util.js":97,"tone":77,"total-serialism":80}],96:[function(require,module,exports){
+},{"./Effects.js":90,"./Sequencer.js":96,"./Util.js":97,"tone":77,"total-serialism":80}],96:[function(require,module,exports){
 const Tone = require('tone');
 const Util = require('./Util.js');
 
@@ -34583,13 +34581,6 @@ const CodeMirror = require('codemirror');
 const code = require('./worker.js');
 const saver = require('file-saver');
 
-// require('codemirror/lib/codemirror.css');
-// require('codemirror/theme/ayu-dark.css');
-// require('codemirror/theme/material-darker.css');
-// require('codemirror/theme/base16-dark.css');
-// require('codemirror/theme/material-ocean.css');
-// require('codemirror/theme/moxer.css');	
-
 require('codemirror/mode/javascript/javascript.js');
 require('codemirror/addon/mode/simple.js');
 require('codemirror/addon/comment/comment.js');
@@ -34872,7 +34863,9 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		menu.id = 'themes';
 		menu.onchange = () => { this.changeTheme() };
 		
-		let themes = ['ayu-dark', 'base16-dark', 'material-darker', 'material-ocean', 'moxer', 'tomorrow-night-eighties'];
+		let themes = ['ayu-dark', 'base16-dark', 'material-darker', 'material-ocean', 'moxer', 'tomorrow-night-eighties', 'panda-syntax', 'yonce'];
+
+		let lightThemes = ['elegant', 'duotone-light', 'base16-light']
 
 		for (let t in themes){
 			let option = document.createElement('option');
@@ -34883,6 +34876,24 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		div.appendChild(menu);
 
 		menu.value = defaultTheme;
+	}
+
+	// light/dark mode switcher
+	this.modeSwitch = function(){
+		let b = document.body;
+		let btn = document.createElement('button');
+		btn.id = 'switch';
+		btn.className = 'themeswitch';
+		btn.onclick = () => {
+			if (localStorage.getItem('theme') === 'darkmode'){
+				switchTheme('lightmode');
+				this.cm.setOption('theme', 'duotone-light');
+			} else {
+				switchTheme('darkmode');
+				this.cm.setOption('theme', 'material-darker');
+			}
+		}
+		b.appendChild(btn);
 	}
 }
 module.exports = Editor;
@@ -35098,6 +35109,14 @@ module.exports = { resume, silence, setBPM, getBPM, randomBPM, getBuffers, addBu
 // The Mercury Playground main code loader
 // 
 
+// switch theme in css
+switchTheme = (t) => {
+	localStorage.setItem('theme', t);
+	document.documentElement.className = t;
+}
+// initial dark mode theme on startup
+switchTheme('darkmode');
+
 window.onload = () => {
 	// load requires
 	const Tone = require('tone');
@@ -35165,6 +35184,7 @@ window.onload = () => {
 	cm.links();
 	cm.hide();
 	cm.tutorialMenu();
+	cm.modeSwitch();
 	cm.clear();
 	
 	Hydra.link('hydra-ui');
