@@ -3,13 +3,6 @@ const CodeMirror = require('codemirror');
 const code = require('./worker.js');
 const saver = require('file-saver');
 
-// require('codemirror/lib/codemirror.css');
-// require('codemirror/theme/ayu-dark.css');
-// require('codemirror/theme/material-darker.css');
-// require('codemirror/theme/base16-dark.css');
-// require('codemirror/theme/material-ocean.css');
-// require('codemirror/theme/moxer.css');	
-
 require('codemirror/mode/javascript/javascript.js');
 require('codemirror/addon/mode/simple.js');
 require('codemirror/addon/comment/comment.js');
@@ -292,7 +285,9 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		menu.id = 'themes';
 		menu.onchange = () => { this.changeTheme() };
 		
-		let themes = ['ayu-dark', 'base16-dark', 'material-darker', 'material-ocean', 'moxer', 'tomorrow-night-eighties'];
+		let themes = ['ayu-dark', 'base16-dark', 'material-darker', 'material-ocean', 'moxer', 'tomorrow-night-eighties', 'panda-syntax', 'yonce'];
+
+		let lightThemes = ['elegant', 'duotone-light', 'base16-light']
 
 		for (let t in themes){
 			let option = document.createElement('option');
@@ -303,6 +298,24 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		div.appendChild(menu);
 
 		menu.value = defaultTheme;
+	}
+
+	// light/dark mode switcher
+	this.modeSwitch = function(){
+		let b = document.body;
+		let btn = document.createElement('button');
+		btn.id = 'switch';
+		btn.className = 'themeswitch';
+		btn.onclick = () => {
+			if (localStorage.getItem('theme') === 'darkmode'){
+				switchTheme('lightmode');
+				this.cm.setOption('theme', 'duotone-light');
+			} else {
+				switchTheme('darkmode');
+				this.cm.setOption('theme', 'material-darker');
+			}
+		}
+		b.appendChild(btn);
 	}
 }
 module.exports = Editor;

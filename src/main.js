@@ -1,11 +1,15 @@
 // The Mercury Playground main code loader
 // 
 
-window.onload = () => {
-	document.getElementById('switch').onclick = () => {
-		switchTheme((localStorage.getItem('theme') === 'darkmode')? 'lightmode' : 'darkmode');
-	}
+// switch theme in css
+switchTheme = (t) => {
+	localStorage.setItem('theme', t);
+	document.documentElement.className = t;
+}
+// initial dark mode theme on startup
+switchTheme('darkmode');
 
+window.onload = () => {
 	// load requires
 	const Tone = require('tone');
 	
@@ -72,15 +76,8 @@ window.onload = () => {
 	cm.links();
 	cm.hide();
 	cm.tutorialMenu();
+	cm.modeSwitch();
 	cm.clear();
 	
 	Hydra.link('hydra-ui');
 }
-
-// switch theme in css
-switchTheme = (t) => {
-	localStorage.setItem('theme', t);
-	document.documentElement.className = t;
-}
-// initial dark mode theme on startup
-switchTheme('darkmode');

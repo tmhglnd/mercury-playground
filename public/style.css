@@ -25,7 +25,7 @@
 }
 
 .lightmode {
-	--bg: rgb(240, 240, 240);
+	--bg: rgb(230, 230, 230);
 	--accent: black;
 	--primary: rgb(75, 75, 75);
 	--secundary: rgb(0, 0, 0, 0.6);
@@ -35,7 +35,7 @@
 	--textarea: rgb(0, 0, 0, 0.1);
 	--transparant: rgb(0, 0, 0, 0);
 
-	--cm-line: rgb(0, 0, 0, 0.9);
+	--cm-line: var(--bg);
 	--cm-flash: rgb(255, 255, 255, 0.5);
 	--cm-gutter: var(--transparant);
 	--cm-select: rgba(0, 0, 0, 0.3);
