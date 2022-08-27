@@ -1,14 +1,28 @@
 
-list vals random(4 0 12)
+// list prg chordsFigured(I IIm V7 VIsus2)
+// list prg2 chordsFromNames(C Dm G7 Asus2)
+// list prg2 chordsNamed(C Dm G7 Asus2)
 
-print vals
+list spr spread(10)
+list nspr norm(spr)
+list snspr snorm(spr)
 
-display [1 2 3]
-display 'hello world'
+// list prg2 repeat(makeChords(I IIm V7) [3 4 2])
 
-print reverse(vals)
+// list inf infinitySeries()
+// list inf infinitySeries(20)
+// list inf2 infinitySeries(10 [1 2])
 
-new polySynth saw name(chordSaw) 
+// list vals random(4 0 12)
+
+// print vals
+
+// display [1 2 3]
+// display 'hello world'
+
+// print reverse(vals)
+
+// new polySynth saw name(chordSaw) 
 
 // display vals
 // display shuffle(vals)

@@ -1105,23 +1105,18 @@
     0,
     1,
     2,
-    [
-     3,
-     4
-    ],
+    3,
+    4,
     5,
-    [
-     6,
-     [
-      7
-     ]
-    ]
+    6,
+    7,
+    1
    ],
    "inv1": [
-    24,
-    21,
-    17,
-    12
+    12,
+    9,
+    5,
+    0
    ],
    "inv2": [
     10,
@@ -2740,23 +2735,18 @@
     0,
     1,
     2,
-    [
-     3,
-     4
-    ],
+    3,
+    4,
     5,
-    [
-     6,
-     [
-      7
-     ]
-    ]
+    6,
+    7,
+    1
    ],
    [
-    24,
-    21,
-    17,
-    12
+    12,
+    9,
+    5,
+    0
    ],
    [
     10,
@@ -8943,7 +8933,7 @@
      "@name": "mtn3",
      "@params": {
       "@function": {
-       "@name": "midi2note",
+       "@name": "midiToNote",
        "@args": [
         {
          "@array": [
@@ -8990,7 +8980,7 @@
      "@name": "mtf1",
      "@params": {
       "@function": {
-       "@name": "midi2freq",
+       "@name": "midiToFreq",
        "@args": [
         {
          "@array": [
@@ -9037,7 +9027,7 @@
      "@name": "ntm1",
      "@params": {
       "@function": {
-       "@name": "note2midi",
+       "@name": "noteToMidi",
        "@args": [
         {
          "@array": [
@@ -9084,7 +9074,7 @@
      "@name": "ntf1",
      "@params": {
       "@function": {
-       "@name": "note2freq",
+       "@name": "noteToFreq",
        "@args": [
         {
          "@array": [
@@ -9131,7 +9121,7 @@
      "@name": "ftm1",
      "@params": {
       "@function": {
-       "@name": "freq2midi",
+       "@name": "freqToMidi",
        "@args": [
         {
          "@array": [
@@ -9183,7 +9173,7 @@
      "@name": "ftm2",
      "@params": {
       "@function": {
-       "@name": "freq2midi",
+       "@name": "freqToMidi",
        "@args": [
         {
          "@array": [
@@ -9233,7 +9223,7 @@
      "@name": "ftn1",
      "@params": {
       "@function": {
-       "@name": "freq2note",
+       "@name": "freqToNote",
        "@args": [
         {
          "@array": [
@@ -9280,7 +9270,7 @@
      "@name": "rtm1",
      "@params": {
       "@function": {
-       "@name": "relative2midi",
+       "@name": "relativeToMidi",
        "@args": [
         {
          "@array": [
@@ -9343,7 +9333,7 @@
      "@name": "rtm2",
      "@params": {
       "@function": {
-       "@name": "relative2freq",
+       "@name": "relativeToFreq",
        "@args": [
         {
          "@array": [
@@ -9406,7 +9396,7 @@
      "@name": "rtc1",
      "@params": {
       "@function": {
-       "@name": "ratio2cent",
+       "@name": "ratioToCent",
        "@args": [
         {
          "@array": [
@@ -9497,7 +9487,7 @@
      "@name": "ms1",
      "@params": {
       "@function": {
-       "@name": "d2ms",
+       "@name": "dtoms",
        "@args": [
         {
          "@identifier": "divs"
@@ -9526,7 +9516,7 @@
      "@name": "ms2",
      "@params": {
       "@function": {
-       "@name": "d2ms",
+       "@name": "dtoms",
        "@args": [
         {
          "@identifier": "divs"
@@ -9593,7 +9583,7 @@
      "@name": "ms3",
      "@params": {
       "@function": {
-       "@name": "d2ms",
+       "@name": "dtoms",
        "@args": [
         {
          "@identifier": "ratios"
@@ -9660,7 +9650,7 @@
      "@name": "ms4",
      "@params": {
       "@function": {
-       "@name": "d2ms",
+       "@name": "dtoms",
        "@args": [
         {
          "@identifier": "comb"
@@ -9683,7 +9673,7 @@
      "@name": "tv1",
      "@params": {
       "@function": {
-       "@name": "t2r",
+       "@name": "ttor",
        "@args": [
         {
          "@array": [
@@ -9730,7 +9720,7 @@
      "@name": "tv2",
      "@params": {
       "@function": {
-       "@name": "t2r",
+       "@name": "ttor",
        "@args": [
         {
          "@array": [

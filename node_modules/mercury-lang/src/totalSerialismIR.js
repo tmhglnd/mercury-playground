@@ -134,6 +134,14 @@ const functionMap = {
 	'hex' : (...v) => {
 		return Algo.hexBeat(v[0]);
 	},
+	// generate a sequence of numbers from the collatz conjecture
+	// thread lightly, can grow large with large input numbers
+	'collatz' : (...v) => {
+		return Algo.collatz(v[0]);
+	},
+	'collatzMod' : (...v) => {
+		return Algo.collatzMod(...v);
+	},
 	// generate the numbers in the fibonacci sequence
 	'fibonacci' : (...v) => {
 		return Algo.fibonacci(...v);
@@ -141,6 +149,9 @@ const functionMap = {
 	// generate the pisano periods from the fibonacci sequence
 	'pisano' : (...v) => {
 		return Algo.pisano(...v);
+	},
+	'fibonacciMod' : (...v) => {
+		return functionMap.pisano(v);
 	},
 	// generate the numbers in the fibonacci sequence
 	'pell' : (...v) => {
@@ -153,6 +164,13 @@ const functionMap = {
 	// generate the numbers in the fibonacci sequence
 	'threeFibonacci' : (...v) => {
 		return Algo.threeFibonacci(...v);
+	},
+	// Per Nørgards Inifity series
+	'infinitySeries' : (...v) => {
+		return Algo.infinitySeries(...v);
+	},
+	'infSeries' : (...v) => {
+		return functionMap.infinitySeries(v);
 	},
 	// 
 	// Stochastic Methods
@@ -271,8 +289,11 @@ const functionMap = {
 		return Mod.every(...v);
 	},
 	// flatten a multidimensional array to 1D (or specified)
-	'flat' : (...v) => {
+	'flatten' : (...v) => {
 		return Util.flatten(...v);
+	},
+	'flat' : (...v) => {
+		return functionMap.flatten(v);
 	},
 	// invert an array around a center point
 	'invert' : (...v) => {
@@ -284,11 +305,12 @@ const functionMap = {
 	'flip' : (...v) => {
 		return Mod.invert(...v);
 	},
-	'filter' : (...v) => {
-		return Mod.filter(v[0], v.slice(1, v.length));
-	},
 	'inv' : (...v) => {
 		return Mod.invert(...v);
+	},
+	// filter items from an array
+	'filter' : (...v) => {
+		return Mod.filter(v[0], v.slice(1, v.length));
 	},
 	// lookup the values from an array based on another array
 	'lookup' : (...v) => {
@@ -308,9 +330,9 @@ const functionMap = {
 	'merge' : (...v) => {
 		return Mod.merge(...v);
 	},
-	'mix' : (...v) => {
-		return Mod.merge(...v);
-	},
+	// 'mix' : (...v) => {
+	// 	return Mod.merge(...v);
+	// },
 	// generate a palindrome of an array
 	'palindrome' : (...v) => {
 		return Mod.palindrome(...v);
@@ -321,16 +343,6 @@ const functionMap = {
 	'mirror' : (...v) => {
 		return Mod.palindrome(...v);
 	},
-	// rotate an array in positive or negative direction
-	'rotate' : (...v) => {
-		return Mod.rotate(...v);
-	},
-	'rot' : (...v) => {
-		return Mod.rotate(...v);
-	},
-	'turn' : (...v) => {
-		return Mod.rotate(...v);
-	},
 	// reverse an array
 	'reverse' : (...v) => {
 		return Mod.reverse(...v);
@@ -340,6 +352,16 @@ const functionMap = {
 	},
 	'retrograde' : (...v) => {
 		return Mod.reverse(...v);
+	},
+	// rotate an array in positive or negative direction
+	'rotate' : (...v) => {
+		return Mod.rotate(...v);
+	},
+	'rot' : (...v) => {
+		return Mod.rotate(...v);
+	},
+	'turn' : (...v) => {
+		return Mod.rotate(...v);
 	},
 	// sort an array in ascending or descending order
 	'sort' : (...v) => {
@@ -402,88 +424,125 @@ const functionMap = {
 		TL.setRoot(v[0]);
 		return TL.getSettings().root;
 	},
-	'toScale' : (...v) => {
-		return TL.toScale(...v);
-	},
 	// tempo translate methods
-	'division2ms' : (...v) => {
+	// divisionToMs
+	'divisionToMs' : (...v) => {
 		return TL.divisionToMs(...v);
 	},
-	'd2ms' : (...v) => {
+	'dtoms' : (...v) => {
 		return TL.divisionToMs(...v);
 	},
-	'division2ratio' : (...v) => {
+	// divisionToRatio
+	'divisionToRatio' : (...v) => {
 		return TL.divisionToRatio(...v);
 	},
-	'd2r' : (...v) => {
+	'dtor' : (...v) => {
 		return TL.divisionToRatio(...v);
 	},
-	'ratio2ms' : (...v) => {
+	// ratioToMs
+	'ratioToMs' : (...v) => {
 		return TL.ratioToMs(...v);
 	},
-	'r2ms' : (...v) => {
+	'rtoms' : (...v) => {
 		return TL.ratioToMs(...v);
 	},
-	'time2ratio' : (...v) => {
+	// timeToRatio
+	'timeToRatio' : (...v) => {
 		return TL.timevalueToRatio(...v);
 	},
-	't2r' : (...v) => {
+	'ttor' : (...v) => {
 		return TL.timevalueToRatio(...v);
 	},
 	// pitch translate methods
-	'note2midi' : (...v) => {
-		return TL.ntom(...v);
-	},
-	'n2m' : (...v) => {
-		return TL.ntom(...v);
-	},
-	'note2freq' : (...v) => {
-		return TL.noteToFreq(...v);
-	},
-	'n2f' : (...v) => {
-		return TL.noteToFreq(...v);
-	},
-	'midi2note' : (...v) => {
+	// midiToNote
+	'midiToNote' : (...v) => {
 		return TL.midiToNote(...v);
 	},
-	'm2n' : (...v) => {
+	'mton' : (...v) => {
 		return TL.midiToNote(...v);
 	},
-	'midi2freq' : (...v) => {
+	// midiToFreq
+	'midiToFreq' : (...v) => {
 		return TL.midiToFreq(...v);
 	},
-	'm2f' : (...v) => {
+	'mtof' : (...v) => {
 		return TL.midiToFreq(...v);
 	},
-	'freq2midi' : (...v) => {
+	// freqToMidi
+	'freqToMidi' : (...v) => {
 		return TL.freqToMidi(...v);
 	},
-	'f2m' : (...v) => {
+	'ftom' : (...v) => {
 		return TL.freqToMidi(...v);
 	},
-	'freq2note' : (...v) => {
+	// freqToNote
+	'freqToNote' : (...v) => {
 		return TL.freqToNote(...v);
 	},
-	'f2n' : (...v) => {
+	'fton' : (...v) => {
 		return TL.freqToNote(...v);
 	},
-	'relative2midi' : (...v) => {
+	// noteToMidi
+	'noteToMidi' : (...v) => {
+		return TL.ntom(...v);
+	},
+	'ntom' : (...v) => {
+		return TL.ntom(...v);
+	},
+	// noteToFreq
+	'noteToFreq' : (...v) => {
+		return TL.noteToFreq(...v);
+	},
+	'ntof' : (...v) => {
+		return TL.noteToFreq(...v);
+	},
+	// chromaToRelative
+	'chromaToRelative' : (...v) => {
+		return TL.chromaToRelative(...v);
+	},
+	'ctor' : (...v) => {
+		return TL.chromaToRelative(...v);
+	},
+	// relativeToMidi
+	'relativeToMidi' : (...v) => {
 		return TL.relativeToMidi(...v);
 	},
-	'r2m' : (...v) => {
+	'rtom' : (...v) => {
 		return TL.relativeToMidi(...v);
 	},
-	'relative2freq' : (...v) => {
+	// relativeToFreq
+	'relativeToFreq' : (...v) => {
 		return TL.relativeToFreq(...v);
 	},
-	'r2f' : (...v) => {
+	'rtof' : (...v) => {
 		return TL.relativeToFreq(...v);
 	},
-	'ratio2cent' : (...v) => {
+	// mapToScale functions
+	'toScale' : (...v) => {
+		return TL.toScale(...v);
+	},
+	// ratio to cent
+	'ratioToCent' : (...v) => {
 		return TL.ratioToCent(...v);
 	},
-	'rtc' : (...v) => {
+	'rtoc' : (...v) => {
 		return TL.ratioToCent(...v);
+	},
+	// chords generation
+	'chordsFromNumerals' : (...v) => {
+		return TL.chordsFromNumerals(v);
+	},
+	'makeChords' : (...v) => {
+		return functionMap.chordsFromNumerals(v);
+	},
+	'chordsFigured' : (...v) => {
+		return functionMap.chordsFromNumerals(v);
+	},
+	'chordsFromNames' : (...v) => {
+		return TL.chordsFromNames(...v);
+	},
+	'chordsNamed' : (...v) => {
+		return functionMap.chordsFromNames(v);
 	},
 	// 
 	// Statistic Methods
@@ -548,6 +607,13 @@ const functionMap = {
 	},
 	'norm' : (...v) => {
 		return Util.normalize(...v);
+	},
+	// signed normalize an array to -1 1 range
+	'signedNormalize' : (...v) => {
+		return Util.add(Util.mult(Util.norm(...v), 2), -1);
+	},
+	'snorm' : (...v) => {
+		return functionMap.signedNormalize(...v);
 	},
 	// take the modulus of an array
 	'modulo' : (...v) => {
