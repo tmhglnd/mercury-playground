@@ -25,6 +25,20 @@ const objects = {
 			'add_fx' : [],
 		}
 	},
+	'polySynth' : {
+		'object' : '',
+		'type' : 'saw',
+		'functions' : {
+			'group' : [],
+			'time' : [ '1/1', 0 ],
+			'note' : [ 0, 0 ],
+			'env' : [ 1, 250 ],
+			'beat' : [ 1 ],
+			'amp' : [ 0.7 ],
+			'wave2' : [ 'saw', 0 ],
+			'add_fx' : [],
+		}
+	},
 	'sample' : {
 		'object' : '',
 		'type' : 'kick_909',
