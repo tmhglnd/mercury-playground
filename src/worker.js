@@ -8,8 +8,8 @@ const MonoSynth = require('./core/MonoSynth.js');
 const PolyInstrument = require('./core/PolyInstrument.js');
 const Tempos = require('./data/genre-tempos.json');
 
-// fade time in seconds TODO: Make this adjustable with code/setting
-let crossFade = 1.5;
+// cross-fade time
+let crossFade = 0.5;
 // array with the insturments playing
 let _sounds = [];
 let sounds = [];
@@ -17,7 +17,6 @@ let sounds = [];
 // parse and evaluate the inputted code
 // as an asyncronous function with promise
 async function code({ file, engine, canvas, p5canvas }){
-	console.log('Evaluating');
 	let c = file;
 
 	let t = Tone.Transport.seconds;
@@ -26,7 +25,7 @@ async function code({ file, engine, canvas, p5canvas }){
 	});
 	let parse = await parser;
 	// let parse = Mercury(c);
-	console.log(`Done: ${((Tone.Transport.seconds - t) * 1000).toFixed(3)}ms`);
+	console.log(`Evaluated in: ${((Tone.Transport.seconds - t) * 1000).toFixed(3)}ms`);
 
 	let tree = parse.parseTree;
 	let errors = parse.errors;
@@ -217,9 +216,9 @@ async function code({ file, engine, canvas, p5canvas }){
 		}
 	}
 
-	sounds.map(async (s) => {
+	sounds.map((s) => {
 		// start new loops;
-		await s.makeLoop();
+		s.makeLoop();
 	});
 	console.log(`Made instruments in: ${((Tone.Transport.seconds - t) * 1000).toFixed(3)}ms`);
 

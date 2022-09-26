@@ -9,7 +9,6 @@ class Sequencer {
 		this._canvas = canvas;
 		
 		// Sequencer specific parameters
-		this._bbs = [ 0, 0, 0 ];
 		this._count = 0;
 		this._beatCount = 0;
 		this._time = 1;
@@ -38,22 +37,22 @@ class Sequencer {
 		}
 		let schedule = Tone.Time(this._offset).toSeconds();
 
+		console.log('schedule', schedule);
+
 		// create new loop for synth
 		this._loop = new Tone.Loop((time) => {
-			// convert transport time to Bars:Beats:Sixteenths
-			let t = Tone.Transport.getSecondsAtTime(time);
-			let bbs = Tone.Time(t).toBarsBeatsSixteenths().split(':');
-			// if reset per bar is greater than 0
+			// convert transport time to Ticks and convert reset time to ticks
+			let ticks = Tone.Transport.getTicksAtTime(time);
+			let rTicks = Tone.Time(`${this._reset}m`).toTicks();
+
+			// if reset per bar is a valid argument
 			if (this._reset > 0){
-				// if bars % reset === 0 and bar count is different then reset
-				if (!(Number(bbs[0]) % this._reset)){
-					if (bbs[0] !== this._bbs[0]){
-						this._count = 0;
-						this._beatCount = 0;
-					}
+				// if ticks % resetTicks === 0 then reset
+				if (ticks % rTicks === 0){
+					this._count = 0;
+					this._beatCount = 0;
 				}
 			}
-			this._bbs = bbs;
 
 			// get beat probability for current count
 			let b = Util.getParam(this._beat, this._count);

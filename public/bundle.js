@@ -36795,7 +36795,6 @@ class Sequencer {
 		this._canvas = canvas;
 		
 		// Sequencer specific parameters
-		this._bbs = [ 0, 0, 0 ];
 		this._count = 0;
 		this._beatCount = 0;
 		this._time = 1;
@@ -36824,22 +36823,22 @@ class Sequencer {
 		}
 		let schedule = Tone.Time(this._offset).toSeconds();
 
+		console.log('schedule', schedule);
+
 		// create new loop for synth
 		this._loop = new Tone.Loop((time) => {
-			// convert transport time to Bars:Beats:Sixteenths
-			let t = Tone.Transport.getSecondsAtTime(time);
-			let bbs = Tone.Time(t).toBarsBeatsSixteenths().split(':');
-			// if reset per bar is greater than 0
+			// convert transport time to Ticks and convert reset time to ticks
+			let ticks = Tone.Transport.getTicksAtTime(time);
+			let rTicks = Tone.Time(`${this._reset}m`).toTicks();
+
+			// if reset per bar is a valid argument
 			if (this._reset > 0){
-				// if bars % reset === 0 and bar count is different then reset
-				if (!(Number(bbs[0]) % this._reset)){
-					if (bbs[0] !== this._bbs[0]){
-						this._count = 0;
-						this._beatCount = 0;
-					}
+				// if ticks % resetTicks === 0 then reset
+				if (ticks % rTicks === 0){
+					this._count = 0;
+					this._beatCount = 0;
 				}
 			}
-			this._bbs = bbs;
 
 			// get beat probability for current count
 			let b = Util.getParam(this._beat, this._count);
@@ -37632,7 +37631,7 @@ function resume(){
 			Tone.Transport.start('+0.1');
 
 			Tone.getDestination().volume.rampTo(0, 0.01);
-			console.log("Resumed Transport");
+			// console.log("Resumed Transport");
 		}
 		// record(true);
 	} catch {
@@ -37643,8 +37642,10 @@ function resume(){
 // stop the transport end therefore playing the sounds
 function silence(){
 	try {
-		Tone.Transport.pause();
-		Tone.getDestination().volume.rampTo(-Infinity, 0.5);
+		Tone.getDestination().volume.rampTo(-Infinity, 0.01);
+		// Tone.Transport.pause();
+		// Stop the transport instead of pause to make sure transports starts from 0 again.
+		Tone.Transport.stop();
 		// Tone.stop();
 		// record(false);
 	} catch {
@@ -37861,8 +37862,8 @@ const MonoSynth = require('./core/MonoSynth.js');
 const PolyInstrument = require('./core/PolyInstrument.js');
 const Tempos = require('./data/genre-tempos.json');
 
-// fade time in seconds TODO: Make this adjustable with code/setting
-let crossFade = 1.5;
+// cross-fade time
+let crossFade = 0.5;
 // array with the insturments playing
 let _sounds = [];
 let sounds = [];
@@ -37870,7 +37871,6 @@ let sounds = [];
 // parse and evaluate the inputted code
 // as an asyncronous function with promise
 async function code({ file, engine, canvas, p5canvas }){
-	console.log('Evaluating');
 	let c = file;
 
 	let t = Tone.Transport.seconds;
@@ -37879,7 +37879,7 @@ async function code({ file, engine, canvas, p5canvas }){
 	});
 	let parse = await parser;
 	// let parse = Mercury(c);
-	console.log(`Done: ${((Tone.Transport.seconds - t) * 1000).toFixed(3)}ms`);
+	console.log(`Evaluated in: ${((Tone.Transport.seconds - t) * 1000).toFixed(3)}ms`);
 
 	let tree = parse.parseTree;
 	let errors = parse.errors;
@@ -38070,9 +38070,9 @@ async function code({ file, engine, canvas, p5canvas }){
 		}
 	}
 
-	sounds.map(async (s) => {
+	sounds.map((s) => {
 		// start new loops;
-		await s.makeLoop();
+		s.makeLoop();
 	});
 	console.log(`Made instruments in: ${((Tone.Transport.seconds - t) * 1000).toFixed(3)}ms`);
 
