@@ -37318,12 +37318,14 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		// keymaps for execute/stopping/commenting code
 		extraKeys: {
 			'Ctrl-/': 'toggleComment',
-			'Ctrl-Enter': () => { this.evaluate() },
-			'Ctrl-.': () => { this.silence() },
 			'Alt-/': 'toggleComment',
+			'Ctrl-Enter': () => { this.evaluate() },
 			'Alt-Enter': () => { this.evaluate() },
+			'Ctrl-.': () => { this.silence() },
 			'Alt-.': () => { this.silence() },
-			'Tab': 'insertSoftTab'
+			'Shift-Alt-Enter': () => { this.evaluateBlock() },
+			'Shift-Ctrl-Enter': () => { this.evaluateBlock() },
+			'Tab': 'insertSoftTab',
 		}
 	}
 
@@ -37357,16 +37359,41 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 	}
 
 	this.evaluate = async function(){
-		this.flash();
+		this.flash(this.cm.firstLine(), this.cm.lastLine()+1);
 
-		// console.log('evaluating code...');
 		await code({ file: this.cm.getValue(), engine: engine, canvas: canvas, p5canvas: p5canvas });
 		await engine.resume();
 	}
 
-	this.flash = async function(){
-		let start = { line: this.cm.firstLine(), ch: 0 };
-		let end = { line: this.cm.lastLine()+1, ch: 0 };
+	this.evaluateBlock = async function(){
+		let c = this.getCurrentBlock();
+		this.flash(c.start.line, c.end.line);
+
+		await code({ file: c.text, engine: engine, canvas: canvas, p5canvas: p5canvas });
+		await engine.resume();
+	}
+
+	// thanks to graham wakefield + gibber
+	this.getCurrentBlock = function(){ 
+		let pos = this.cm.getCursor();
+		let start = pos.line;
+		let end = pos.line;
+		while (start > 0 && this.cm.getLine(start) !== '') {
+			start--;
+		}
+		while (end < this.cm.lineCount() && this.cm.getLine(end) !== '') {
+			end++;
+		}
+		let p1 = { line: start, ch: 0 };
+		let p2 = { line: end, ch: 0};
+		let block = this.cm.getRange(p1, p2);
+
+		return { start: p1, end: p2, text: block };
+	}
+
+	this.flash = async function(from, to){
+		let start = { line: from, ch: 0 };
+		let end = { line: to, ch: 0 };
 		// console.log(start, end);
 
 		let marker = this.cm.markText(start, end, { className: 'editorFlash' });
