@@ -17,7 +17,10 @@ window.onload = () => {
 	Tone.UserMedia.enumerateDevices().then((devices) => {
 		// print the device labels
 		window.devices = devices.map(device => device.label);
-		console.log(window.devices);
+		console.log("=> Input devices");
+		window.devices.forEach((i) => {
+			console.log(`- input: ${i}`);
+		})
 	});
 	
 	// console.log catch function
@@ -56,10 +59,10 @@ window.onload = () => {
 		} else {
 			console.log("=> webMidi enabled");
 			WebMidi.inputs.forEach((i) => {
-				console.log('- inputs: ', i.name);
+				console.log(`- inputs: ${i.name}`);
 			});
 			WebMidi.outputs.forEach((i) => {
-				console.log('- outputs: ', i.name);
+				console.log(`- outputs: ${i.name}`);
 			});
 		}
 	});
