@@ -21832,6 +21832,17 @@ const objects = {
 			'sync' : 'off',
 			'add_fx' : []
 		}
+	},
+	'input' : {
+		'object' : '',
+		'type' : 'default',
+		'functions' : {
+			'group' : [],
+			'time' : [ '1/1', 0 ],
+			'env' : [ -1 ],
+			'amp' : [ 0.9 ],
+			'add_fx' : []
+		}
 	}
 }
 module.exports = { objects };
@@ -35848,7 +35859,7 @@ const PingPongDelay = function(_params){
 		this._fx.dispose();
 	}
 }
-},{"./Util.js":107,"tone":87,"total-serialism":90}],101:[function(require,module,exports){
+},{"./Util.js":108,"tone":87,"total-serialism":90}],101:[function(require,module,exports){
 const Tone = require('tone');
 const Util = require('./Util.js');
 const fxMap = require('./Effects.js');
@@ -36065,7 +36076,56 @@ class Instrument extends Sequencer {
 	}
 }
 module.exports = Instrument;
-},{"./Effects.js":100,"./Sequencer.js":106,"./Util.js":107,"tone":87}],102:[function(require,module,exports){
+},{"./Effects.js":100,"./Sequencer.js":107,"./Util.js":108,"tone":87}],102:[function(require,module,exports){
+const Tone = require('tone');
+const Instrument = require('./Instrument.js');
+
+class MonoInput extends Instrument {
+	constructor(engine, d, canvas){
+		super(engine, canvas);
+
+		if (d === 'default'){
+			this._device = 0;
+		} else if (d.match(/in(\d+)/g)){
+			this._device = Number(d.match(/in(\d+)/)[1]);
+		} else {
+			log(`${d} is not a valid microphone input. set to default`);
+			this._device = 0;
+		}
+		// log(`Opened microphone: ${window.devices[this._device]}`);
+
+		this.mic;
+		this.createSource();
+
+		console.log('=> MonoInput()', this);
+	}
+
+	createSource(){
+		this.mic = new Tone.UserMedia().connect(this.channelStrip());
+		this.mic.open(this._device).then(() => {
+			log(`Opened microphone: ${window.devices[this._device]}`);
+		}).catch((e) => {
+			log(`Unable to use microphone`);
+		});
+		this.source = this.mic;
+	}
+
+	sourceEvent(c, e, time){
+		return;	
+	}
+
+	delete(){
+		// delete super class
+		super.delete();
+		// disconnect the sound dispose the player
+		this.source.close();
+		this.source.dispose();
+
+		console.log('=> disposed MonoInput()', this._sound);
+	}
+}
+module.exports = MonoInput;
+},{"./Instrument.js":101,"tone":87}],103:[function(require,module,exports){
 const Tone = require('tone');
 const Util = require('./Util.js');
 const Sequencer = require('./Sequencer.js');
@@ -36191,7 +36251,7 @@ class MonoMidi extends Sequencer {
 	}	
 }
 module.exports = MonoMidi;
-},{"./Sequencer.js":106,"./Util.js":107,"tone":87,"webmidi":98}],103:[function(require,module,exports){
+},{"./Sequencer.js":107,"./Util.js":108,"tone":87,"webmidi":98}],104:[function(require,module,exports){
 const Tone = require('tone');
 const Util = require('./Util.js');
 // const fxMap = require('./Effects.js');
@@ -36317,7 +36377,7 @@ class MonoSample extends Instrument {
 	}
 }
 module.exports = MonoSample;
-},{"./Instrument.js":101,"./Util.js":107,"tone":87}],104:[function(require,module,exports){
+},{"./Instrument.js":101,"./Util.js":108,"tone":87}],105:[function(require,module,exports){
 const Tone = require('tone');
 const Util = require('./Util.js');
 // const fxMap = require('./Effects.js');
@@ -36452,7 +36512,7 @@ class MonoSynth extends Instrument {
 	}
 }
 module.exports = MonoSynth;
-},{"./Instrument":101,"./Util.js":107,"tone":87,"total-serialism":90}],105:[function(require,module,exports){
+},{"./Instrument":101,"./Util.js":108,"tone":87,"total-serialism":90}],106:[function(require,module,exports){
 const Tone = require('tone');
 const Util = require('./Util.js');
 const fxMap = require('./Effects.js');
@@ -36783,7 +36843,7 @@ module.exports = PolyInstrument;
 
 // }
 // module.exports = Voice;
-},{"./Effects.js":100,"./Sequencer.js":106,"./Util.js":107,"tone":87,"total-serialism":90}],106:[function(require,module,exports){
+},{"./Effects.js":100,"./Sequencer.js":107,"./Util.js":108,"tone":87,"total-serialism":90}],107:[function(require,module,exports){
 const Tone = require('tone');
 const Util = require('./Util.js');
 
@@ -36928,7 +36988,7 @@ class Sequencer {
 	}
 }
 module.exports = Sequencer;
-},{"./Util.js":107,"tone":87}],107:[function(require,module,exports){
+},{"./Util.js":108,"tone":87}],108:[function(require,module,exports){
 // lookup a value from array with wrap index
 function lookup(a, i){
 	return a[i % a.length];
@@ -36993,7 +37053,7 @@ function divToS(d, bpm){
 }
 
 module.exports = { lookup, randLookup, isRandom, getParam, toArray, msToS, formatRatio, divToS }
-},{}],108:[function(require,module,exports){
+},{}],109:[function(require,module,exports){
 module.exports={
   "00_sample-and-time": "// play different samples\n// at different time intervals\nset tempo 95\n\nnew sample piano_a time(1)\nnew sample piano_c time(1/2)\nnew sample piano_f time(1/3)\nnew sample piano_g time(1/4)\n\n// add reverb fx to all samples\nset all fx(reverb 0.4 3)",
   "01_offset-in-time": "// multiple samples make up a beat\n// using a time offset as \n// second argument\nset tempo 131\n\nnew sample kick_909 time(1/4)\nnew sample snare_909 time(1/2 1/4)\nnew sample hat_909 time(1/4 1/8)\nnew sample hat_909_open time(1 15/16)\nnew sample clap_909 time(5/16)\n\n// short slapback reverb\nset all fx(reverb 0.5 2)",
@@ -37010,7 +37070,7 @@ module.exports={
   "12_drone-synths": "// A synth that functions as bass drone \n// Combined with a short high pitch synth with delay\n// Creating in a melody from a lookup scale list\nset tempo 124\n// set a scale\nset scale harmonic_minor c\n\n// some note numbers for bass synth\nlist notes [3 7 5 8]\nnew synth saw note(notes 0) time(4) name(drone)\n    set drone fat(0.1132 3) shape(off) fx(squash 5)\n    set drone fx(reverb 0.6 5) fx(filter low 1500 0.4)\n\n// create a melody for the lead synth\nlist melody cosine(16 5.32 0 12)\nnew synth sine note(melody 2) time(1/2) name(lead)\n    set lead shape(1 120) fat(0.021 3) fx(distort 10)\n    set lead fx(delay 3/16 4/16 0.8) fx(reverb 0.5 3)"
 }
 
-},{}],109:[function(require,module,exports){
+},{}],110:[function(require,module,exports){
 module.exports={
 	"uptempo" : 10,
 	"downtempo" : 10,
@@ -37031,7 +37091,7 @@ module.exports={
 	"dnb" : 170,
 	"neurofunk" : 180
 }
-},{}],110:[function(require,module,exports){
+},{}],111:[function(require,module,exports){
 module.exports={
   "noise_a": "assets/samples/noise/noise_a.wav",
   "drone_cymbal": "assets/samples/ambient/cymbal/drone_cymbal.wav",
@@ -37178,7 +37238,7 @@ module.exports={
   "pluck_g": "assets/samples/string/plucked/violin/pluck_g.wav"
 }
 
-},{}],111:[function(require,module,exports){
+},{}],112:[function(require,module,exports){
 module.exports={
   "-tutorials": "// Welcome to the Mercury Playground ^^\n// click \"play\" to execute the code\n// and adjust the code below:\n\nlist kickBeat [1 0.01 0.1 1 0]\nnew sample kick_house time(1/16) play(kickBeat)\n\nlist hatBeat euclid(16 7)\nnew sample hat_909 time(1/16) play(hatBeat) pan(0.5)\n\nnew sample snare_hvy time(1 3/4)\n\nlist positions sineFloat(16 6.523 0 0.6)\nlist pitch repeat([2 1 1 0.84 0.94] 16)\nnew sample chimes_l time(1/16) shape(1 70 5) name(stut)\n\tset stut offset(positions) pan(random) gain(1) speed(pitch)\n",
   "000-intro": "// === TUTORIAL 000: Intro ===\n// Welcome to the Mercury tutorial ^^\n// These short tutorials will teach you all everything \n// that you can do with this environment\n\n// Lines starting with '//' are comments and are not part of the code\n// You can (un)comment coded lines with Option+/ (or by deleting the //)\n\n// Uncomment the line below and click 'play' above\n// new sample harp_up time(1)\n// Now comment the line and click 'play' again",
@@ -37234,7 +37294,7 @@ module.exports={
   "604-view-with-hydra": "// === TUTORIAL 604: View & Hydra ===\n// You can access the canvas of the displayed list by\n// initializing a hydra source: s0.init({src: listView})\n\nlist cos mod(cosine(2000 60 20) 2)\nview cos\n\nlist hydraVisual ['s0.init({src: listView}); src(s0).modulate(noise([2,5,10]), [0.05, 0.1]).out()']\nnew sample hat_909 time(1/4) visual(hydraVisual)\n"
 }
 
-},{}],112:[function(require,module,exports){
+},{}],113:[function(require,module,exports){
 
 const CodeMirror = require('codemirror');
 const code = require('./worker.js');
@@ -37358,19 +37418,19 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		);
 	}
 
-	this.evaluate = async function(){
+	this.evaluate = function(){
 		this.flash(this.cm.firstLine(), this.cm.lastLine()+1);
 
-		await code({ file: this.cm.getValue(), engine: engine, canvas: canvas, p5canvas: p5canvas });
-		await engine.resume();
+		code({ file: this.cm.getValue(), engine: engine, canvas: canvas, p5canvas: p5canvas });
+		engine.resume();
 	}
 
-	this.evaluateBlock = async function(){
+	this.evaluateBlock = function(){
 		let c = this.getCurrentBlock();
 		this.flash(c.start.line, c.end.line);
 
-		await code({ file: c.text, engine: engine, canvas: canvas, p5canvas: p5canvas });
-		await engine.resume();
+		code({ file: c.text, engine: engine, canvas: canvas, p5canvas: p5canvas });
+		engine.resume();
 	}
 
 	// thanks to graham wakefield + gibber
@@ -37610,7 +37670,7 @@ function date(){
 // 	editor.setOption('theme', t);
 // 	cEditor.setOption('theme', t);
 // }
-},{"./data/examples.json":108,"./data/tutorials.json":111,"./worker.js":115,"codemirror":27,"codemirror/addon/comment/comment.js":25,"codemirror/addon/mode/simple.js":26,"codemirror/mode/javascript/javascript.js":28,"file-saver":30,"tone":87}],113:[function(require,module,exports){
+},{"./data/examples.json":109,"./data/tutorials.json":112,"./worker.js":116,"codemirror":27,"codemirror/addon/comment/comment.js":25,"codemirror/addon/mode/simple.js":26,"codemirror/mode/javascript/javascript.js":28,"file-saver":30,"tone":87}],114:[function(require,module,exports){
 const Tone = require('tone');
 
 // latency reduces cpu load
@@ -37793,7 +37853,7 @@ async function record(start){
 }
 
 module.exports = { resume, silence, setBPM, getBPM, randomBPM, getBuffers, addBuffers, setLowPass, setHiPass, setVolume, record };
-},{"./data/samples.json":110,"tone":87}],114:[function(require,module,exports){
+},{"./data/samples.json":111,"tone":87}],115:[function(require,module,exports){
 // The Mercury Playground main code loader
 // 
 
@@ -37805,9 +37865,16 @@ switchTheme = (t) => {
 // initial dark mode theme on startup
 switchTheme('darkmode');
 
+window.devices;
+
 window.onload = () => {
 	// load requires
 	const Tone = require('tone');
+	Tone.UserMedia.enumerateDevices().then((devices) => {
+		// print the device labels
+		window.devices = devices.map(device => device.label);
+		console.log(window.devices);
+	});
 	
 	// console.log catch function
 	if (typeof console != "undefined"){ 
@@ -37877,7 +37944,7 @@ window.onload = () => {
 	
 	Hydra.link('hydra-ui');
 }
-},{"./canvas.js":99,"./editor.js":112,"./engine.js":113,"tone":87,"webmidi":98}],115:[function(require,module,exports){
+},{"./canvas.js":99,"./editor.js":113,"./engine.js":114,"tone":87,"webmidi":98}],116:[function(require,module,exports){
 const Tone = require('tone');
 const Util = require('total-serialism').Utility;
 const TL = require('total-serialism').Translate;
@@ -37885,6 +37952,7 @@ const Mercury = require('mercury-lang');
 const MonoSample = require('./core/MonoSample.js');
 const MonoMidi = require('./core/MonoMidi.js');
 const MonoSynth = require('./core/MonoSynth.js');
+const MonoInput = require('./core/MonoInput.js');
 const PolyInstrument = require('./core/PolyInstrument.js');
 const Tempos = require('./data/genre-tempos.json');
 
@@ -38083,6 +38151,20 @@ async function code({ file, engine, canvas, p5canvas }){
 				}
 			});
 			return inst;
+		},
+		'input' : async (obj) => {
+			let device = obj.type;
+			let args = obj.functions;
+			let inst = new MonoInput(engine, device, canvas);
+			// apply arguments to instrument
+			Object.keys(args).forEach((a) => {
+				if (inst[a]){
+					inst[a](...args[a]);
+				} else {
+					log(`${a}() is not a function of input`);
+				}
+			});
+			return inst;
 		}
 	}
 
@@ -38116,4 +38198,4 @@ async function code({ file, engine, canvas, p5canvas }){
 	_sounds = [];
 }
 module.exports = code;
-},{"./core/MonoMidi.js":102,"./core/MonoSample.js":103,"./core/MonoSynth.js":104,"./core/PolyInstrument.js":105,"./data/genre-tempos.json":109,"mercury-lang":54,"tone":87,"total-serialism":90}]},{},[114]);
+},{"./core/MonoInput.js":102,"./core/MonoMidi.js":103,"./core/MonoSample.js":104,"./core/MonoSynth.js":105,"./core/PolyInstrument.js":106,"./data/genre-tempos.json":110,"mercury-lang":54,"tone":87,"total-serialism":90}]},{},[115]);

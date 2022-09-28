@@ -5,6 +5,7 @@ const Mercury = require('mercury-lang');
 const MonoSample = require('./core/MonoSample.js');
 const MonoMidi = require('./core/MonoMidi.js');
 const MonoSynth = require('./core/MonoSynth.js');
+const MonoInput = require('./core/MonoInput.js');
 const PolyInstrument = require('./core/PolyInstrument.js');
 const Tempos = require('./data/genre-tempos.json');
 
@@ -200,6 +201,20 @@ async function code({ file, engine, canvas, p5canvas }){
 					inst[a](...args[a]);
 				} else {
 					log(`${a}() is not a function of midi`);
+				}
+			});
+			return inst;
+		},
+		'input' : async (obj) => {
+			let device = obj.type;
+			let args = obj.functions;
+			let inst = new MonoInput(engine, device, canvas);
+			// apply arguments to instrument
+			Object.keys(args).forEach((a) => {
+				if (inst[a]){
+					inst[a](...args[a]);
+				} else {
+					log(`${a}() is not a function of input`);
 				}
 			});
 			return inst;

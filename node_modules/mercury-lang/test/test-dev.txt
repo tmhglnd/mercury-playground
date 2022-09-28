@@ -1,11 +1,13 @@
 
+new input default time(1/8)
+
 // list prg chordsFigured(I IIm V7 VIsus2)
 // list prg2 chordsFromNames(C Dm G7 Asus2)
 // list prg2 chordsNamed(C Dm G7 Asus2)
 
-list spr spread(10)
-list nspr norm(spr)
-list snspr snorm(spr)
+// list spr spread(10)
+// list nspr norm(spr)
+// list snspr snorm(spr)
 
 // list prg2 repeat(makeChords(I IIm V7) [3 4 2])
 

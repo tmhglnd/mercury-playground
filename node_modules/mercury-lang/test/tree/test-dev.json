@@ -14,45 +14,26 @@
    ],
    "silence": false
   },
-  "variables": {
-   "spr": [
-    0,
-    1,
-    2,
-    3,
-    4,
-    5,
-    6,
-    7,
-    8,
-    9
-   ],
-   "nspr": [
-    0,
-    0.1111111111111111,
-    0.2222222222222222,
-    0.3333333333333333,
-    0.4444444444444444,
-    0.5555555555555556,
-    0.6666666666666666,
-    0.7777777777777778,
-    0.8888888888888888,
-    1
-   ],
-   "snspr": [
-    -1,
-    -0.7777777777777778,
-    -0.5555555555555556,
-    -0.33333333333333337,
-    -0.11111111111111116,
-    0.11111111111111116,
-    0.33333333333333326,
-    0.5555555555555556,
-    0.7777777777777777,
-    1
-   ]
+  "variables": {},
+  "objects": {
+   "ZPFB5QBF": {
+    "object": "input",
+    "type": "default",
+    "functions": {
+     "group": [],
+     "time": [
+      "1/8"
+     ],
+     "env": [
+      -1
+     ],
+     "add_fx": [],
+     "name": [
+      "ZPFB5QBF"
+     ]
+    }
+   }
   },
-  "objects": {},
   "groups": {
    "all": []
   },
@@ -62,6 +43,9 @@
    "// list prg chordsFigured(I IIm V7 VIsus2)",
    "// list prg2 chordsFromNames(C Dm G7 Asus2)",
    "// list prg2 chordsNamed(C Dm G7 Asus2)",
+   "// list spr spread(10)",
+   "// list nspr norm(spr)",
+   "// list snspr snorm(spr)",
    "// list prg2 repeat(makeChords(I IIm V7) [3 4 2])",
    "// list inf infinitySeries()",
    "// list inf infinitySeries(20)",
@@ -87,6 +71,28 @@
  "syntaxTree": {
   "@main": [
    {
+    "@object": {
+     "@new": {
+      "@inst": "input",
+      "@type": {
+       "@identifier": "default"
+      },
+      "@functions": [
+       {
+        "@function": {
+         "@name": "time",
+         "@args": [
+          {
+           "@division": "1/8"
+          }
+         ]
+        }
+       }
+      ]
+     }
+    }
+   },
+   {
     "@global": {
      "@comment": "// list prg chordsFigured(I IIm V7 VIsus2)"
     }
@@ -102,48 +108,18 @@
     }
    },
    {
-    "@list": {
-     "@name": "spr",
-     "@params": {
-      "@function": {
-       "@name": "spread",
-       "@args": [
-        {
-         "@number": 10
-        }
-       ]
-      }
-     }
+    "@global": {
+     "@comment": "// list spr spread(10)"
     }
    },
    {
-    "@list": {
-     "@name": "nspr",
-     "@params": {
-      "@function": {
-       "@name": "norm",
-       "@args": [
-        {
-         "@identifier": "spr"
-        }
-       ]
-      }
-     }
+    "@global": {
+     "@comment": "// list nspr norm(spr)"
     }
    },
    {
-    "@list": {
-     "@name": "snspr",
-     "@params": {
-      "@function": {
-       "@name": "snorm",
-       "@args": [
-        {
-         "@identifier": "spr"
-        }
-       ]
-      }
-     }
+    "@global": {
+     "@comment": "// list snspr snorm(spr)"
     }
    },
    {

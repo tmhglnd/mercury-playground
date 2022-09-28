@@ -121,19 +121,19 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		);
 	}
 
-	this.evaluate = async function(){
+	this.evaluate = function(){
 		this.flash(this.cm.firstLine(), this.cm.lastLine()+1);
 
-		await code({ file: this.cm.getValue(), engine: engine, canvas: canvas, p5canvas: p5canvas });
-		await engine.resume();
+		code({ file: this.cm.getValue(), engine: engine, canvas: canvas, p5canvas: p5canvas });
+		engine.resume();
 	}
 
-	this.evaluateBlock = async function(){
+	this.evaluateBlock = function(){
 		let c = this.getCurrentBlock();
 		this.flash(c.start.line, c.end.line);
 
-		await code({ file: c.text, engine: engine, canvas: canvas, p5canvas: p5canvas });
-		await engine.resume();
+		code({ file: c.text, engine: engine, canvas: canvas, p5canvas: p5canvas });
+		engine.resume();
 	}
 
 	// thanks to graham wakefield + gibber

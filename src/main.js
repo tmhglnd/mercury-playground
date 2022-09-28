@@ -9,9 +9,16 @@ switchTheme = (t) => {
 // initial dark mode theme on startup
 switchTheme('darkmode');
 
+window.devices;
+
 window.onload = () => {
 	// load requires
 	const Tone = require('tone');
+	Tone.UserMedia.enumerateDevices().then((devices) => {
+		// print the device labels
+		window.devices = devices.map(device => device.label);
+		console.log(window.devices);
+	});
 	
 	// console.log catch function
 	if (typeof console != "undefined"){ 
