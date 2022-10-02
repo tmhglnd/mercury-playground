@@ -28,6 +28,12 @@ class MonoInput extends Instrument {
 		}).catch((e) => {
 			log(`Unable to use microphone`);
 		});
+		this.mic.channelInterpretation = 'discrete';
+		console.log(`Number of inputs: ${this.mic.numberOfOutputs}`);
+		console.log(`Number of outputs: ${this.mic.numberOfOutputs}`);
+		console.log(`channelInterpretation: ${this.mic.channelInterpretation}`);
+		console.log(`channelCount: ${this.mic.channelCount}`);
+		console.log(`channelCountMode: ${this.mic.channelCountMode}`);
 		this.source = this.mic;
 	}
 
