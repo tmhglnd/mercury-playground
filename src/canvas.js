@@ -1,4 +1,5 @@
 // Hydra Canvas
+const p5 = require('p5');
 const HydraSynth = require('hydra-synth');
 const loop = require('raf-loop');
 
