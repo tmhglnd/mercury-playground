@@ -16,9 +16,12 @@ try {
 	socket.on('connected', (id) => {
 		console.log(`Connected for OSC: ${id}`);
 	});
-	// socket.on('osc', (msg) => {
-		// console.log(`Received: ${msg}`);
-	// });
+	socket.on('osc', (msg) => {
+		console.log(`Received: ${msg}`);
+	});
+	window.emit = (msg) => {
+		socket.emit('message', msg);
+	}
 } catch (e) {
 	console.log('Not able to set up osc connection');
 }

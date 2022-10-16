@@ -19,7 +19,7 @@ const server = app.listen(port, () => {
 const io = socket(server);
 
 io.sockets.on('connection', (socket) => {
-	console.log('connected', socket.id);
+	console.log('Connected', socket.id);
 	socket.emit('connected', socket.id);
 
 	const oscServer = new osc.Server(9000, '0.0.0.0');
@@ -27,12 +27,18 @@ io.sockets.on('connection', (socket) => {
 		console.log('Listening for OSC message on port 9000');
 	});
 	oscServer.on('message', (msg) => {
-		socket.emit('message', msg);
-		console.log('Forwarded message:', msg);
+		socket.emit('osc', msg);
+		// console.log('Forwarded message:', msg);
+	});
+
+	const oscClient = new osc.Client('127.0.0.1', 8000);
+	socket.on('message', (msg) => {
+		oscClient.send(msg);
+		console.log(`Received: ${msg}`)
 	});
 
 	socket.on('disconnect', () => {
 		oscServer.close();
-		console.log('disconnected', socket.id);
+		console.log('Disconnected', socket.id);
 	});
 });

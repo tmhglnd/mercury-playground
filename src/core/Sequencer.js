@@ -65,6 +65,9 @@ class Sequencer {
 				// on the current count and time
 				this.event(c, time);
 
+				// osc-connection needs syncing with Tone Transport
+				emit([`/trigger`, 1]);
+
 				// execute a visual event for Hydra
 				if (this._visual.length > 0){
 					this._canvas.eval(Util.getParam(this._visual, c));
