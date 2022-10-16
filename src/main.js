@@ -9,6 +9,20 @@ switchTheme = (t) => {
 // initial dark mode theme on startup
 switchTheme('darkmode');
 
+// osc connection for When running mercury as localhost
+try {
+	const io = require('socket.io-client');
+	const socket = io();
+	socket.on('connected', (id) => {
+		console.log(`Connected for OSC: ${id}`);
+	});
+	// socket.on('osc', (msg) => {
+		// console.log(`Received: ${msg}`);
+	// });
+} catch (e) {
+	console.log('Not able to set up osc connection');
+}
+
 window.onload = () => {
 	// load requires
 	const Tone = require('tone');
