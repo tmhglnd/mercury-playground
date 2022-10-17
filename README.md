@@ -7,7 +7,7 @@ Mercury currently has 2 versions:
 * Web version running in the browser (Windows/Mac/Linux) (you're in the right place)
 * Full version running in Max8 (Windows/Mac only) [go to this repo](https://github.com/tmhglnd/mercury)
 
-[**🚀 Start Sketching Online!**](https://mercury-sketch.glitch.me/)
+[**🚀 Start Sketching Online!**](https://mercury.timohoogland.com/)
 
 **👾 Or code with the latest full version:** 
 
@@ -151,13 +151,13 @@ new emitter osc address(yourDevice) theParam(params) time(1/4)
 //          /yourDevice/theParam 0.25
 //          etc...
 ```
+-->
 
-Easily control parameters in Mercury via external OSC-messages
+Easily control parameters in Mercury via external OSC-messages (only when running a localhost)
 
 ```java
-new synth triangle fx(reverb /extOSC/verbAmount) fx(filter low /extOSC/cutoff 0.4) time(1) shape(1 1000)
+new synth triangle fx(reverb '/synth/verb') fx(filter low '/synth/cutoff' 0.4) time(1) shape(1 'synth/length')
 ```
--->
 
 **AND MANY MORE (TO COME...)**
 
@@ -218,6 +218,7 @@ Currently the playground does not have the full functionality of the original Me
 	- [ ] bend
 	- [ ] sync
 - [ ] osc
+	- [x] receive parameters as arguments
 - [ ] fx
 	- [ ] chip (downsampling)
 	- [x] delay
@@ -258,19 +259,19 @@ It is now possible to code together in Mercury using the amazing [**Flok**](http
 ## 🚀 Install
 
 😎 No need for installing! You can start coding immediately here:
-[**https://mercury-sketch.glitch.me/**](https://mercury-sketch.glitch.me/)
+[**https://mercury-sketch.glitch.me/**](https://mercury.timohoogland.com/)
 
 🤓 If you want to run and develop the application locally:
 
 `$ git clone http://github.com/tmhglnd/mercury-playground`
 
-`$ npm install`
+`$ npm install` (make sure you have NodeJS installed)
 
-`$ npm run build` or `$ npm run watch` while developing
+`$ npm run build` (or `$ npm run watch` while developing)
 
 `$ npm start`
 
-`$ open -a Google\ Chrome http://localhost:3000`
+open a browser and go to `http://localhost:3000`
 
 ## 📖 Documentation
 
@@ -292,7 +293,7 @@ Many sounds in Mercury are downloaded from [freesound.org](http://www.freesound.
 
 ### Use your own sounds
 
-If you like to include your own sounds you'll need to run the application locally. See [install](#-install) for instructions. You can then replace or add any sounds to the `public/assets/samples` folder and run `npm run build`, this creates a new database of soundfiles in `src/data/samples.json`.
+If you like to include your own sounds you can click `Add sounds` on the bottom right of the editor. Or when you run the application locally you can also replace or add any sounds to the `public/assets/samples` folder and run `npm run build`, this creates a new database of soundfiles in `src/data/samples.json`.
 
 ## ⚡️ Visuals
 
