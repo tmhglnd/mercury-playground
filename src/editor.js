@@ -365,7 +365,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		btn.onclick = () => {
 			if (localStorage.getItem('theme') === 'darkmode'){
 				switchTheme('lightmode');
-				this.cm.setOption('theme', 'duotone-light');
+				this.cm.setOption('theme', 'elegant');
 			} else {
 				switchTheme('darkmode');
 				this.cm.setOption('theme', 'material-darker');
