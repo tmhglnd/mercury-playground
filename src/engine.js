@@ -16,7 +16,7 @@ console.log(`PPQ: ${Tone.Transport.PPQ}`);
 // get the sample file paths from json
 let loadingID = setInterval(() => {
 	console.log('downloading sounds...');
-}, 1000);
+}, 2500);
 
 let samples = require('./data/samples.json');
 let buffers = new Tone.ToneAudioBuffers({
