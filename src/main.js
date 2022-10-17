@@ -9,23 +9,6 @@ switchTheme = (t) => {
 // initial dark mode theme on startup
 switchTheme('darkmode');
 
-// osc connection for When running mercury as localhost
-try {
-	const io = require('socket.io-client');
-	const socket = io();
-	socket.on('connected', (id) => {
-		console.log(`Connected for OSC: ${id}`);
-	});
-	socket.on('osc', (msg) => {
-		console.log(`Received: ${msg}`);
-	});
-	window.emit = (msg) => {
-		socket.emit('message', msg);
-	}
-} catch (e) {
-	console.log('Not able to set up osc connection');
-}
-
 window.onload = () => {
 	// load requires
 	const Tone = require('tone');
@@ -73,6 +56,26 @@ window.onload = () => {
 			});
 		}
 	});
+
+	const io = require('socket.io-client');
+	// Empty object to store/update all received oscMessages
+	window.oscMessages = {};
+	// Setup osc connection for when running mercury as localhost
+	try {
+		const socket = io();
+		socket.on('connected', (id) => {
+			console.log(`Connected for OSC: ${id}`);
+		});
+		socket.on('osc', (msg) => {
+			window.oscMessages[msg.shift()] = msg;
+			// console.log(`Received: ${msg}`);
+		});
+		// window.emit = (msg) => {
+		// 	socket.emit('message', msg);
+		// }
+	} catch (e) {
+		console.log('Unable to use OSC connection. Clone Mercury from github and run as localhost');
+	}
 
 	// Initialize random BPM
 	Engine.randomBPM();

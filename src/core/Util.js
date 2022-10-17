@@ -23,7 +23,27 @@ function isRandom(a, l=0, h=1){
 
 // get parameter from 1 or 2d array
 function getParam(a, i){
-	return randLookup(lookup(a, i));
+	// also check if value is an osc-address, then use last received value
+	// return randLookup(getOSC(lookup(a, i)));
+	return randLookup(lookup(getOSC(a), i));
+}
+
+// retrieve received messages via osc as arguments or pass through
+function getOSC(a){
+	// only take first value from array to check if an osc-address
+	let osc = a[0];
+	if (typeof osc !== 'string'){
+		// pass through
+		return a;
+	} else if (osc.match(/^\/[^`'"\s]+/g)){
+		if (!window.oscMessages[osc]){
+			console.log(`No message received on address ${osc}`);
+			return 0;
+		}
+		return window.oscMessages[osc];
+	}
+	// pass through
+	return a;
 }
 
 // convert to array if not an array

@@ -66,7 +66,7 @@ class Sequencer {
 				this.event(c, time);
 
 				// osc-connection needs syncing with Tone Transport
-				emit([`/trigger`, 1]);
+				// emit([`/trigger`, 1]);
 
 				// execute a visual event for Hydra
 				if (this._visual.length > 0){

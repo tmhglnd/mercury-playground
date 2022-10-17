@@ -70,7 +70,8 @@ class Instrument extends Sequencer {
 		this.panner.pan.setValueAtTime(p, time);
 
 		// ramp volume
-		let g = Util.getParam(this._gain[0], c);
+		let g = 20 * Math.log(Util.getParam(this._gain[0], c) * 0.707);
+		// let g = Util.getParam(this._gain[0], c);
 		let r = Util.getParam(this._gain[1], c);
 		this.source.volume.rampTo(g, r, time);
 
@@ -142,7 +143,8 @@ class Instrument extends Sequencer {
 		g = Util.toArray(g);
 		r = (r !== undefined)? Util.toArray(r) : [ 0 ];
 		// convert amplitude to dBFullScale
-		this._gain[0] = g.map(g => 20 * Math.log(g * 0.707) );
+		this._gain[0] = g;
+		// this._gain[0] = g.map(g => 20 * Math.log(g * 0.707) );
 		this._gain[1] = r.map(r => Util.msToS(Math.max(0, r)) );
 	}
 

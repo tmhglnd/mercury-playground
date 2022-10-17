@@ -28,13 +28,13 @@ io.sockets.on('connection', (socket) => {
 	});
 	oscServer.on('message', (msg) => {
 		socket.emit('osc', msg);
-		// console.log('Forwarded message:', msg);
+		console.log('Forwarded message:', msg);
 	});
 
 	const oscClient = new osc.Client('127.0.0.1', 8000);
 	socket.on('message', (msg) => {
 		oscClient.send(msg);
-		console.log(`Received: ${msg}`)
+		console.log(`Received: ${msg}`);
 	});
 
 	socket.on('disconnect', () => {
