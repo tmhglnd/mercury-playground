@@ -71,8 +71,7 @@ class Instrument extends Sequencer {
 
 		// ramp volume
 		let g = 20 * Math.log(Util.getParam(this._gain[0], c) * 0.707);
-		// let g = Util.getParam(this._gain[0], c);
-		let r = Util.getParam(this._gain[1], c);
+		let r = Util.msToS(Math.max(0, Util.getParam(this._gain[1], c)));
 		this.source.volume.rampTo(g, r, time);
 
 		this.sourceEvent(c, e, time);
@@ -140,12 +139,12 @@ class Instrument extends Sequencer {
 
 	amp(g, r){
 		// set the gain and ramp time
-		g = Util.toArray(g);
-		r = (r !== undefined)? Util.toArray(r) : [ 0 ];
+		this._gain[0] = Util.toArray(g);
+		this._gain[1] = (r !== undefined)? Util.toArray(r) : [ 0 ];
+
 		// convert amplitude to dBFullScale
-		this._gain[0] = g;
 		// this._gain[0] = g.map(g => 20 * Math.log(g * 0.707) );
-		this._gain[1] = r.map(r => Util.msToS(Math.max(0, r)) );
+		// this._gain[1] = r.map(r => Util.msToS(Math.max(0, r)) );
 	}
 
 	env(...e){

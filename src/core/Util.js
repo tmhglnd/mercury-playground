@@ -38,7 +38,7 @@ function getOSC(a){
 	} else if (osc.match(/^\/[^`'"\s]+/g)){
 		if (!window.oscMessages[osc]){
 			console.log(`No message received on address ${osc}`);
-			return 0;
+			return [0];
 		}
 		return window.oscMessages[osc];
 	}
