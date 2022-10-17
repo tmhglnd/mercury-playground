@@ -258,8 +258,8 @@ It is now possible to code together in Mercury using the amazing [**Flok**](http
 
 ## 🚀 Install
 
-😎 No need for installing! You can start coding immediately here:
-[**https://mercury-sketch.glitch.me/**](https://mercury.timohoogland.com/)
+😎 No need for installing! You can start coding immediately in the browser:
+[**https://mercury.timohoogland.com/**](https://mercury.timohoogland.com/)
 
 🤓 If you want to run and develop the application locally:
 
