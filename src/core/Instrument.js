@@ -87,9 +87,9 @@ class Instrument extends Sequencer {
 
 		// set shape for playback (fade-in / out and length)
 		if (this._att){
-			let att = Util.divToS(Util.lookup(this._att, c), this.bpm());
-			let dec = Util.divToS(Util.lookup(this._sus, c), this.bpm());
-			let rel = Util.divToS(Util.lookup(this._rel, c), this.bpm());
+			let att = Util.divToS(Util.getParam(this._att, c), this.bpm());
+			let dec = Util.divToS(Util.getParam(this._sus, c), this.bpm());
+			let rel = Util.divToS(Util.getParam(this._rel, c), this.bpm());
 
 			this.adsr.attack = att;
 			this.adsr.decay = dec;

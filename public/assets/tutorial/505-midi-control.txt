@@ -1,4 +1,4 @@
-// === TUTORIAL 34 ===
+// === TUTORIAL 505 ===
 // With the cc() method we can send control change messages
 // to the same device, to control other parameters
 // Add multiple cc() methods to make different messages

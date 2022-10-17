@@ -57,11 +57,11 @@ window.onload = () => {
 		}
 	});
 
-	const io = require('socket.io-client');
 	// Empty object to store/update all received oscMessages
 	window.oscMessages = {};
 	// Setup osc connection for when running mercury as localhost
 	try {
+		const io = require('socket.io-client');
 		const socket = io();
 		socket.on('connected', (id) => {
 			console.log(`Connected for OSC: ${id}`);
