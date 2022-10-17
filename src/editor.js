@@ -22,6 +22,8 @@ let tutorials = require('./data/tutorials.json');
 const { ToneAudioBuffer } = require('tone');
 console.log('=> tutorials loaded');
 
+let samples = require('./data/samples.json');
+
 // the simple mode lexer for Mercury syntax-highlighting
 CodeMirror.defineSimpleMode("mercury", {
 	meta: {
@@ -226,7 +228,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 	this.links = function(){
 		let urls = {
 			// 'tutorial': 'https://tmhglnd.github.io/mercury/tutorial.html',
-			'sounds' : 'https://github.com/tmhglnd/mercury/blob/master/mercury_ide/media/README.md',
+			// 'sounds' : 'https://github.com/tmhglnd/mercury/blob/master/mercury_ide/media/README.md',
 			'help': 'https://tmhglnd.github.io/mercury/reference.html',
 			'full version': 'https://github.com/tmhglnd/mercury'
 		}
@@ -239,6 +241,11 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		menu.id = 'tutorials';
 		menu.onchange = () => { this.loadTutorial() }
 		p.appendChild(menu);
+
+		let snds = document.createElement('select');
+		snds.id = 'sounds';
+		snds.onchange = () => { this.insertSound() }
+		p.appendChild(snds);
 
 		Object.keys(urls).forEach((k) => {
 			let btn = document.createElement('button');
@@ -281,6 +288,28 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		let t = document.getElementById('tutorials').value;
 		await this.set(tutorials[t]);
 		this.evaluate();
+	}
+
+	this.soundsMenu = function(){
+		let menu = document.getElementById('sounds');
+
+		let values = ['sounds'].concat(Object.keys(samples));
+		values.forEach((t) => {
+			let option = document.createElement('option');
+			option.value = option.innerHTML = t;
+			menu.appendChild(option);
+		});
+	}
+
+	this.insertSound = function(){
+		let s = document.getElementById('sounds').value;
+		document.getElementById('sounds').value = 'sounds';
+		// console.log(this.cm.getSelection());
+		if (this.cm.getSelection() !== ''){
+			this.cm.replaceSelection(s);
+		} else {
+			this.cm.replaceRange(s, this.cm.getCursor());
+		}
 	}
 
 	this.menuHidden = false;
