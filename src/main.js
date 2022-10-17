@@ -9,15 +9,6 @@ switchTheme = (t) => {
 // initial dark mode theme on startup
 switchTheme('darkmode');
 
-// // socket io connection when using localhost
-// const io = require('socket.io-client');
-// const socket = io();
-
-// socket.on('connect', () => {
-// 	console.log(socket.id);
-// 	// console.log('received:', msg);
-// });
-
 window.onload = () => {
 	// load requires
 	const Tone = require('tone');

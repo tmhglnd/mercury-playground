@@ -14,11 +14,15 @@ console.log(`samplerate: ${Tone.getContext().sampleRate}Hz`);
 console.log(`PPQ: ${Tone.Transport.PPQ}`);
 
 // get the sample file paths from json
-console.log('loading sounds...');
+let loadingID = setInterval(() => {
+	console.log('downloading sounds...');
+}, 1000);
+
 let samples = require('./data/samples.json');
 let buffers = new Tone.ToneAudioBuffers({
 	urls: samples,
 	onload: function(){ 
+		clearInterval(loadingID);
 		console.log('=> sounds loaded');
 		// remove the logging function to the innerHTML from here on
 		console.log = console.olog;
