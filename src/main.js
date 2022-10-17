@@ -93,6 +93,7 @@ window.onload = () => {
 	cm.links();
 	cm.hide();
 	cm.tutorialMenu();
+	cm.soundsMenu();
 	cm.modeSwitch();
 	cm.clear();
 	
