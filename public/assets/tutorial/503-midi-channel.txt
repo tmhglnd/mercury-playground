@@ -1,4 +1,4 @@
-// === TUTORIAL 32 ===
+// === TUTORIAL 503 ===
 // We can change the midi-channel with the out() method
 
 new midi default time(1/8) note(0 0) out(10)
