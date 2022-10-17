@@ -118,6 +118,11 @@ function addBuffers(uploads){
 		buffers.add(n, url, () => {
 			log(`${f.name} added as ${n}`);
 			URL.revokeObjectURL(url);
+			// also add soundfiles to menu for easy selection
+			let m = document.getElementById('sounds');
+			let o = document.createElement('option');
+			o.value = o.innerHTML = n;
+			m.appendChild(o);
 		}, () => {
 			log(`error adding sound ${f.name}`);
 		});
