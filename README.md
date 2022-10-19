@@ -153,7 +153,7 @@ new emitter osc address(yourDevice) theParam(params) time(1/4)
 ```
 -->
 
-Easily control parameters in Mercury via external OSC-messages (only when running a localhost)
+Easily control parameters in Mercury via external OSC-messages (only when running a [localhost](#-install))
 
 ```java
 new synth triangle fx(reverb '/synth/verb') fx(filter low '/synth/cutoff' 0.4) time(1) shape(1 'synth/length')
@@ -261,17 +261,37 @@ It is now possible to code together in Mercury using the amazing [**Flok**](http
 😎 No need for installing! You can start coding immediately in the browser:
 [**https://mercury.timohoogland.com/**](https://mercury.timohoogland.com/)
 
-🤓 If you want to run and develop the application locally:
+🤓 If you want to run the application locally (for using OSC or when developing extra features):
 
-`$ git clone http://github.com/tmhglnd/mercury-playground`
+In the Terminal navigate to the folder you want to install Mercury. Then run:
 
-`$ npm install` (make sure you have NodeJS installed)
+`git clone http://github.com/tmhglnd/mercury-playground`
 
-`$ npm run build` (or `$ npm run watch` while developing)
+Navigate to the cloned folder with:
 
-`$ npm start`
+`cd mercury-playground`
 
-open a browser and go to `http://localhost:3000`
+Then install all the dependecies:
+
+`npm install` (make sure you have NodeJS v18 installed, check by running `node -v`)
+
+Then build your local version:
+
+`npm run build` (or `$ npm run watch` while developing)
+
+Now start the local server:
+
+`npm start`
+
+Open a browser and go to `http://localhost:3000`. Once connected the Terminal will print:
+
+```
+Connected yH0SGEdRHbZD1IACAAAB
+Receive messages from Mercury on port 9000
+Send messages to Mercury on port 8000
+```
+
+Mercury can now receive OSC-messages on port `8000`
 
 ## 📖 Documentation
 
