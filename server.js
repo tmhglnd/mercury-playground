@@ -4,6 +4,13 @@ const app = express();
 const socket = require('socket.io');
 const osc = require('node-osc');
 
+let verbose = false;
+if (process.argv.length > 2){
+	if (process.argv[2] === '--log'){
+		verbose = true;
+	}
+}
+
 app.use(express.static("public"));
 
 app.get("/", (request, response) => {
@@ -30,14 +37,14 @@ io.sockets.on('connection', (socket) => {
 	});
 	oscServer.on('message', (msg) => {
 		socket.emit('osc', msg);
-		console.log('Send:', msg);
+		verboseLog('Send:', msg);
 	});
 
 	const oscClient = new osc.Client('127.0.0.1', outPort);
 	console.log(`Receive messages from Mercury on port ${outPort}`);
 	socket.on('message', (msg) => {
 		oscClient.send(msg);
-		console.log(`Received: ${msg}`);
+		verboseLog('Received:', msg);
 	});
 
 	socket.on('disconnect', () => {
@@ -45,3 +52,9 @@ io.sockets.on('connection', (socket) => {
 		console.log('Disconnected', socket.id);
 	});
 });
+
+function verboseLog(...m){
+	if (verbose){
+		console.log(m);
+	}
+}
