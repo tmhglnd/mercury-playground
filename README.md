@@ -1,11 +1,11 @@
 # 🌕 Mercury Live Coding Playground
 
-**A fun lite version of the Mercury Live Coding Environment running in the browser for quick experimentation and exploration.**
+**A version of the Mercury Live Coding Environment running in the browser for quick experimentation and exploration.**
 
 Mercury currently has 2 versions:
 
 * Web version running in the browser (Windows/Mac/Linux) (you're in the right place)
-* Full version running in Max8 (Windows/Mac only) [go to this repo](https://github.com/tmhglnd/mercury)
+* Standalone version running in Max8 (Windows/Mac only) [go to this repo](https://github.com/tmhglnd/mercury)
 
 [**🚀 Start Sketching Online!**](https://mercury.timohoogland.com/)
 
@@ -13,11 +13,11 @@ Mercury currently has 2 versions:
 
 [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/tmhglnd/mercury)](https://github.com/tmhglnd/mercury/releases)
 
-[**📟 Build a local app from the browser version with Electron:**](https://github.com/tmhglnd/mercury-app)
+[**📟 Build a local app from the browser version with Electron**](https://github.com/tmhglnd/mercury-app)
 
 [**🙏 Support Mercury by becoming a Patron**](https://www.patreon.com/bePatron?u=9649817) 
 
-[**💬 Join the Discord Community**](https://discord.gg/vt59NYU)
+[**💬 Join the Mercury Community on Discord**](https://discord.gg/vt59NYU)
 
 ![The Mercury playground in the browser](media/screenshot.png)
 
@@ -66,19 +66,20 @@ new sample hat_909 time(3/16)
 Make rhythmic patterns with sequences of numbers and probabilities
 
 ```java
-ring loBeat [1 0 0 1 0.5]
-ring hiBeat [0 1 0.2 0]
+list loBeat [1 0 0 1 0.5]
+list hiBeat [0 1 0.2 0]
 
 new sample tabla_lo time(1/8) play(loBeat)
 new sample tabla_hi time(1/8) play(hiBeat)
 ```
 
-Generate psuedorandom melodic content for a synthesizer in a range <!-- and set a scale -->
+Generate psuedorandom melodic content for a synthesizer in a range and set a scale
 
 ```java
+set scale minor a
 set randomSeed 31415
 
-ring melody random(16 0 24)
+list melody random(16 0 24)
 
 new synth saw note(melody) time(1/16) shape(4 100)
 ```
@@ -87,12 +88,12 @@ Generate sequences algorithmically to compose complex structures and choose from
 
 ```java
 set tempo 132
-ring rhythm euclid(32 13)
+list rhythm euclid(32 13)
 
-ring melody spread(5 0 24)
-ring melody palindrome(melody)
-ring melody clone(melody 0 5 7 3)
-ring melody lace(melody melody)
+list melody spread(5 0 24)
+list melody palindrome(melody)
+list melody clone(melody 0 5 7 3)
+list melody lace(melody melody)
 
 new synth triangle time(1/16) note(melody 1) shape(1 80) play(rhythm)
 ```
@@ -100,7 +101,7 @@ new synth triangle time(1/16) note(melody 1) shape(1 80) play(rhythm)
 Design sounds with various effects (and upload your own sounds to use)
 
 ```java
-new sample chimes time(2) speed(-0.25) fx(reverb 0.3 15) fx(drive 10) fx(shift 3 0.5)
+new sample chimes time(2) speed(0.25) fx(reverb 0.3 15) fx(drive 10) fx(shift 3 0.5)
 ```
 
 Easily give multiple instruments the same effects
@@ -153,7 +154,7 @@ new emitter osc address(yourDevice) theParam(params) time(1/4)
 ```
 -->
 
-Easily control parameters in Mercury via external OSC-messages (only when running a [localhost](#-install))
+Easily control parameters in Mercury via external OSC-messages (only when running [localhost](#-install))
 
 ```java
 new synth triangle fx(reverb '/synth/verb') fx(filter low '/synth/cutoff' 0.4) time(1) shape(1 'synth/length')
@@ -161,7 +162,7 @@ new synth triangle fx(reverb '/synth/verb') fx(filter low '/synth/cutoff' 0.4) t
 
 **AND MANY MORE (TO COME...)**
 
-Currently the playground does not have the full functionality of the original Mercury environment.
+The playground does not have exactly the same functionality of the original Mercury environment running in Max8. See below the differences. You may also encounter some discrepancies in syntax. Please support issues if you find any.
 
 - [x] tempo
 - [x] scale
@@ -252,16 +253,18 @@ This subset of Mercury was designed to use as a teaching environment for:
 
 ## 👩‍💻👨‍💻 Collaborative Coding
 
-It is now possible to code together in Mercury using the amazing [**Flok**](https://flok.clic.cf/) live coding environment in the browser.
+It is possible to code together in Mercury using the amazing [**Flok**](https://flok.clic.cf/) live coding editor in the browser together with the Mercury standalone version in Max8.
 
 - [Start coding together here](https://tmhglnd.github.io/mercury/collaborate.html)
 
 ## 🚀 Install
 
-😎 No need for installing! You can start coding immediately in the browser:
+😎 **No need for installing!** You can start coding immediately in the browser:
 [**https://mercury.timohoogland.com/**](https://mercury.timohoogland.com/)
 
-🤓 If you want to run the application locally (for using OSC or when developing extra features):
+### 💻 Running without internet
+
+🤓 If you want to run the application locally (for using without internet, or using the OSC functionality or when developing extra features):
 
 In the Terminal navigate to the folder you want to install Mercury. Then run:
 
@@ -303,7 +306,7 @@ Full explanation of all the possibilities in Mercury:
 
 ## 💻 System Requirements
 
-A computer that runs a browser like Chrome or Firefox.
+Any laptop/desktop that runs a browser like Chrome, Brave or Firefox.
 
 ## 🎵 Sounds
 
@@ -313,7 +316,7 @@ Many sounds in Mercury are downloaded from [freesound.org](http://www.freesound.
 
 ### Use your own sounds
 
-If you like to include your own sounds you can click `Add sounds` on the bottom right of the editor. Or when you run the application locally you can also replace or add any sounds to the `public/assets/samples` folder and run `npm run build`, this creates a new database of soundfiles in `src/data/samples.json`.
+If you like to include your own sounds you can click `Add sounds` on the bottom right of the editor. When you run the application locally you can also replace or add any sounds to the `public/assets/samples` folder and run `npm run build`, this creates a new database of soundfiles in `src/data/samples.json`.
 
 ## ⚡️ Visuals
 
