@@ -20,7 +20,7 @@ app.get("/", (request, response) => {
 const port = process.env.PORT || 3000;
 const server = app.listen(port, () => {
 	console.log(`Mercury Playground running`);
-	console.log(`Use 'npm start --log' to print incoming/outgoing osc-messages\n`);
+	console.log(`Use 'node server.js --log' to print incoming/outgoing osc-messages\n`);
 	console.log(`Visit http://localhost:${port}\n`);
 });
 
