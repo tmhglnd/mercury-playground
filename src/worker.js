@@ -42,6 +42,7 @@ async function code({ file, engine, canvas, p5canvas }){
 	if (errors.length > 0){
 		// return if the code contains any syntax errors
 		log(`Could not run because of syntax error`);
+		log(`Please see Help for more information`);
 		return;
 	}
 

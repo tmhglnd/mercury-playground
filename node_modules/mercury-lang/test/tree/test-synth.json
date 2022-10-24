@@ -88,7 +88,7 @@
    ]
   },
   "objects": {
-   "OBM4U92G": {
+   "BQ53NFX4": {
     "object": "synth",
     "type": [
      "sine",
@@ -143,11 +143,11 @@
       ]
      ],
      "name": [
-      "OBM4U92G"
+      "BQ53NFX4"
      ]
     }
    },
-   "C9Y02EY8": {
+   "XWCCW64I": {
     "object": "sample",
     "type": [
      "kick_min",
@@ -189,7 +189,7 @@
       ]
      ],
      "name": [
-      "C9Y02EY8"
+      "XWCCW64I"
      ]
     }
    },
