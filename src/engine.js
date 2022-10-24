@@ -46,8 +46,7 @@ function resume(){
 			// Tone.Transport.swing = 0.5;
 			// a bit of latency for safety
 			Tone.Transport.start('+0.1');
-
-			Tone.getDestination().volume.rampTo(0, 0.01);
+			// Tone.getDestination().volume.rampTo(0, 0.01);
 			// console.log("Resumed Transport");
 		}
 		// record(true);
@@ -59,9 +58,9 @@ function resume(){
 // stop the transport end therefore playing the sounds
 function silence(){
 	try {
-		Tone.getDestination().volume.rampTo(-Infinity, 0.01);
+		// Tone.getDestination().volume.rampTo(-Infinity, 0.01);
 		// Tone.Transport.pause();
-		// Stop the transport instead of pause to make sure transports starts from 0 again.
+		// Stop the transport instead of pause to make sure transport starts from 0 again.
 		Tone.Transport.stop();
 		// Tone.stop();
 		// record(false);

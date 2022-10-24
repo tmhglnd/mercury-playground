@@ -122,7 +122,8 @@ class Instrument extends Sequencer {
 		this.gain.gain.rampTo(0, t, Tone.now());
 		setTimeout(() => {
 			this.delete();
-		}, t * 1000);
+			// wait a little bit extra before deleting to avoid clicks
+		}, t * 1000 + 100);
 	}
 
 	delete(){

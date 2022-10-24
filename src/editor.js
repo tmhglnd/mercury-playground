@@ -1,6 +1,6 @@
 
 const CodeMirror = require('codemirror');
-const code = require('./worker.js');
+const { code, removeSound, getSound } = require('./worker.js');
 const saver = require('file-saver');
 
 require('codemirror/mode/javascript/javascript.js');
@@ -19,7 +19,6 @@ console.log('=> examples loaded');
 // get the tutorial files
 console.log('loading tutorials...');
 let tutorials = require('./data/tutorials.json');
-const { ToneAudioBuffer } = require('tone');
 console.log('=> tutorials loaded');
 
 let samples = require('./data/samples.json');
@@ -98,7 +97,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 
 	this.cm.markText({line: 0, ch: 0}, {line: 6, ch: 42}, {className: 'styled-background'})
 
-	this.set = async function(v){
+	this.set = function(v){
 		this.cm.setValue(v);
 	}
 
@@ -123,19 +122,19 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		);
 	}
 
-	this.evaluate = async function(){
+	this.evaluate = function(){
 		this.flash(this.cm.firstLine(), this.cm.lastLine()+1);
 
-		await code({ file: this.cm.getValue(), engine: engine, canvas: canvas, p5canvas: p5canvas });
-		await engine.resume();
+		code({ file: this.cm.getValue(), engine: engine, canvas: canvas, p5canvas: p5canvas });
+		engine.resume();
 	}
 
-	this.evaluateBlock = async function(){
+	this.evaluateBlock = function(){
 		let c = this.getCurrentBlock();
 		this.flash(c.start.line, c.end.line);
 
-		await code({ file: c.text, engine: engine, canvas: canvas, p5canvas: p5canvas });
-		await engine.resume();
+		code({ file: c.text, engine: engine, canvas: canvas, p5canvas: p5canvas });
+		engine.resume();
 	}
 
 	// thanks to graham wakefield + gibber
@@ -156,7 +155,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		return { start: p1, end: p2, text: block };
 	}
 
-	this.flash = async function(from, to){
+	this.flash = function(from, to){
 		let start = { line: from, ch: 0 };
 		let end = { line: to, ch: 0 };
 		// console.log(start, end);
@@ -166,9 +165,11 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		setTimeout(() => marker.clear(), 250);
 	}
 
-	this.silence = async function(){
+	this.silence = function(){
 		// console.log('silence code');
-		await engine.silence();
+		// fade out and remove code after 0.1
+		removeSound(getSound(), 0.1);
+		engine.silence();
 		canvas.clear();
 	}
 
@@ -198,14 +199,14 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		
 		let example = document.createElement('button');
 		example.innerHTML = 'example';
-		example.onclick = async () => {
+		example.onclick = () => {
 			// initialize editor with some code
 			let names = Object.keys(examples);
 			let amount = names.length;
 			let rand = Math.floor(Math.random() * amount);
 			rand = (rand === _rand)? (rand + 1) % amount : rand;
 
-			await this.set(examples[names[rand]]);
+			this.set(examples[names[rand]]);
 			_rand = rand;
 
 			this.evaluate();
@@ -284,9 +285,9 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		});
 	}
 
-	this.loadTutorial = async function(){
+	this.loadTutorial = function(){
 		let t = document.getElementById('tutorials').value;
-		await this.set(tutorials[t]);
+		this.set(tutorials[t]);
 		this.evaluate();
 	}
 
