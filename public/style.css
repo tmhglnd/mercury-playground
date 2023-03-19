@@ -22,6 +22,9 @@
 	--cm-flash: rgb(255, 255, 255, 0.3);
 	--cm-gutter: var(--transparant);
 	--cm-select: rgb(255, 255, 255, 0.2);
+
+	--record: #ff1791;
+	--record-secundary: #aa1791;
 }
 
 .lightmode {
@@ -39,6 +42,9 @@
 	--cm-flash: rgb(255, 255, 255, 0.5);
 	--cm-gutter: var(--transparant);
 	--cm-select: rgba(0, 0, 0, 0.3);
+
+	--record: #ff1791;
+	--record-secundary: #aa1791;
 }
 
 .colormode {
@@ -164,7 +170,23 @@ button:hover {
 button:active {
 	/* background: rgb(50, 50, 50); */
 	color: var(--bg);
-	background: var(----secundary);
+	background: var(--secundary);
+}
+
+.recording {
+	color: var(--accent);
+	background: var(--record);
+	animation: blinker 0.5s linear infinite;
+}
+
+.recording:hover {
+	color: var(--accent);
+	background: var(--record-secundary);
+	animation: blinker 0.5s linear infinite;
+}
+
+@keyframes blinker {
+	50% { opacity: 0.5; }
 }
 
 select {

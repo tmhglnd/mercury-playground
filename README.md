@@ -229,8 +229,8 @@ The playground does not have exactly the same functionality of the original Merc
 	- [x] squash (compress/overdrive)
 	- [ ] kink (waveshaping)
 	- [x] filter
-		- [ ] modulation
 	- [x] triggerFilter
+	- [ ] autoFilter / lfoFilter
 	- [x] lfo
 	- [x] reverb
 		- [x] decaying noise convolution

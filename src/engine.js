@@ -165,26 +165,26 @@ function setVolume(g, t=0){
 const Recorder = new Tone.Recorder({ mimeType: 'audio/webm' });
 GN.connect(Recorder);
 
-async function record(start){
-	if (Recorder.state !== 'started' && start){
-		// start the recording process
-		// console.log(Recorder);
-		// Recorder.mimeType = 'audio/wav;';
-		Recorder.start();
-	}
+function isRecording(){
+	// returns 'started' if the recording is recording
+	return Recorder.state;
+}
 
-	if (Recorder.state === 'started' && !start){
+async function record(on, f){
+	if (on){
+		// start the recording process
+		Recorder.start();
+	} else {
 		// stop the recording process
-		// Recorder.stop();
 		// the recorded audio is returned as a blob
 		const recording = await Recorder.stop();
 		// download the recording by creating an anchor element and blob url
 		const url = URL.createObjectURL(recording);
 		const anchor = document.createElement("a");
-		anchor.download = "mercuryRecording.webm";
+		anchor.download = `${f}.webm`;
 		anchor.href = url;
 		anchor.click();
 	}
 }
 
-module.exports = { resume, silence, setBPM, getBPM, randomBPM, getBuffers, addBuffers, setLowPass, setHiPass, setVolume, record };
+module.exports = { resume, silence, setBPM, getBPM, randomBPM, getBuffers, addBuffers, setLowPass, setHiPass, setVolume, record, isRecording };

@@ -213,10 +213,27 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		};
 
 		let save = document.createElement('button');
-		save.innerHTML = 'download';
+		save.style.width = '9%';
+		save.innerHTML = 'save';
 		save.onclick = () => {
-			let f = `mercury-sketch_${date()}.txt`
-			saver.saveAs(new File([this.cm.getValue()], f, { type: 'text/plain;charset=utf-8' }));
+			let f = `mercury-sketch_${ date() }`;
+			saver.saveAs(new File([this.cm.getValue()], `${f}.txt`, { type: 'text/plain;charset=utf-8' }));
+		}
+		
+		let rec = document.createElement('button');
+		// rec.id = 'recButton';
+		rec.style.width = '9%';
+		rec.innerHTML = 'record';
+		rec.onclick = () => {
+			let f = `mercury-recording_${ date() }`;
+
+			if (engine.isRecording() !== 'started'){
+				engine.record(true);
+				rec.className = 'recording';
+			} else {
+				engine.record(false, f);
+				rec.className = 'button';
+			}
 		}
 
 		div.appendChild(play);
@@ -224,6 +241,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		div.appendChild(clear);
 		div.appendChild(example);
 		div.appendChild(save);
+		div.appendChild(rec);
 	}
 
 	this.links = function(){
