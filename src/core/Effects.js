@@ -17,7 +17,10 @@ const fxMap = {
 		return new Squash(params);
 	},
 	'compress' : (params) => {
-		return new Squash(params);
+		return new Compressor(params);
+	},
+	'comp' : (params) => {
+		return new Compressor(params);
 	},
 	'lfo' : (params) => {
 		return new LFO(params);
@@ -66,6 +69,46 @@ const fxMap = {
 	}
 }
 module.exports = fxMap;
+
+// A Compressor effect, allowing to reduce the dynamic range of a signal
+// Set the threshold (in dB's), the ratio, the attack and release time in ms
+// or relative to the tempo
+//
+const Compressor = function(_params){
+	// replace defaults with provided params
+	this.defaults = [-30, 6, 10, 80];
+	this.defaults.splice(0, _params.length, ..._params);
+	_params = this.defaults.map(p => Util.toArray(p));	
+
+	this._fx = new Tone.Compressor({
+		threshold: -24,
+		ratio: 4,
+		knee: 8,
+		attack: 0.005,
+		release: 0.07
+	});
+
+	this._thr = _params[0];
+	this._rat = _params[1];
+	this._att = _params[2];
+	this._rel = _params[3];
+
+	this.set = function(c, time, bpm){
+		this._fx.threshold.setValueAtTime(Util.getParam(this._thr, c), time);
+		this._fx.ratio.setValueAtTime(Math.min(20, Util.getParam(this._rat, c)), time);
+		this._fx.attack.setValueAtTime(Util.divToS(Util.getParam(this._att, c)), time);
+		this._fx.release.setValueAtTime(Util.divToS(Util.getParam(this._rel, c)), time);
+	}
+
+	this.chain = function(){
+		return { 'send' : this._fx, 'return': this._fx }
+	}
+
+	this.delete = function(){
+		this._fx.disconnect();
+		this._fx.dispose();
+	}
+}
 
 const Drive = function(_params){
 	// console.log('FX => Drive()', _params);
@@ -342,9 +385,9 @@ const Filter = function(_params){
 // Set the curve mode
 //
 const TriggerFilter = function(_params){
-	console.log('FX => TriggerFilter()', _params);
+	// console.log('FX => TriggerFilter()', _params);
 
-	this._fx = new Tone.Filter();
+	this._fx = new Tone.Filter(1000, 'lowpass', -24);
 	this._adsr = new Tone.Envelope({
 		attackCurve: "linear",
 		decayCurve: "linear",
