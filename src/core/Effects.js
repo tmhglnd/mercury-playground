@@ -43,6 +43,12 @@ const fxMap = {
 	'filter' : (params) => {
 		return new Filter(params);
 	},
+	'triggerFilter' : (params) => {
+		return new TriggerFilter(params);
+	},
+	'envFilter' : (params) => {
+		return new TriggerFilter(params);
+	},
 	/*'autoFilter' : (params) => {
 		return new AutoFilter(params);
 	},
@@ -326,6 +332,92 @@ const Filter = function(_params){
 	this.delete = function(){
 		this._fx.disconnect();
 		this._fx.dispose();
+	}
+}
+
+// A automated filter (filter with envelope) that is triggered by the note
+// Set the filter type (lowpass, highpass, bandpass)
+// Set the attack and release time
+// Set the low and high filter range
+// Set the curve mode
+//
+const TriggerFilter = function(_params){
+	console.log('FX => TriggerFilter()', _params);
+
+	this._fx = new Tone.Filter();
+	this._adsr = new Tone.Envelope({
+		attackCurve: "linear",
+		decayCurve: "linear",
+		sustain: 0,
+		release: 0.001
+	});
+	this._mul = new Tone.Multiply();
+	this._add = new Tone.Add();
+	this._pow = new Tone.Pow(3);
+
+	this._adsr.connect(this._pow.connect(this._mul));
+	this._mul.connect(this._add);
+	this._add.connect(this._fx.frequency);
+
+	this._types = {
+		'lo' : 'lowpass',
+		'low' : 'lowpass',
+		'lowpass' : 'lowpass',
+		'hi' : 'highpass',
+		'high' : 'highpass',
+		'highpass' : 'highpass',
+		'band' : 'bandpass',
+		'bandpass': 'bandpass'
+	}
+
+	this.defaults = ['low', 1, '1/16', 4000, 30];
+	// replace defaults with provided arguments
+	this.defaults.splice(0, _params.length, ..._params);
+	_params = this.defaults.map(p => Util.toArray(p));
+
+	if (this._types[_params[0][0]]){
+		this._fx.set({ type: this._types[_params[0][0]] });
+	} else {
+		log(`'${_params[0][0]}' is not a valid filter type. Defaulting to lowpass`);
+		this._fx.set({ type: 'lowpass' });
+	}
+
+	this._att = _params[1];
+	this._rel = _params[2];
+	this._high = _params[3];
+	this._low = _params[4];
+
+	this.set = function(c, time, bpm){
+		this._adsr.attack = Util.divToS(Util.getParam(this._att, c), bpm);
+		this._adsr.decay = Util.divToS(Util.getParam(this._rel, c), bpm);
+
+		let min = Util.getParam(this._low, c);
+		let max = Util.getParam(this._high, c);
+		let range = Math.abs(max - min);
+		let lower = Math.min(max, min);
+
+		this._mul.setValueAtTime(range, time);
+		this._add.setValueAtTime(lower, time);
+
+		// fade-out running envelope over 5 ms
+		if (this._adsr.value > 0){
+			this._adsr.triggerRelease(time);
+			time += this._adsr.release;
+		}
+		this._adsr.triggerAttack(time, 1);
+	}
+
+	this.chain = function(){
+		return { 'send' : this._fx, 'return' : this._fx };
+	}
+
+	this.delete = function(){
+		let blocks = [ this._fx, this._adsr, this._mul, this._add, this._pow ];
+
+		blocks.forEach((b) => {
+			b.disconnect();
+			b.dispose();
+		});
 	}
 }
 

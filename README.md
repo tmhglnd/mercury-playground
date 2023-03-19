@@ -230,7 +230,7 @@ The playground does not have exactly the same functionality of the original Merc
 	- [ ] kink (waveshaping)
 	- [x] filter
 		- [ ] modulation
-	- [ ] envFilter
+	- [x] triggerFilter
 	- [x] lfo
 	- [x] reverb
 		- [x] decaying noise convolution
