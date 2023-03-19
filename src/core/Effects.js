@@ -354,10 +354,10 @@ const Filter = function(_params){
 	this._q = (_params[2]) ? Util.toArray(_params[2]) : [ 0.5 ];
 	this._rt = (_params[3]) ? Util.toArray(_params[3]) : [ 0 ];
 
-	this.set = function(c, time){
+	this.set = function(c, time, bpm){
 		let f = Util.getParam(this._cutoff, c);
 		let r = 1 / (1 - Math.min(0.95, Math.max(0, Util.getParam(this._q, c))));
-		let rt = Util.divToS(Util.getParam(this._rt, c));
+		let rt = Util.divToS(Util.getParam(this._rt, c), bpm);
 
 		if (rt > 0){
 			this._fx.frequency.rampTo(f, rt, time);
