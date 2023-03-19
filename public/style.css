@@ -67,13 +67,15 @@
 .themeswitch {
 	position: absolute;
 	/* float: right; */
-	bottom: 12px;
-	right: 12px;
+	/* bottom: 12px; */
+	top: 20px;
+	right: 20px;
 	background: var(--button-bg);
-	width: 20px;
-	height: 20px;
+	width: 24px;
+	height: 24px;
 	border-radius: 2px;
-	margin: 4px;
+	/* margin: 4px; */
+	z-index: 9999;
 }
 
 .themeswitch:hover {
@@ -246,6 +248,7 @@ textarea:focus {
 	/* border: 1px solid black; */
 	font-size: 16px;
 	height: auto;
+	/* max-height: 200%; */
 	/* font-family: "Consolas"; */
 	/* font-family: 'Ubuntu Mono', monospace; */
 	font-family: inherit;

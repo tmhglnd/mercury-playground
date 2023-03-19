@@ -79,6 +79,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		cursorScrollMargin: 20,
 		mode: "mercury",
 		showCursorWhenSelecting: true,
+		lineWrapping: true,
 		// keymaps for execute/stopping/commenting code
 		extraKeys: {
 			'Ctrl-/': 'toggleComment',
@@ -249,7 +250,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 			// 'tutorial': 'https://tmhglnd.github.io/mercury/tutorial.html',
 			// 'sounds' : 'https://github.com/tmhglnd/mercury/blob/master/mercury_ide/media/README.md',
 			'help': 'https://tmhglnd.github.io/mercury/reference.html',
-			'full version': 'https://github.com/tmhglnd/mercury'
+			'local version': 'https://github.com/tmhglnd/mercury-playground'
 		}
 
 		let div = document.getElementById('links');
@@ -377,7 +378,8 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 
 	// light/dark mode switcher
 	this.modeSwitch = function(){
-		let b = document.body;
+		// let b = document.body;
+		let b = document.getElementById('ui');
 		let btn = document.createElement('button');
 		btn.id = 'switch';
 		btn.className = 'themeswitch';
