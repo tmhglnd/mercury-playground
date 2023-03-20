@@ -23,8 +23,8 @@
 	--cm-gutter: var(--transparant);
 	--cm-select: rgb(255, 255, 255, 0.2);
 
-	--record: #ff1791;
-	--record-secundary: #aa1791;
+	--record: rgb(200, 0, 0);
+	--record-secundary: rgb(200, 0, 0, 0.5);
 }
 
 .lightmode {
@@ -43,8 +43,8 @@
 	--cm-gutter: var(--transparant);
 	--cm-select: rgba(0, 0, 0, 0.3);
 
-	--record: #ff1791;
-	--record-secundary: #aa1791;
+	--record: rgb(200, 0, 0);
+	--record-secundary: rgb(200, 0, 0, 0.5);
 }
 
 .colormode {

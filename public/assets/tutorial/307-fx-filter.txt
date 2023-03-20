@@ -1,12 +1,10 @@
-// === TUTORIAL 307: FX Trigger Filter ===
-// The trigger filter is a filter where the cutoff frequency is 
-// driven by an envelope (shape). The filter is triggered every time
-// the note is played. 
-// Set the filter type: lowpass, highpass or bandpass.
-// Set the attack and release times in milliseconds or relative to the tempo.
-// Set the high and low frequency points between which the envelope moves.
+// === TUTORIAL 307: FX Filter ===
+// The filter is a simple filter where the cutoff frequency is 
+// set with a list or argument. The second argument changes the Q
+// and the third argument allows to set a ramptime in milliseconds or 
+// relative to the bpm
 
-new synth saw note(0 0) time(1/1) shape(off) fx(triggerFilter low 1/4 3/4 5000 100)
+new synth saw shape(off) time(1/4) fx(filter low [4000 100 2000 50] 0.6 1/8)
 
 // Try changing the values in the function to hear what happens
 // It is also possible to modulate the parameters with lists
