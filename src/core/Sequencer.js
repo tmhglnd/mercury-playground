@@ -12,8 +12,10 @@ class Sequencer {
 		this._count = 0;
 		this._beatCount = 0;
 		this._time = 1;
+		this._subdiv = [ 1 ];
 		this._offset = 0;
 		this._beat = [ 1 ];
+		this._human = 0;
 
 		// visual code
 		this._visual = [];
@@ -52,6 +54,11 @@ class Sequencer {
 					this._beatCount = 0;
 				}
 			}
+			// set subdivision speeds
+			this._loop.playbackRate = Util.getParam(this._subdiv, this._count);
+
+			// humanize method is interesting to add
+			this._loop.humanize = Util.getParam(this._human, this._count);
 
 			// get beat probability for current count
 			let b = Util.getParam(this._beat, this._count);
@@ -116,11 +123,24 @@ class Sequencer {
 		this._loop.stop();
 	}
 
-	time(t, o=0){
+	time(t, o=0, s=[1]){
 		// set the timing interval and offset
-		// this._time = Util.toArray(t);
 		this._time = Util.formatRatio(t, this.bpm());
 		this._offset = Util.formatRatio(o, this.bpm());
+		// set timing division optionally, also possible via timediv()
+		// this.timediv(s);
+	}
+
+	timediv(s){
+		// set timing subdivisions for the loop
+		let tmp = Util.toArray(s);
+		this._subdiv = [];
+		for (let i=0; i<tmp.length; i++){
+			let sub = Math.max(0.001, Math.floor(tmp[i]));
+			for (let j=0; j<sub; j++){
+				this._subdiv.push(sub);
+			}
+		}
 	}
 
 	beat(b, r='off'){
@@ -130,6 +150,11 @@ class Sequencer {
 		if (r === 'off' || r < 1){
 			this._reset = -1;
 		}
+	}
+
+	human(h){
+		// set the humanizing factor for the instrument in milliseconds
+		this._human = Util.toArray(h).map(x => Util.divToS(x));
 	}
 
 	name(n){
