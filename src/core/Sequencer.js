@@ -153,7 +153,7 @@ class Sequencer {
 	}
 
 	human(h){
-		// set the humanizing factor for the instrument in milliseconds
+		// set the humanizing factor for the instrument in seconds
 		this._human = Util.toArray(h).map(x => Util.divToS(x));
 	}
 
