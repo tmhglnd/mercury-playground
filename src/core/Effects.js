@@ -66,6 +66,9 @@ const fxMap = {
 	},
 	'ppDelay' : (params) => {
 		return new PingPongDelay(params);
+	},
+	'freeverb' : (params) => {
+		return new FreeVerb(params);
 	}
 }
 module.exports = fxMap;
@@ -580,5 +583,26 @@ const PingPongDelay = function(_params){
 	this.delete = function(){
 		this._fx.disconnect();
 		this._fx.dispose();
+	}
+}
+
+const FreeVerb = function(_params){
+	this._fx = new Tone.Freeverb(_params[0], _params[1]);
+
+	this.set = function(c, time, bpm){
+
+	}
+
+	this.chain = function(){
+		return { 'send' : this._fx, 'return' : this._fx };
+	}
+
+	this.delete = function(){
+		let blocks = [ this._fx ];
+
+		blocks.forEach((b) => {
+			b.disconnect();
+			b.dispose();
+		});
 	}
 }
