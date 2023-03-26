@@ -90,6 +90,13 @@ async function code({ file, engine, canvas, p5canvas }){
 			let scl = Array.isArray(args[0])? args[0][0] : args[0];
 			let rt = Array.isArray(args[1])? args[1][0] : args[1];
 
+			if (scl.match(/(none|null|off)/)){
+				TL.setScale('chromatic');
+				TL.setRoot('c');
+				document.getElementById('scale').innerHTML = '';
+				return;
+			}
+
 			if (s.indexOf(scl) > -1){
 				TL.setScale(scl)
 			} else {
