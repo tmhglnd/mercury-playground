@@ -66,19 +66,8 @@ class MonoSynth extends Instrument {
 		// note as interval / octave coordinate
 		let o = Util.getParam(this._note[1], c);
 		let i = Util.getParam(this._note[0], c);
-		
-		if (isNaN(i)){
-			let _i = TL.noteToMidi(i);
-			if (!_i){
-				log(`${i} is not a valid number or name`);
-				i = 0;
-			} else {
-				i = _i - 36;
-			}
-		}
-		// reconstruct midi note value, (0, 0) = 36
-		// let n = i + (o * 12) + 36;
-		let n = TL.toScale(i + o * 12 + 36);
+		// reconstruct midi note value with scale, (0, 0) = 36
+		let n = Util.toMidi(i, o);
 
 		// calculate frequency in 12-TET A4 = 440;
 		// let f = Math.pow(2, (n - 69)/12) * 440;

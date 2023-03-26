@@ -48,20 +48,11 @@ class MonoMidi extends Sequencer {
 		} else {
 			i = [ Util.getParam(this._note[0], c) ];
 		}
-		console.log('notes', i);
+		
 		for (let x=0; x<i.length; x++){
 			// reconstruct midi note value, (0, 0) = 36
-			if (isNaN(i[x])){
-				let _i = noteToMidi(i[x]);
-				if (!_i){
-					log(`${i[x]} is not a valid number or name`);
-					i[x] = 0;
-				} else {
-					i[x] = _i - 36;
-				}
-			}
 			// convert to scale and include the octave
-			n[x] = toScale(i[x] + o * 12 + 36);
+			n[x] = Util.toMidi(i[x], o);
 		}
 
 		// timing offset to sync WebMidi and WebAudio
