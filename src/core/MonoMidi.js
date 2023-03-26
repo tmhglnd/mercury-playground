@@ -1,6 +1,7 @@
 const Tone = require('tone');
 const Util = require('./Util.js');
 const Sequencer = require('./Sequencer.js');
+const { noteToMidi, toScale } = require('total-serialism').Translate;
 const WebMidi = require("webmidi");
 
 class MonoMidi extends Sequencer {
@@ -39,18 +40,28 @@ class MonoMidi extends Sequencer {
 
 		// note as interval / octave coordinate
 		let o = Util.getParam(this._note[1], c);
-		let n;
+		let n = [];
+		let i = [];
 		if (this._chord){
-			let i = Util.lookup(this._note[0], c);
-			// reconstruct midi note value, (0, 0) = 36
-			n = [];
-			for (let x=0; x<i.length; x++){
-				n[x] = i[x] + (o * 12) + 36;
-			}
+			i = Util.lookup(this._note[0], c);
+			i = Util.toArray(i);
 		} else {
-			let i = Util.getParam(this._note[0], c);
+			i = [ Util.getParam(this._note[0], c) ];
+		}
+		console.log('notes', i);
+		for (let x=0; x<i.length; x++){
 			// reconstruct midi note value, (0, 0) = 36
-			n = i + (o * 12) + 36;
+			if (isNaN(i[x])){
+				let _i = noteToMidi(i[x]);
+				if (!_i){
+					log(`${i[x]} is not a valid number or name`);
+					i[x] = 0;
+				} else {
+					i[x] = _i - 36;
+				}
+			}
+			// convert to scale and include the octave
+			n[x] = toScale(i[x] + o * 12 + 36);
 		}
 
 		// timing offset to sync WebMidi and WebAudio
