@@ -138,12 +138,6 @@ class Instrument extends Sequencer {
 		console.log('=> disposed Instrument() with FX:', this._fx);
 	}
 
-	note(i=0, o=0){
-		// set the note as semitone interval and octave offset
-		// (0, 0) = MidiNote 36
-		this._note = [Util.toArray(i), Util.toArray(o)];
-	}
-
 	amp(g, r){
 		// set the gain and ramp time
 		this._gain[0] = Util.toArray(g);

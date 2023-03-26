@@ -157,6 +157,12 @@ class Sequencer {
 		this._human = Util.toArray(h).map(x => Util.divToS(x));
 	}
 
+	note(i=0, o=0){
+		// set the note as semitone interval and octave offset
+		// (0, 0) = MidiNote 36
+		this._note = [Util.toArray(i), Util.toArray(o)];
+	}
+
 	name(n){
 		// placeholder function for name
 		// is not used besides when parsing in mercury-lang

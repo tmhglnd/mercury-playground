@@ -1,7 +1,6 @@
 const Tone = require('tone');
 const Util = require('./Util.js');
 const Sequencer = require('./Sequencer.js');
-const { noteToMidi, toScale } = require('total-serialism').Translate;
 const WebMidi = require("webmidi");
 
 class MonoMidi extends Sequencer {
