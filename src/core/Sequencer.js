@@ -16,6 +16,9 @@ class Sequencer {
 		this._offset = 0;
 		this._beat = [ 1 ];
 		this._human = 0;
+		this._follow = null;
+
+		this._emitter = new Tone.Emitter();
 
 		// visual code
 		this._visual = [];
@@ -38,7 +41,14 @@ class Sequencer {
 			this._loop.dispose();
 		}
 		let schedule = Tone.Time(this._offset).toSeconds();
-		// console.log('schedule', schedule);
+
+		if (this._follow){
+			console.log('is following', this._follow);
+
+			// document.addEventListener(this._follow, (e) => console.log('received from emitter:', e), false);
+			this._emitter.on(this._follow, (time) => console.log('recieved', time));
+			return;
+		}
 
 		// create new loop for synth
 		this._loop = new Tone.Loop((time) => {
@@ -71,6 +81,13 @@ class Sequencer {
 				// trigger some events for this instrument based
 				// on the current count and time
 				this.event(c, time);
+
+				// also emit the count to all listeners
+				// console.log('emitter', this._name, c, time);
+				// this._emitter.debug = true;
+				this._emitter.emit(this._name, time);
+				// this._emitter = new CustomEvent(this._follow, { detail: [c, time ], bubbles: true, cancelable: true, composed: false});
+				// document.dispatchEvent(this._emitter);
 
 				// osc-connection needs syncing with Tone Transport
 				// emit([`/trigger`, 1]);
@@ -155,6 +172,12 @@ class Sequencer {
 	human(h){
 		// set the humanizing factor for the instrument in seconds
 		this._human = Util.toArray(h).map(x => Util.divToS(x));
+	}
+
+	follow(l){
+		// set the name of another instrument to listen to for triggering
+		// can currently only be one instrument
+		this._follow = Array.isArray(l) ? l[0] : l;
 	}
 
 	name(n){
