@@ -86,7 +86,7 @@ function divToS(d, bpm){
 // convert note and octave (int/float/name) to a midi value
 function toMidi(n, o){
 	if (isNaN(n)){
-		let _n = noteToMidi(i);
+		let _n = noteToMidi(n);
 		if (!_n){
 			log(`${n} is not a valid number or name`);
 			n = 0;
