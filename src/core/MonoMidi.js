@@ -72,12 +72,6 @@ class MonoMidi extends Sequencer {
 		this._device.playNote(n, ch, { duration: d, velocity: g, time: sync });
 	}
 
-	note(i=0, o=0){
-		// set the note as semitone interval and octave offset
-		// (0, 0) = MidiNote 36
-		this._note = [Util.toArray(i), Util.toArray(o)];
-	}
-
 	amp(g, r){
 		// set the gain and ramp time
 		g = Util.toArray(g);

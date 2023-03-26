@@ -82,12 +82,6 @@ class MonoSynth extends Instrument {
 		}
 	}
 
-	note(i=0, o=0){
-		// set the note as semitone interval and octave offset
-		// (0, 0) = MidiNote 36
-		this._note = [Util.toArray(i), Util.toArray(o)];
-	}
-
 	super(d=[0.1], v=[3]){
 		// add unison voices and detune the spread
 		// first argument is the detune amount

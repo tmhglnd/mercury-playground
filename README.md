@@ -186,8 +186,9 @@ The playground does not have exactly the same functionality of the original Merc
 	- [x] beat
 	- [x] gain
 	- [x] speed
-		- [x] reverse
-	- [ ] note
+		- [ ] reverse
+	- [x] note
+		- [x] tune
 	- [x] pan
 	- [x] name
 	- [x] fx

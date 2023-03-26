@@ -1,0 +1,15 @@
+// === TUTORIAL 124: Note & Tune ===
+// It is also possible to change the pitch of a sample with the 
+// note() function, similar to the note function in a synth 
+// (see tutorial 203). In the case the sample is not recorded at 
+// c4 (midi 60, 261.626Hz) you'll have to set the tune() in order 
+// to get the correct pitch transposition. Any adjustments to speed() 
+// will also affect the audible pitch together with note().
+
+set scale dorian eb
+set tempo 100
+
+new sample kalimba_a time(1/4) note([0 7 5 3] 2) tune(a3)
+new sample piano_e time(1/4 1/8) note([0 9 12 10 7 3] 1) tune(e3)
+
+// Try other samples to hear the melody and adjust the tune accordingly

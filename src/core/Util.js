@@ -1,4 +1,4 @@
-const { noteToMidi, toScale } = require('total-serialism').Translate;
+const { noteToMidi, toScale, mtof } = require('total-serialism').Translate;
 
 // lookup a value from array with wrap index
 function lookup(a, i){
@@ -84,7 +84,7 @@ function divToS(d, bpm){
 }
 
 // convert note and octave (int/float/name) to a midi value
-function toMidi(n, o){
+function toMidi(n=0, o=0){
 	if (isNaN(n)){
 		let _n = noteToMidi(n);
 		if (!_n){
@@ -97,4 +97,4 @@ function toMidi(n, o){
 	return toScale(n + o * 12 + 36);
 }
 
-module.exports = { lookup, randLookup, isRandom, getParam, toArray, msToS, formatRatio, divToS, toMidi }
+module.exports = { lookup, randLookup, isRandom, getParam, toArray, msToS, formatRatio, divToS, toMidi, mtof, noteToMidi }

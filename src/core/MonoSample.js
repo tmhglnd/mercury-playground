@@ -15,6 +15,8 @@ class MonoSample extends Instrument {
 		this._speed = [ 1 ];
 		this._rev = false;
 		this._stretch = [ 0 ];
+		this._note = null;
+		this._tune = [ 261.6255653 ];
 
 		// playback start position
 		this._pos = [ 0 ];
@@ -52,6 +54,18 @@ class MonoSample extends Instrument {
 
 		// get speed and if 2d array pick randomly
 		let s = Util.getParam(this._speed, c);
+
+		if (this._note){
+			// note as interval / octave coordinate
+			let o = Util.getParam(this._note[1], c);
+			let i = Util.getParam(this._note[0], c);
+			let t = Util.getParam(this._tune, c);
+
+			// reconstruct midi note value with scale, (0, 0) = 36
+			let n = Util.toMidi(i, o);
+			let r = Util.mtof(n) / t;
+			s = s * r;
+		}
 
 		// reversing seems to reverse every time the 
 		// value is set to true (so after 2 times reverse
@@ -100,6 +114,20 @@ class MonoSample extends Instrument {
 	speed(s){
 		// set the speed pattern as an array
 		this._speed = Util.toArray(s);
+	}
+
+	tune(t=60){
+		// set the fundamental midi note for this sample in Hz, MIDI or Notename
+		this._tune = Util.toArray(t);
+		this._tune = this._tune.map((t) => {
+			if (typeof t === 'number'){
+				if (Math.floor(t) !== t){
+					return t;
+				}
+				return Util.mtof(t);
+			}
+			return Util.mtof(Util.noteToMidi(t));
+		});
 	}
 
 	stretch(s){
