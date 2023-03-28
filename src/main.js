@@ -67,12 +67,21 @@ window.onload = () => {
 			console.log(`Connected for OSC: ${id}`);
 		});
 		socket.on('osc', (msg) => {
-			window.oscMessages[msg.shift()] = msg;
-			// console.log(`Received: ${msg}`);
+			console.log(`Received: ${msg}`);
+			if (msg[0] === '/mercury-code'){
+				try {
+					cm.set(msg[1]);
+					cm.evaluate();
+				} catch (e) {
+					log(`Unable to execute code`);
+				}
+			} else {
+				window.oscMessages[msg.shift()] = msg;
+			}
 		});
-		// window.emit = (msg) => {
-		// 	socket.emit('message', msg);
-		// }
+		window.emit = (msg) => {
+			socket.emit('message', msg);
+		}
 	} catch (e) {
 		console.log('Unable to use OSC connection. Clone Mercury from github and run as localhost');
 	}

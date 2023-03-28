@@ -254,9 +254,9 @@ This subset of Mercury was designed to use as a teaching environment for:
 
 ## 👩‍💻👨‍💻 Collaborative Coding
 
-It is possible to code together in Mercury using the amazing [**Flok**](https://flok.clic.cf/) live coding editor in the browser together with the Mercury standalone version in Max8.
+You can code together in Mercury using the amazing [**Flok**](https://flok.cc/) live coding editor in the browser together with the **Mercury Playground** or the **standalone version** in Max8.
 
-- [Start coding together here](https://tmhglnd.github.io/mercury/collaborate.html)
+- [Follow the instructions here](https://tmhglnd.github.io/mercury/collaborate.html)
 
 ## 🚀 Install
 
@@ -267,35 +267,27 @@ It is possible to code together in Mercury using the amazing [**Flok**](https://
 
 🤓 If you want to run the application locally (for using without internet, or using the OSC functionality or when developing extra features):
 
-In the Terminal navigate to the folder you want to install Mercury. Then run:
+Make sure you have NodeJS installed [for Mac](https://nodejs.org/en) or [for Windows](https://nodejs.org/en)
 
-`git clone http://github.com/tmhglnd/mercury-playground`
+In the Terminal navigate to the folder you want to install Mercury. Then run: `git clone http://github.com/tmhglnd/mercury-playground`
 
-Navigate to the cloned folder with:
+Navigate to the cloned folder with: `cd mercury-playground`
 
-`cd mercury-playground`
+Then install all the dependecies: `npm install` (make sure you have NodeJS v18 installed, check by running `node -v`)
 
-Then install all the dependecies:
+Then build your local version: `npm run build` (or `npm run watch` while developing)
 
-`npm install` (make sure you have NodeJS v18 installed, check by running `node -v`)
+Now start the local server: `npm start`, open a browser and go to [`http://localhost:8080`](http://localhost:8080). 
 
-Then build your local version:
-
-`npm run build` (or `$ npm run watch` while developing)
-
-Now start the local server:
-
-`npm start`
-
-Open a browser and go to `http://localhost:3000`. Once connected the Terminal will print:
+Once connected the Terminal will print:
 
 ```
 Connected yH0SGEdRHbZD1IACAAAB
-Receive messages from Mercury on port 9000
-Send messages to Mercury on port 8000
+Receive messages from Mercury on port 2440
+Send messages to Mercury on port 4880
 ```
 
-Mercury can now receive OSC-messages on port `8000`
+Mercury can now receive OSC-messages on port `4880` *(the portnumber is chosen to not interfere with many other default portnumbers. The number is the diameter in kilometers of the planet Mercury)*
 
 ## 📖 Documentation
 
@@ -303,11 +295,11 @@ Full explanation of all the possibilities in Mercury:
 
 - [Open the documentation](https://tmhglnd.github.io/mercury/table-of-content.html)
 
-*NB: The Mercury Playground still lacks some functionalities, see the list above*
+*NB: There are some differences between the Mercury Playground and the Max8 version. If you find any discrepancies please report an issue*
 
 ## 💻 System Requirements
 
-Any laptop/desktop that runs a browser like Chrome, Brave or Firefox.
+Any laptop/desktop that runs a chromium based browser like Chrome or Brave.
 
 ## 🎵 Sounds
 

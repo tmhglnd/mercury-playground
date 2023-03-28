@@ -17,17 +17,17 @@ app.get("/", (request, response) => {
 	response.sendFile(__dirname + "/public/index.html");
 });
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 8080;
 const server = app.listen(port, () => {
 	console.log(`Mercury Playground running`);
-	console.log(`Use 'node server.js --log' to print incoming/outgoing osc-messages\n`);
+	console.log(`Use 'node server.js --log' to monitor incoming/outgoing osc-messages\n`);
 	console.log(`Visit http://localhost:${port}\n`);
 });
 
 // for OSC connection when using localhost via npm start
 const io = socket(server);
-const inPort = 8000;
-const outPort = 9000;
+const inPort = 4880;
+const outPort = 2440;
 
 io.sockets.on('connection', (socket) => {
 	console.log('Connected', socket.id);
