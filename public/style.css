@@ -207,10 +207,10 @@ select {
 	-webkit-app-region: no-drag;
 }
 
-select:hover {
+select:hover, select:focus {
 	/* background: rgb(50, 50, 50); */
 	color: var(--accent);
-	background: var(--transparant);
+	background: var(--bg);
 	/* background: rgb(255, 255, 255, 0.15); */
 }
 
