@@ -37,8 +37,6 @@ function getFiles(glob){
 	const fold = fg.sync(glob);
 	let files = {};
 	
-	
-
 	for (let f in fold){
 		let relative_path = fold[f];
 		let separator = (relative_path.includes("/")) ? '/' : '\\';
