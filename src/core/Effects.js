@@ -69,6 +69,9 @@ const fxMap = {
 	},
 	'freeverb' : (params) => {
 		return new FreeVerb(params);
+	},
+	'noise' : (params) => {
+		return new Noise(params);
 	}
 }
 module.exports = fxMap;
@@ -604,5 +607,30 @@ const FreeVerb = function(_params){
 			b.disconnect();
 			b.dispose();
 		});
+	}
+}
+
+const Noise = function(_params){
+
+	this._out = new Tone.Gain(1);
+	this._in = new Tone.Gain(1);
+	// this._fx = Tone.getContext().createAudioWorkletNode('white-noise');
+	// this._fx = new Tone.getContext().createAudioWorkletNode('tanh-distortion');
+
+	this._fx = Tone.getContext().createAudioWorkletNode('bit-crusher-processor');
+	this._in.connect(this._fx);
+	this._fx.connect(this._out.input);
+
+	this.set = function(c, time, bpm){
+
+	}
+
+	this.chain = function(){
+		return { 'send' : this._in, 'return' : this._out }
+	}
+
+	this.delete = function(){
+		this._fx.disconnect();
+		this._fx.dispose();
 	}
 }

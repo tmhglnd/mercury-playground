@@ -9,7 +9,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
-    "watch": "watchify src/main.js -o public/bundle.js -v",
+    "watch": "watchify -t brfs src/main.js -o public/bundle.js -v",
     "build": "npm run data && npm run browserify && npm run uglify",
     "data": "node index.js",
     "browserify": "browserify src/main.js -o public/bundle.js",
@@ -36,6 +36,7 @@
     "webmidi": "^2.5.3"
   },
   "devDependencies": {
+    "brfs": "^2.0.2",
     "browserify": "^17.0.0",
     "terser": "^5.12.1",
     "watchify": "^4.0.0"

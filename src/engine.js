@@ -1,5 +1,15 @@
 const Tone = require('tone');
 
+// load extra AudioWorkletProcessors from file
+// transformed to inline with browserify brfs
+// const fs = require('fs');
+// const fxExtensions = fs.readFileSync('./src/core/effects/noise.js', 'utf-8');
+// Tone.getContext().addAudioWorkletModule(URL.createObjectURL(new Blob([ fxExtensions ], { type: 'text/javascript' })));
+
+Tone.getContext().addAudioWorkletModule('https://raw.githubusercontent.com/GoogleChromeLabs/web-audio-samples/main/src/audio-worklet/basic/one-pole-filter/one-pole-processor.js').then(() => console.log('one-pole-processor loaded')).catch((e) => console.log(e));
+
+Tone.getContext().addAudioWorkletModule('https://raw.githubusercontent.com/GoogleChromeLabs/web-audio-samples/main/src/audio-worklet/basic/bit-crusher/bit-crusher-processor.js').then(() => console.log('bit-crusher-processor loaded')).catch((e) => console.log(e));
+
 // latency reduces cpu load
 // Tone.context.latencyHint = 'playback';
 Tone.context.lookAhead = 0.1;
