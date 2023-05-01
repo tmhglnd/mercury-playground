@@ -28,9 +28,12 @@ const fxMap = {
 	'tremolo' : (params) => {
 		return new LFO(params);
 	},
-	// 'chip' : (params) => {
-	// 	return new BitCrusher(params);
-	// },
+	'chip' : (params) => {
+		return new DownSampler(params);
+	},
+	'downsample' : (params) => {
+		return new DownSampler(params);
+	},
 	'reverb' : (params) => {
 		return new Reverb(params);
 	},
@@ -69,12 +72,39 @@ const fxMap = {
 	},
 	'freeverb' : (params) => {
 		return new FreeVerb(params);
-	},
-	'noise' : (params) => {
-		return new Noise(params);
 	}
 }
 module.exports = fxMap;
+
+// A Downsampling Chiptune effect. Downsamples the signal by a specified amount
+// Resulting in a lower samplerate, making it sound more like 8bit/chiptune
+// Programmed with a custom AudioWorkletProcessor, see 
+//
+const DownSampler = function(_params){
+	this._down = (_params[0])? Util.toArray(_params[0]) : [8];
+
+	this._fx = new Tone.ToneAudioNode();
+	this._fx.input = new Tone.Gain(1);
+	this._fx.output = new Tone.Gain(1);
+	this._fx.workletNode = Tone.getContext().createAudioWorkletNode('downsampler-processor');
+	this._fx.input.chain(this._fx.workletNode, this._fx.output);
+
+	this.set = function(c, time, bpm){
+		let p = this._fx.workletNode.parameters.get('down');
+		let d = Math.floor(1 / Math.max(1 - Util.lookup(this._down, c), 0.00001));
+
+		p.setValueAtTime(d, time);
+	}
+
+	this.chain = function(){
+		return { 'send' : this._fx, 'return' : this._fx }
+	}
+
+	this.delete = function(){
+		this._fx.disconnect();
+		this._fx.dispose();
+	}
+}
 
 // A Compressor effect, allowing to reduce the dynamic range of a signal
 // Set the threshold (in dB's), the ratio, the attack and release time in ms
@@ -607,30 +637,5 @@ const FreeVerb = function(_params){
 			b.disconnect();
 			b.dispose();
 		});
-	}
-}
-
-const Noise = function(_params){
-
-	this._out = new Tone.Gain(1);
-	this._in = new Tone.Gain(1);
-	// this._fx = Tone.getContext().createAudioWorkletNode('white-noise');
-	// this._fx = new Tone.getContext().createAudioWorkletNode('tanh-distortion');
-
-	this._fx = Tone.getContext().createAudioWorkletNode('bit-crusher-processor');
-	this._in.connect(this._fx);
-	this._fx.connect(this._out.input);
-
-	this.set = function(c, time, bpm){
-
-	}
-
-	this.chain = function(){
-		return { 'send' : this._in, 'return' : this._out }
-	}
-
-	this.delete = function(){
-		this._fx.disconnect();
-		this._fx.dispose();
 	}
 }
