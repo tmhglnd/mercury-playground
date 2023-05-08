@@ -91,7 +91,7 @@ const DownSampler = function(_params){
 
 	this.set = function(c, time, bpm){
 		let p = this._fx.workletNode.parameters.get('down');
-		let d = Math.floor(1 / Math.max(1 - Util.lookup(this._down, c), 0.00001));
+		let d = Math.floor(1 / Math.max(0.0001, 1 - Util.lookup(this._down, c) ** 0.25));
 
 		p.setValueAtTime(d, time);
 	}
