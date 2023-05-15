@@ -10,7 +10,7 @@ let hydraCanvas = function(c, u) {
 	this.canvas.style.width = '100%';
 	this.canvas.style.height = '100%';
 	this.canvas.style.display = 'none';
-	// this.canvas.style.imageRendering = 'pixelated';
+	this.canvas.style.imageRendering = 'pixelated';
 
 	this.div = document.getElementById(u);
 
