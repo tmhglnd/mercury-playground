@@ -60,10 +60,11 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 
 	// let container = document.createElement('div');
 	// container.id = 'code-editor';
-	let container = document.getElementById('code-editor');
+	this.container = document.getElementById('code-editor');
 	let text = document.createElement('textarea');
 	// document.body.appendChild(container);
-	container.appendChild(text);
+	this.container.appendChild(text);
+	this.container.style.opacity = 1;
 
 	this.options = {
 		// options for the editor
@@ -90,6 +91,8 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 			'Alt-.': () => { this.silence() },
 			'Shift-Alt-Enter': () => { this.evaluateBlock() },
 			'Shift-Ctrl-Enter': () => { this.evaluateBlock() },
+			'Shift-Alt-H': () => { this.hideEditor() },
+			'Shift-Ctrl-H': () => { this.hideEditor() },
 			'Tab': 'insertSoftTab',
 		}
 	}
@@ -109,7 +112,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 	this.clear = function(){
 		// this.cm.setValue('// start coding here ^^');
 		this.set(
-			'// Welcome to the Mercury Playground ^^\n' + 
+			'// Welcome to the Mercury Playground! ^^\n' + 
 			'// click "play" to start the sound and start coding\n' +
 			'// or open the tutorials or a random example\n' +
 			'\n' +
@@ -172,6 +175,15 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		removeSound(getSound(), 0.1);
 		engine.silence();
 		canvas.clear();
+	}
+
+	// hide the editor on shortkey
+	this.hideEditor = function(){
+		if (this.container.style.opacity == 1){
+			this.container.style.opacity = 0;
+		} else {
+			this.container.style.opacity = 1;
+		}
 	}
 
 	this.changeTheme = function(){
@@ -344,7 +356,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		btn.onclick = () => {
 			this.menuHidden = !this.menuHidden;
 
-			let divs = [ 'header', 'settings', 'menu', 'links', 'hydra-ui' ];
+			let divs = [ 'header', 'settings', 'menu', 'links', 'hydra-ui', 'switch' ];
 			for (let i=0; i<divs.length; i++){
 				let d = document.getElementById(divs[i]);
 				d.style.display = this.menuHidden ? 'none' : 'inline';
