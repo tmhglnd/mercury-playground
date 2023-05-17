@@ -262,7 +262,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 			// 'tutorial': 'https://tmhglnd.github.io/mercury/tutorial.html',
 			// 'sounds' : 'https://github.com/tmhglnd/mercury/blob/master/mercury_ide/media/README.md',
 			'help': 'https://tmhglnd.github.io/mercury/reference.html',
-			'local version': 'https://github.com/tmhglnd/mercury-playground'
+			'local version': 'https://github.com/tmhglnd/mercury-playground#-running-without-internet'
 		}
 
 		let div = document.getElementById('links');

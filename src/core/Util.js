@@ -48,6 +48,38 @@ function getOSC(a){
 	return a;
 }
 
+// global functions for string expressions in eval()
+// very experimental currently
+window.cos = Math.cos;
+window.sin = Math.sin;
+window.floor = Math.floor;
+window.ceil = Math.ceil;
+window.round = Math.round;
+window.mod = Math.mod;
+window.pow = Math.pow;
+window.sqrt = Math.sqrt;
+window.pi = Math.PI;
+window.twopi = Math.PI * 2;
+
+// check if the string is formatted as an expression, then evaluate it
+function evalExpr(a){
+	let expr = a;
+	if (typeof expr !== 'string'){
+		return a;
+	} else if (expr.match(/^\{[^{}]+\}$/g)){
+		let result = 0;
+		// console.log('evaluate this expression:', eval(expr));
+		try {
+			result = eval(expr);
+		} catch (e){
+			log(`Unable to evaluate expression: ${expr}`);
+		}
+		return result;
+	}
+	// pass through
+	return a;
+}
+
 // convert to array if not an array
 function toArray(a){
 	return Array.isArray(a) ? a : [a];

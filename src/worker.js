@@ -14,6 +14,10 @@ let crossFade = 0.5;
 let _sounds = [];
 let sounds = [];
 
+// global variables easily accessed
+// window.time = Tone.now();
+// window.transport = Tone.getTransport().position;
+
 // parse and evaluate the inputted code
 // as an asyncronous function with promise
 async function code({ file, engine, canvas, p5canvas }){
