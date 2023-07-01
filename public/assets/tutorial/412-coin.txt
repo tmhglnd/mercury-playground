@@ -1,0 +1,14 @@
+// === TUTORIAL 410: Coin ===
+// Generate a list of n-length containing random coin tosses 
+// The resulting list only contains 0's and 1's
+// coin(size)
+
+// Useful to generate random rhythms
+
+set tempo 130
+list rhythm1 coin(8)
+list rhythm2 coin(8)
+print rhythm1 rhythm2
+
+new sample bongo time(1/16) play(rhythm1)
+new sample bongo_lo time(1/16) play(rhythm2)
