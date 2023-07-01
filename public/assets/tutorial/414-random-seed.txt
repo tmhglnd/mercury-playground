@@ -1,0 +1,19 @@
+// === TUTORIAL 411: Random Seed ===
+// Set the seed for the Random Number Generator (RNG). A value of 0 sets to 
+// unpredictable seeding. Seeding the RNG results in predictable psuedo
+// random numbers that give the same result every time the code is
+// evaluated.
+// randomSeed anyValue
+
+// Useful to fix generated random numbers
+
+// Try both seeds and hear the difference
+set randomSeed 4738
+// set randomSeed 7385
+
+list melody random(5 0 12)
+list cutoff random(5 100 2000)
+list rhythm clave(16)
+print melody cutoff rhythm
+
+new synth saw note(melody 1) time(1/16) play(rhythm) fx(filter low cutoff)
