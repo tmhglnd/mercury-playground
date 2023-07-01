@@ -1,6 +1,6 @@
 // Welcome to the Mercury Playground ^^
-// click "play" to execute the code
-// and adjust the code below:
+// click "play" to start the code
+// adjust the code below:
 
 list kickBeat [1 0.01 0.1 1 0]
 new sample kick_house time(1/16) play(kickBeat)

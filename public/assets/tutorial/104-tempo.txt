@@ -10,4 +10,4 @@ new sample snare_808 time(1/2)
 
 // Some genres are defined by there own bpm range
 // Try for example tempo 86 for HipHop, 
-// or 162 for Drum'n'Bass styles
+// or 162 for Drum'n'Bass
