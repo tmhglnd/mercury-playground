@@ -1,0 +1,15 @@
+// === TUTORIAL 406: fibonacci numbers ===
+// Generate a list of Fibonacci numbers F[n] = F[n-1] + F[n-2]. The fibonacci 
+// sequence is famous because it's numbers pop up in nature in many places 
+// and when you divide any number in the sequence by its previous number it 
+// converges towards the golden ratio (phi, 1.618)
+// fibonacci(amount)
+// fibonacci(amount, starting number)
+
+// Useful as a starting point for melodic content or modulation of parameters
+
+list melody fibonacci(9)
+list cutoff fibonacci(8 12)
+print melody cutoff
+
+new synth saw note(melody 1) time(1/8) shape(off) fx(filter low cutoff)

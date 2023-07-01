@@ -1,0 +1,12 @@
+// === TUTORIAL 406: fibonacci numbers ===
+// Generate Pisano periods from the Fibonacci sequence. The pisano period is a
+// result of applying a modulo (%) operation on the Fibonacci sequence 
+// F[n] = (F[n-1] + F[n-2]) mod a. The length of the period differs per modulus
+// value, but the sequence will always repeat.
+
+// Useful as a starting point for melodic content or modulation of parameters
+
+list melody pisano(13)
+print melody
+
+new synth sine note(melody 2) time(1/16)

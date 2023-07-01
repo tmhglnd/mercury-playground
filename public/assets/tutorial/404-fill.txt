@@ -1,0 +1,11 @@
+// === TUTORIAL 404: fill ===
+// Fill a list with values and a number of repetitions. The values
+// are provided in pairs of number, amount. 
+// fill(value1 amount1 value2 amount2 etc...)
+
+// Useful for creating longer lists with a lot of duplicate values
+
+list melody fill(0 4 7 2 3 4 12 2 9 4 3 2 2 2)
+print melody
+
+new synth sine note(melody 2) time(1/16)

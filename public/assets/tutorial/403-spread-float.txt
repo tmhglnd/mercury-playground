@@ -1,0 +1,14 @@
+// === TUTORIAL 403: spreadFloat ===
+// Generate a list of n-length containing floating-point numbers
+// Starting at x and ending at y (excluding y)
+// spreadFloat(size low high) (alias: spreadF)
+// spreadInclusiveFloat(size low high) (alias: spreadInclusiveF)
+
+// Useful for parameters that are based on floating-point numbers
+// such as sequences for modulation of for example gain and panning
+
+list volume spreadF(16 0 1)
+list panning spreadInclusiveF(7 -1 1)
+print volume panning
+
+new synth saw note(0 1) time(1/16) shape(1 80) pan(panning) gain(volume)
