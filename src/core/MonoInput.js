@@ -13,7 +13,6 @@ class MonoInput extends Instrument {
 			log(`${d} is not a valid microphone input. defaults to in0`);
 			this._device = 0;
 		}
-		// log(`Opened microphone: ${window.devices[this._device]}`);
 
 		this.mic;
 		this.createSource();
@@ -29,11 +28,7 @@ class MonoInput extends Instrument {
 			log(`Unable to use microphone`);
 		});
 		this.mic.channelInterpretation = 'discrete';
-		// console.log(`Number of inputs: ${this.mic.numberOfOutputs}`);
-		// console.log(`Number of outputs: ${this.mic.numberOfOutputs}`);
-		// console.log(`channelInterpretation: ${this.mic.channelInterpretation}`);
-		// console.log(`channelCount: ${this.mic.channelCount}`);
-		// console.log(`channelCountMode: ${this.mic.channelCountMode}`);
+		
 		this.source = this.mic;
 	}
 
