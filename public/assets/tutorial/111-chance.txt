@@ -8,7 +8,7 @@ set tempo 115
 new sample hat_808 time(1/16) play(0.6)
 // play hat 60% of the time
 
-new sample kick_808_long time(1/8) play(0.3)
+new sample kick_808_dist time(1/8) play(0.3)
 // play kick 30% of the time
 
 new sample snare_808 time(1/2)

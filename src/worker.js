@@ -11,9 +11,13 @@ const Tempos = require('./data/genre-tempos.json');
 
 // cross-fade time
 let crossFade = 0.5;
-// array with the insturments playing
+// arrays with the current and previous instruments playing for crossfade
 let _sounds = [];
 let sounds = [];
+
+// global variables easily accessed
+// window.time = Tone.now();
+// window.transport = Tone.getTransport().position;
 
 // parse and evaluate the inputted code
 // as an asyncronous function with promise
@@ -43,6 +47,7 @@ async function code({ file, engine, canvas, p5canvas }){
 	if (errors.length > 0){
 		// return if the code contains any syntax errors
 		log(`Could not run because of syntax error`);
+		log(`Please see Help for more information`);
 		return;
 	}
 
@@ -84,12 +89,18 @@ async function code({ file, engine, canvas, p5canvas }){
 		}, 
 		'silence' : (mute) => {
 			if (mute){ engine.silence(); }
-			else { engine.resume(); }
 		},
 		'scale' : (args) => {
 			let s = TL.scaleNames();
 			let scl = Array.isArray(args[0])? args[0][0] : args[0];
 			let rt = Array.isArray(args[1])? args[1][0] : args[1];
+
+			if (scl.match(/(none|null|off)/)){
+				TL.setScale('chromatic');
+				TL.setRoot('c');
+				document.getElementById('scale').innerHTML = '';
+				return;
+			}
 
 			if (s.indexOf(scl) > -1){
 				TL.setScale(scl)
@@ -132,7 +143,7 @@ async function code({ file, engine, canvas, p5canvas }){
 	sounds = [];
 
 	const objectMap = {
-		'sample' : async (obj) => {
+		'sample' : (obj) => {
 			// console.log('make sample', obj);
 			let type = obj.type;
 			let args = obj.functions;			
@@ -150,7 +161,7 @@ async function code({ file, engine, canvas, p5canvas }){
 			});
 			return inst;
 		},
-		'loop' : async (obj) => {
+		'loop' : (obj) => {
 			// console.log('make sample', obj);
 			let type = obj.type;
 			let args = obj.functions;			
@@ -168,7 +179,7 @@ async function code({ file, engine, canvas, p5canvas }){
 			});
 			return inst;
 		},
-		'synth' : async (obj) => {
+		'synth' : (obj) => {
 			console.log('make synth', obj);
 			let type = obj.type;
 			let args = obj.functions;			
@@ -187,7 +198,7 @@ async function code({ file, engine, canvas, p5canvas }){
 			});
 			return inst;
 		},
-		'midi' : async (obj) => {
+		'midi' : (obj) => {
 			// console.log('make midi', obj);
 			let device = obj.type;
 			let args = obj.functions;
@@ -225,7 +236,7 @@ async function code({ file, engine, canvas, p5canvas }){
 	for (let o in tree.objects){
 		let type = tree.objects[o].object;;
 		if (objectMap[type]){
-			sounds.push(await objectMap[type](tree.objects[o]));
+			sounds.push(objectMap[type](tree.objects[o]));
 		} else {
 			log(`Instrument named '${type}' is not supported`);
 		}
@@ -238,16 +249,30 @@ async function code({ file, engine, canvas, p5canvas }){
 	console.log(`Made instruments in: ${((Tone.Transport.seconds - t) * 1000).toFixed(3)}ms`);
 
 	// when all loops started fade in the new sounds and fade out old
-	sounds.map(async (s) => {
-		// fade in new sounds;
-		s.fadeIn(crossFade);
-	});
+	if (!sounds.length){
+		startSound(sounds);
+	}
+	startSound(sounds, crossFade);
+	removeSound(_sounds, crossFade);
+}
+	
+function getSound(){
+	return sounds;
+}
 
-	_sounds.map(async (s) => {
+function startSound(s, f=0){
+	// fade in new sounds
+	s.map((_s) => {
+		_s.fadeIn(f);
+	});
+}
+
+function removeSound(s, f=0) {
+	s.map((_s) => {
 		// fade out and delete after fade
-		s.fadeOut(crossFade);
+		_s.fadeOut(f);
 	});
 	// empty array to trigger garbage collection
-	_sounds = [];
+	s.length = 0;
 }
-module.exports = code;
+module.exports = { code, removeSound, getSound };

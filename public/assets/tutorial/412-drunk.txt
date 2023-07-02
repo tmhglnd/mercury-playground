@@ -1,0 +1,15 @@
+// === TUTORIAL 412: Drunk ===
+// Generate a list of n-length containing random values 
+// of whole numbers between low and high value (excluding high)
+// Every random number is based on the previous number and generated
+// within a specified step-range.
+// drunk(size step low high)
+
+// Useful to generate random sequences for melodies and any parameter
+
+list melody drunk(16 2 0 12)
+list cutoff drunk(16 1000 300 4000)
+list length drunk(16 50 80 500)
+print melody cutoff length
+
+new synth saw note(melody 1) time(1/16) shape(1 length) fx(filter low cutoff)

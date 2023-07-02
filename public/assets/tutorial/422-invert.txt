@@ -1,0 +1,15 @@
+// === TUTORIAL 422: Invert ===
+// Invert the contents of a list. This is done by looking at
+// the highest and lowest value in the list and flipping every
+// number to the opposite side.
+// invert(list) - alias: flip
+
+// Useful to transform a melodic phrase to generate new 
+// musical material
+
+list melody [0 3 2 7 9 7 12 14]
+list inv invert(melody)
+print melody inv
+
+new synth saw note(melody 1) time(1/4)
+new synth saw note(inv 0) time(1/4 1/8)

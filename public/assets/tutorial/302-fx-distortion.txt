@@ -1,6 +1,12 @@
 // === TUTORIAL 302: FX Distortion ===
 // With the distortion effect you can give the sound a crunchy
-// quality, like it is sound through a guitar amplifier
+// quality, like it is sounding through a guitar amplifier
+// fx(drive amount) - alias: distort
 
-set tempo 105
-new loop amen time(1) fx(drive 50)
+set tempo 100
+
+list amounts spread(5 10 50)
+new loop amen time(1) gain(0.6) fx(drive amounts)
+
+// Try changing the values in the function to hear what happens
+// It is also possible to modulate the parameters with lists

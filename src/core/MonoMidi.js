@@ -39,18 +39,19 @@ class MonoMidi extends Sequencer {
 
 		// note as interval / octave coordinate
 		let o = Util.getParam(this._note[1], c);
-		let n;
+		let n = [];
+		let i = [];
 		if (this._chord){
-			let i = Util.lookup(this._note[0], c);
-			// reconstruct midi note value, (0, 0) = 36
-			n = [];
-			for (let x=0; x<i.length; x++){
-				n[x] = i[x] + (o * 12) + 36;
-			}
+			i = Util.lookup(this._note[0], c);
+			i = Util.toArray(i);
 		} else {
-			let i = Util.getParam(this._note[0], c);
+			i = [ Util.getParam(this._note[0], c) ];
+		}
+		
+		for (let x=0; x<i.length; x++){
 			// reconstruct midi note value, (0, 0) = 36
-			n = i + (o * 12) + 36;
+			// convert to scale and include the octave
+			n[x] = Util.toMidi(i[x], o);
 		}
 
 		// timing offset to sync WebMidi and WebAudio
@@ -68,12 +69,6 @@ class MonoMidi extends Sequencer {
 
 		// play the note!
 		this._device.playNote(n, ch, { duration: d, velocity: g, time: sync });
-	}
-
-	note(i=0, o=0){
-		// set the note as semitone interval and octave offset
-		// (0, 0) = MidiNote 36
-		this._note = [Util.toArray(i), Util.toArray(o)];
 	}
 
 	amp(g, r){

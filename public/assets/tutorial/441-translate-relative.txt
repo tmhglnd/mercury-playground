@@ -1,0 +1,18 @@
+// === TUTORIAL 441: Translate Relative ===
+// You can use translate relative values/names to midi numbers or 
+// frequencies easily with the relative and chroma methods 
+
+// Convert relative semitone values to midi-numbers (alias: rtom)
+// specify the octave as second argument (default = 'C4' = 4 => 48)
+print relativeToMidi([-12 -9 -5 0 4 7 2 5 9] 'c4')
+
+// Convert relative semitone values to frequency (A4 = 440 Hz) (alias: rtof)
+// specify the octave as second argument (default = 'C4' = 4 => 48)
+print relativeToFreq([-12 -9 -5 0 4 7 2 5 9] 'c4')
+
+// Convert a chroma value to a relative note number (alias: ctor)
+// Can also include octave offsets with -/+, case-insensitive
+print chromaToRelative(['C' 'Eb' 'G' 'Ab' 'A+' 'F-'])
+
+// Convert ratios to relative midi-cents (alias: rtoc)
+print ratioToCent([2/1 3/2 4/3 5/4 9/8])

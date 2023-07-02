@@ -8,3 +8,5 @@ new sample chimes time(1/8) fx(shift [0 3 2 -1 7 5]) shape(100)
 
 // The first argument is the pitch shift in semitones which is
 // also mapped according to the scale that is set
+// Try changing the values in the function to hear what happens
+// It is also possible to modulate the parameters with lists

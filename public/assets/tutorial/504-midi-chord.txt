@@ -1,4 +1,4 @@
-// === TUTORIAL 33 ===
+// === TUTORIAL 504 ===
 // By setting the chord() method to 'on' we can output
 // multiple notes at the same time to create a chord
 

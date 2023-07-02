@@ -1,6 +1,6 @@
 
 const CodeMirror = require('codemirror');
-const code = require('./worker.js');
+const { code, removeSound, getSound } = require('./worker.js');
 const saver = require('file-saver');
 
 require('codemirror/mode/javascript/javascript.js');
@@ -19,8 +19,9 @@ console.log('=> examples loaded');
 // get the tutorial files
 console.log('loading tutorials...');
 let tutorials = require('./data/tutorials.json');
-const { ToneAudioBuffer } = require('tone');
 console.log('=> tutorials loaded');
+
+let samples = require('./data/samples.json');
 
 // the simple mode lexer for Mercury syntax-highlighting
 CodeMirror.defineSimpleMode("mercury", {
@@ -59,10 +60,11 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 
 	// let container = document.createElement('div');
 	// container.id = 'code-editor';
-	let container = document.getElementById('code-editor');
+	this.container = document.getElementById('code-editor');
 	let text = document.createElement('textarea');
 	// document.body.appendChild(container);
-	container.appendChild(text);
+	this.container.appendChild(text);
+	this.container.style.opacity = 1;
 
 	this.options = {
 		// options for the editor
@@ -78,6 +80,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		cursorScrollMargin: 20,
 		mode: "mercury",
 		showCursorWhenSelecting: true,
+		lineWrapping: true,
 		// keymaps for execute/stopping/commenting code
 		extraKeys: {
 			'Ctrl-/': 'toggleComment',
@@ -88,6 +91,8 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 			'Alt-.': () => { this.silence() },
 			'Shift-Alt-Enter': () => { this.evaluateBlock() },
 			'Shift-Ctrl-Enter': () => { this.evaluateBlock() },
+			'Shift-Alt-H': () => { this.hideEditor() },
+			'Shift-Ctrl-H': () => { this.hideEditor() },
 			'Tab': 'insertSoftTab',
 		}
 	}
@@ -96,7 +101,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 
 	this.cm.markText({line: 0, ch: 0}, {line: 6, ch: 42}, {className: 'styled-background'})
 
-	this.set = async function(v){
+	this.set = function(v){
 		this.cm.setValue(v);
 	}
 
@@ -107,7 +112,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 	this.clear = function(){
 		// this.cm.setValue('// start coding here ^^');
 		this.set(
-			'// Welcome to the Mercury Playground ^^\n' + 
+			'// Welcome to the Mercury Playground! ^^\n' + 
 			'// click "play" to start the sound and start coding\n' +
 			'// or open the tutorials or a random example\n' +
 			'\n' +
@@ -154,7 +159,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		return { start: p1, end: p2, text: block };
 	}
 
-	this.flash = async function(from, to){
+	this.flash = function(from, to){
 		let start = { line: from, ch: 0 };
 		let end = { line: to, ch: 0 };
 		// console.log(start, end);
@@ -164,10 +169,21 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		setTimeout(() => marker.clear(), 250);
 	}
 
-	this.silence = async function(){
+	this.silence = function(){
 		// console.log('silence code');
-		await engine.silence();
+		// fade out and remove code after 0.1
+		removeSound(getSound(), 0.1);
+		engine.silence();
 		canvas.clear();
+	}
+
+	// hide the editor on shortkey
+	this.hideEditor = function(){
+		if (this.container.style.opacity == 1){
+			this.container.style.opacity = 0;
+		} else {
+			this.container.style.opacity = 1;
+		}
 	}
 
 	this.changeTheme = function(){
@@ -196,24 +212,41 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		
 		let example = document.createElement('button');
 		example.innerHTML = 'example';
-		example.onclick = async () => {
+		example.onclick = () => {
 			// initialize editor with some code
 			let names = Object.keys(examples);
 			let amount = names.length;
 			let rand = Math.floor(Math.random() * amount);
 			rand = (rand === _rand)? (rand + 1) % amount : rand;
 
-			await this.set(examples[names[rand]]);
+			this.set(examples[names[rand]]);
 			_rand = rand;
 
 			this.evaluate();
 		};
 
 		let save = document.createElement('button');
-		save.innerHTML = 'download';
+		save.style.width = '9%';
+		save.innerHTML = 'save';
 		save.onclick = () => {
-			let f = `mercury-sketch_${date()}.txt`
-			saver.saveAs(new File([this.cm.getValue()], f, { type: 'text/plain;charset=utf-8' }));
+			let f = `mercury-sketch_${ date() }`;
+			saver.saveAs(new File([this.cm.getValue()], `${f}.txt`, { type: 'text/plain;charset=utf-8' }));
+		}
+		
+		let rec = document.createElement('button');
+		// rec.id = 'recButton';
+		rec.style.width = '9%';
+		rec.innerHTML = 'record';
+		rec.onclick = () => {
+			let f = `mercury-recording_${ date() }`;
+
+			if (engine.isRecording() !== 'started'){
+				engine.record(true);
+				rec.className = 'recording';
+			} else {
+				engine.record(false, f);
+				rec.className = 'button';
+			}
 		}
 
 		div.appendChild(play);
@@ -221,14 +254,15 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		div.appendChild(clear);
 		div.appendChild(example);
 		div.appendChild(save);
+		div.appendChild(rec);
 	}
 
 	this.links = function(){
 		let urls = {
 			// 'tutorial': 'https://tmhglnd.github.io/mercury/tutorial.html',
-			'sounds' : 'https://github.com/tmhglnd/mercury/blob/master/mercury_ide/media/README.md',
+			// 'sounds' : 'https://github.com/tmhglnd/mercury/blob/master/mercury_ide/media/README.md',
 			'help': 'https://tmhglnd.github.io/mercury/reference.html',
-			'full version': 'https://github.com/tmhglnd/mercury'
+			'local version': 'https://github.com/tmhglnd/mercury-playground#-running-without-internet'
 		}
 
 		let div = document.getElementById('links');
@@ -239,6 +273,11 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		menu.id = 'tutorials';
 		menu.onchange = () => { this.loadTutorial() }
 		p.appendChild(menu);
+
+		let snds = document.createElement('select');
+		snds.id = 'sounds';
+		snds.onchange = () => { this.insertSound() }
+		p.appendChild(snds);
 
 		Object.keys(urls).forEach((k) => {
 			let btn = document.createElement('button');
@@ -277,10 +316,32 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		});
 	}
 
-	this.loadTutorial = async function(){
+	this.loadTutorial = function(){
 		let t = document.getElementById('tutorials').value;
-		await this.set(tutorials[t]);
+		this.set(tutorials[t]);
 		this.evaluate();
+	}
+
+	this.soundsMenu = function(){
+		let menu = document.getElementById('sounds');
+
+		let values = ['sounds'].concat(Object.keys(samples));
+		values.forEach((t) => {
+			let option = document.createElement('option');
+			option.value = option.innerHTML = t;
+			menu.appendChild(option);
+		});
+	}
+
+	this.insertSound = function(){
+		let s = document.getElementById('sounds').value;
+		document.getElementById('sounds').value = 'sounds';
+		// console.log(this.cm.getSelection());
+		if (this.cm.getSelection() !== ''){
+			this.cm.replaceSelection(s);
+		} else {
+			this.cm.replaceRange(s, this.cm.getCursor());
+		}
 	}
 
 	this.menuHidden = false;
@@ -295,7 +356,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		btn.onclick = () => {
 			this.menuHidden = !this.menuHidden;
 
-			let divs = [ 'header', 'settings', 'menu', 'links', 'hydra-ui' ];
+			let divs = [ 'header', 'settings', 'menu', 'links', 'hydra-ui', 'switch' ];
 			for (let i=0; i<divs.length; i++){
 				let d = document.getElementById(divs[i]);
 				d.style.display = this.menuHidden ? 'none' : 'inline';
@@ -329,14 +390,15 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 
 	// light/dark mode switcher
 	this.modeSwitch = function(){
-		let b = document.body;
+		// let b = document.body;
+		let b = document.getElementById('ui');
 		let btn = document.createElement('button');
 		btn.id = 'switch';
 		btn.className = 'themeswitch';
 		btn.onclick = () => {
 			if (localStorage.getItem('theme') === 'darkmode'){
 				switchTheme('lightmode');
-				this.cm.setOption('theme', 'duotone-light');
+				this.cm.setOption('theme', 'elegant');
 			} else {
 				switchTheme('darkmode');
 				this.cm.setOption('theme', 'material-darker');

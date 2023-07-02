@@ -1,4 +1,5 @@
 // Hydra Canvas
+const p5 = require('p5');
 const HydraSynth = require('hydra-synth');
 const loop = require('raf-loop');
 
@@ -9,7 +10,7 @@ let hydraCanvas = function(c, u) {
 	this.canvas.style.width = '100%';
 	this.canvas.style.height = '100%';
 	this.canvas.style.display = 'none';
-	// this.canvas.style.imageRendering = 'pixelated';
+	this.canvas.style.imageRendering = 'pixelated';
 
 	this.div = document.getElementById(u);
 

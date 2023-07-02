@@ -233,10 +233,15 @@ function traverseTree(tree, code, level, obj){
 
 			if (tsIR[func] && level !== '@object'){
 				// if function is part of TS and not in @object level
-				if (args){
-					return tsIR[func](...args);
+				try {
+					if (args){
+						return tsIR[func](...args);
+					}
+					return tsIR[func]();
+				} catch (e) {
+					ccode.errors.push(`Error in arguments for function: ${func}`)
+					return [0];
 				}
-				return tsIR[func]();
 			}
 			else if (level === '@list'){
 				// if not part of TS and in @list level
