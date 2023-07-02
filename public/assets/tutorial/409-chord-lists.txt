@@ -1,0 +1,18 @@
+// === TUTORIAL 442: Translate Time ===
+// Generate 2-dimensional arrays of relative notevalues that can 
+// be used as chord information or flattened to generate melodic
+// progressions based on chords
+// chordsFromNumerals(list)
+
+// Convert a chord progression from roman numerals to semitones
+// alias: makeChords()
+print chordsFromNumerals([I IIm IVsus2 V7 VIm9])
+
+// Convert a chord progression from chordnames to semitones
+print chordsFromNames([C Dm Fsus2 G7 Am9])
+
+set scale chromatic c
+list chords flatten(chordsFromNumerals(repeat([I7 IV7sus2 IIm7 V7] 2)))
+print chords 
+
+new synth saw note(chords 1) time(1/16)

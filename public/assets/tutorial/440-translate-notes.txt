@@ -1,0 +1,24 @@
+// === TUTORIAL 440: Translate Notes ===
+// You can use various methods to translate between different
+// note notation formats such as Midi, Notenames and Frequency
+
+// Convert Array or Int as midi-number to midi-notenames (alias: mton)
+print midiToNote([60 63 67 69 57 65])
+
+// Convert midi-pitches to frequency (A4 = 440 Hz) (alias: mtof)
+print midiToFreq([60 63 67 69 57 65])
+
+// Convert Array of String as midi-notenames to midi-pitch (alias: ntom)
+print noteToMidi(['c4' 'eb4' 'g4' 'a4' 'a3' 'f4'])
+
+// Convert midi-notenames to frequency (A4 = 440 Hz) (alias: ntof)
+print noteToFreq(['c4' 'eb4' 'g4' 'a4' 'a3' 'f4'])
+
+// Convert frequency to nearest midi note (alias: ftom)
+print freqToMidi([261 311 391 440 220 349])
+
+// Set detune flag to true to get floating midi output for pitchbend
+print freqToMidi([261 311 391 440 220 349] true)
+
+// Convert frequency to nearest midi note name (alias: fton)
+print freqToNote([261 311 391 440 220 349])
