@@ -1,4 +1,4 @@
-// === TUTORIAL 402: spreadInclusive ===
+// === TUTORIAL 402: Spread Inclusive ===
 // Generate a list of n-length containing whole numbers
 // Starting at x and ending at y (including y)
 // spreadInclusive(size low high)

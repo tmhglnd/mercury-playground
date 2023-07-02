@@ -1,0 +1,14 @@
+// === TUTORIAL 424: Repeat ===
+// Join to or more lists together into one longer list
+// join(list1 list2 ... list-n) - alias: combine
+
+// Useful for transforming a melodic phrase to generate new 
+// musical material and joining the results together
+
+list melody [0 3 7 12]
+list inv invert(melody)
+list shuf shuffle(melody)
+list joined join(melody inv shuf shuf)
+print melody inv shuf joined
+
+new synth sine note(joined 2) time(1/16)

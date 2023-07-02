@@ -1,4 +1,4 @@
-// === TUTORIAL 406: hexadecimal rhythm ===
+// === TUTORIAL 406: Hexadecimal Rhythm ===
 // Hexadecimal beats make use of hexadecimal values (0 - f) that are a base-16
 // number system. Because one digit in a base-16 number system has 16 possible
 // values (0 - 15) these can be converted to 4 bits that therefore can be seen 

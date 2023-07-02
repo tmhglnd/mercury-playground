@@ -1,4 +1,4 @@
-// === TUTORIAL 405: euclidean rhythm ===
+// === TUTORIAL 405: Euclidean Rhythm ===
 // Generate a euclidean rhythm. The algorithm evenly spaces n-beats over 
 // n-steps, return a list of 1's and 0's. Inspired by Godfried Toussaints
 // famous paper "The Euclidean Algorithm Generates Traditional Musical Rhythms".

@@ -1,0 +1,13 @@
+// === TUTORIAL 415: Choose ===
+// Use Choose to randomly select items from a defined list
+// choose(size list)
+
+// Useful to generate random lists with predefined options
+// For example for melodies or sample selections
+
+list melody choose(16 [-1 0 2 3 6 7])
+list beat choose(8 [kick_808 hat_808 snare_808])
+print melody beat
+
+new synth sine note(melody 2) time(1/16)
+new sample beat time(1/8)

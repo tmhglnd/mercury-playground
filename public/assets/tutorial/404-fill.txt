@@ -1,4 +1,4 @@
-// === TUTORIAL 404: fill ===
+// === TUTORIAL 404: Fill ===
 // Fill a list with values and a number of repetitions. The values
 // are provided in pairs of number, amount. 
 // fill(value1 amount1 value2 amount2 etc...)

@@ -1,4 +1,4 @@
-// === TUTORIAL 403: spreadFloat ===
+// === TUTORIAL 403: Spread Float ===
 // Generate a list of n-length containing floating-point numbers
 // Starting at x and ending at y (excluding y)
 // spreadFloat(size low high) (alias: spreadF)

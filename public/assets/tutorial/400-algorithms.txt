@@ -1,4 +1,4 @@
-// === TUTORIAL 400: Algorithms ===
+// === TUTORIAL 400: Algorithmic Composition ===
 // This chapter discusses the algorithmic processes that can be used in 
 // Mercury. Mercury is heavily inspired by the composition technique Serialism. 
 // This technique approaches every musical parameter (rhythm, pitch, dynamics, 

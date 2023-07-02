@@ -1,4 +1,4 @@
-// === TUTORIAL 401: spread ===
+// === TUTORIAL 401: Spread ===
 // Generate a list of n-length containing whole numbers
 // Starting at x and ending at y (excluding y)
 // spread(size low high)

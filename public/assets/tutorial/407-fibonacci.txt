@@ -1,4 +1,4 @@
-// === TUTORIAL 406: fibonacci numbers ===
+// === TUTORIAL 407: Fibonacci Numbers ===
 // Generate a list of Fibonacci numbers F[n] = F[n-1] + F[n-2]. The fibonacci 
 // sequence is famous because it's numbers pop up in nature in many places 
 // and when you divide any number in the sequence by its previous number it 
