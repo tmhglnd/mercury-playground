@@ -135,13 +135,13 @@ const TanhDistortion = function(_params){
 
 	this.set = function(c, time, bpm){
 		// drive amount, minimum drive of 1
-		const d = Util.assureNum(Math.max(1, Util.getParam(this._drive, c) + 1));
+		const d = Util.assureNum(Math.max(1, Math.pow(Util.getParam(this._drive, c), 2) + 1));
 		// preamp gain reduction for linear at drive = 1
-		const p = 0.6;
+		const p = 0.4;
 		// makeup gain
-		const m = 1.0 / p / (d ** p);
+		const m = 1.0 / p / (d ** 0.6);
 		// set the input gain and output gain reduction
-		this._fx.input.gain.setValueAtTime(p * (d ** 2), time);
+		this._fx.input.gain.setValueAtTime(p * d, time);
 		this._fx.output.gain.setValueAtTime(m, time);
 	}
 
