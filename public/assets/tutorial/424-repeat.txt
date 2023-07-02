@@ -1,14 +1,11 @@
 // === TUTORIAL 424: Repeat ===
-// Join to or more lists together into one longer list
-// join(list1 list2 ... list-n) - alias: combine
+// Repeat the content of a list a specified amount of times.
+// The amount can be specified as another list resulting in different
+// repetitions per value from the input list.
+// repeat(list amount)
 
-// Useful for transforming a melodic phrase to generate new 
-// musical material and joining the results together
+list melody [0 3 7 12 9]
+list repeats repeat(melody [4 2])
+print melody repeats
 
-list melody [0 3 7 12]
-list inv invert(melody)
-list shuf shuffle(melody)
-list joined join(melody inv shuf shuf)
-print melody inv shuf joined
-
-new synth sine note(joined 2) time(1/16)
+new synth saw note(repeats 1) time(1/16)
