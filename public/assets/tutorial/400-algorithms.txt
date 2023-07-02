@@ -1,0 +1,20 @@
+// === TUTORIAL 400: Algorithmic Composition ===
+// This chapter discusses the algorithmic processes that can be used in 
+// Mercury. Mercury is heavily inspired by the composition technique Serialism. 
+// This technique approaches every musical parameter (rhythm, pitch, dynamics, 
+// etc) as an individual sequence of numbers. These sequences can then be 
+// transformed in many ways to extend and generate new musical material. 
+
+// With algorithmic processes (functions) we can generate or transform lists. 
+// With the lists we can control the parameters in functions of instruments. By 
+// combining various list functions we can create more complex outputs.
+
+// This chapter will cover most of the algorithmic methods, but many unique 
+// combinations are up to you to discover!
+
+// A list is a collection of items (numbers, words) that has a unique name
+list myValues [1 2 3.14 6.18 kick_909 snare_808]
+
+// It is possible to print the content of a list. This is useful to view
+// the result of list functions
+print myValues

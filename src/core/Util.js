@@ -37,6 +37,7 @@ function isRandom(a, l=0, h=1){
 function getParam(a, i){
 	// also check if value is an osc-address, then use last received value
 	// return randLookup(getOSC(lookup(a, i)));
+	// return evalExpr(randLookup(lookup(getOSC(a), i)));
 	return randLookup(lookup(getOSC(a), i));
 }
 
@@ -53,6 +54,38 @@ function getOSC(a){
 			return [0];
 		}
 		return window.oscMessages[osc];
+	}
+	// pass through
+	return a;
+}
+
+// global functions for string expressions in eval()
+// very experimental currently
+window.cos = Math.cos;
+window.sin = Math.sin;
+window.floor = Math.floor;
+window.ceil = Math.ceil;
+window.round = Math.round;
+window.mod = Math.mod;
+window.pow = Math.pow;
+window.sqrt = Math.sqrt;
+window.pi = Math.PI;
+window.twopi = Math.PI * 2;
+
+// check if the string is formatted as an expression, then evaluate it
+function evalExpr(a){
+	let expr = a;
+	if (typeof expr !== 'string'){
+		return a;
+	} else if (expr.match(/^\{[^{}]+\}$/g)){
+		let result = 0;
+		// console.log('evaluate this expression:', eval(expr));
+		try {
+			result = eval(expr);
+		} catch (e){
+			log(`Unable to evaluate expression: ${expr}`);
+		}
+		return result;
 	}
 	// pass through
 	return a;

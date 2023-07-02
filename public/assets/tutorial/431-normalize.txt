@@ -1,0 +1,12 @@
+// === TUTORIAL 431: Normalize ===
+// Normalize the content of a list. When normalizing a list 
+// the lowest value will become 0 and the highest value 1.
+// All the values in between will be scaled in ratio to the 
+// lowest and highest value.
+// normalize(list) - alias: norm()
+
+list psn pisano(7)
+list psnNorm normalize(psn)
+print pattern psnNorm
+
+new sample hat_808 time(1/16) gain(psnNorm)

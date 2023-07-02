@@ -1,7 +1,8 @@
 // === TUTORIAL 106: Rhythm ===
-// With a list we can make more complex patterns 
-// like a beat of 1's and 0's
-// A list is just a collection of numbers (or words)
+// With a list we can make more complex patterns, like a beat of 1's and 0's
+// A list is a collection of numbers (or words) written between 
+// square-brackets "[]" and seperated by spaces
+// The list has a unique name that can be used in other functions
 
 list hatBeat [1 0 1 0 0 1 0 1]
 new sample hat_808 time(1/16) play(hatBeat)

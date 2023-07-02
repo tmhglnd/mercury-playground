@@ -1,0 +1,16 @@
+// === TUTORIAL 413: Clave ===
+// Generate random clave patterns. The output is a binary list that represents
+// a rhythm, where 1's represent onsets and 0's rests. A clave pattern can be
+// found in musical genres such as salsa, mambo, rumba, raggae, raggaeton and 
+// more. It is usually defined as an alternation of a beat with 1 or 2 rests
+// clave(size)
+
+// Useful to generate random rhythms
+
+set tempo 130
+list rhythm1 clave(8)
+list rhythm2 clave(8)
+print rhythm1 rhythm2
+
+new sample bongo time(1/16) play(rhythm1)
+new sample bongo_lo time(1/16) play(rhythm2)
