@@ -1,5 +1,15 @@
 const { noteToMidi, toScale, mtof } = require('total-serialism').Translate;
 
+// clip a value between a specified range
+function clip(v, l, h){
+	return Math.max(l, Math.min(h, v));
+}
+
+// make sure the output is a number, else output a default value
+function assureNum(v, d=1){
+	return isNaN(v) ? d : v;
+}
+
 // lookup a value from array with wrap index
 function lookup(a, i){
 	return a[i % a.length];
@@ -130,4 +140,4 @@ function toMidi(n=0, o=0){
 	return toScale(n + o * 12 + 36);
 }
 
-module.exports = { lookup, randLookup, isRandom, getParam, toArray, msToS, formatRatio, divToS, toMidi, mtof, noteToMidi }
+module.exports = { clip, assureNum, lookup, randLookup, isRandom, getParam, toArray, msToS, formatRatio, divToS, toMidi, mtof, noteToMidi }

@@ -1,5 +1,11 @@
 const Tone = require('tone');
 
+// load extra AudioWorkletProcessors from file
+// transformed to inline with browserify brfs
+const fs = require('fs');
+const fxExtensions = fs.readFileSync('./src/core/effects/Processors.js', 'utf-8');
+Tone.getContext().addAudioWorkletModule(URL.createObjectURL(new Blob([ fxExtensions ], { type: 'text/javascript' })));
+
 // latency reduces cpu load
 // Tone.context.latencyHint = 'playback';
 Tone.context.lookAhead = 0.1;

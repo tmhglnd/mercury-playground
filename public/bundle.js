@@ -1,1 +1,0 @@
-console.error("Error: Cannot find module '/Users/timohoogland/Drive/work/code/js/mercury-playground/node_modules/brfs/index.js' from '/Users/timohoogland/Drive/work/code/js/mercury-playground'");
