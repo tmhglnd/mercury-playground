@@ -26,7 +26,7 @@ window.onload = () => {
 		console.log("=> Input devices");
 		window.devices.forEach((i) => {
 			console.log(`- input: ${i}`);
-		})
+		});
 	});
 	
 	// console.log catch function
