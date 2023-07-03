@@ -1,8 +1,0 @@
-// === TUTORIAL 702: Input Microphone ===
-// Similar to the sample and synth you can use functions 
-// to adjust the incoming sound in real time
-// For example this stutter effect
-
-set tempo 120
-
-new input default shape(1 40 1) time(1/16) gain(1)

@@ -1,0 +1,13 @@
+// === TUTORIAL 701: Input Microphone ===
+// You can access the default microphone as input in the code
+
+// WATCH OUT when not using headphones! 
+// You can get very loud feedback if the output of the speakers 
+// goes directly back into the microphone
+
+new input default gain(0)
+// the gain is set at 0 to make sure there is no feedback
+// carefully increment the gain so you can hear the microphone
+
+// if your microphone is not the default then try:
+// in1, in2, in3, etc... (default = in0)

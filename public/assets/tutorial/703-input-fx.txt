@@ -1,7 +1,0 @@
-// === TUTORIAL 703: Input Microphone ===
-// It is also possible to add FX to the incoming microphone sound
-// Such as distortion, delay and pitchshifting
-
-set tempo 100
-
-new input default time(1/16) shape(1 40 1) fx(drive 4) fx(shift -7) gain(1)

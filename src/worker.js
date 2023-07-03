@@ -216,7 +216,7 @@ async function code({ file, engine, canvas, p5canvas }){
 			});
 			return inst;
 		},
-		'input' : async (obj) => {
+		'input' : (obj) => {
 			let device = obj.type;
 			let args = obj.functions;
 			let inst = new MonoInput(engine, device, canvas);
