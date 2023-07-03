@@ -27,7 +27,7 @@ class PolySynth extends PolyInstrument {
 		}
 	}
 
-	sourceEvent(c, time, id){
+	sourceEvent(c, time, id, num){
 		// ramp volume
 		let g = Util.getParam(this._gain[0], c);
 		let r = Util.getParam(this._gain[1], c);
@@ -50,7 +50,8 @@ class PolySynth extends PolyInstrument {
 		// set the frequency based on the selected note
 		// note as interval / octave coordinate
 		let o = Util.getParam(this._note[1], c);
-		let i = Util.getParam(this._note[0], c);
+		// let i = Util.getParam(this._note[0], c);
+		let i = Util.toArray(Util.lookup(this._note[0], c))[num];
 		let f = Util.noteToFreq(i, o);
 
 		// get the slide time for next note and set the frequency
