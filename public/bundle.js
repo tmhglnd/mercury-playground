@@ -35848,7 +35848,7 @@ const PingPongDelay = function(_params){
 		this._fx.dispose();
 	}
 }
-},{"./Util.js":108,"tone":87,"total-serialism":90}],101:[function(require,module,exports){
+},{"./Util.js":109,"tone":87,"total-serialism":90}],101:[function(require,module,exports){
 const Tone = require('tone');
 const Util = require('./Util.js');
 const fxMap = require('./Effects.js');
@@ -36065,7 +36065,7 @@ class Instrument extends Sequencer {
 	}
 }
 module.exports = Instrument;
-},{"./Effects.js":100,"./Sequencer.js":107,"./Util.js":108,"tone":87}],102:[function(require,module,exports){
+},{"./Effects.js":100,"./Sequencer.js":108,"./Util.js":109,"tone":87}],102:[function(require,module,exports){
 const Tone = require('tone');
 const Util = require('./Util.js');
 const Sequencer = require('./Sequencer.js');
@@ -36191,7 +36191,7 @@ class MonoMidi extends Sequencer {
 	}	
 }
 module.exports = MonoMidi;
-},{"./Sequencer.js":107,"./Util.js":108,"tone":87,"webmidi":98}],103:[function(require,module,exports){
+},{"./Sequencer.js":108,"./Util.js":109,"tone":87,"webmidi":98}],103:[function(require,module,exports){
 const Tone = require('tone');
 const Util = require('./Util.js');
 // const fxMap = require('./Effects.js');
@@ -36317,7 +36317,7 @@ class MonoSample extends Instrument {
 	}
 }
 module.exports = MonoSample;
-},{"./Instrument.js":101,"./Util.js":108,"tone":87}],104:[function(require,module,exports){
+},{"./Instrument.js":101,"./Util.js":109,"tone":87}],104:[function(require,module,exports){
 const Tone = require('tone');
 const Util = require('./Util.js');
 // const fxMap = require('./Effects.js');
@@ -36455,7 +36455,7 @@ class MonoSynth extends Instrument {
 	}
 }
 module.exports = MonoSynth;
-},{"./Instrument":101,"./Util.js":108,"tone":87,"total-serialism":90}],105:[function(require,module,exports){
+},{"./Instrument":101,"./Util.js":109,"tone":87,"total-serialism":90}],105:[function(require,module,exports){
 const Tone = require('tone');
 const Util = require('./Util.js');
 const fxMap = require('./Effects.js');
@@ -36628,7 +36628,152 @@ class PolyInstrument extends Instrument {
 	}
 }
 module.exports = PolyInstrument;
-},{"./Effects.js":100,"./Instrument.js":101,"./Util.js":108,"tone":87,"total-serialism":90}],106:[function(require,module,exports){
+},{"./Effects.js":100,"./Instrument.js":101,"./Util.js":109,"tone":87,"total-serialism":90}],106:[function(require,module,exports){
+const Tone = require('tone');
+const Util = require('./Util.js');
+const PolyInstrument = require('./PolyInstrument.js');
+
+class PolySample extends PolyInstrument {
+	constructor(engine, s, canvas){
+		// Inherit from PolyInstrument
+		super(engine, canvas);
+
+		this._bufs = this._engine.getBuffers();
+		this._sound;
+		this.sound(s);
+
+		// sample variables
+		this._speed = [ 1 ];
+		this._rev = false;
+		this._stretch = [ 0 ];
+
+		// playback start position
+		this._pos = [ 0 ];
+
+		this.sample;
+
+		// synth specific variables;
+		// this._wave = Util.toArray(t);
+		this._note = [ 0, 0 ];
+		// this._slide = [ 0 ];
+		this._voices = [ 1 ];
+		this._detune = [ 0 ];
+
+		this.createSources();
+
+		console.log('=> PolySample()', this);
+	}
+
+	createSources(){
+		for (let i=0; i<this.numVoices; i++){
+			this.sources[i] = new Tone.Player().connect(this.adsrs[i]);
+			this.sources[i].autostart = false;
+		}
+	}
+
+	sourceEvent(c, time, id, num){
+		// ramp volume
+		let g = Util.getParam(this._gain[0], c);
+		let r = Util.getParam(this._gain[1], c);
+		this.sources[id].volume.rampTo(g, r, time);
+
+		// set the frequency based on the selected note
+		// note as interval / octave coordinate
+		// let o = Util.getParam(this._note[1], c);
+		// let i = Util.getParam(this._note[0], c);
+		// let i = Util.toArray(Util.lookup(this._note[0], c))[num];
+		// let f = Util.noteToFreq(i, o);
+
+		// get the sample from array
+		let b = Util.getParam(this._sound, c);
+
+		if (this.sources[id].buffer){
+			// clean-up previous buffer
+			this.sources[id].buffer.dispose();
+		}
+		if (this._bufs.has(b)){	
+			this.sources[id].buffer = this._bufs.get(b);
+		} else {
+			// default sample if file does not exist
+			this.sources[id].buffer = this._bufs.get('kick_min');
+		}
+		// the duration of the buffer in seconds
+		let dur = this.sources[id].buffer.duration;
+
+		// get speed and if 2d array pick randomly
+		let s = Util.getParam(this._speed, c);
+
+		// reversing seems to reverse every time the 
+		// value is set to true (so after 2 times reverse
+		// it becomes normal playback again) no fix yet
+		// this.sample.reverse = s < 0.0;
+
+		let l = Util.lookup(this._stretch, c);
+		let n = 1;
+		if (l){
+			n = dur / (60 * 4 / this.bpm()) / l;
+		}
+		// playbackrate can not be 0 or negative
+		this.sources[id].playbackRate = Math.max(Math.abs(s) * n, 0.0001);
+
+		// get the start position
+		let p = dur * Util.getParam(this._pos, c);
+
+		// when sample is loaded, start
+		this.sources[id].start(time, p);
+	}
+
+	sound(s){
+		// load all soundfiles and return as array
+		this._sound = this.checkBuffer(Util.toArray(s));
+	}
+
+	checkBuffer(a){
+		// check if file is part of the loaded samples
+		return a.map((s) => {
+			if (Array.isArray(s)) {
+				return this.checkBuffer(s);
+			}
+			// error if soundfile does not exist
+			else if (!this._bufs.has(s)){
+				// set default (or an ampty soundfile?)
+				log(`sample ${s} not found`);
+				return 'kick_909';
+			}
+			return s;
+		});
+	}
+
+	note(i=0, o=0){
+		// set the note as semitone interval and octave offset
+		// (0, 0) = MidiNote 36
+		this._note = [Util.toArray(i), Util.toArray(o)];
+	}
+
+	speed(s){
+		// set the speed pattern as an array
+		this._speed = Util.toArray(s);
+	}
+
+	stretch(s){
+		// set the stretch loop bar length
+		this._stretch = Util.toArray(s);
+	}
+
+	offset(o){
+		// set the playback start position as an array
+		this._pos = Util.toArray(o);
+	}
+
+	delete(){
+		// delete super class
+		super.delete();
+		
+		console.log('disposed PolySample()', this._sound);
+	}
+}
+module.exports = PolySample;
+},{"./PolyInstrument.js":105,"./Util.js":109,"tone":87}],107:[function(require,module,exports){
 const Tone = require('tone');
 const Util = require('./Util.js');
 const PolyInstrument = require('./PolyInstrument');
@@ -36730,7 +36875,7 @@ class PolySynth extends PolyInstrument {
 	}
 }
 module.exports = PolySynth;
-},{"./PolyInstrument":105,"./Util.js":108,"tone":87}],107:[function(require,module,exports){
+},{"./PolyInstrument":105,"./Util.js":109,"tone":87}],108:[function(require,module,exports){
 const Tone = require('tone');
 const Util = require('./Util.js');
 
@@ -36877,7 +37022,7 @@ class Sequencer {
 	}
 }
 module.exports = Sequencer;
-},{"./Util.js":108,"tone":87}],108:[function(require,module,exports){
+},{"./Util.js":109,"tone":87}],109:[function(require,module,exports){
 const TL = require('total-serialism').Translate;
 
 // lookup a value from array with wrap index
@@ -36987,7 +37132,7 @@ function assureWave(w){
 }
 
 module.exports = { lookup, randLookup, isRandom, getParam, toArray, msToS, formatRatio, divToS, noteToFreq, assureWave }
-},{"total-serialism":90}],109:[function(require,module,exports){
+},{"total-serialism":90}],110:[function(require,module,exports){
 module.exports={
   "00_sample-and-time": "// play different samples\n// at different time intervals\nset tempo 95\n\nnew sample piano_a time(1)\nnew sample piano_c time(1/2)\nnew sample piano_f time(1/3)\nnew sample piano_g time(1/4)\n\n// add reverb fx to all samples\nset all fx(reverb 0.4 3)",
   "01_offset-in-time": "// multiple samples make up a beat\n// using a time offset as \n// second argument\nset tempo 131\n\nnew sample kick_909 time(1/4)\nnew sample snare_909 time(1/2 1/4)\nnew sample hat_909 time(1/4 1/8)\nnew sample hat_909_open time(1 15/16)\nnew sample clap_909 time(5/16)\n\n// short slapback reverb\nset all fx(reverb 0.5 2)",
@@ -37004,7 +37149,7 @@ module.exports={
   "12_drone-synths": "// A synth that functions as bass drone \n// Combined with a short high pitch synth with delay\n// Creating in a melody from a lookup scale list\nset tempo 124\n// set a scale\nset scale harmonic_minor c\n\n// some note numbers for bass synth\nlist notes [3 7 5 8]\nnew synth saw note(notes 0) time(4) name(drone)\n    set drone fat(0.1132 3) shape(off) fx(squash 5)\n    set drone fx(reverb 0.6 5) fx(filter low 1500 0.4)\n\n// create a melody for the lead synth\nlist melody cosine(16 5.32 0 12)\nnew synth sine note(melody 2) time(1/2) name(lead)\n    set lead shape(1 120) fat(0.021 3) fx(distort 10)\n    set lead fx(delay 3/16 4/16 0.8) fx(reverb 0.5 3)"
 }
 
-},{}],110:[function(require,module,exports){
+},{}],111:[function(require,module,exports){
 module.exports={
 	"uptempo" : 10,
 	"downtempo" : 10,
@@ -37025,7 +37170,7 @@ module.exports={
 	"dnb" : 170,
 	"neurofunk" : 180
 }
-},{}],111:[function(require,module,exports){
+},{}],112:[function(require,module,exports){
 module.exports={
   "noise_a": "assets/samples/noise/noise_a.wav",
   "drone_cymbal": "assets/samples/ambient/cymbal/drone_cymbal.wav",
@@ -37172,7 +37317,7 @@ module.exports={
   "pluck_g": "assets/samples/string/plucked/violin/pluck_g.wav"
 }
 
-},{}],112:[function(require,module,exports){
+},{}],113:[function(require,module,exports){
 module.exports={
   "-tutorials": "// Welcome to the Mercury Playground ^^\n// click \"play\" to execute the code\n// and adjust the code below:\n\nlist kickBeat [1 0.01 0.1 1 0]\nnew sample kick_house time(1/16) play(kickBeat)\n\nlist hatBeat euclid(16 7)\nnew sample hat_909 time(1/16) play(hatBeat) pan(0.5)\n\nnew sample snare_hvy time(1 3/4)\n\nlist positions sineFloat(16 6.523 0 0.6)\nlist pitch repeat([2 1 1 0.84 0.94] 16)\nnew sample chimes_l time(1/16) shape(1 70 5) name(stut)\n\tset stut offset(positions) pan(random) gain(1) speed(pitch)\n",
   "000-intro": "// === TUTORIAL 000: Intro ===\n// Welcome to the Mercury tutorial ^^\n// These short tutorials will teach you all everything \n// that you can do with this environment\n\n// Lines starting with '//' are comments and are not part of the code\n// You can (un)comment coded lines with Option+/ (or by deleting the //)\n\n// Uncomment the line below and click 'play' above\n// new sample harp_up time(1)\n// Now comment the line and click 'play' again",
@@ -37228,7 +37373,7 @@ module.exports={
   "604-view-with-hydra": "// === TUTORIAL 604: View & Hydra ===\n// You can access the canvas of the displayed list by\n// initializing a hydra source: s0.init({src: listView})\n\nlist cos mod(cosine(2000 60 20) 2)\nview cos\n\nlist hydraVisual ['s0.init({src: listView}); src(s0).modulate(noise([2,5,10]), [0.05, 0.1]).out()']\nnew sample hat_909 time(1/4) visual(hydraVisual)\n"
 }
 
-},{}],113:[function(require,module,exports){
+},{}],114:[function(require,module,exports){
 
 const CodeMirror = require('codemirror');
 const code = require('./worker.js');
@@ -37577,7 +37722,7 @@ function date(){
 // 	editor.setOption('theme', t);
 // 	cEditor.setOption('theme', t);
 // }
-},{"./data/examples.json":109,"./data/tutorials.json":112,"./worker.js":116,"codemirror":27,"codemirror/addon/comment/comment.js":25,"codemirror/addon/mode/simple.js":26,"codemirror/mode/javascript/javascript.js":28,"file-saver":30,"tone":87}],114:[function(require,module,exports){
+},{"./data/examples.json":110,"./data/tutorials.json":113,"./worker.js":117,"codemirror":27,"codemirror/addon/comment/comment.js":25,"codemirror/addon/mode/simple.js":26,"codemirror/mode/javascript/javascript.js":28,"file-saver":30,"tone":87}],115:[function(require,module,exports){
 const Tone = require('tone');
 
 // latency reduces cpu load
@@ -37758,7 +37903,7 @@ async function record(start){
 }
 
 module.exports = { resume, silence, setBPM, getBPM, randomBPM, getBuffers, addBuffers, setLowPass, setHiPass, setVolume, record };
-},{"./data/samples.json":111,"tone":87}],115:[function(require,module,exports){
+},{"./data/samples.json":112,"tone":87}],116:[function(require,module,exports){
 // The Mercury Playground main code loader
 // 
 
@@ -37842,7 +37987,7 @@ window.onload = () => {
 	
 	Hydra.link('hydra-ui');
 }
-},{"./canvas.js":99,"./editor.js":113,"./engine.js":114,"tone":87,"webmidi":98}],116:[function(require,module,exports){
+},{"./canvas.js":99,"./editor.js":114,"./engine.js":115,"tone":87,"webmidi":98}],117:[function(require,module,exports){
 const Tone = require('tone');
 const Util = require('total-serialism').Utility;
 const TL = require('total-serialism').Translate;
@@ -37851,6 +37996,7 @@ const MonoSample = require('./core/MonoSample.js');
 const MonoMidi = require('./core/MonoMidi.js');
 const MonoSynth = require('./core/MonoSynth.js');
 const PolySynth = require('./core/PolySynth.js');
+const PolySample = require('./core/PolySample.js');
 const Tempos = require('./data/genre-tempos.json');
 
 // fade time in seconds TODO: Make this adjustable with code/setting
@@ -38007,8 +38153,17 @@ async function code({ file, engine, canvas, p5canvas }){
 		'polySynth' : (obj) => {
 			let type = obj.type;
 			let args = obj.functions;
-			let inst = new PolySynth(engine, type, canvas);
+			// let inst = new PolySynth(engine, type, canvas);
+			let inst = new PolySample(engine, type, canvas);
 
+			objectMap.applyFunctions(args, inst, type);
+			return inst;
+		},
+		'polySample' : (obj) => {
+			let type = obj.type;
+			let args = obj.functions;
+			let inst = new PolySample(engine, type, canvas);
+			
 			objectMap.applyFunctions(args, inst, type);
 			return inst;
 		},
@@ -38063,4 +38218,4 @@ async function code({ file, engine, canvas, p5canvas }){
 	_sounds = [];
 }
 module.exports = code;
-},{"./core/MonoMidi.js":102,"./core/MonoSample.js":103,"./core/MonoSynth.js":104,"./core/PolySynth.js":106,"./data/genre-tempos.json":110,"mercury-lang":54,"tone":87,"total-serialism":90}]},{},[115]);
+},{"./core/MonoMidi.js":102,"./core/MonoSample.js":103,"./core/MonoSynth.js":104,"./core/PolySample.js":106,"./core/PolySynth.js":107,"./data/genre-tempos.json":111,"mercury-lang":54,"tone":87,"total-serialism":90}]},{},[116]);

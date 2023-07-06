@@ -6,6 +6,7 @@ const MonoSample = require('./core/MonoSample.js');
 const MonoMidi = require('./core/MonoMidi.js');
 const MonoSynth = require('./core/MonoSynth.js');
 const PolySynth = require('./core/PolySynth.js');
+const PolySample = require('./core/PolySample.js');
 const Tempos = require('./data/genre-tempos.json');
 
 // fade time in seconds TODO: Make this adjustable with code/setting
@@ -162,8 +163,17 @@ async function code({ file, engine, canvas, p5canvas }){
 		'polySynth' : (obj) => {
 			let type = obj.type;
 			let args = obj.functions;
-			let inst = new PolySynth(engine, type, canvas);
+			// let inst = new PolySynth(engine, type, canvas);
+			let inst = new PolySample(engine, type, canvas);
 
+			objectMap.applyFunctions(args, inst, type);
+			return inst;
+		},
+		'polySample' : (obj) => {
+			let type = obj.type;
+			let args = obj.functions;
+			let inst = new PolySample(engine, type, canvas);
+			
 			objectMap.applyFunctions(args, inst, type);
 			return inst;
 		},
