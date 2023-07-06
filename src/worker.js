@@ -163,8 +163,8 @@ async function code({ file, engine, canvas, p5canvas }){
 		'polySynth' : (obj) => {
 			let type = obj.type;
 			let args = obj.functions;
-			// let inst = new PolySynth(engine, type, canvas);
-			let inst = new PolySample(engine, type, canvas);
+			let inst = new PolySynth(engine, type, canvas);
+			// let inst = new PolySample(engine, type, canvas);
 
 			objectMap.applyFunctions(args, inst, type);
 			return inst;
