@@ -80,4 +80,6 @@ set crossFade 100
 
 set tempo hiphop uptempo
 
+new sample bell gain(/osc/paramAddress) fx(drive /osc/1/fxDrive)
+
 silence

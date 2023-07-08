@@ -1,0 +1,11 @@
+// === TUTORIAL 122: Humanize ===
+// Humanize the playback of an instrument with the human()
+// method. The argument is a delay range in milliseconds with
+// which the trigger of the sound is randomly delayed or rushed
+
+set tempo 110
+
+new sample hat_808 time(1/16) human(10)
+new sample [kick_808_dist snare_808] time(1/2) human(100)
+
+// Try some different list values

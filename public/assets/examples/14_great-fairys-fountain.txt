@@ -1,0 +1,15 @@
+// The Legend of Zelda - Ocarina of Time - The Great Fairy's Fountain
+// The first 4 measures of this melody, generated using algorithmic process
+// lacing the lead notes with the repetitive arpegiator and joining the 4 bars
+
+set tempo 80
+// we'll set the scale to none in order for the exact notenames to work correctly
+set scale none
+
+list m1 flat(lace([a5 g5 f#5 g5] duplicate([[d5 bb4 g4]] 4)))
+list m2 flat(lace([g5 f5 e5 f5] duplicate([[c5 a4 f4]] 4)))
+list m3 flat(lace([f5 e5 d#5 e5] duplicate([[bb4 g4 e4]] 4)))
+list m4 flat(lace([e5 d5 c#5 d5] duplicate([[a4 f4 d4]] 4)))
+list total join(m1 m2 m3 m4)
+
+new synth square note(total 0) shape(1 1/8) time(1/16) fx(reverb 0.5 4)

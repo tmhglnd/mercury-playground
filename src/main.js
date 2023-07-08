@@ -9,6 +9,11 @@ switchTheme = (t) => {
 // initial dark mode theme on startup
 switchTheme('darkmode');
 
+// Ask if user is sure to close or refresh and loose all code
+window.onbeforeunload = function() {
+	return "Code will be lost if you refresh. Are you sure?";
+};
+
 window.onload = () => {
 	// load requires
 	const Tone = require('tone');
@@ -57,6 +62,35 @@ window.onload = () => {
 		}
 	});
 
+	// Empty object to store/update all received oscMessages
+	window.oscMessages = {};
+	// Setup osc connection for when running mercury as localhost
+	try {
+		const io = require('socket.io-client');
+		const socket = io();
+		socket.on('connected', (id) => {
+			console.log(`Connected for OSC: ${id}`);
+		});
+		socket.on('osc', (msg) => {
+			console.log(`Received: ${msg}`);
+			if (msg[0] === '/mercury-code'){
+				try {
+					cm.set(msg[1]);
+					cm.evaluate();
+				} catch (e) {
+					log(`Unable to execute code`);
+				}
+			} else {
+				window.oscMessages[msg.shift()] = msg;
+			}
+		});
+		window.emit = (msg) => {
+			socket.emit('message', msg);
+		}
+	} catch (e) {
+		console.log('Unable to use OSC connection. Clone Mercury from github and run as localhost');
+	}
+
 	// Initialize random BPM
 	Engine.randomBPM();
 
@@ -76,6 +110,7 @@ window.onload = () => {
 	cm.links();
 	cm.hide();
 	cm.tutorialMenu();
+	cm.soundsMenu();
 	cm.modeSwitch();
 	cm.clear();
 	

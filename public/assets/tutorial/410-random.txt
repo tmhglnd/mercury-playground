@@ -1,0 +1,15 @@
+// === TUTORIAL 410: Random ===
+// Generate a list of n-length containing random values 
+// of whole numbers between low and high value (excluding high)
+// Note that any time you evalute the code the random numbers are 
+// different. See "randomseed" for a solution to this issue.
+// random(size low high)
+
+// Useful to generate random sequences for melodies and any parameter
+
+list melody random(8 0 12)
+list cutoff random(5 300 4000)
+list length random(4 80 300)
+print melody cutoff length
+
+new synth saw note(melody 1) time(1/8) shape(1 length) fx(filter low cutoff)

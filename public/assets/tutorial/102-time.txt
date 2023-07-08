@@ -1,8 +1,8 @@
 // === TUTORIAL 102: Time ===
-// You can change how often a sound is played
-// in one measure/bar.
-// For example 1/4 means 4 times per measure
-// And 1/16 means 16 times per measure
+// A sound is played once per bar by default.
+// You can change how often a sound is played in one measure/bar.
+// For example 1/4 means 1 bar divided by 4, so 4 times per measure.
+// 1/16 means 16 times per measure, etc.
 
 new sample kick_909 time(1/4)
-// Try for example: 1/8, 3/16, 5/32, 1/100
+// Try for example: 1/8, 3/16, 1/6, 5/32

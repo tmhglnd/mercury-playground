@@ -22,6 +22,9 @@
 	--cm-flash: rgb(255, 255, 255, 0.3);
 	--cm-gutter: var(--transparant);
 	--cm-select: rgb(255, 255, 255, 0.2);
+
+	--record: rgb(200, 0, 0);
+	--record-secundary: rgb(200, 0, 0, 0.5);
 }
 
 .lightmode {
@@ -39,6 +42,9 @@
 	--cm-flash: rgb(255, 255, 255, 0.5);
 	--cm-gutter: var(--transparant);
 	--cm-select: rgba(0, 0, 0, 0.3);
+
+	--record: rgb(200, 0, 0);
+	--record-secundary: rgb(200, 0, 0, 0.5);
 }
 
 .colormode {
@@ -61,13 +67,15 @@
 .themeswitch {
 	position: absolute;
 	/* float: right; */
-	bottom: 12px;
-	right: 12px;
+	/* bottom: 12px; */
+	top: 20px;
+	right: 20px;
 	background: var(--button-bg);
-	width: 20px;
-	height: 20px;
+	width: 24px;
+	height: 24px;
 	border-radius: 2px;
-	margin: 4px;
+	/* margin: 4px; */
+	z-index: 9999;
 }
 
 .themeswitch:hover {
@@ -164,7 +172,23 @@ button:hover {
 button:active {
 	/* background: rgb(50, 50, 50); */
 	color: var(--bg);
-	background: var(----secundary);
+	background: var(--secundary);
+}
+
+.recording {
+	color: var(--accent);
+	background: var(--record);
+	animation: blinker 0.5s linear infinite;
+}
+
+.recording:hover {
+	color: var(--accent);
+	background: var(--record-secundary);
+	animation: blinker 0.5s linear infinite;
+}
+
+@keyframes blinker {
+	50% { opacity: 0.5; }
 }
 
 select {
@@ -183,10 +207,10 @@ select {
 	-webkit-app-region: no-drag;
 }
 
-select:hover {
+select:hover, select:focus {
 	/* background: rgb(50, 50, 50); */
 	color: var(--accent);
-	background: var(--transparant);
+	background: var(--bg);
 	/* background: rgb(255, 255, 255, 0.15); */
 }
 
@@ -224,6 +248,7 @@ textarea:focus {
 	/* border: 1px solid black; */
 	font-size: 16px;
 	height: auto;
+	/* max-height: 200%; */
 	/* font-family: "Consolas"; */
 	/* font-family: 'Ubuntu Mono', monospace; */
 	font-family: inherit;

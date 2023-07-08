@@ -9,12 +9,13 @@ class Sequencer {
 		this._canvas = canvas;
 		
 		// Sequencer specific parameters
-		this._bbs = [ 0, 0, 0 ];
 		this._count = 0;
 		this._beatCount = 0;
 		this._time = 1;
+		this._subdiv = [ 1 ];
 		this._offset = 0;
 		this._beat = [ 1 ];
+		this._human = 0;
 
 		// visual code
 		this._visual = [];
@@ -37,23 +38,27 @@ class Sequencer {
 			this._loop.dispose();
 		}
 		let schedule = Tone.Time(this._offset).toSeconds();
+		// console.log('schedule', schedule);
 
 		// create new loop for synth
 		this._loop = new Tone.Loop((time) => {
-			// convert transport time to Bars:Beats:Sixteenths
-			let t = Tone.Transport.getSecondsAtTime(time);
-			let bbs = Tone.Time(t).toBarsBeatsSixteenths().split(':');
-			// if reset per bar is greater than 0
+			// convert transport time to Ticks and convert reset time to ticks
+			let ticks = Tone.Transport.getTicksAtTime(time);
+			let rTicks = Tone.Time(`${this._reset}m`).toTicks();
+
+			// if reset per bar is a valid argument
 			if (this._reset > 0){
-				// if bars % reset === 0 and bar count is different then reset
-				if (!(Number(bbs[0]) % this._reset)){
-					if (bbs[0] !== this._bbs[0]){
-						this._count = 0;
-						this._beatCount = 0;
-					}
+				// if ticks % resetTicks === 0 then reset
+				if (ticks % rTicks === 0){
+					this._count = 0;
+					this._beatCount = 0;
 				}
 			}
-			this._bbs = bbs;
+			// set subdivision speeds
+			this._loop.playbackRate = Util.getParam(this._subdiv, this._count);
+
+			// humanize method is interesting to add
+			this._loop.humanize = Util.getParam(this._human, this._count);
 
 			// get beat probability for current count
 			let b = Util.getParam(this._beat, this._count);
@@ -66,6 +71,9 @@ class Sequencer {
 				// trigger some events for this instrument based
 				// on the current count and time
 				this.event(c, time);
+
+				// osc-connection needs syncing with Tone Transport
+				// emit([`/trigger`, 1]);
 
 				// execute a visual event for Hydra
 				if (this._visual.length > 0){
@@ -115,11 +123,24 @@ class Sequencer {
 		this._loop.stop();
 	}
 
-	time(t, o=0){
+	time(t, o=0, s=[1]){
 		// set the timing interval and offset
-		// this._time = Util.toArray(t);
 		this._time = Util.formatRatio(t, this.bpm());
 		this._offset = Util.formatRatio(o, this.bpm());
+		// set timing division optionally, also possible via timediv()
+		// this.timediv(s);
+	}
+
+	timediv(s){
+		// set timing subdivisions for the loop
+		let tmp = Util.toArray(s);
+		this._subdiv = [];
+		for (let i=0; i<tmp.length; i++){
+			let sub = Math.max(0.001, Math.floor(tmp[i]));
+			for (let j=0; j<sub; j++){
+				this._subdiv.push(sub);
+			}
+		}
 	}
 
 	beat(b, r='off'){
@@ -129,6 +150,17 @@ class Sequencer {
 		if (r === 'off' || r < 1){
 			this._reset = -1;
 		}
+	}
+
+	human(h){
+		// set the humanizing factor for the instrument in seconds
+		this._human = Util.toArray(h).map(x => Util.divToS(x));
+	}
+
+	note(i=0, o=0){
+		// set the note as semitone interval and octave offset
+		// (0, 0) = MidiNote 36
+		this._note = [Util.toArray(i), Util.toArray(o)];
 	}
 
 	name(n){

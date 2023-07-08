@@ -1,0 +1,11 @@
+// === TUTORIAL 430: Add ===
+// It is possible to perform basic arithmetic on entire
+// lists with a single scalare, or adding 2 lists together.
+// add(list1 list2/scalar) sub() div() mul() - alias: subtract, divide, multiply
+
+list melody [0 3 7 3 5 7 9]
+list melody2 add(melody 12)
+print melody melody2
+
+new synth saw note(melody) time(1/4)
+new synth saw note(melody2) time(1/4 1/8)

@@ -1,5 +1,11 @@
 const Tone = require('tone');
 
+// load extra AudioWorkletProcessors from file
+// transformed to inline with browserify brfs
+const fs = require('fs');
+const fxExtensions = fs.readFileSync('./src/core/effects/Processors.js', 'utf-8');
+Tone.getContext().addAudioWorkletModule(URL.createObjectURL(new Blob([ fxExtensions ], { type: 'text/javascript' })));
+
 // latency reduces cpu load
 // Tone.context.latencyHint = 'playback';
 Tone.context.lookAhead = 0.1;
@@ -14,11 +20,15 @@ console.log(`samplerate: ${Tone.getContext().sampleRate}Hz`);
 console.log(`PPQ: ${Tone.Transport.PPQ}`);
 
 // get the sample file paths from json
-console.log('loading sounds...');
+let loadingID = setInterval(() => {
+	console.log('downloading sounds...');
+}, 2500);
+
 let samples = require('./data/samples.json');
 let buffers = new Tone.ToneAudioBuffers({
 	urls: samples,
 	onload: function(){ 
+		clearInterval(loadingID);
 		console.log('=> sounds loaded');
 		// remove the logging function to the innerHTML from here on
 		console.log = console.olog;
@@ -42,9 +52,8 @@ function resume(){
 			// Tone.Transport.swing = 0.5;
 			// a bit of latency for safety
 			Tone.Transport.start('+0.1');
-
-			Tone.getDestination().volume.rampTo(0, 0.01);
-			console.log("Resumed Transport");
+			// Tone.getDestination().volume.rampTo(0, 0.01);
+			// console.log("Resumed Transport");
 		}
 		// record(true);
 	} catch {
@@ -55,8 +64,10 @@ function resume(){
 // stop the transport end therefore playing the sounds
 function silence(){
 	try {
-		Tone.Transport.pause();
-		Tone.getDestination().volume.rampTo(-Infinity, 0.5);
+		// Tone.getDestination().volume.rampTo(-Infinity, 0.01);
+		// Tone.Transport.pause();
+		// Stop the transport instead of pause to make sure transport starts from 0 again.
+		Tone.Transport.stop();
 		// Tone.stop();
 		// record(false);
 	} catch {
@@ -112,6 +123,11 @@ function addBuffers(uploads){
 		buffers.add(n, url, () => {
 			log(`${f.name} added as ${n}`);
 			URL.revokeObjectURL(url);
+			// also add soundfiles to menu for easy selection
+			let m = document.getElementById('sounds');
+			let o = document.createElement('option');
+			o.value = o.innerHTML = n;
+			m.appendChild(o);
 		}, () => {
 			log(`error adding sound ${f.name}`);
 		});
@@ -155,26 +171,26 @@ function setVolume(g, t=0){
 const Recorder = new Tone.Recorder({ mimeType: 'audio/webm' });
 GN.connect(Recorder);
 
-async function record(start){
-	if (Recorder.state !== 'started' && start){
-		// start the recording process
-		// console.log(Recorder);
-		// Recorder.mimeType = 'audio/wav;';
-		Recorder.start();
-	}
+function isRecording(){
+	// returns 'started' if the recording is recording
+	return Recorder.state;
+}
 
-	if (Recorder.state === 'started' && !start){
+async function record(on, f){
+	if (on){
+		// start the recording process
+		Recorder.start();
+	} else {
 		// stop the recording process
-		// Recorder.stop();
 		// the recorded audio is returned as a blob
 		const recording = await Recorder.stop();
 		// download the recording by creating an anchor element and blob url
 		const url = URL.createObjectURL(recording);
 		const anchor = document.createElement("a");
-		anchor.download = "mercuryRecording.webm";
+		anchor.download = `${f}.webm`;
 		anchor.href = url;
 		anchor.click();
 	}
 }
 
-module.exports = { resume, silence, setBPM, getBPM, randomBPM, getBuffers, addBuffers, setLowPass, setHiPass, setVolume, record };
+module.exports = { resume, silence, setBPM, getBPM, randomBPM, getBuffers, addBuffers, setLowPass, setHiPass, setVolume, record, isRecording };

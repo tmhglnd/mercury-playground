@@ -1,0 +1,6 @@
+# node_modules
+# /node_modules
+
+# builds
+/public/bundle.js
+/public/bundle.min.js

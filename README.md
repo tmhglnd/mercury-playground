@@ -1,23 +1,23 @@
 # 🌕 Mercury Live Coding Playground
 
-**A fun lite version of the Mercury Live Coding Environment running in the browser for quick experimentation and exploration.**
+**Browser version of the Mercury Live Coding Environment for quick experimentation and exploration of live coded electronic music.**
 
 Mercury currently has 2 versions:
 
 * Web version running in the browser (Windows/Mac/Linux) (you're in the right place)
-* Full version running in Max8 (Windows/Mac only) [go to this repo](https://github.com/tmhglnd/mercury)
+* Original version running in Max8 (Windows/Mac only) [go to this repo](https://github.com/tmhglnd/mercury)
 
-[**🚀 Start Sketching Online!**](https://mercury-sketch.glitch.me/)
+[**🚀 Start Sketching Online!** (recommended for beginners)](https://mercury.timohoogland.com/)
 
-**👾 Or code with the latest full version:** 
+**👾 Or code with the latest full version in Max8:** 
 
 [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/tmhglnd/mercury)](https://github.com/tmhglnd/mercury/releases)
 
-[**📟 Build a local app from the browser version with Electron:**](https://github.com/tmhglnd/mercury-app)
+[**📟 Build a local app from the browser version with Electron**](https://github.com/tmhglnd/mercury-app)
 
 [**🙏 Support Mercury by becoming a Patron**](https://www.patreon.com/bePatron?u=9649817) 
 
-[**💬 Join the Discord Community**](https://discord.gg/vt59NYU)
+[**💬 Join the Mercury Community on Discord**](https://discord.gg/vt59NYU)
 
 ![The Mercury playground in the browser](media/screenshot.png)
 
@@ -66,19 +66,20 @@ new sample hat_909 time(3/16)
 Make rhythmic patterns with sequences of numbers and probabilities
 
 ```java
-ring loBeat [1 0 0 1 0.5]
-ring hiBeat [0 1 0.2 0]
+list loBeat [1 0 0 1 0.5]
+list hiBeat [0 1 0.2 0]
 
 new sample tabla_lo time(1/8) play(loBeat)
 new sample tabla_hi time(1/8) play(hiBeat)
 ```
 
-Generate psuedorandom melodic content for a synthesizer in a range <!-- and set a scale -->
+Generate psuedorandom melodic content for a synthesizer in a range and set a scale
 
 ```java
+set scale minor a
 set randomSeed 31415
 
-ring melody random(16 0 24)
+list melody random(16 0 24)
 
 new synth saw note(melody) time(1/16) shape(4 100)
 ```
@@ -87,12 +88,12 @@ Generate sequences algorithmically to compose complex structures and choose from
 
 ```java
 set tempo 132
-ring rhythm euclid(32 13)
+list rhythm euclid(32 13)
 
-ring melody spread(5 0 24)
-ring melody palindrome(melody)
-ring melody clone(melody 0 5 7 3)
-ring melody lace(melody melody)
+list melody spread(5 0 24)
+list melody palindrome(melody)
+list melody clone(melody 0 5 7 3)
+list melody lace(melody melody)
 
 new synth triangle time(1/16) note(melody 1) shape(1 80) play(rhythm)
 ```
@@ -100,7 +101,7 @@ new synth triangle time(1/16) note(melody 1) shape(1 80) play(rhythm)
 Design sounds with various effects (and upload your own sounds to use)
 
 ```java
-new sample chimes time(2) speed(-0.25) fx(reverb 0.3 15) fx(drive 10) fx(shift 3 0.5)
+new sample chimes time(2) speed(0.25) fx(reverb 0.3 15) fx(drive 10) fx(shift 3 0.5)
 ```
 
 Easily give multiple instruments the same effects
@@ -151,26 +152,29 @@ new emitter osc address(yourDevice) theParam(params) time(1/4)
 //          /yourDevice/theParam 0.25
 //          etc...
 ```
+-->
 
-Easily control parameters in Mercury via external OSC-messages
+Easily control parameters in Mercury via external OSC-messages (only when running [localhost](#-install))
 
 ```java
-new synth triangle fx(reverb /extOSC/verbAmount) fx(filter low /extOSC/cutoff 0.4) time(1) shape(1 1000)
+new synth triangle fx(reverb '/synth/verb') fx(filter low '/synth/cutoff' 0.4) time(1) shape(1 'synth/length')
 ```
--->
 
 **AND MANY MORE (TO COME...)**
 
-Currently the playground does not have the full functionality of the original Mercury environment.
+The browser playground does not have exactly the same functionality as the original Mercury environment running in Max8. See below the 
+differences. You may also encounter some discrepancies in syntax and in the documentation. Please report issues if you find any so they can be fixed.
 
 - [x] tempo
 - [x] scale
 - [x] volume
-- [x] lowPass / highPass
+- [x] lowpass / highpass
 - [x] randomSeed
+- [x] print
+- [x] view
 - [x] list
 	- [x] spread / spreadInclusive / fill
-	- [x] random / coin / dice / choose / pick / drunk / urn / shuffle
+	- [x] random / coin / dice / choose / pick / drunk / urn / shuffle / clave
 	- [x] sine / cosine
 	- [x] join / duplicate / merge / repeat / lace
 	- [x] merge / reverse / invert / palindrome
@@ -182,11 +186,12 @@ Currently the playground does not have the full functionality of the original Me
 	- [x] type
 	- [x] time
 	- [x] shape
-	- [x] beat
+	- [x] play
 	- [x] gain
 	- [x] speed
-		- [x] reverse
-	- [ ] note
+		- [ ] reverse
+	- [x] note
+		- [x] tune
 	- [x] pan
 	- [x] name
 	- [x] fx
@@ -195,7 +200,7 @@ Currently the playground does not have the full functionality of the original Me
 		- [x] super
 	- [x] time
 	- [x] shape
-	- [x] beat
+	- [x] play
 	- [x] gain
 	- [x] note
 		- [x] map to scale
@@ -204,7 +209,7 @@ Currently the playground does not have the full functionality of the original Me
 	- [x] fx
 	- [x] slide
 - [ ] sampler
-- [ ] polySynth
+- [ ] polySynth (work-in-progress)
 - [ ] polySample
 - [ ] midi
 	- [x] device
@@ -218,8 +223,10 @@ Currently the playground does not have the full functionality of the original Me
 	- [ ] bend
 	- [ ] sync
 - [ ] osc
+	- [x] receive parameters as arguments
+	- [ ] send osc messages as an intrument
 - [ ] fx
-	- [ ] chip (downsampling)
+	- [x] degrade (chip)
 	- [x] delay
 		- [x] stereo feedback delay with damping
 		- [ ] ping pong feedback delay
@@ -227,50 +234,81 @@ Currently the playground does not have the full functionality of the original Me
 	- [x] squash (compress/overdrive)
 	- [ ] kink (waveshaping)
 	- [x] filter
-		- [ ] modulation
-	- [ ] envFilter
+	- [x] triggerFilter
+	- [ ] autoFilter / lfoFilter
 	- [x] lfo
 	- [x] reverb
 		- [x] decaying noise convolution
 		- [ ] dattorro reverb algorithm
 	- [x] shift (pitchshift)
+ 	- [x] compress 
 	- [ ] chorus
 		- [ ] double
+- [x] visual
+	- [x] use Hydra code synchronized with instrument triggers 
 
 ## 🔭 Vision / Goals
 
-This subset of Mercury was designed to use as a teaching environment for:
-- introduction to (electronic) music
-- algorithmic composition
-- sequencing and pattern generating
-- sound design
-- creative coding and live coding
-- sampling and beat making
+- Provide creatives with a quick and hands-on coding environment/language to expres, communicate and improvise livecoded works.
+- Use the environment as a teaching tool for:
+	- introduction to (electronic) music
+	- algorithmic composition
+	- sequencing and pattern generating
+	- sound design
+	- creative coding and live coding
+- Provide creatives with an hands-on language to create realtime processes
+	- code sound and music
+	- code visuals and let them react to sound
+- Provide creatives with an extensive library of algorithmic composition techniques
+	- released as a seperate Node Package titled [Total-Serialism](https://www.npmjs.com/package/total-serialism)
+	- included in the Mercury environment through Node4Max
+- Provide creatives with a multi-purpose non-linear-sequencer 
+	- use OSC to communicate with other platforms (coming soon...)
+	- use MIDI to communicate with other platforms and devices
+- Provide creatives with an easy sampler/synthesizer for sounddesign and composition
+	- use external OSC to control parameters in the sampler/synthesis
+	- use external MIDI devices and messages to play the sampler/synthesizers (coming soon...)
+- Collaborate in Mercury via the browser with Flok and code music together
+- Extending the Mercury users-community and including extensions on the environment in the master-branch
 
 ⭐️ *watch and star this repo to keep up-to-date with the latest changes whenever they're made*
 
 ## 👩‍💻👨‍💻 Collaborative Coding
 
-It is now possible to code together in Mercury using the amazing [**Flok**](https://flok.clic.cf/) live coding environment in the browser.
+You can code together in Mercury using the amazing [**Flok**](https://flok.cc/) live coding editor in the browser together with the **Mercury Playground** or the **standalone version** in Max8.
 
-- [Start coding together here](https://tmhglnd.github.io/mercury/collaborate.html)
+- [Follow the instructions here](https://tmhglnd.github.io/mercury/collaborate.html)
 
 ## 🚀 Install
 
-😎 No need for installing! You can start coding immediately here:
-[**https://mercury-sketch.glitch.me/**](https://mercury-sketch.glitch.me/)
+😎 **No need for installing!** You can start coding immediately in the browser:
+[**https://mercury.timohoogland.com/**](https://mercury.timohoogland.com/)
 
-🤓 If you want to run and develop the application locally:
+### 💻 Running without internet
 
-`$ git clone http://github.com/tmhglnd/mercury-playground`
+🤓 If you want to run the application locally (for using without internet, or using the OSC functionality or when developing extra features):
 
-`$ npm install`
+Make sure you have NodeJS installed [for Mac](https://nodejs.org/en) or [for Windows](https://nodejs.org/en)
 
-`$ npm run build` or `$ npm run watch` while developing
+In the Terminal navigate to the folder you want to install Mercury. Then run: `git clone http://github.com/tmhglnd/mercury-playground`
 
-`$ npm start`
+Navigate to the cloned folder with: `cd mercury-playground`
 
-`$ open -a Google\ Chrome http://localhost:3000`
+Then install all the dependecies: `npm install` (make sure you have NodeJS v18 installed, check by running `node -v`)
+
+Then build your local version: `npm run build` (or `npm run watch` while developing)
+
+Now start the local server: `npm start`, open a browser and go to [`http://localhost:8080`](http://localhost:8080). 
+
+Once connected the Terminal will print:
+
+```
+Connected yH0SGEdRHbZD1IACAAAB
+Receive messages from Mercury on port 2440
+Send messages to Mercury on port 4880
+```
+
+Mercury can now receive OSC-messages on port `4880` *(the portnumber is chosen to not interfere with many other default portnumbers. The number is the diameter in kilometers of the planet Mercury)*
 
 ## 📖 Documentation
 
@@ -278,21 +316,21 @@ Full explanation of all the possibilities in Mercury:
 
 - [Open the documentation](https://tmhglnd.github.io/mercury/table-of-content.html)
 
-*NB: The Mercury Playground still lacks some functionalities, see the list above*
+**NB: There are still some differences between the Mercury Playground and the Max8 version. If you find any discrepancies please report an issue**
 
 ## 💻 System Requirements
 
-A computer that runs a browser like Chrome or Firefox.
+Any laptop/desktop that runs a chromium based browser like Chrome or Brave.
 
 ## 🎵 Sounds
 
-Many sounds in Mercury are downloaded from [freesound.org](http://www.freesound.org) and are licensed with Creative Commons Attribution or Creative Commons 0 licenses. If not downloaded from freesound it is made sure that the license allows to redistribute the sounds via the Mercury environment and that you can use them in your projects. A list of all the available sounds and the original sample can be found here:
+Most sounds in Mercury are downloaded from [freesound.org](http://www.freesound.org) and are licensed with Creative Commons Attribution or Creative Commons 0 licenses. If not downloaded from freesound it is made sure that the license allows to redistribute the sounds via the Mercury environment and that you can use them in your projects. A list of all the available sounds and the original sample can be found here:
 
 - [List of sounds and credits](https://github.com/tmhglnd/mercury/blob/master/mercury_ide/media/README.md)
 
 ### Use your own sounds
 
-If you like to include your own sounds you'll need to run the application locally. See [install](#-install) for instructions. You can then replace or add any sounds to the `public/assets/samples` folder and run `npm run build`, this creates a new database of soundfiles in `src/data/samples.json`.
+If you like to include your own sounds you can click `Add sounds` on the bottom right of the editor. When you run the application locally you can also replace or add any sounds to the `public/assets/samples` folder and run `npm run build`, this creates a new database of soundfiles in `src/data/samples.json`.
 
 ## ⚡️ Visuals
 
@@ -333,9 +371,9 @@ During the development of Mercury (both the playground and the full version) I'v
 
 ## 📄 Licenses
 
-- Main Source - [The GNU GPL v.3 License](https://choosealicense.com/licenses/gpl-3.0/) (c) Timo Hoogland 2019
+- Main Source - [The GNU GPL v.3 License](https://choosealicense.com/licenses/gpl-3.0/) (c) Timo Hoogland 2019-2023
 - Sound Files - Individually licensed, listed under [media/README.md](https://github.com/tmhglnd/mercury/blob/master/mercury_ide/media/README.md)
-- Documentation - [The CC BY-SA 4.0 License](https://creativecommons.org/licenses/by-sa/4.0/) (c) Timo Hoogland 2019
-- Examples - [The CC BY-SA 4.0 License](https://creativecommons.org/licenses/by-sa/4.0/) (c) Timo Hoogland 2019
+- Documentation - [The CC BY-SA 4.0 License](https://creativecommons.org/licenses/by-sa/4.0/) (c) Timo Hoogland 2019-2023
+- Examples - [The CC BY-SA 4.0 License](https://creativecommons.org/licenses/by-sa/4.0/) (c) Timo Hoogland 2019-2023
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

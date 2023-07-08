@@ -1,0 +1,14 @@
+// === TUTORIAL 416: Shuffle ===
+// Shuffle the contents of a list. The shuffle order is also
+// controlled by the random seed.
+// shuffle(list) - alias: scramble
+
+// Useful to generate random orders of a predefined list
+// For example for melodies or sample selections
+
+list melody shuffle([-1 0 2 3 6 7 9 12])
+list beat shuffle([kick_808 hat_808 snare_808 tabla_hi_short])
+print melody beat
+
+new synth sine note(melody 2) time(1/16)
+new sample beat time(1/8)
