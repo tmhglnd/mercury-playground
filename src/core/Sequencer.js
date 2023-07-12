@@ -38,7 +38,6 @@ class Sequencer {
 			this._loop.dispose();
 		}
 		let schedule = Tone.Time(this._offset).toSeconds();
-		// console.log('schedule', schedule);
 
 		// create new loop for synth
 		this._loop = new Tone.Loop((time) => {
