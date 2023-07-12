@@ -38,7 +38,7 @@ window.onload = () => {
 		// console.log('printing', typeof print);
 		let p = JSON.stringify(print).replace(/\,/g, ' ').replace(/\"/g, '');
 		document.getElementById('console-log').innerHTML += `${p}<br>`;
-		console.log(...print);
+		console.log(print);
 	}
 
 	const Engine = require('./engine.js');
