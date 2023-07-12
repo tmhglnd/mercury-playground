@@ -39,6 +39,9 @@ class Sequencer {
 		}
 		let schedule = Tone.Time(this._offset).toSeconds();
 
+		// get the first time interval from the list before creating the loop
+		let initTime = Util.lookup(this._time, this._beatCount);
+
 		// create new loop for synth
 		this._loop = new Tone.Loop((time) => {
 			// convert transport time to Ticks and convert reset time to ticks
@@ -80,11 +83,19 @@ class Sequencer {
 				}
 
 				// increment internal beat counter
-				this._beatCount++;
+				++this._beatCount;
 			}
 			// increment count for sequencing
 			this._count++;
-		}, this._time).start(schedule);
+
+			// set the interval for the next triggering of the loop
+			// this._loop.interval.setValueAtTime()
+			console.log('beat', this._beatCount);
+
+			this._loop.interval = Util.lookup(this._time, this._beatCount);
+			console.log('new interval', this._loop.interval);
+
+		}, initTime).start(schedule);
 	}
 
 	event(c, time){
@@ -124,7 +135,8 @@ class Sequencer {
 
 	time(t, o=0, s=[1]){
 		// set the timing interval and offset
-		this._time = Util.formatRatio(t, this.bpm());
+		// this._time = Util.formatRatio(t, this.bpm());
+		this._time = Util.toArray(t).map(x => Util.formatRatio(x, this.bpm()));
 		this._offset = Util.formatRatio(o, this.bpm());
 		// set timing division optionally, also possible via timediv()
 		// this.timediv(s);
