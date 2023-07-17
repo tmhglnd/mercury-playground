@@ -163,7 +163,7 @@ new synth triangle fx(reverb '/synth/verb') fx(filter low '/synth/cutoff' 0.4) t
 **AND MANY MORE (TO COME...)**
 
 The browser playground does not have exactly the same functionality as the original Mercury environment running in Max8. See below the 
-differences. You may also encounter some discrepancies in syntax and in the documentation. Please report issues if you find any so they can be fixed.
+differences. You may also encounter some discrepancies in syntax and in the documentation. Please report issues if you find any so they can be fixed. Every item with a `*` is only available in the browser version.
 
 - [x] tempo
 - [x] scale
@@ -171,7 +171,8 @@ differences. You may also encounter some discrepancies in syntax and in the docu
 - [x] lowpass / highpass
 - [x] randomSeed
 - [x] print
-- [x] view
+- [x] view (*)
+- [x] crossFade (*)
 - [x] list
 	- [x] spread / spreadInclusive / fill
 	- [x] random / coin / dice / choose / pick / drunk / urn / shuffle / clave
@@ -191,7 +192,7 @@ differences. You may also encounter some discrepancies in syntax and in the docu
 	- [x] speed
 		- [ ] reverse
 	- [x] note
-		- [x] tune
+		- [x] tune (*)
 	- [x] pan
 	- [x] name
 	- [x] fx
@@ -244,8 +245,8 @@ differences. You may also encounter some discrepancies in syntax and in the docu
  	- [x] compress 
 	- [ ] chorus
 		- [ ] double
-- [x] visual
-	- [x] use Hydra code synchronized with instrument triggers 
+- [x] visual 
+	- [x] use Hydra code synchronized with instrument triggers (*)
 
 ## 🔭 Vision / Goals
 

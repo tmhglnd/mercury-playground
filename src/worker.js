@@ -13,6 +13,7 @@ let crossFade = 0.5;
 // arrays with the current and previous instruments playing for crossfade
 let _sounds = [];
 let sounds = [];
+let counters = [];
 
 // global variables easily accessed
 // window.time = Tone.now();
@@ -232,7 +233,8 @@ async function code({ file, engine, canvas, p5canvas }){
 		s.makeLoop();
 	});
 	console.log(`Made instruments in: ${((Tone.Transport.seconds - t) * 1000).toFixed(3)}ms`);
-
+	
+	transferCount(_sounds, sounds);
 	// when all loops started fade in the new sounds and fade out old
 	if (!sounds.length){
 		startSound(sounds);
@@ -243,6 +245,20 @@ async function code({ file, engine, canvas, p5canvas }){
 	
 function getSound(){
 	return sounds;
+}
+
+function transferCount(_s, s){
+	// transfer the time of the previous sound to the new sound object
+	// to preserve continuity when re-evaluating code
+	// this works only for instruments that have a name()
+	_s.map((prev) => {
+		s.map((cur) => {
+			if (cur._name === prev._name){
+				cur._count = prev._count;
+				cur._beatCount = prev._beatCount;
+			}
+		});
+	});
 }
 
 function startSound(s, f=0){
