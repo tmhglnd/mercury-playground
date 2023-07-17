@@ -112,7 +112,13 @@ window.onload = () => {
 	cm.tutorialMenu();
 	cm.soundsMenu();
 	cm.modeSwitch();
-	cm.clear();
+	
+	// Load recent code from localStorage if any
+	if (localStorage.getItem('code')){
+		cm.set(localStorage.getItem('code'));
+	} else {
+		cm.clear();
+	}
 	
 	Hydra.link('hydra-ui');
 }

@@ -131,6 +131,9 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 
 		code({ file: this.cm.getValue(), engine: engine, canvas: canvas, p5canvas: p5canvas });
 		engine.resume();
+
+		// store code in localstorage upon evaluating
+		localStorage.setItem('code', this.cm.getValue());
 	}
 
 	this.evaluateBlock = function(){
