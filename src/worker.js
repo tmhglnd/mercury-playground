@@ -13,7 +13,6 @@ let crossFade = 0.5;
 // arrays with the current and previous instruments playing for crossfade
 let _sounds = [];
 let sounds = [];
-let counters = [];
 
 // global variables easily accessed
 // window.time = Tone.now();

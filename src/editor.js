@@ -93,6 +93,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 			'Shift-Ctrl-Enter': () => { this.evaluateBlock() },
 			'Shift-Alt-H': () => { this.hideEditor() },
 			'Shift-Ctrl-H': () => { this.hideEditor() },
+			'Shift-Ctrl-R': () => { this.randomize() },
 			'Tab': 'insertSoftTab',
 		}
 	}
@@ -102,7 +103,12 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 	this.cm.markText({line: 0, ch: 0}, {line: 6, ch: 42}, {className: 'styled-background'})
 
 	this.set = function(v){
+		// get the current cursor position
+		let crs = this.cm.getCursor();
+		// change the text content of the editor
 		this.cm.setValue(v);
+		// place the cursor back where it was
+		this.cm.setCursor(crs);
 	}
 
 	this.get = function(){
@@ -124,6 +130,61 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 			'    set bass fx(filter low random(5 50 5000) 0.2)\n' +
 			'    set bass fx(delay 2/16 3/16 0.9) super(0.13212 5)\n'
 		);
+	}
+
+	this.randomize = function(){
+		// regex to find variable numbers/divisions
+		// first check for comments, tempo, keywords, then filter the numbers/divisions
+		let tokens = /(\/\/.+)|(tempo.+)|([A-Za-z_-]+[A-Za-z0-9]*)|([0-9]+[0-9:/.]*)/g;
+		// updated with latest find
+		let find;
+		// code from the editor
+		let code = this.get();
+		// percentage of change for the numbers (+/-)
+		let deviation = 0.2;
+
+		// check the code for all instances of the variables
+		while ((find = tokens.exec(code)) !== null) {
+			let v = find[0];
+			let rnd = Math.random();
+			let sign = (Math.random() > 0.5) * 2 - 1;
+			// check type of found value (Integer, Float, Division)
+			if (isNaN(v)){
+				if (v.match(/[0-9]+\/[0-9]+/)){
+					v = v.split('/').map(x => Number(x));
+
+					// choose either numerator or denominator to change
+					if (Math.random() < 0.75){
+						let dQ = Math.log2(v[1]);
+						let dT = Math.log2(v[1]/3);
+						if (Number.isInteger(dQ)){
+							v[1] = 2 ** Math.min(5, Math.max(0, Math.round(dQ + rnd * sign)));
+						} else if (Number.isInteger(dT)){
+							v[1] = 2 ** Math.min(3, Math.max(0, Math.round(dT + rnd * sign))) * 3;
+						} else {
+							v[1] = Math.max(1, Math.round(v[1] + rnd));
+						}
+					} else {
+						v[0] = Math.max(1, v[0] + (rnd < 0.5) * sign);
+					}
+					// v = find[0];
+					v = `${v[0]}/${v[1]}`;
+				}
+				// if not a number check for division
+			} else {
+				v = Number(v);
+				let _v = v + v * deviation * rnd * sign;
+				v = Number.isInteger(v) ? _v.toFixed(0) :_v.toFixed(3);
+			}
+			// add the random value on the location of the found number
+			code = code.substring(0, find.index) + v + code.substring(tokens.lastIndex);
+			// update the lastIndex to account for length change in code string
+			tokens.lastIndex = find.index + v.length;
+		}
+		// update the code in the editor
+		this.set(code);
+		// evaluate the new code
+		this.evaluate();
 	}
 
 	this.evaluate = function(){
