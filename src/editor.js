@@ -136,7 +136,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 	this.randomize = function(){
 		// regex to find variable numbers/divisions
 		// first check for comments, tempo, keywords, then filter the numbers/divisions
-		let tokens = /(\/\/.+)|(tempo.+)|([A-Za-z_-]+[A-Za-z0-9]*)|([0-9]+[0-9:/.]*)/g;
+		let tokens = /\/\/.+|tempo.+|out[^\)]+\)|[A-Za-z_-]+[A-Za-z0-9]*|[0-9]+[0-9:/.]*/g;
 		// updated with latest find
 		let find;
 		// code from the editor
@@ -151,7 +151,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 			let sign = (Math.random() > 0.5) * 2 - 1;
 			// check type of found value (Integer, Float, Division)
 			if (isNaN(v)){
-				if (v.match(/[0-9]+\/[0-9]+/)){
+				if (v.match(/^[0-9]+\/[0-9]+/)){
 					v = v.split('/').map(x => Number(x));
 
 					// choose either numerator or denominator to change
