@@ -93,6 +93,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 			'Shift-Ctrl-Enter': () => { this.evaluateBlock() },
 			'Shift-Alt-H': () => { this.hideEditor() },
 			'Shift-Ctrl-H': () => { this.hideEditor() },
+			'Shift-Alt-R': () => { this.randomize() },
 			'Shift-Ctrl-R': () => { this.randomize() },
 			'Tab': 'insertSoftTab',
 		}
@@ -184,7 +185,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		// update the code in the editor
 		this.set(code);
 		// evaluate the new code
-		this.evaluate();
+		// this.evaluate();
 	}
 
 	this.evaluate = function(){
