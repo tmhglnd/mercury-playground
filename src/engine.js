@@ -10,7 +10,7 @@ Tone.getContext().addAudioWorkletModule(URL.createObjectURL(new Blob([ fxExtensi
 // Tone.context.latencyHint = 'playback';
 Tone.context.lookAhead = 0.1;
 // Tone.context.updateInterval = 0.5;
-// Tone.context.samplerate = 44100;
+Tone.context.samplerate = 44100;
 
 console.log('=> Engine settings:');
 console.log(`latency: ${Tone.getContext().lookAhead * 1000}ms`);

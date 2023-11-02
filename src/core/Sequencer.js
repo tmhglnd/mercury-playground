@@ -100,16 +100,17 @@ class Sequencer {
 			let schedule = Tone.Time(this._offset).toSeconds();
 			// create new loop for synth
 			this._loop = new Tone.Loop((time) => { this._event(time) }, this._time).start(schedule);
-		} else {
-			// generate a listener for the osc-address
-			let oscAddress = `${this._offset}`;
-			window.addEventListener(oscAddress, (event) => {
-				// trigger the event if value greater than 0
-				if (event.detail > 0){ 
-					Tone.Transport.scheduleOnce((time) => this._event(time), '+0.005');
-				}
-			});
-		}
+		} 
+		// else {
+		// 	// generate a listener for the osc-address
+		// 	let oscAddress = `${this._offset}`;
+		// 	window.addEventListener(oscAddress, (event) => {
+		// 		// trigger the event if value greater than 0
+		// 		if (event.detail > 0){ 
+		// 			Tone.Transport.scheduleOnce((time) => this._event(time), Tone.immediate());
+		// 		}
+		// 	});
+		// }
 	}
 
 	event(c, time){
