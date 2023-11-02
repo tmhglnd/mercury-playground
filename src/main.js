@@ -9,6 +9,9 @@ switchTheme = (t) => {
 // initial dark mode theme on startup
 switchTheme('darkmode');
 
+// global variable for device storage and recall of microphone inputs
+window.devices;
+
 // Ask if user is sure to close or refresh and loose all code
 window.onbeforeunload = function() {
 	return "Code will be lost if you refresh. Are you sure?";
@@ -17,6 +20,14 @@ window.onbeforeunload = function() {
 window.onload = () => {
 	// load requires
 	const Tone = require('tone');
+	Tone.UserMedia.enumerateDevices().then((devices) => {
+		// print the device labels
+		window.devices = devices.map(device => device.label);
+		console.log("=> Input devices");
+		window.devices.forEach((i) => {
+			console.log(`- input: ${i}`);
+		});
+	});
 	
 	// console.log catch function
 	if (typeof console != "undefined"){ 
@@ -54,10 +65,10 @@ window.onload = () => {
 		} else {
 			console.log("=> webMidi enabled");
 			WebMidi.inputs.forEach((i) => {
-				console.log('- inputs: ', i.name);
+				console.log(`- inputs: ${i.name}`);
 			});
 			WebMidi.outputs.forEach((i) => {
-				console.log('- outputs: ', i.name);
+				console.log(`- outputs: ${i.name}`);
 			});
 		}
 	});
