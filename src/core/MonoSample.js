@@ -15,7 +15,7 @@ class MonoSample extends Instrument {
 		this._speed = [ 1 ];
 		this._rev = false;
 		this._stretch = [ 0 ];
-		this._note = null;
+		this._note = [ 'off' ];
 		this._tune = [ 261.6255653 ];
 
 		// playback start position
@@ -55,10 +55,11 @@ class MonoSample extends Instrument {
 		// get speed and if 2d array pick randomly
 		let s = Util.getParam(this._speed, c);
 
-		if (this._note){
+		// check if note is not 'off'
+		let i = Util.getParam(this._note[0], c);
+		if (i !== 'off'){
 			// note as interval / octave coordinate
 			let o = Util.getParam(this._note[1], c);
-			let i = Util.getParam(this._note[0], c);
 			let t = Util.getParam(this._tune, c);
 
 			// reconstruct midi note value with scale, (0, 0) = 36
