@@ -9,6 +9,9 @@ switchTheme = (t) => {
 // initial dark mode theme on startup
 switchTheme('darkmode');
 
+// global variable for device storage and recall of microphone inputs
+window.devices;
+
 // Ask if user is sure to close or refresh and loose all code
 window.onbeforeunload = function() {
 	return "Code will be lost if you refresh. Are you sure?";
@@ -17,6 +20,14 @@ window.onbeforeunload = function() {
 window.onload = () => {
 	// load requires
 	const Tone = require('tone');
+	Tone.UserMedia.enumerateDevices().then((devices) => {
+		// print the device labels
+		window.devices = devices.map(device => device.label);
+		console.log("=> Input devices");
+		window.devices.forEach((i) => {
+			console.log(`- input: ${i}`);
+		});
+	});
 	
 	// console.log catch function
 	if (typeof console != "undefined"){ 
@@ -38,7 +49,7 @@ window.onload = () => {
 		// console.log('printing', typeof print);
 		let p = JSON.stringify(print).replace(/\,/g, ' ').replace(/\"/g, '');
 		document.getElementById('console-log').innerHTML += `${p}<br>`;
-		console.log(...print);
+		console.log(print);
 	}
 
 	const Engine = require('./engine.js');
@@ -54,21 +65,25 @@ window.onload = () => {
 		} else {
 			console.log("=> webMidi enabled");
 			WebMidi.inputs.forEach((i) => {
-				console.log('- inputs: ', i.name);
+				console.log(`- inputs: ${i.name}`);
 			});
 			WebMidi.outputs.forEach((i) => {
-				console.log('- outputs: ', i.name);
+				console.log(`- outputs: ${i.name}`);
 			});
 		}
 	});
 
 	// Empty object to store/update all received oscMessages
 	window.oscMessages = {};
+	// Is there a client connected?
+	window.ioClient = false;
 	// Setup osc connection for when running mercury as localhost
 	try {
 		const io = require('socket.io-client');
 		const socket = io();
+
 		socket.on('connected', (id) => {
+			window.ioClient = true;
 			console.log(`Connected for OSC: ${id}`);
 		});
 		socket.on('osc', (msg) => {
@@ -112,7 +127,13 @@ window.onload = () => {
 	cm.tutorialMenu();
 	cm.soundsMenu();
 	cm.modeSwitch();
-	cm.clear();
+	
+	// Load recent code from localStorage if any
+	if (localStorage.getItem('code')){
+		cm.set(localStorage.getItem('code'));
+	} else {
+		cm.clear();
+	}
 	
 	Hydra.link('hydra-ui');
 }

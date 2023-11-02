@@ -1,0 +1,18 @@
+// === TUTORIAL 125: Name Instruments ===
+// Instruments can have a name. Giving the instrument a name gives two advantages:
+// 1. Parameters can be set for the instrument on another line with `set <name>`
+// 2. Re-evaluating code will transfer the current count to the new instrument.
+//    This will preserve continuity while sequencing (long) lists, instead
+//    of hearing the counter reset every time code is evaluated
+
+set tempo 100
+set scale minor
+
+list notes spread(13 0 24)
+list rhythm euclid(16 13)
+new synth saw note(notes 0) time(1/16) play(rhythm) name(synthy)
+
+// these parameters are send to the synth named "synthy"
+set synthy fx(filter low 3000 0.3) fx(degrade 0.4) fx(delay)
+
+// try evaluating the code multiple times to hear the pattern does not reset

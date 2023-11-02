@@ -1,4 +1,4 @@
-// === TUTORIAL 504 ===
+// === TUTORIAL 504: MIDI Chord ===
 // By setting the chord() method to 'on' we can output
 // multiple notes at the same time to create a chord
 

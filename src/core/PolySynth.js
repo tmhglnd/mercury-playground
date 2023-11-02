@@ -29,8 +29,8 @@ class PolySynth extends PolyInstrument {
 
 	sourceEvent(c, time, id, num){
 		// ramp volume
-		let g = Util.getParam(this._gain[0], c);
-		let r = Util.getParam(this._gain[1], c);
+		let g = 20 * Math.log(Util.getParam(this._gain[0], c) * 0.707);
+		let r = Util.msToS(Math.max(0, Util.getParam(this._gain[1], c)));
 		this.sources[id].volume.rampTo(g, r, time);
 
 		// set voice amount for super synth

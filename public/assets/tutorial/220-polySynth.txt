@@ -1,0 +1,13 @@
+// === TUTORIAL 220: polySynth ===
+// The polySynth is a polyphonic synthesizer, this allows you
+// to play overlapping notes or notes at the same time to generate
+// chord progressions
+
+set tempo 80
+set scale major c
+
+// a 2-dimensional list of notes plays all the notes at the same time
+list chord [ [0 4 5 7 8 10 12] ]
+new polySynth sine note(chord 2) time(1/2) shape(1 1/4) 
+
+// Try some different values for to generate more chords

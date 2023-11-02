@@ -5,6 +5,7 @@ const Mercury = require('mercury-lang');
 const MonoSample = require('./core/MonoSample.js');
 const MonoMidi = require('./core/MonoMidi.js');
 const MonoSynth = require('./core/MonoSynth.js');
+const MonoInput = require('./core/MonoInput.js');
 const PolySynth = require('./core/PolySynth.js');
 const PolySample = require('./core/PolySample.js');
 const Tempos = require('./data/genre-tempos.json');
@@ -205,6 +206,21 @@ async function code({ file, engine, canvas, p5canvas }){
 					log(`${a}() is not a function of ${type}`);
 				}
 			});
+			return inst;
+		},
+		'input' : (obj) => {
+			let device = obj.type;
+			let args = obj.functions;
+			let inst = new MonoInput(engine, device, canvas);
+			// apply arguments to instrument
+			Object.keys(args).forEach((a) => {
+				if (inst[a]){
+					inst[a](...args[a]);
+				} else {
+					log(`${a}() is not a function of input`);
+				}
+			});
+			return inst;
 		}
 	}
 
@@ -223,7 +239,8 @@ async function code({ file, engine, canvas, p5canvas }){
 		s.makeLoop();
 	});
 	console.log(`Made instruments in: ${((Tone.Transport.seconds - t) * 1000).toFixed(3)}ms`);
-
+	
+	transferCount(_sounds, sounds);
 	// when all loops started fade in the new sounds and fade out old
 	if (!sounds.length){
 		startSound(sounds);
@@ -234,6 +251,20 @@ async function code({ file, engine, canvas, p5canvas }){
 	
 function getSound(){
 	return sounds;
+}
+
+function transferCount(_s, s){
+	// transfer the time of the previous sound to the new sound object
+	// to preserve continuity when re-evaluating code
+	// this works only for instruments that have a name()
+	_s.map((prev) => {
+		s.map((cur) => {
+			if (cur._name === prev._name){
+				cur._count = prev._count;
+				cur._beatCount = prev._beatCount;
+			}
+		});
+	});
 }
 
 function startSound(s, f=0){
