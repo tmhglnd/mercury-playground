@@ -1,6 +1,8 @@
 // The Mercury Playground main code loader
 // 
 
+const { add } = require('total-serialism/src/utility.js');
+
 // switch theme in css
 switchTheme = (t) => {
 	localStorage.setItem('theme', t);
@@ -96,7 +98,14 @@ window.onload = () => {
 					log(`Unable to execute code`);
 				}
 			} else {
-				window.oscMessages[msg.shift()] = msg;
+				let address = msg.shift();
+				let details = msg;
+				// store the osc message values in the object
+				window.oscMessages[address] = details;
+				
+				// emit an event to the listener if there is one
+				let event = new CustomEvent(address, { detail: details });
+				window.dispatchEvent(event);
 			}
 		});
 		window.emit = (msg) => {

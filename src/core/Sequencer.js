@@ -22,6 +22,7 @@ class Sequencer {
 		this._visual = [];
 
 		// Tone looper
+		this._event;
 		this._loop;
 		this.makeLoop();
 
@@ -38,14 +39,13 @@ class Sequencer {
 		if (this._loop){
 			this._loop.dispose();
 		}
-		let schedule = Tone.Time(this._offset).toSeconds();
 
-		// create new loop for synth
-		this._loop = new Tone.Loop((time) => {
+		// create the event for a loop or external trigger
+		this._event = (time) => {
 			// convert transport time to Ticks and convert reset time to ticks
 			let ticks = Tone.Transport.getTicksAtTime(time);
 			let rTicks = Tone.Time(`${this._reset}m`).toTicks();
-
+	
 			// if reset per bar is a valid argument
 			if (this._reset > 0){
 				// if ticks % resetTicks === 0 then reset
@@ -56,40 +56,60 @@ class Sequencer {
 			}
 			// set subdivision speeds
 			this._loop.playbackRate = Util.getParam(this._subdiv, this._count);
-
+	
 			// humanize method is interesting to add
 			this._loop.humanize = Util.getParam(this._human, this._count);
-
+	
 			// get beat probability for current count
 			let b = Util.getParam(this._beat, this._count);
-
+	
 			// if random value is below probability, then play
 			if (Math.random() < b){
 				// get the count value
 				let c = this._beatCount;
-
+	
 				// trigger some events for this instrument based
 				// on the current count and time
 				this.event(c, time);
-
+	
 				// send an osc-message trigger of 1 with the /name
 				if (window.ioClient){
 					setTimeout(() => {
 						window.emit([`/${this._name}`, 1]);
 					}, (time - Tone.context.currentTime) * 1000);
 				}
-
+				// also emit an internal event for other instruments to sync to
+				// let event = new CustomEvent(`/${this._name}`, { detail: 1 });
+				// window.dispatchEvent(event);
+	
 				// execute a visual event for Hydra
 				if (this._visual.length > 0){
 					this._canvas.eval(Util.getParam(this._visual, c));
 				}
-
+	
 				// increment internal beat counter
 				this._beatCount++;
 			}
 			// increment count for sequencing
 			this._count++;
-		}, this._time).start(schedule);
+		}
+
+		if (this._time){
+			// generate the standard loop if there is a time value
+			// calculate the scheduling
+			let schedule = Tone.Time(this._offset).toSeconds();
+			// create new loop for synth
+			this._loop = new Tone.Loop((time) => { this._event(time) }, this._time).start(schedule);
+		} else {
+			// generate a listener for the osc-address
+			let oscAddress = `${this._offset}`;
+			window.addEventListener(oscAddress, (event) => {
+				// trigger the event if value greater than 0
+				if (event.detail > 0){ 
+					Tone.Transport.scheduleOnce((time) => this._event(time), '+0.005');
+				}
+			});
+		}
 	}
 
 	event(c, time){
@@ -129,10 +149,15 @@ class Sequencer {
 
 	time(t, o=0, s=[1]){
 		// set the timing interval and offset
-		this._time = Util.formatRatio(t, this.bpm());
-		this._offset = Util.formatRatio(o, this.bpm());
-		// set timing division optionally, also possible via timediv()
-		// this.timediv(s);
+		if (t === 'free'){
+			this._time = null;
+			this._offset = Util.toArray(o)[0];
+		} else {
+			this._time = Util.formatRatio(t, this.bpm());
+			this._offset = Util.formatRatio(o, this.bpm());
+			// set timing division optionally, also possible via timediv()
+			// this.timediv(s);
+		}
 	}
 
 	timediv(s){
