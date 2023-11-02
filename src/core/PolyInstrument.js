@@ -88,6 +88,7 @@ class PolyInstrument extends Instrument {
 		// get the notes from the note array to know how many voices
 		// need to be triggered at once
 		let notes = Util.toArray(Util.lookup(this._note[0], c));
+		// console.log('notes to trigger', notes);
 
 		for (let n=0; n<notes.length; n++){
 			// if any voices are free

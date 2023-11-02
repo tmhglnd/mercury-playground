@@ -20,10 +20,9 @@ class PolySample extends PolyInstrument {
 		this._pos = [ 0 ];
 
 		this.sample;
-
-		// synth specific variables;
-		// this._wave = Util.toArray(t);
 		this._note = [ 0, 0 ];
+		this._tune = [ 261.6255653 ];
+
 		// this._slide = [ 0 ];
 		this._voices = [ 1 ];
 		this._detune = [ 0 ];
@@ -42,12 +41,11 @@ class PolySample extends PolyInstrument {
 
 	sourceEvent(c, time, id, num){
 		// ramp volume
-		let g = Util.getParam(this._gain[0], c);
-		let r = Util.getParam(this._gain[1], c);
+		let g = 20 * Math.log(Util.getParam(this._gain[0], c) * 0.707);
+		let r = Util.msToS(Math.max(0, Util.getParam(this._gain[1], c)));
 		this.sources[id].volume.rampTo(g, r, time);
 
-		// set the frequency based on the selected note
-		// note as interval / octave coordinate
+
 		// let o = Util.getParam(this._note[1], c);
 		// let i = Util.getParam(this._note[0], c);
 		// let i = Util.toArray(Util.lookup(this._note[0], c))[num];
@@ -71,6 +69,21 @@ class PolySample extends PolyInstrument {
 
 		// get speed and if 2d array pick randomly
 		let s = Util.getParam(this._speed, c);
+
+		// set the playbackrate based on the selected note
+		// note as interval / octave coordinate
+		// check if note is not 'off'
+		let i = Util.toArray(Util.lookup(this._note[0], c))[num];
+		if (i !== 'off'){
+			// note as interval / octave coordinate
+			let o = Util.getParam(this._note[1], c);
+			let t = Util.getParam(this._tune, c);
+
+			// reconstruct midi note value with scale, (0, 0) = 36
+			let n = Util.toMidi(i, o);
+			let r = Util.mtof(n) / t;
+			s = s * r;
+		}
 
 		// reversing seems to reverse every time the 
 		// value is set to true (so after 2 times reverse
@@ -122,6 +135,20 @@ class PolySample extends PolyInstrument {
 	speed(s){
 		// set the speed pattern as an array
 		this._speed = Util.toArray(s);
+	}
+
+	tune(t=60){
+		// set the fundamental midi note for this sample in Hz, MIDI or Notename
+		this._tune = Util.toArray(t);
+		this._tune = this._tune.map((t) => {
+			if (typeof t === 'number'){
+				if (Math.floor(t) !== t){
+					return t;
+				}
+				return Util.mtof(t);
+			}
+			return Util.mtof(Util.noteToMidi(t));
+		});
 	}
 
 	stretch(s){
