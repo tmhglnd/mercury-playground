@@ -1,5 +1,6 @@
 const Tone = require('tone');
 const Util = require('./Util.js');
+const WebMidi = require("webmidi");
 
 // Basic Sequencer class for triggering events
 class Sequencer {
@@ -71,8 +72,12 @@ class Sequencer {
 				// on the current count and time
 				this.event(c, time);
 
-				// osc-connection needs syncing with Tone Transport
-				// emit([`/trigger`, 1]);
+				// send an osc-message trigger of 1 with the /name
+				if (window.ioClient){
+					setTimeout(() => {
+						window.emit([`/${this._name}`, 1]);
+					}, (time - Tone.context.currentTime) * 1000);
+				}
 
 				// execute a visual event for Hydra
 				if (this._visual.length > 0){
