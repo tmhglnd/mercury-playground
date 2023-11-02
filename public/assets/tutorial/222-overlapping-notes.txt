@@ -1,18 +1,17 @@
-// === TUTORIAL 221: Chord Progression ===
-// With the chordsFromNumerals function you can generate a
-// 2-dimensional list containing the notes for the chords you specify
-// Chords are numbered I to VII. Adding an 'm' makes them minor
-// It is also possible to add the 7, 9, 11 or 13th
+// === TUTORIAL 222: Overlapping Notes ===
+// We can also generate a list of notes for an arpeggiator and
+// let the notes overlap by creating a longer length than 
+// the space in between the notes
 
-set tempo 100
-// we can set the scale to none to allow all the notes to be played
+set tempo 110
 set scale none
 
-// a chord progression in the style of the 4-chord-song
-list progression chordsFromNumerals([I IV V VIm])
-// see in the console that the result is a 2d-list
+// here the chord progression is repeated 4 times and flattened into a 1d list
+list progression flat(repeat(chordsFromNumerals([I IV V VI]) 4))
 print progression
 
-new polySynth sine note(progression 2) time(1/1) shape(1 1/1) 
+// hear how some of the notes are not played because there are no more voices 
+// available. You can change this by setting voice-stealing to 'on'
+new polySynth sine note(progression 2) time(1/12) shape(1 1/1) steal(off)
 
 // Try some different numerals to hear how the chords change
