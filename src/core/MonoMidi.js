@@ -17,12 +17,13 @@ class MonoMidi extends Sequencer {
 		}
 
 		// Midi specific parameters
-		this._note = [ 0, 0 ];		
+		this._note = [];		
 		this._velocity = [ 127, 0 ];
 		this._dur = [ 100 ];
 		this._cc = [];
 		this._channel = [ 1 ];
 		this._chord = false;
+		this._bend = [];
 
 		console.log('=> class MonoMidi', this);
 	}
@@ -36,6 +37,30 @@ class MonoMidi extends Sequencer {
 
 		// get the channel
 		let ch = Util.getParam(this._channel, c);
+
+		// timing offset to sync WebMidi and WebAudio
+		let offset = WebMidi.time - Tone.context.currentTime * 1000;
+		let sync = time * 1000 + offset;
+
+		// send pitchbend message in hires -1 1 at specified channel
+		if (this._bend.length > 0){
+			let b = Util.lookup(this._bend, c);
+			// clip the bend range between -1 and 1 (results in hires 14bit)
+			b = Math.min(1.0, Math.max(-1, b));
+			this._device.sendPitchBend(b, ch, { time: sync });
+		}
+
+		// send control changes!
+		this._cc.forEach((cc) => {
+			let ctrl = Number(cc[0]);
+			let val = Util.getParam(cc[1], c);
+			val = Math.max(0, Math.min(127, val));
+
+			this._device.sendControlChange(ctrl, val, ch, { time: sync });
+		});
+
+		// only play a note if the notes are provided in the function
+		// if (this._note.length > 0){
 
 		// note as interval / octave coordinate
 		let o = Util.getParam(this._note[1], c);
@@ -53,22 +78,11 @@ class MonoMidi extends Sequencer {
 			// convert to scale and include the octave
 			n[x] = Util.toMidi(i[x], o);
 		}
-
-		// timing offset to sync WebMidi and WebAudio
-		let offset = WebMidi.time - Tone.context.currentTime * 1000;
-		let sync = time * 1000 + offset;
-
-		// send control changes!
-		this._cc.forEach((cc) => {
-			let ctrl = Number(cc[0]);
-			let val = Util.getParam(cc[1], c);
-			val = Math.max(0, Math.min(127, val));
-
-			this._device.sendControlChange(ctrl, val, ch, { time: sync });
-		});
-
-		// play the note!
+		
+		// play the note(s)!
 		this._device.playNote(n, ch, { duration: d, velocity: g, time: sync });
+
+		// }
 	}
 
 	amp(g, r){
@@ -87,6 +101,10 @@ class MonoMidi extends Sequencer {
 
 	out(c){
 		this._channel = Util.toArray(c);
+	}
+
+	bend(b=[0]){
+		this._bend = Util.toArray(b);
 	}
 
 	chord(c){

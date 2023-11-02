@@ -1,15 +1,15 @@
 # 🌕 Mercury Live Coding Playground
 
-**A version of the Mercury Live Coding Environment running in the browser for quick experimentation and exploration.**
+**Browser version of the Mercury Live Coding Environment for quick experimentation and exploration of live coded electronic music.**
 
 Mercury currently has 2 versions:
 
 * Web version running in the browser (Windows/Mac/Linux) (you're in the right place)
-* Standalone version running in Max8 (Windows/Mac only) [go to this repo](https://github.com/tmhglnd/mercury)
+* Original version running in Max8 (Windows/Mac only) [go to this repo](https://github.com/tmhglnd/mercury)
 
-[**🚀 Start Sketching Online!**](https://mercury.timohoogland.com/)
+[**🚀 Start Sketching Online!** (recommended for beginners)](https://mercury.timohoogland.com/)
 
-**👾 Or code with the latest full version:** 
+**👾 Or code with the latest full version in Max8:** 
 
 [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/tmhglnd/mercury)](https://github.com/tmhglnd/mercury/releases)
 
@@ -162,16 +162,20 @@ new synth triangle fx(reverb '/synth/verb') fx(filter low '/synth/cutoff' 0.4) t
 
 **AND MANY MORE (TO COME...)**
 
-The playground does not have exactly the same functionality of the original Mercury environment running in Max8. See below the differences. You may also encounter some discrepancies in syntax. Please support issues if you find any.
+The browser playground does not have exactly the same functionality as the original Mercury environment running in Max8. See below the 
+differences. You may also encounter some discrepancies in syntax and in the documentation. Please report issues if you find any so they can be fixed. Every item with a `*` is only available in the browser version.
 
 - [x] tempo
 - [x] scale
 - [x] volume
-- [x] lowPass / highPass
+- [x] lowpass / highpass
 - [x] randomSeed
+- [x] print
+- [x] view (*)
+- [x] crossFade (*)
 - [x] list
 	- [x] spread / spreadInclusive / fill
-	- [x] random / coin / dice / choose / pick / drunk / urn / shuffle
+	- [x] random / coin / dice / choose / pick / drunk / urn / shuffle / clave
 	- [x] sine / cosine
 	- [x] join / duplicate / merge / repeat / lace
 	- [x] merge / reverse / invert / palindrome
@@ -183,12 +187,12 @@ The playground does not have exactly the same functionality of the original Merc
 	- [x] type
 	- [x] time
 	- [x] shape
-	- [x] beat
+	- [x] play
 	- [x] gain
 	- [x] speed
 		- [ ] reverse
 	- [x] note
-		- [x] tune
+		- [x] tune (*)
 	- [x] pan
 	- [x] name
 	- [x] fx
@@ -197,7 +201,7 @@ The playground does not have exactly the same functionality of the original Merc
 		- [x] super
 	- [x] time
 	- [x] shape
-	- [x] beat
+	- [x] play
 	- [x] gain
 	- [x] note
 		- [x] map to scale
@@ -206,7 +210,7 @@ The playground does not have exactly the same functionality of the original Merc
 	- [x] fx
 	- [x] slide
 - [ ] sampler
-- [ ] polySynth
+- [ ] polySynth (work-in-progress)
 - [ ] polySample
 - [ ] midi
 	- [x] device
@@ -221,8 +225,9 @@ The playground does not have exactly the same functionality of the original Merc
 	- [ ] sync
 - [ ] osc
 	- [x] receive parameters as arguments
+	- [ ] send osc messages as an intrument
 - [ ] fx
-	- [ ] chip (downsampling)
+	- [x] degrade (chip)
 	- [x] delay
 		- [x] stereo feedback delay with damping
 		- [ ] ping pong feedback delay
@@ -237,18 +242,35 @@ The playground does not have exactly the same functionality of the original Merc
 		- [x] decaying noise convolution
 		- [ ] dattorro reverb algorithm
 	- [x] shift (pitchshift)
+ 	- [x] compress 
 	- [ ] chorus
 		- [ ] double
+- [x] visual 
+	- [x] use Hydra code synchronized with instrument triggers (*)
 
 ## 🔭 Vision / Goals
 
-This subset of Mercury was designed to use as a teaching environment for:
-- introduction to (electronic) music
-- algorithmic composition
-- sequencing and pattern generating
-- sound design
-- creative coding and live coding
-- sampling and beat making
+- Provide creatives with a quick and hands-on coding environment/language to expres, communicate and improvise livecoded works.
+- Use the environment as a teaching tool for:
+	- introduction to (electronic) music
+	- algorithmic composition
+	- sequencing and pattern generating
+	- sound design
+	- creative coding and live coding
+- Provide creatives with an hands-on language to create realtime processes
+	- code sound and music
+	- code visuals and let them react to sound
+- Provide creatives with an extensive library of algorithmic composition techniques
+	- released as a seperate Node Package titled [Total-Serialism](https://www.npmjs.com/package/total-serialism)
+	- included in the Mercury environment through Node4Max
+- Provide creatives with a multi-purpose non-linear-sequencer 
+	- use OSC to communicate with other platforms (coming soon...)
+	- use MIDI to communicate with other platforms and devices
+- Provide creatives with an easy sampler/synthesizer for sounddesign and composition
+	- use external OSC to control parameters in the sampler/synthesis
+	- use external MIDI devices and messages to play the sampler/synthesizers (coming soon...)
+- Collaborate in Mercury via the browser with Flok and code music together
+- Extending the Mercury users-community and including extensions on the environment in the master-branch
 
 ⭐️ *watch and star this repo to keep up-to-date with the latest changes whenever they're made*
 
@@ -295,7 +317,7 @@ Full explanation of all the possibilities in Mercury:
 
 - [Open the documentation](https://tmhglnd.github.io/mercury/table-of-content.html)
 
-*NB: There are some differences between the Mercury Playground and the Max8 version. If you find any discrepancies please report an issue*
+**NB: There are still some differences between the Mercury Playground and the Max8 version. If you find any discrepancies please report an issue**
 
 ## 💻 System Requirements
 
@@ -303,7 +325,7 @@ Any laptop/desktop that runs a chromium based browser like Chrome or Brave.
 
 ## 🎵 Sounds
 
-Many sounds in Mercury are downloaded from [freesound.org](http://www.freesound.org) and are licensed with Creative Commons Attribution or Creative Commons 0 licenses. If not downloaded from freesound it is made sure that the license allows to redistribute the sounds via the Mercury environment and that you can use them in your projects. A list of all the available sounds and the original sample can be found here:
+Most sounds in Mercury are downloaded from [freesound.org](http://www.freesound.org) and are licensed with Creative Commons Attribution or Creative Commons 0 licenses. If not downloaded from freesound it is made sure that the license allows to redistribute the sounds via the Mercury environment and that you can use them in your projects. A list of all the available sounds and the original sample can be found here:
 
 - [List of sounds and credits](https://github.com/tmhglnd/mercury/blob/master/mercury_ide/media/README.md)
 
@@ -350,9 +372,9 @@ During the development of Mercury (both the playground and the full version) I'v
 
 ## 📄 Licenses
 
-- Main Source - [The GNU GPL v.3 License](https://choosealicense.com/licenses/gpl-3.0/) (c) Timo Hoogland 2019
+- Main Source - [The GNU GPL v.3 License](https://choosealicense.com/licenses/gpl-3.0/) (c) Timo Hoogland 2019-2023
 - Sound Files - Individually licensed, listed under [media/README.md](https://github.com/tmhglnd/mercury/blob/master/mercury_ide/media/README.md)
-- Documentation - [The CC BY-SA 4.0 License](https://creativecommons.org/licenses/by-sa/4.0/) (c) Timo Hoogland 2019
-- Examples - [The CC BY-SA 4.0 License](https://creativecommons.org/licenses/by-sa/4.0/) (c) Timo Hoogland 2019
+- Documentation - [The CC BY-SA 4.0 License](https://creativecommons.org/licenses/by-sa/4.0/) (c) Timo Hoogland 2019-2023
+- Examples - [The CC BY-SA 4.0 License](https://creativecommons.org/licenses/by-sa/4.0/) (c) Timo Hoogland 2019-2023
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

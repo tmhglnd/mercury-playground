@@ -1,4 +1,4 @@
-// === TUTORIAL 501 ===
+// === TUTORIAL 501: MIDI Note ===
 // We can also output MIDI notes from the browser to external
 // instruments or applications on the computer via WebMidi.
 // This allows us to use Mecruy for generative music while

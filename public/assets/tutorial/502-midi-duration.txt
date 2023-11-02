@@ -1,4 +1,4 @@
-// === TUTORIAL 502 ===
+// === TUTORIAL 502: MIDI Duration ===
 // With the length() method we can change the duration.
 // The duration of a midi-note is determined by the interval between 
 // the note-on and note-off message in milliseconds
