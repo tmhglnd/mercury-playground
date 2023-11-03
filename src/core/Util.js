@@ -126,6 +126,49 @@ function divToS(d, bpm){
 	}
 }
 
+// convert note value to a frequency 
+function noteToFreq(i, o){
+	if (isNaN(i)){
+		let _i = noteToMidi(i);
+		if (!_i){
+			log(`${i} is not a valid number or name`);
+			i = 0;
+		} else {
+			i = _i - 48;
+		}
+	}
+	// reconstruct midi note value, (0, 0) = 36
+	// let n = i + (o * 12) + 36;
+	let n = toScale(i + o * 12 + 36);
+
+	// calculate frequency in 12-TET A4 = 440;
+	// let f = Math.pow(2, (n - 69)/12) * 440;
+	return mtof(n);
+}
+
+function assureWave(w){
+	let waveMap = {
+		sine : 'sine',
+		saw : 'sawtooth',
+		square : 'square',
+		triangle : 'triangle',
+		tri : 'triangle',
+		rect : 'square',
+		fm: 'fmsine',
+		am: 'amsine',
+		pwm: 'pwm',
+		organ: 'sine4',
+	}
+	if (waveMap[w]){
+		w = waveMap[w];
+	} else {
+		log(`${w} is not a valid waveshape`);
+		// default wave if wave does not exist
+		w = 'sine';
+	}
+	return w;
+}
+
 // convert note and octave (int/float/name) to a midi value
 function toMidi(n=0, o=0){
 	if (isNaN(n)){
@@ -140,4 +183,4 @@ function toMidi(n=0, o=0){
 	return toScale(n + o * 12 + 36);
 }
 
-module.exports = { clip, assureNum, lookup, randLookup, isRandom, getParam, toArray, msToS, formatRatio, divToS, toMidi, mtof, noteToMidi }
+module.exports = { clip, assureNum, lookup, randLookup, isRandom, getParam, toArray, msToS, formatRatio, divToS, toMidi, mtof, noteToMidi, noteToFreq, assureWave }
