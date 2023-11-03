@@ -1,8 +1,6 @@
 // The Mercury Playground main code loader
 // 
 
-const { add } = require('total-serialism/src/utility.js');
-
 // switch theme in css
 switchTheme = (t) => {
 	localStorage.setItem('theme', t);
