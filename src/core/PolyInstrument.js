@@ -19,7 +19,7 @@ class PolyInstrument extends Instrument {
 		this.adsrs = [];
 		this.busymap = [];
 		this.next = 0;
-		this._steal = false;
+		this._steal = true;
 
 		this.channelStrip();
 		this.createVoices();
@@ -116,22 +116,17 @@ class PolyInstrument extends Instrument {
 					this.adsrs[i].release = rel;
 					
 					e = Math.min(this._time, att + dec + rel);
+			
+					// trigger the envelope
+					let rt = Math.max(0.001, e - this.adsrs[i].release);
+					this.adsrs[i].triggerAttackRelease(rt, time);
+				} else {
+					// if shape is off only trigger attack
+					// when voice stealing is 'off' this will lead to all 
+					// voices set to busy!
+					this.adsrs[i].triggerAttack(time);
 				}
 		
-				// if (this.adsr.value > 0){
-				// 	// fade-out running envelope over 5 ms
-				// 	let tmp = this.adsr.release;
-				// 	this.adsr.release = 0.005;
-				// 	this.adsr.triggerRelease(time);
-				// 	this.adsr.release = tmp;
-				// 	time += 0.005;
-				// }
-		
-				// trigger the envelope
-				let rt = Math.max(0.001, e - this.adsrs[i].release);
-				this.adsrs[i].triggerAttackRelease(rt, time);
-				// the voice is now busy
-				// this.busymap[i] = true;
 			}
 		}
 	}

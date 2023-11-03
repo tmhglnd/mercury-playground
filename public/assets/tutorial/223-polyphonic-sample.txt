@@ -1,0 +1,16 @@
+// === TUTORIAL 223: Polyphonic Sample ===
+// The polySample is a polyphonic sample player, allowing you to play
+// overlapping sounds and also play notes with those sounds.
+// 
+
+set tempo 110
+set scale none
+
+// here the chord progression is repeated 4 times and flattened into a 1d list
+list progression flat(repeat(chordsFromNumerals([I7 IV7 V7 VIm7]) 4))
+print progression
+
+// With the sample it is important to have voice stealing 'on' when the shape is
+// turned off. Otherwise all the voices will stay busy because there is no "fade-out"
+new polySample bamboo_g name(polySamp)
+    set polySamp note(progression 2) tune(67) time(1/16) shape(off) steal(on)

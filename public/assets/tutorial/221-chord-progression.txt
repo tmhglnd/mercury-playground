@@ -13,6 +13,6 @@ list progression chordsFromNumerals([I IV V VIm])
 // see in the console that the result is a 2d-list
 print progression
 
-new polySynth sine note(progression 2) time(1/1) shape(1 1/1) 
+new polySynth sine note(progression 2) time(1/1) shape(1 3/4 1/4) 
 
 // Try some different numerals to hear how the chords change
