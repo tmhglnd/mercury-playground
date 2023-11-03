@@ -141,6 +141,12 @@ window.onload = () => {
 	} else {
 		cm.clear();
 	}
+
+	// or load the hash if this is provided in the url
+	let url = new URL(window.location);
+	if (url.hash !== ''){
+		cm.setHash(url.hash);
+	}
 	
 	Hydra.link('hydra-ui');
 }

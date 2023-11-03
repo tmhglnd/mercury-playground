@@ -112,6 +112,11 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		this.cm.setCursor(crs);
 	}
 
+	this.setHash = function(v){
+		// set the code from a hash
+		this.set(hash2code(v));
+	}
+
 	this.get = function(){
 		return this.cm.getValue();
 	}
@@ -193,9 +198,13 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 
 		code({ file: this.cm.getValue(), engine: engine, canvas: canvas, p5canvas: p5canvas });
 		engine.resume();
-
+		
 		// store code in localstorage upon evaluating
 		localStorage.setItem('code', this.cm.getValue());
+		// convert to base64 and append to url
+		let href = document.location.href.split('#')[0];
+		let url = `${href}#${code2hash(this.cm.getValue())}`;
+		window.history.pushState({}, "", url);
 	}
 
 	this.evaluateBlock = function(){
@@ -483,6 +492,23 @@ function date(){
 	let mi = String(now.getMinutes()).padStart(2, '0');
 	let ss = String(now.getSeconds()).padStart(2, '0');
 	return `${yyyy}-${mm}-${dd}_${hh}.${mi}.${ss}`
+}
+
+// 
+// Thanks to https://github.com/tidalcycles/strudel/blob/main/website/src/repl/helpers.mjs!
+// 
+function code2hash(code) {
+	const utf8Bytes = new TextEncoder().encode(code);
+	const base64String = btoa(String.fromCharCode(...utf8Bytes));
+	return encodeURIComponent(base64String);
+}
+
+function hash2code(hash) {
+	const utf8Bytes = new Uint8Array(
+		atob(hash).split('').map((char) => char.charCodeAt(0)),
+	);
+	const decodedText = new TextDecoder().decode(utf8Bytes);
+	return base64ToUnicode(decodedText);
 }
 
 // the codemirror editor
