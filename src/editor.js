@@ -114,7 +114,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 
 	this.setHash = function(v){
 		// set the code from a hash
-		this.set(hash2code(v));
+		this.set(hash2code(v.substr(1)));
 	}
 
 	this.get = function(){
@@ -201,6 +201,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		
 		// store code in localstorage upon evaluating
 		localStorage.setItem('code', this.cm.getValue());
+
 		// convert to base64 and append to url
 		let href = document.location.href.split('#')[0];
 		let url = `${href}#${code2hash(this.cm.getValue())}`;
@@ -495,7 +496,7 @@ function date(){
 }
 
 // 
-// Thanks to https://github.com/tidalcycles/strudel/blob/main/website/src/repl/helpers.mjs!
+// Thanks to https://github.com/tidalcycles/strudel/blob/main/website/src/repl/helpers.mjs !!!
 // 
 function code2hash(code) {
 	const utf8Bytes = new TextEncoder().encode(code);
@@ -505,10 +506,12 @@ function code2hash(code) {
 
 function hash2code(hash) {
 	const utf8Bytes = new Uint8Array(
-		atob(hash).split('').map((char) => char.charCodeAt(0)),
+		atob(decodeURIComponent(hash))
+		.split('')
+		.map((char) => char.charCodeAt(0)),
 	);
 	const decodedText = new TextDecoder().decode(utf8Bytes);
-	return base64ToUnicode(decodedText);
+	return decodedText;
 }
 
 // the codemirror editor
