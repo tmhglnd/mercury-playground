@@ -194,7 +194,7 @@ async function code({ file, engine, canvas, p5canvas }){
 			let args = obj.functions;
 			let inst = new MonoMidi(engine, device, canvas);
 
-			objectMap.applyFunctions(args, inst, type);
+			objectMap.applyFunctions(args, inst, device);
 			return inst;
 		},
 		'applyFunctions' : (args, inst, type) => {
