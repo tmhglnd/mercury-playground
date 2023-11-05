@@ -128,6 +128,15 @@ async function code({ file, engine, canvas, p5canvas }){
 		'lowPass' : (args) => {
 			engine.setLowPass(...args);
 			// log(`set bpm to ${args[0]} Hz`);
+		},
+		'samples' : (args) => {
+			// load samples in the audiobuffer
+			// this can be a single url to a soundfile
+			// or a url to a folder that will be searched through
+			// console.log('Loading samples', args);
+			engine.addBuffers(args);
+			// args.forEach((a) => {
+			// });
 		}
 	}
 

@@ -108,30 +108,87 @@ function getBuffers(){
 	return buffers;
 }
 
-// add files to the buffer
+// add files to the buffer from a single File Link
+// an array or file paths, or a json of { name:file, ... }
 function addBuffers(uploads){
 	// for every file from uploads
-	for (let f of uploads){
-		// remove extension 
-		let n = f.name.replace(/\.\w+/g, '');
-		// replace whitespace with _
-		n = n.replace(/[-\s]+/g, '_');
-		// remove leading/trailing whitespace and to lower case
-		n = n.toLowerCase().trim();
-		// add to ToneAudioBuffers
-		let url = URL.createObjectURL(f);
-		buffers.add(n, url, () => {
-			log(`${f.name} added as ${n}`);
-			URL.revokeObjectURL(url);
-			// also add soundfiles to menu for easy selection
-			let m = document.getElementById('sounds');
-			let o = document.createElement('option');
-			o.value = o.innerHTML = n;
-			m.appendChild(o);
-		}, () => {
-			log(`error adding sound ${f.name}`);
-		});
-	}
+	uploads.forEach((f) => {
+		let n = f;
+		let url = f;
+		if (f.name){
+			// get the filename from File object
+			n = f.name;
+			url = URL.createObjectURL(f);
+		}
+		if (Array.isArray(f)){
+			// if array use first value as the name
+			n = f[0];
+			url = f[1];
+		}
+		if (n.endsWith('.json')){
+			// read from json if loaded is a json file
+			addBufferFromJson(url);
+		} else {
+			// otherwise read the soundfile regularly
+			addBufferFromURL(url, n);
+		}
+	});
+}
+
+// add a single file to the buffer from URL
+// use the name as reference in the buffer
+// if name is undefined it will be constructed from the URL
+// 
+function addBufferFromURL(url, n){
+	// get file name from url string
+	n = n.split('\\').pop().split('/').pop();
+	// remove extension 
+	n = n.replace(/\.\w+/g, '');
+	// replace whitespaces with _
+	n = n.replace(/[\s]+/g, '_');
+	// remove leading/trailing whitespace
+	n = n.trim().replace(/[\s]+/g, '_');
+
+	// add to ToneAudioBuffers
+	buffers.add(n, url, () => {
+		log(`sound added as: ${n}`);
+		URL.revokeObjectURL(url);
+
+		// also add soundfiles to menu for easy selection
+		let m = document.getElementById('sounds');
+		let o = document.createElement('option');
+		o.value = o.innerHTML = n;
+		m.appendChild(o);
+	}, (e) => {
+		log(`error adding sound from: ${n}`);
+	});
+}
+
+async function addBufferFromJson(url){
+	// get the json file via fetch
+	let response = await fetch(url);
+	let files = await response.json();
+	// if there is a _base use that as the start of the url
+	let base = files['_base'];
+	delete files['_base'];
+
+	Object.keys(files).forEach((f) => {
+		if (Array.isArray(files[f])){
+			let idx = 0;
+			files[f].forEach((i) => {
+				// when array is used increment the filename with _x
+				let u = (base)? base + i : i;
+				let n = (idx > 0)? f + '_' + idx : f;
+				addBufferFromURL(u, n);
+				idx++;
+			});
+		} else {
+			if (base){
+				files[f] = base + files[f];
+			}
+			addBufferFromURL(files[f], f);
+		}
+	});
 }
 
 // master effects chain for Tone
