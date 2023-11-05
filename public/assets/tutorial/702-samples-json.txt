@@ -1,0 +1,22 @@
+// === TUTORIAL 702: Samples JSON ===
+// Loading more than one sample is also possible via a .json file
+// The .json file can be stored on the computer and selected 
+// when click 'add sounds'. Or it can be stored on github and used 
+// via the raw file link as argument to 'set samples'
+
+// A .json file could look like this:
+// {
+// 	"snare_short" : "https://cdn.freesound.org/previews/671/671221_3797507-lq.mp3",
+// 	"psykick" : "https://cdn.freesound.org/previews/145/145778_2101444-lq.mp3",
+// 	"hat_short" : "https://cdn.freesound.org/previews/222/222058_1676145-lq.mp3"
+// }
+
+// If the base url is the same for all the sounds you can add that 
+// as a separate key:value in the dictionairy
+
+// {
+// 	"snare_short" : "671/671221_3797507-lq.mp3",
+// 	"psykick" : "145/145778_2101444-lq.mp3",
+// 	"hat_short" : "222/222058_1676145-lq.mp3",
+// 	"_base" : "https://cdn.freesound.org/previews/"
+// }
