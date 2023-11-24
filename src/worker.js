@@ -9,6 +9,7 @@ const MonoInput = require('./core/MonoInput.js');
 const PolySynth = require('./core/PolySynth.js');
 const PolySample = require('./core/PolySample.js');
 const Tempos = require('./data/genre-tempos.json');
+const MonoOSC = require('./core/MonoOSC.js');
 
 // cross-fade time
 let crossFade = 0.5;
@@ -229,6 +230,24 @@ async function code({ file, engine, canvas, p5canvas }){
 					log(`${a}() is not a function of input`);
 				}
 			});
+			return inst;
+		},
+		'osc' : (obj) => {
+			let type = obj.type;
+			let args = obj.functions;
+			let inst = new MonoOSC(engine, type, canvas);
+
+			// for OSC we specifically allow all methods because they are used
+			// as addresses for sending messages
+			Object.keys(args).forEach((a) => {
+				if (inst[a]){
+					inst[a](...args[a]);
+				} else {
+					inst.addMessage(a, ...args[a]);
+					// console.log(`Make osc message function with ${a}, ${args[a]}`);
+				}
+			})
+
 			return inst;
 		}
 	}
