@@ -22,27 +22,34 @@ class MonoOSC extends Sequencer {
 		// get the start of the address
 		let a = Util.getParam(this.address, c);
 
+		// send note as midi
+		let o = Util.getParam(this._note[1], c);
+		let i = Util.getParam(this._note[0], c);
+		let t = (a !== '')? `/${a}/note` : `/note`;
+		this.sendMessage(t, Util.toMidi(i, o), time);
+
 		// for every message (function)
 		this.messages.forEach((msg) => {
 			// create the tag with main address / function
 			// or just the fuction if main addres is "" or default
-			let tag = `/${msg[0]}`;
-			if (a !== ''){
-				tag = `/${a}/${msg[0]}`;
-			}
+			let tag = (a !== '')? `/${a}/${msg[0]}` : `/${msg[0]}`;
 			// get all the current values 
 			let args = Util.toArray(msg[1]);
 			let send = [];
 			args.forEach((arg) => {
 				send.push(Util.getParam(Util.toArray(arg), c));
 			});
-			// only send if there is a osc client available
-			if (window.ioClient){
-				setTimeout(() => {
-					window.emit([tag, ...send]);
-				}, (time - Tone.context.currentTime) * 1000);
-			}
+			this.sendMessage(tag, ...send, time);
 		});
+	}
+	
+	sendMessage(addr, msg, time){
+		// only send if there is a osc client available
+		if (window.ioClient){
+			setTimeout(() => {
+				window.emit([addr, msg]);
+			}, (time - Tone.context.currentTime) * 1000);
+		}
 	}
 
 	addMessage(addr, ...msg){
