@@ -30,7 +30,6 @@ class MonoOSC extends Sequencer {
 			if (a !== ''){
 				tag = `/${a}/${msg[0]}`;
 			}
-
 			// get all the current values 
 			let args = Util.toArray(msg[1]);
 			let send = [];
@@ -51,13 +50,9 @@ class MonoOSC extends Sequencer {
 		this.messages.push([addr, msg]);
 	}
 
-	amp(){}
-
-	env(){}
-
-	out(){}
-
-	pan(){}
+	amp(a){
+		this.messages.push(['gain', Util.toArray(a)]);
+	}
 
 	add_fx(){}	
 }
