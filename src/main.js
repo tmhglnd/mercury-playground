@@ -14,7 +14,7 @@ window.devices;
 
 // Ask if user is sure to close or refresh and loose all code
 window.onbeforeunload = function() {
-	return "Code will be lost if you refresh. Are you sure?";
+	return "Code may be lost if you refresh. Are you sure?";
 };
 
 window.onload = () => {
