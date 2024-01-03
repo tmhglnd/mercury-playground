@@ -92,11 +92,10 @@ class MonoSample extends Instrument {
 		// get the start position
 		let o = dur * Util.getParam(this._pos, c);
 
-		// when sample is loaded, start
-		// this.sample.start(time, o, e);
-		this.sample.start(time, o);
-		// if (this.sample.loaded){
-		// }
+		// when sample is loaded allow playback to start
+		if (this.sample.loaded){
+			this.sample.start(time, o);
+		}
 	}
 
 	sound(s){
