@@ -41,6 +41,14 @@ class MonoSample extends Instrument {
 			// clean-up previous buffer
 			this.sample.buffer.dispose();
 		}
+
+		if (!this._bufs.has(f)){
+			// default sample if file does not exist
+			log(`${w} is not a valid sample name`);
+			// default sample is kick_909
+			f = 'kick_909';
+		}
+
 		if (this._bufs.has(f)){	
 			this.sample.buffer = this._bufs.get(f);
 			// this.sample.buffer = this._bufs.get(f).slice(0);
@@ -49,9 +57,7 @@ class MonoSample extends Instrument {
 			this.sample.buffer = this._bufs.get('kick_min');
 			// this.sample.buffer = this._bufs.get('kick_min').slice(0);
 		}
-		// the duration of the buffer in seconds
-		let dur = this.sample.buffer.duration;
-
+		
 		// get speed and if 2d array pick randomly
 		let s = Util.getParam(this._speed, c);
 
@@ -72,7 +78,9 @@ class MonoSample extends Instrument {
 		// value is set to true (so after 2 times reverse
 		// it becomes normal playback again) no fix yet
 		// this.sample.reverse = s < 0.0;
-
+		// the duration of the buffer in seconds
+	
+		let dur = this.sample.buffer.duration;
 		let l = Util.lookup(this._stretch, c);
 		let n = 1;
 		if (l){
