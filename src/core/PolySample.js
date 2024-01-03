@@ -101,8 +101,10 @@ class PolySample extends PolyInstrument {
 		// get the start position
 		let p = dur * Util.getParam(this._pos, c);
 
-		// when sample is loaded, start
-		this.sources[id].start(time, p);
+		// when sample is loaded allow playback to start
+		if (this.sources[id].loaded){
+			this.sources[id].start(time, p);
+		}
 	}
 
 	sound(s){
