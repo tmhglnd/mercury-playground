@@ -1,5 +1,10 @@
 const { noteToMidi, toScale, mtof } = require('total-serialism').Translate;
 
+// convert amplitude to dBFS scale
+function atodb(a=0){
+	return 20 * Math.log(a);
+}
+
 // clip a value between a specified range
 function clip(v, l, h){
 	return Math.max(l, Math.min(h, v));
@@ -183,4 +188,4 @@ function toMidi(n=0, o=0){
 	return toScale(n + o * 12 + 36);
 }
 
-module.exports = { clip, assureNum, lookup, randLookup, isRandom, getParam, toArray, msToS, formatRatio, divToS, toMidi, mtof, noteToMidi, noteToFreq, assureWave }
+module.exports = { atodb, clip, assureNum, lookup, randLookup, isRandom, getParam, toArray, msToS, formatRatio, divToS, toMidi, mtof, noteToMidi, noteToFreq, assureWave }

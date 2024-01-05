@@ -22,26 +22,44 @@ class MonoSynth extends Instrument {
 			pwm: 'pwm',
 			organ: 'sine4',
 		}
-		// // synth specific variables;
+		// synth specific variables;
 		this._note = [ 0, 0 ];
 		this._slide = [ 0 ];
 		this._voices = [ 1 ];
 		this._detune = [ 0 ];
+		// this._noise = [ [ 0 ], [ 1 ] ];
 
 		this.synth;
+		this.nx;
+		this.nxGain;
+
 		this.createSource();
 
 		console.log('=> MonoSynth()', this);
 	}
 
 	createSource(){
+		// the source connects the Synth + Noise to the channelstrip
+		// this.source = new Tone.Gain(0).connect(this.channelStrip());
+
 		this.synth = new Tone.FatOscillator().connect(this.channelStrip());
+		// this.synth = new Tone.FatOscillator().connect(this.source);
+
+		// this.nxGain = new Tone.Gain(0).connect(this.source);
+		// this.nx = new Tone.Noise("white", { volume: 0.5 }).connect(this.nxGain);
+		// this.nx.connect(this.nxGain);
+
 		this.synth.count = 1;
 		this.synth.start();
 		this.source = this.synth;
 	}
 
 	sourceEvent(c, e, time){
+		// set the noise parameters
+		// this.nxGain.gain.setValueAtTime(Util.getParam(this._noise[0], c) * 0.25, time);
+		// if (this.nxGain.gain.value > 0){ this.nx.start(time); } 
+		// else { this.nx.stop(time); }
+
 		// set voice amount for super synth
 		let v = Util.getParam(this._voices, c);
 		this.synth.count = Math.max(1, Math.floor(v));
@@ -83,7 +101,7 @@ class MonoSynth extends Instrument {
 		}
 	}
 
-	super(d=[0.1], v=[3]){
+	super(v=[3], d=[0.111]){
 		// add unison voices and detune the spread
 		// first argument is the detune amount
 		// second argument changes the amount of voices
@@ -91,15 +109,16 @@ class MonoSynth extends Instrument {
 		this._detune = Util.toArray(d);
 	}
 
-	fat(...a){
-		// alias for super synth
-		this.super(...a);
-	}
-
 	slide(s){
 		// portamento from one note to another
 		this._slide = Util.toArray(s);
 	}
+
+	// noise(v=[0], t=[0]){
+		// add noise to the synth sound
+		// 3rd parameter for modulation is not supported yet
+		// this._noise = [ Util.toArray(v), Util.toArray(t) ];
+	// }
 
 	wave2(w){
 		// placeholder function for wave2
@@ -113,6 +132,9 @@ class MonoSynth extends Instrument {
 		this.adsr.dispose();
 		this.synth.dispose();
 		this.source.dispose();
+		
+		// this.nx.dispose();
+		// this.nxGain.dispose();
 		
 		console.log('disposed MonoSynth()', this._wave);
 	}

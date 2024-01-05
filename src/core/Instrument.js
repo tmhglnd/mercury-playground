@@ -70,9 +70,10 @@ class Instrument extends Sequencer {
 		this.panner.pan.setValueAtTime(p, time);
 
 		// ramp volume
-		let g = 20 * Math.log(Util.getParam(this._gain[0], c) * 0.707);
+		let g = Util.atodb(Util.getParam(this._gain[0], c) * 0.707);
 		let r = Util.msToS(Math.max(0, Util.getParam(this._gain[1], c)));
 		this.source.volume.rampTo(g, r, time);
+		// this.source.gain.rampTo(g, r, time);
 
 		this.sourceEvent(c, e, time);
 

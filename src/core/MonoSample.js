@@ -28,6 +28,8 @@ class MonoSample extends Instrument {
 	}
 
 	createSource(){
+		// this.source = new Tone.Gain(0).connect(this.channelStrip());
+		// this.sample = new Tone.Player().connect(this.source);
 		this.sample = new Tone.Player().connect(this.channelStrip());
 		this.sample.autostart = false;
 		this.source = this.sample;

@@ -8,14 +8,14 @@ list progression chordsFromNumerals([I7 IIIm7 IV7 V7])
 print progression
 // chord progression used in the polySynth
 new polySynth saw name(chrd)
-    set chrd note(progression 1) time(2/1) shape(1 2/1) fx(triggerFilter low 1/1 1/1 4000 100) super(0.132 3)
+    set chrd note(progression 1) time(2/1) shape(1 2/1) fx(triggerFilter low 1/1 1/1 4000 100) super(3 0.132)
 
 // chord progression flattened to 1d list, repeated with octave offset
 list melody add(repeat(flat(progression) 2) [0 12])
 print melody
 // the melody is played by another polySynth with overlapping adsrs
 new polySynth saw name(lead)
-    set lead note(melody 2) time(1/8) shape(1 2/1) super(0.112 3) gain(0.6) fx(triggerFilter low 1 1/6 5000 100) 
+    set lead note(melody 2) time(1/8) shape(1 2/1) super(3 0.112) gain(0.6) fx(triggerFilter low 1 1/6 5000 100) 
 // some effects applied to all instruments above
 set all fx(squash 1) fx(reverb 0.4 7)
 
