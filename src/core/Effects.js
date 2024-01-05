@@ -80,20 +80,10 @@ const fxMap = {
 		return new FreeVerb(params);
 	},
 	'chorus' : (params) => {
-		this.defaults = ['8/1', 45, 0.5];
-		// replace defaults with provided arguments
-		this.defaults.splice(0, params.length, ...params);
-		params = this.defaults.map(p => Util.toArray(p));
-
-		return new Chorus(params);
+		return new Chorus(Util.mapDefaults(params, ['4/1', 45, 0.5]));
 	},
 	'double' : (params) => {
-		this.defaults = ['8/1', 8, 1];
-		// replace defaults with provided arguments
-		this.defaults.splice(0, params.length, ...params);
-		params = this.defaults.map(p => Util.toArray(p));
-
-		return new Chorus(params);
+		return new Chorus(Util.mapDefaults(params, ['8/1', 8, 1]));
 	}
 }
 module.exports = fxMap;

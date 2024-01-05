@@ -1,5 +1,11 @@
 const { noteToMidi, toScale, mtof } = require('total-serialism').Translate;
 
+// replace defaults with incoming parameters
+function mapDefaults(params, defaults){
+	defaults.splice(0, params.length, ...params);
+	return defaults.map(p => toArray(p));
+}
+
 // convert amplitude to dBFS scale
 function atodb(a=0){
 	return 20 * Math.log(a);
@@ -193,4 +199,4 @@ function toMidi(n=0, o=0){
 	return toScale(n + o * 12 + 36);
 }
 
-module.exports = { atodb, clip, assureNum, lookup, randLookup, isRandom, getParam, toArray, msToS, formatRatio, divToS, divToF, toMidi, mtof, noteToMidi, noteToFreq, assureWave }
+module.exports = { mapDefaults, atodb, clip, assureNum, lookup, randLookup, isRandom, getParam, toArray, msToS, formatRatio, divToS, divToF, toMidi, mtof, noteToMidi, noteToFreq, assureWave }
