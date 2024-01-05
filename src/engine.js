@@ -1,4 +1,5 @@
 const Tone = require('tone');
+const { divToS } = require('./core/Util.js');
 
 // load extra AudioWorkletProcessors from file
 // transformed to inline with browserify brfs
@@ -79,10 +80,11 @@ function silence(){
 // second argument determines ramptime
 // 
 function setBPM(bpm, ramp=0){
-	if (ramp === 0){
-		Tone.Transport.bpm.setValueAtTime(bpm, Tone.now());
+	t = divToS(ramp, getBPM());
+	if (t > 0){
+		Tone.Transport.bpm.rampTo(bpm, t);
 	} else {
-		Tone.Transport.bpm.rampTo(bpm, ramp / 1000);
+		Tone.Transport.bpm.setValueAtTime(bpm, Tone.now());
 	}
 	document.getElementById('bpm').innerHTML = `tempo = ${bpm}`;
 }
@@ -199,8 +201,10 @@ Tone.Destination.chain(LP, HP, GN);
 
 // set the lowpass frequency cutoff and ramptime
 function setLowPass(f, t=0){
-	if (t>0){
-		LP.frequency.rampTo(f, t/1000, Tone.now());
+	f = (f === 'default')? 18000 : f;
+	t = divToS(t, getBPM());
+	if (t > 0){
+		LP.frequency.rampTo(f, t, Tone.now());
 	} else {
 		LP.frequency.setValueAtTime(f, Tone.now());
 	}
@@ -208,8 +212,10 @@ function setLowPass(f, t=0){
 
 // set the highpass frequency cutoff and ramptime
 function setHiPass(f, t=0){
-	if (t>0){
-		HP.frequency.rampTo(f, t/1000, Tone.now());
+	f = (f === 'default')? 5 : f;
+	t = divToS(t, getBPM());
+	if (t > 0){
+		HP.frequency.rampTo(f, t, Tone.now());
 	} else {
 		HP.frequency.setValueAtTime(f, Tone.now());
 	}
@@ -217,8 +223,10 @@ function setHiPass(f, t=0){
 
 // set the main volume
 function setVolume(g, t=0){
-	if (t>0){
-		GN.gain.rampTo(g, t/1000, Tone.now());
+	g = (g === 'default')? 1 : g;
+	t = divToS(t, getBPM());
+	if (t > 0){
+		GN.gain.rampTo(g, t, Tone.now());
 	} else {
 		GN.gain.setValueAtTime(g, Tone.now());
 	}
