@@ -173,6 +173,13 @@ class Sequencer {
 		}
 	}
 
+	ratchet(p=1, s=[1]){
+		// set the ratcheting probability and subdivision
+		// for now defaults to the timediv method
+		log(`ratchet() is not yet supported, defaults to timediv() with probability of 1`);
+		this.timediv(s)
+	}
+
 	beat(b, r='off'){
 		// set the beat pattern as an array and reset time in bars
 		this._beat = Util.toArray(b);
