@@ -11,6 +11,7 @@ class PolySynth extends PolyInstrument {
 		this._wave = Util.toArray(t);
 		this._note = [ 0, 0 ];
 		this._slide = [ 0 ];
+		this._firstSlide = [];
 		this._voices = [ 1 ];
 		this._detune = [ 0 ];
 
@@ -24,6 +25,7 @@ class PolySynth extends PolyInstrument {
 			this.sources[i] = new Tone.FatOscillator().connect(this.adsrs[i]);
 			this.sources[i].count = 1;
 			this.sources[i].start();
+			this._firstSlide[i] = true;
 		}
 	}
 
@@ -56,11 +58,13 @@ class PolySynth extends PolyInstrument {
 
 		// get the slide time for next note and set the frequency
 		let s = Util.divToS(Util.getParam(this._slide, c), this.bpm());
-		if (s > 0){
+		if (s > 0 && !this._firstSlide[id]){
 			this.sources[id].frequency.rampTo(f, s, time);
 		} else {
 			this.sources[id].frequency.setValueAtTime(f, time);
 		}
+		// first time the synth plays don't slide!
+		this._firstSlide[id] = false;
 	}
 
 	note(i=0, o=0){

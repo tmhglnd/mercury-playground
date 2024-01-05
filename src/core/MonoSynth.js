@@ -25,6 +25,7 @@ class MonoSynth extends Instrument {
 		// synth specific variables;
 		this._note = [ 0, 0 ];
 		this._slide = [ 0 ];
+		this._firstSlide = true;
 		this._voices = [ 1 ];
 		this._detune = [ 0 ];
 		// this._noise = [ [ 0 ], [ 1 ] ];
@@ -94,10 +95,11 @@ class MonoSynth extends Instrument {
 
 		// get the slide time for next note and set the frequency
 		let s = Util.divToS(Util.getParam(this._slide, c), this.bpm());
-		if (s > 0){
+		if (s > 0 && !this._firstSlide){
 			this.synth.frequency.rampTo(f, s, time);
 		} else {
 			this.synth.frequency.setValueAtTime(f, time);
+			this._firstSlide = false;
 		}
 	}
 
