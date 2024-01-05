@@ -131,6 +131,11 @@ function divToS(d, bpm){
 	}
 }
 
+// convert division format to frequency in Hz based on bpm
+function divToF(d, bpm){
+	return 1.0 / divToS(d, bpm)
+}
+
 // convert note value to a frequency 
 function noteToFreq(i, o){
 	if (isNaN(i)){
@@ -188,4 +193,4 @@ function toMidi(n=0, o=0){
 	return toScale(n + o * 12 + 36);
 }
 
-module.exports = { atodb, clip, assureNum, lookup, randLookup, isRandom, getParam, toArray, msToS, formatRatio, divToS, toMidi, mtof, noteToMidi, noteToFreq, assureWave }
+module.exports = { atodb, clip, assureNum, lookup, randLookup, isRandom, getParam, toArray, msToS, formatRatio, divToS, divToF, toMidi, mtof, noteToMidi, noteToFreq, assureWave }
