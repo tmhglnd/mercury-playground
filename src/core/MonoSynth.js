@@ -99,8 +99,9 @@ class MonoSynth extends Instrument {
 			this.synth.frequency.rampTo(f, s, time);
 		} else {
 			this.synth.frequency.setValueAtTime(f, time);
-			this._firstSlide = false;
 		}
+		// first time the synth plays don't slide!
+		this._firstSlide = false;
 	}
 
 	super(v=[3], d=[0.111]){
