@@ -34,7 +34,7 @@ let hydraCanvas = function(c, u) {
 
 		// not displaying the canvas when no visuals are rendered
 		let text = document.getElementById('hydra-code');
-		text.value = '<paste hydra>'
+		text.value = '<paste hydra code for background visuals>'
 		this.canvas.style.display = 'none';
 	}
 
@@ -67,16 +67,26 @@ let hydraCanvas = function(c, u) {
 		let p = document.createElement('p');
 
 		let text = document.createElement('textarea');
+		text.width = '25%';
 		text.id = 'hydra-code';
-		text.value = '<paste hydra>'
-		text.onchange = () => { this.eval(text.value) };
+		text.value = '<paste hydra code for background visuals>'
+		text.onchange = () => { 
+			this.eval(text.value);
+			this.style.height = 0;
+			this.style.height = (this.scrollHeight) + "px";
+		};
 
 		let btn = document.createElement('button');
 		btn.innerHTML = 'code with Hydra';
 		btn.onclick = () => { window.open('https://hydra.ojack.xyz/', '_blank'); }
+		
+		let btn2 = document.createElement('button');
+		btn2.innerHTML = 'collaborate in Flok';
+		btn2.onclick = () => { window.open('https://next.flok.cc', '_blank'); }
 
 		div.appendChild(text);
 		div.appendChild(btn);
+		div.appendChild(btn2);
 		// div.appendChild(p);	
 	}
 

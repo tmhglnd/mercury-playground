@@ -1,6 +1,6 @@
 const Tone = require('tone');
 const Util = require('./Util.js');
-const WebMidi = require("webmidi");
+// const WebMidi = require("webmidi");
 
 // Basic Sequencer class for triggering events
 class Sequencer {

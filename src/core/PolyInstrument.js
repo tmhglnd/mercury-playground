@@ -1,9 +1,9 @@
 const Tone = require('tone');
 const Util = require('./Util.js');
-const fxMap = require('./Effects.js');
-const TL = require('total-serialism').Translate;
-// const Sequencer = require('./Sequencer.js');
 const Instrument = require('./Instrument.js');
+// const fxMap = require('./Effects.js');
+// const TL = require('total-serialism').Translate;
+// const Sequencer = require('./Sequencer.js');
 
 // Basic class for a poly-instrument
 class PolyInstrument extends Instrument {
