@@ -73,7 +73,7 @@ class PolySynth extends PolyInstrument {
 		this._note = [Util.toArray(i), Util.toArray(o)];
 	}
 
-	super(d=[0.1], v=[3]){
+	super(v=[3], d=[0.1]){
 		// add unison voices and detune the spread
 		// first argument is the detune amount
 		// second argument changes the amount of voices
