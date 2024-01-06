@@ -88,6 +88,9 @@ class MonoSynth extends Instrument {
 		let i = Util.getParam(this._note[0], c);
 		// reconstruct midi note value with scale, (0, 0) = 36
 		let n = Util.toMidi(i, o);
+		// if (!n){
+		// 	return false;
+		// }
 
 		// calculate frequency in 12-TET A4 = 440;
 		// let f = Math.pow(2, (n - 69)/12) * 440;
@@ -102,6 +105,7 @@ class MonoSynth extends Instrument {
 		}
 		// first time the synth plays don't slide!
 		this._firstSlide = false;
+		// return true;
 	}
 
 	super(v=[3], d=[0.111]){

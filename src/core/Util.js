@@ -192,6 +192,7 @@ function toMidi(n=0, o=0){
 		if (!_n){
 			log(`${n} is not a valid number or name`);
 			n = 0;
+			// return false;
 		} else {
 			n = _n - 36;
 		}

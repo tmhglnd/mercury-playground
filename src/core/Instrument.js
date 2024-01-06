@@ -76,6 +76,8 @@ class Instrument extends Sequencer {
 		// this.source.gain.rampTo(g, r, time);
 
 		this.sourceEvent(c, e, time);
+		// let play = this.sourceEvent(c, e, time);
+		// if (!play){ return; }
 
 		// fade-out running envelope over 5 ms
 		if (this.adsr.value > 0){

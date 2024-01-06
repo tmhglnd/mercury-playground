@@ -390,10 +390,32 @@ const LFO = function(_params){
 
 // A filter FX, choose between highpass, lowpass and bandpass
 // Set the cutoff frequency and Q factor
+// Optionally with extra arguments you can apply a modulation
 //
 const Filter = function(_params){
+	// parameter mapping changes based on amount of arguments
+	this._static = true;
+	if (_params.length < 3){
+		_params = [['low']].concat(Util.mapDefaults(_params, [1500, 0.4]));
+	} else if (_params.length < 4){
+		_params = Util.mapDefaults(_params, ['low', 1500, 0.4]);
+	} else {
+		_params = Util.mapDefaults(_params, ['low', '1/1', 100, 1500, 0.4, 'sine', 4]);
+		this._static = false;
+	}
+
 	this._fx = new Tone.Filter();
 
+	// the following is only used if the parameters for modulation
+	// are added as arguments to the fx(filter) function
+	if (!this._static){
+		this._lfo = new Tone.LFO();
+		this._scale = new Tone.ScaleExp();
+		this._lfo.connect(this._scale);
+		this._scale.connect(this._fx.frequency);
+	}
+
+	// available filter types for the filter
 	this._types = {
 		'lo' : 'lowpass',
 		'low' : 'lowpass',
@@ -402,7 +424,7 @@ const Filter = function(_params){
 		'high' : 'highpass',
 		'highpass' : 'highpass',
 		'band' : 'bandpass',
-		'bandpass': 'bandpass'
+		'bandpass': 'bandpass',
 	}
 	if (this._types[_params[0]]){
 		this._fx.set({ type: this._types[_params[0]] });
@@ -412,22 +434,63 @@ const Filter = function(_params){
 	}
 	this._fx.set({ rolloff: -24 });
 
-	this._cutoff = (_params[1]) ? Util.toArray(_params[1]) : [ 1000 ];
-	this._q = (_params[2]) ? Util.toArray(_params[2]) : [ 0.5 ];
-	this._rt = (_params[3]) ? Util.toArray(_params[3]) : [ 0 ];
+	// available waveforms for the LFO
+	this._waveMap = {
+		sine : 'sine',
+		saw : 'sawtooth',
+		square : 'square',
+		rect : 'square',
+		triangle : 'triangle',
+		tri : 'triangle',
+		up: 'sawtooth',
+		sawUp: 'sawtooth'
+	}
 
 	this.set = function(c, time, bpm){
-		let f = Util.getParam(this._cutoff, c);
-		let r = 1 / (1 - Math.min(0.95, Math.max(0, Util.getParam(this._q, c))));
-		let rt = Util.divToS(Util.getParam(this._rt, c), bpm);
+		let _q;
+		if (this._static){
+			let f = Util.getParam(_params[1], c);
+			_q = _params[2];
 
-		if (rt > 0){
-			this._fx.frequency.rampTo(f, rt, time);
-		} else {
 			this._fx.frequency.setValueAtTime(f, time);
+			// let rt = Util.divToS(Util.getParam(this._rt, c), bpm);
+		} else {
+			_q = _params[4];
+			let f = Util.divToF(Util.getParam(_params[1], c), bpm);
+			let lo = Util.clip(Util.getParam(_params[2], c), 5, 19000);
+			let hi = Util.clip(Util.getParam(_params[3], c), 5, 19000);
+
+			let w = Util.getParam(_params[5], c);
+			if (this._waveMap[w]){
+				w = this._waveMap[w];
+			} else {
+				log(`'${w} is not a valid waveshape`);
+				// default wave if wave does not exist
+				w = 'sine';
+			}
+			this._lfo.set({ type: w });
+
+			let exp = Util.clip(Util.getParam(_params[6], c), 0.01, 100);
+
+			this._scale.min = lo;
+			this._scale.max = hi;
+			this._scale.exponent = exp;
+			this._lfo.frequency.setValueAtTime(f, time);
+
+			if (this._lfo.state !== 'started'){
+				this._lfo.start(time);
+			}
 		}
 
+		let r = 1 / (1 - Math.min(0.95, Math.max(0, Util.getParam(_q, c))));
 		this._fx.Q.setValueAtTime(r, time);
+
+		// ramptime removed now that modulation is possible
+		// if (rt > 0){
+		// 	this._fx.frequency.rampTo(f, rt, time);
+		// } else {
+		// 	this._fx.frequency.setValueAtTime(f, time);
+		// }
 	}
 
 	this.chain = function(){
@@ -473,7 +536,7 @@ const TriggerFilter = function(_params){
 		'bandpass': 'bandpass'
 	}
 
-	this.defaults = ['low', 1, '1/16', 4000, 30];
+	this.defaults = ['low', 1, '1/16', 4000, 30, 1];
 	// replace defaults with provided arguments
 	this.defaults.splice(0, _params.length, ..._params);
 	_params = this.defaults.map(p => Util.toArray(p));
@@ -489,6 +552,7 @@ const TriggerFilter = function(_params){
 	this._rel = _params[2];
 	this._high = _params[3];
 	this._low = _params[4];
+	this._exp = _params[5];
 
 	this.set = function(c, time, bpm){
 		this._adsr.attack = Util.divToS(Util.getParam(this._att, c), bpm);
@@ -498,9 +562,11 @@ const TriggerFilter = function(_params){
 		let max = Util.getParam(this._high, c);
 		let range = Math.abs(max - min);
 		let lower = Math.min(max, min);
+		let exp = Util.getParam(this._exp, c);
 
 		this._mul.setValueAtTime(range, time);
 		this._add.setValueAtTime(lower, time);
+		this._pow.value = exp;
 
 		// fade-out running envelope over 5 ms
 		if (this._adsr.value > 0){
