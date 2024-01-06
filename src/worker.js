@@ -10,6 +10,7 @@ const PolySynth = require('./core/PolySynth.js');
 const PolySample = require('./core/PolySample.js');
 const Tempos = require('./data/genre-tempos.json');
 const MonoOSC = require('./core/MonoOSC.js');
+const { divToS } = require('./core/Util.js');
 
 // cross-fade time
 let crossFade = 0.5;
@@ -73,8 +74,9 @@ async function code({ file, engine, canvas, p5canvas }){
 	const globalMap = {
 		'crossFade' : (args) => {
 			// set crossFade time in ms
-			crossFade = Number(args[0])/1000;
-			log(`crossfade time is ${args[0]}ms`);
+			crossFade = divToS(args[0], engine.getBPM());
+			// crossFade = Number(args[0])/1000;
+			log(`crossfade time is ${crossFade}ms`);
 		},
 		'tempo' : (args) => {
 			let t = args[0];
