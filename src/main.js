@@ -101,9 +101,10 @@ window.onload = () => {
 				// store the osc message values in the object
 				window.oscMessages[address] = details;
 
-				// emit an event to the listener if there is one
-				// let event = new CustomEvent(address, { detail: details });
-				// window.dispatchEvent(event);
+				// emit an event to the listener if there is one 
+				// add a little latency for scheduling safety to reduce clicks
+				let event = new CustomEvent(address, { detail: { value: details, time: Tone.immediate()+0.01 }});
+				window.dispatchEvent(event);
 			}
 		});
 		window.emit = (msg) => {

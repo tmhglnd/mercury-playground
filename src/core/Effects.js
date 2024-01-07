@@ -43,15 +43,18 @@ const fxMap = {
 	'reverb' : (params) => {
 		return new Reverb(params);
 	},
+	'verb' : (params) => {
+		return new Reverb(params);
+	},
 	'shift' : (params) => {
 		return new PitchShift(params);
 	},
 	'pitchShift' : (params) => {
 		return new PitchShift(params);
 	},
-	'tune' : (params) => {
-		return new PitchShift(params);
-	},
+	// 'tune' : (params) => {
+	// 	return new PitchShift(params);
+	// },
 	'filter' : (params) => {
 		return new Filter(params);
 	},
@@ -76,9 +79,9 @@ const fxMap = {
 	'ppDelay' : (params) => {
 		return new PingPongDelay(params);
 	},
-	'freeverb' : (params) => {
-		return new FreeVerb(params);
-	},
+	// 'freeverb' : (params) => {
+	// 	return new FreeVerb(params);
+	// },
 	'chorus' : (params) => {
 		return new Chorus(Util.mapDefaults(params, ['4/1', 45, 0.5]));
 	},
@@ -705,94 +708,94 @@ const PingPongDelay = function(_params){
 	}
 }
 
-const FreeVerb = function(_params){
-	this._fx = new Tone.Freeverb(_params[0], _params[1]);
+// const FreeVerb = function(_params){
+// 	this._fx = new Tone.Freeverb(_params[0], _params[1]);
 
-	this.set = function(c, time, bpm){
+// 	this.set = function(c, time, bpm){
 
-	}
+// 	}
 
-	this.chain = function(){
-		return { 'send' : this._fx, 'return' : this._fx };
-	}
+// 	this.chain = function(){
+// 		return { 'send' : this._fx, 'return' : this._fx };
+// 	}
 
-	this.delete = function(){
-		let blocks = [ this._fx ];
+// 	this.delete = function(){
+// 		let blocks = [ this._fx ];
 
-		blocks.forEach((b) => {
-			b.disconnect();
-			b.dispose();
-		});
-	}
-}
+// 		blocks.forEach((b) => {
+// 			b.disconnect();
+// 			b.dispose();
+// 		});
+// 	}
+// }
 
 // squash/compress an incoming signal
 // based on algorithm by Peter McCulloch
-const SquashDeprecated = function(_params){
-	this._compress = (_params[0] !== undefined)? Util.toArray(_params[0]) : [1];
+// const SquashDeprecated = function(_params){
+// 	this._compress = (_params[0] !== undefined)? Util.toArray(_params[0]) : [1];
 
-	this._fx = new Tone.WaveShaper();
+// 	this._fx = new Tone.WaveShaper();
 
-	this.shaper = function(amount){
-		// (a * c) / ((a * c)^2 * 0.28 + 1) / √c
-		// drive amount, minimum of 1
-		const c = amount;
-		// makeup gain
-		const m = 1.0 / Math.sqrt(c);
-		// set the waveshaper effect
-		this._fx.setMap((x) => {
-			return (x * c) / ((x * c) * (x * c) * 0.28 + 1) * m; 
-		});
-	}
+// 	this.shaper = function(amount){
+// 		// (a * c) / ((a * c)^2 * 0.28 + 1) / √c
+// 		// drive amount, minimum of 1
+// 		const c = amount;
+// 		// makeup gain
+// 		const m = 1.0 / Math.sqrt(c);
+// 		// set the waveshaper effect
+// 		this._fx.setMap((x) => {
+// 			return (x * c) / ((x * c) * (x * c) * 0.28 + 1) * m; 
+// 		});
+// 	}
 	
-	this.set = function(c){
-		let d = Util.getParam(this._compress, c);
-		this.shaper(isNaN(d)? 1 : Math.max(1, d));
-	}
+// 	this.set = function(c){
+// 		let d = Util.getParam(this._compress, c);
+// 		this.shaper(isNaN(d)? 1 : Math.max(1, d));
+// 	}
 
-	this.chain = function(){
-		return { 'send' : this._fx, 'return' : this._fx };
-	}
+// 	this.chain = function(){
+// 		return { 'send' : this._fx, 'return' : this._fx };
+// 	}
 
-	this.delete = function(){
-		this._fx.disconnect();
-		this._fx.dispose();
-	}
-}
+// 	this.delete = function(){
+// 		this._fx.disconnect();
+// 		this._fx.dispose();
+// 	}
+// }
 
 // A distortion algorithm using the tanh (hyperbolic-tangent) as a 
 // waveshaping technique. Some mapping to apply a more equal loudness 
 // distortion is applied on the overdrive parameter
 //
-const DriveDeprecated = function(_params){
-	this._drive = (_params[0] !== undefined)? Util.toArray(_params[0]) : [1.5];
+// const DriveDeprecated = function(_params){
+// 	this._drive = (_params[0] !== undefined)? Util.toArray(_params[0]) : [1.5];
 
-	this._fx = new Tone.WaveShaper();
+// 	this._fx = new Tone.WaveShaper();
 
-	this.shaper = function(amount){
-		// drive curve, minimum drive of 1
-		const d = Math.pow(amount, 2);
-		// makeup gain
-		const m = Math.pow(d, 0.6);
-		// preamp gain reduction for linear at drive = 1
-		const p = 0.4;
-		// set the waveshaping effect
-		this._fx.setMap((x) => {
-			return Math.tanh(x * p * d) / p / m;
-		});
-	}
+// 	this.shaper = function(amount){
+// 		// drive curve, minimum drive of 1
+// 		const d = Math.pow(amount, 2);
+// 		// makeup gain
+// 		const m = Math.pow(d, 0.6);
+// 		// preamp gain reduction for linear at drive = 1
+// 		const p = 0.4;
+// 		// set the waveshaping effect
+// 		this._fx.setMap((x) => {
+// 			return Math.tanh(x * p * d) / p / m;
+// 		});
+// 	}
 	
-	this.set = function(c){
-		let d = Util.getParam(this._drive, c);
-		this.shaper(isNaN(d)? 1 : Math.max(1, d));
-	}
+// 	this.set = function(c){
+// 		let d = Util.getParam(this._drive, c);
+// 		this.shaper(isNaN(d)? 1 : Math.max(1, d));
+// 	}
 
-	this.chain = function(){
-		return { 'send' : this._fx, 'return' : this._fx };
-	}
+// 	this.chain = function(){
+// 		return { 'send' : this._fx, 'return' : this._fx };
+// 	}
 
-	this.delete = function(){
-		this._fx.disconnect();
-		this._fx.dispose();
-	}
-}
+// 	this.delete = function(){
+// 		this._fx.disconnect();
+// 		this._fx.dispose();
+// 	}
+// }
