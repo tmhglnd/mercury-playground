@@ -10,5 +10,5 @@ new sample kick_909 time(1/4) name(kick)
 new sample [[hat_808 hat_808_open]] time(1/4 1/8)
 
 new synth saw time(1/16) shape(1 1/32 1) name(bass)
-    set bass fx(filter low random(16 50 3000))
+    set bass fx(filter random(16 50 3000))
     set bass fx(reverb 0.5 5) super(3 0.01532)

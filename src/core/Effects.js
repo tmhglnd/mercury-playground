@@ -406,7 +406,7 @@ const Filter = function(_params){
 	} else if (_params.length < 4){
 		_params = Util.mapDefaults(_params, ['low', 1500, 0.4]);
 	} else {
-		_params = Util.mapDefaults(_params, ['low', '1/1', 100, 1500, 0.4, 'sine', 4]);
+		_params = Util.mapDefaults(_params, ['low', '1/1', 100, 1500, 0.4, 'sine', 1]);
 		this._static = false;
 	}
 
@@ -435,7 +435,7 @@ const Filter = function(_params){
 	if (this._types[_params[0]]){
 		this._fx.set({ type: this._types[_params[0]] });
 	} else {
-		console.log(`'${_params[0]}' is not a valid filter type`);
+		console.log(`'${_params[0]}' is not a valid filter type. Defaults to lowpass`);
 		this._fx.set({ type: 'lowpass' });
 	}
 	this._fx.set({ rolloff: -24 });
@@ -449,11 +449,14 @@ const Filter = function(_params){
 		triangle : 'triangle',
 		tri : 'triangle',
 		up: 'sawtooth',
-		sawUp: 'sawtooth'
+		sawUp: 'sawtooth',
+		// sawDown: 0,
+		// down: 0,
 	}
 
 	this.set = function(c, time, bpm){
 		let _q;
+		// if the filter is static use the settings of frequency and resonance 
 		if (this._static){
 			let f = Util.getParam(_params[1], c);
 			_q = _params[2];
@@ -470,9 +473,25 @@ const Filter = function(_params){
 			if (this._waveMap[w]){
 				w = this._waveMap[w];
 			} else {
-				log(`'${w} is not a valid waveshape`);
-				// default wave if wave does not exist
-				w = 'sine';
+				if (isNaN(w)){
+					log(`${w} is not a valid waveshape. Defaults to sine`);
+					// default wave if wave does not exist
+					w = 'sine';
+				} else {
+					// w = value between 0 and 1, map to up, down, triangle 
+					// 0=down, 0.5=triangle, 1=up
+					switch(Math.floor(Util.clip(w, 0, 1)*2.99)){
+						case 0: 
+							w = 'sawtooth';
+							// swap hi/lo range for saw down effect
+							let tmp = lo; lo = hi; hi = tmp; break;
+						case 1:
+							w = 'sine'; break;
+						case 2:
+							// regular saw up
+							w = 'sawtooth'; break;
+					}
+				}
 			}
 			this._lfo.set({ type: w });
 
