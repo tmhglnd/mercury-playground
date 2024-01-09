@@ -1,10 +1,12 @@
 // === TUTORIAL 307: FX Filter ===
-// The filter is a simple filter where the cutoff frequency is 
-// set with a list or argument. The second argument changes the Q
-// and the third argument allows to set a ramptime in milliseconds or 
-// relative to the bpm
+// The filter is a simple filter where the first argument sets the type of the 
+// filter such as low(pass), band(pass) and hi(pass). The second argument sets 
+// the cutoff frequency with a number or list. The third argument changes the 
+// resonance (Q)
 
-new synth saw shape(off) time(1/4) fx(filter low [4000 100 2000 50] 0.6 1/8)
-
+new synth saw shape(off) time(1/4) fx(filter low [8000 400 2000 200] [0.2 0.5 0.8])
 // Try changing the values in the function to hear what happens
 // It is also possible to modulate the parameters with lists
+
+// NOTE: cutoff ramptime in milliseconds is deprecated, now use modulation 
+// filter or triggerFilter !!!

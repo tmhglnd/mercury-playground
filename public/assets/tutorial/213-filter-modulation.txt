@@ -1,6 +1,8 @@
 // === TUTORIAL 213: Filter Modulation ===
 // We can modulate the cutoff frequency and the resonance
-// of the filter with values in a list
+// of the filter with values from two different lists
+// Make sure the cutoffs are values between 50 and 18000 (Hz)
+// and the resonance are values between 0 and 1
 
 list cutoffs [200 400 700 1000]
 list qs [0.3 0.3 0.3 0.3 0.8]

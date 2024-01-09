@@ -43,7 +43,7 @@ const fxMap = {
 	'room' : (params) => {
 		return new Reverb(params);
 	},
-	'verb' : (params) => {
+	'hall' : (params) => {
 		return new Reverb(params);
 	},
 	'reverb' : (params) => {
