@@ -111,7 +111,7 @@ class PolyInstrument extends Instrument {
 					let dec = Util.divToS(Util.lookup(this._dec, c), this.bpm());
 					let rel = Util.divToS(Util.lookup(this._rel, c), this.bpm());
 		
-					this.adsrs[i].attack = att;
+					this.adsrs[i].attack = Math.max(0.001, att);
 					this.adsrs[i].decay = dec;
 					this.adsrs[i].release = Math.max(0.001, rel);
 					
@@ -128,7 +128,6 @@ class PolyInstrument extends Instrument {
 					// voices set to busy!
 					this.adsrs[i].triggerAttack(time);
 				}
-		
 			}
 		}
 	}

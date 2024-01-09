@@ -82,8 +82,8 @@ class Instrument extends Sequencer {
 		// fade-out running envelope over 5 ms
 		if (this.adsr.value > 0){
 			let tmp = this.adsr.release;
-			this.adsr.release = 0.002;
-			this.adsr.triggerRelease(time-0.002);
+			this.adsr.release = 0.004;
+			this.adsr.triggerRelease(time-0.004);
 			this.adsr.release = tmp;
 			// time += 0.010;
 		}
@@ -94,16 +94,11 @@ class Instrument extends Sequencer {
 			let dec = Util.divToS(Util.getParam(this._dec, c), this.bpm());
 			let rel = Util.divToS(Util.getParam(this._rel, c), this.bpm());
 
-			this.adsr.attack = att;
+			this.adsr.attack = Math.max(0.001, att);
 			this.adsr.decay = dec;
 			this.adsr.release = Math.max(0.001, rel);
 
-			// don't know what this was doing but it was not helping
-			// e = Math.min(this._time, att + dec + rel);
-			// e = Math.min(t, att + dec + rel);
-			// let rt = Math.max(0.001, e - this.adsr.release);
-
-			// this.adsr.triggerAttackRelease(rt, time);
+			// trigger the envelope and release after a short while
 			this.adsr.triggerAttack(time);
 			this.adsr.triggerRelease(time + att + dec);
 		} else {

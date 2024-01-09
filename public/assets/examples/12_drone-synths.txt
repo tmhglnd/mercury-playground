@@ -8,11 +8,11 @@ set scale harmonic_minor c
 // some note numbers for bass synth
 list notes [3 7 5 8]
 new synth saw note(notes 0) time(4) name(drone)
-    set drone fat(0.1132 3) shape(off) fx(squash 5)
+    set drone super(3 0.1132) shape(off) fx(squash 5)
     set drone fx(reverb 0.6 5) fx(filter low 1500 0.4)
 
 // create a melody for the lead synth
 list melody cosine(16 5.32 0 12)
 new synth sine note(melody 2) time(1/2) name(lead)
-    set lead shape(1 120) fat(0.021 3) fx(distort 10)
+    set lead shape(1 120) super(3 0.021) fx(distort 10)
     set lead fx(delay 3/16 4/16 0.8) fx(reverb 0.5 3)
