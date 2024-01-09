@@ -12,4 +12,4 @@ list melody fibonacci(9)
 list cutoff fibonacci(8 12)
 print melody cutoff
 
-new synth saw note(melody 1) time(1/8) shape(off) fx(filter low cutoff)
+new synth saw note(melody 1) time(1/8) shape(off) fx(filter cutoff)

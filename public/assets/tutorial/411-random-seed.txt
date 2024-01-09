@@ -16,4 +16,4 @@ list cutoff random(5 100 2000)
 list rhythm random(16 0 2)
 print melody cutoff rhythm
 
-new synth saw note(melody 1) time(1/16) play(rhythm) fx(filter low cutoff)
+new synth saw note(melody 1) time(1/16) play(rhythm) fx(filter cutoff)

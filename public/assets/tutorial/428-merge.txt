@@ -1,0 +1,15 @@
+// === TUTORIAL 428: Merge ===
+// With the merge function you can combine multiple lists into
+// a 2-dimensional list. This can be useful when you want to generate
+// some chords for example.
+
+set scale minor d
+// different rows of notes are generated with various functions
+list row1 spread(6 0 12) 
+list row2 cosine(6 3 7 19)
+list row3 drunk(6 3 12 24)
+// the rows are merged into a 2d list and every item is repeated 4 times
+list chords repeat(merge(row1 row2 row3) 4)
+print chords
+
+new polySynth sine note(chords 1) time(1/4) shape(1/6 100) fx(chorus)

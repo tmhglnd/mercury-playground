@@ -12,4 +12,4 @@ list cutoff random(5 300 4000)
 list length random(4 80 300)
 print melody cutoff length
 
-new synth saw note(melody 1) time(1/8) shape(1 length) fx(filter low cutoff)
+new synth saw note(melody 1) time(1/8) shape(1 length) fx(filter cutoff)
