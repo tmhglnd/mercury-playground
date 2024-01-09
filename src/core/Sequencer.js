@@ -110,7 +110,8 @@ class Sequencer {
 			this._loop = new Tone.Loop((time) => { 
 				this._event(time) 
 			}, this._time).start(schedule);
-		} else {
+		} 
+		else {
 			// generate a listener for the osc-address
 			let oscAddress = `${this._offset}`;
 			window.addEventListener(oscAddress, (event) => {

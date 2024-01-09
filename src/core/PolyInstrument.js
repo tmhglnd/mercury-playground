@@ -108,18 +108,20 @@ class PolyInstrument extends Instrument {
 				// set shape for playback (fade-in / out and length)
 				if (this._att){
 					let att = Util.divToS(Util.lookup(this._att, c), this.bpm());
-					let dec = Util.divToS(Util.lookup(this._sus, c), this.bpm());
+					let dec = Util.divToS(Util.lookup(this._dec, c), this.bpm());
 					let rel = Util.divToS(Util.lookup(this._rel, c), this.bpm());
 		
 					this.adsrs[i].attack = att;
 					this.adsrs[i].decay = dec;
-					this.adsrs[i].release = rel;
+					this.adsrs[i].release = Math.max(0.001, rel);
 					
-					e = Math.min(this._time, att + dec + rel);
-			
+					// e = Math.min(this._time, att + dec + rel);
+					// let rt = Math.max(0.001, e - this.adsrs[i].release);
+					// this.adsrs[i].triggerAttackRelease(rt, time);
+
 					// trigger the envelope
-					let rt = Math.max(0.001, e - this.adsrs[i].release);
-					this.adsrs[i].triggerAttackRelease(rt, time);
+					this.adsrs[i].triggerAttack(time);
+					this.adsrs[i].triggerRelease(time + att + dec);
 				} else {
 					// if shape is off only trigger attack
 					// when voice stealing is 'off' this will lead to all 

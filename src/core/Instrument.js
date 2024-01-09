@@ -13,7 +13,7 @@ class Instrument extends Sequencer {
 		this._gain = [-6, 0];		
 		this._pan = [ 0 ];
 		this._att = [ 0 ];
-		this._sus = [ 0 ];
+		this._dec = [ 0 ];
 		this._rel = [ 0 ];
 
 		// Instrument specific Tone Nodes
@@ -82,27 +82,30 @@ class Instrument extends Sequencer {
 		// fade-out running envelope over 5 ms
 		if (this.adsr.value > 0){
 			let tmp = this.adsr.release;
-			this.adsr.release = 0.005;
-			this.adsr.triggerRelease(time);
+			this.adsr.release = 0.002;
+			this.adsr.triggerRelease(time-0.002);
 			this.adsr.release = tmp;
-			time += 0.005;
+			// time += 0.010;
 		}
 
 		// set shape for playback (fade-in / out and length)
 		if (this._att){
 			let att = Util.divToS(Util.getParam(this._att, c), this.bpm());
-			let dec = Util.divToS(Util.getParam(this._sus, c), this.bpm());
+			let dec = Util.divToS(Util.getParam(this._dec, c), this.bpm());
 			let rel = Util.divToS(Util.getParam(this._rel, c), this.bpm());
 
 			this.adsr.attack = att;
 			this.adsr.decay = dec;
-			this.adsr.release = rel;
-			
-			e = Math.min(this._time, att + dec + rel);
-			// e = Math.min(t, att + dec + rel);
+			this.adsr.release = Math.max(0.001, rel);
 
-			let rt = Math.max(0.001, e - this.adsr.release);
-			this.adsr.triggerAttackRelease(rt, time);
+			// don't know what this was doing but it was not helping
+			// e = Math.min(this._time, att + dec + rel);
+			// e = Math.min(t, att + dec + rel);
+			// let rt = Math.max(0.001, e - this.adsr.release);
+
+			// this.adsr.triggerAttackRelease(rt, time);
+			this.adsr.triggerAttack(time);
+			this.adsr.triggerRelease(time + att + dec);
 		} else {
 			// if shape is 'off' only trigger attack
 			this.adsr.triggerAttack(time);
@@ -152,10 +155,10 @@ class Instrument extends Sequencer {
 	}
 
 	env(...e){
-		// set the fade-in, sustain and fade-out times
+		// set the fade-in, decay and fade-out times
 		this._att = [ 0 ];
 		this._rel = [ 0 ];
-		this._sus = [ 1 ];
+		this._dec = [ 0 ];
 
 		if (e[0] === 'off' || e[0] < 0){
 			this._att = null;
@@ -171,7 +174,7 @@ class Instrument extends Sequencer {
 			} else {
 				// three is attack stustain and release
 				this._att = Util.toArray(e[0]);
-				this._sus = Util.toArray(e[1]);
+				this._dec = Util.toArray(e[1]);
 				this._rel = Util.toArray(e[2]);
 			}
 		}

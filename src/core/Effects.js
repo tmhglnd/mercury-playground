@@ -40,10 +40,13 @@ const fxMap = {
 	'degrade' : (params) => {
 		return new DownSampler(params);
 	},
-	'reverb' : (params) => {
+	'room' : (params) => {
 		return new Reverb(params);
 	},
 	'verb' : (params) => {
+		return new Reverb(params);
+	},
+	'reverb' : (params) => {
 		return new Reverb(params);
 	},
 	'shift' : (params) => {

@@ -25,6 +25,7 @@ let sounds = [];
 // parse and evaluate the inputted code
 // as an asyncronous function with promise
 async function code({ file, engine, canvas, p5canvas }){
+	let silenced = false;
 	let c = file;
 
 	let t = Tone.Transport.seconds;
@@ -92,7 +93,10 @@ async function code({ file, engine, canvas, p5canvas }){
 			// log(`set bpm to ${bpm}`);
 		}, 
 		'silence' : (mute) => {
-			if (mute){ engine.silence(); }
+			if (mute){ 
+				engine.silence(); 
+				silenced = true;
+			}
 		},
 		'scale' : (args) => {
 			let s = TL.scaleNames();
@@ -142,18 +146,6 @@ async function code({ file, engine, canvas, p5canvas }){
 			// });
 		}
 	}
-
-	// handle .global
-	Object.keys(tree.global).forEach((g) => {
-		if (globalMap[g]){
-			globalMap[g](tree.global[g]);
-		}
-	});
-
-	// copy current sounds over
-	_sounds = sounds.slice();
-	// empty previous sounds
-	sounds = [];
 
 	const objectMap = {
 		'sample' : (obj) => {
@@ -253,6 +245,23 @@ async function code({ file, engine, canvas, p5canvas }){
 			return inst;
 		}
 	}
+
+	// handle .global
+	Object.keys(tree.global).forEach((g) => {
+		if (globalMap[g]){
+			globalMap[g](tree.global[g]);
+		}
+	});
+
+	// if silenced break out of everything
+	if (silenced){
+		return;
+	}
+
+	// copy current sounds over
+	_sounds = sounds.slice();
+	// empty previous sounds
+	sounds = [];
 
 	// handle .objects
 	for (let o in tree.objects){
