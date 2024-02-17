@@ -561,7 +561,7 @@ const TriggerFilter = function(_params){
 		'bandpass': 'bandpass'
 	}
 
-	this.defaults = ['low', 1, '1/16', 4000, 30, 1];
+	this.defaults = ['low', 1, '1/16', 4000, 100, 1];
 	// replace defaults with provided arguments
 	this.defaults.splice(0, _params.length, ..._params);
 	_params = this.defaults.map(p => Util.toArray(p));
