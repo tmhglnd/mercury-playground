@@ -22,6 +22,7 @@ class MonoMidi extends Sequencer {
 		this._dur = [ 100 ];
 		this._cc = [];
 		this._channel = [ 1 ];
+		this._program = false;
 		this._chord = false;
 		this._bend = [];
 
@@ -41,6 +42,13 @@ class MonoMidi extends Sequencer {
 		// timing offset to sync WebMidi and WebAudio
 		let offset = WebMidi.time - Tone.context.currentTime * 1000;
 		let sync = time * 1000 + offset;
+
+		// send program change messages on specified channel
+		// only if the value is an integer
+		let pc = Util.getParam(this._program, c);
+		if (!isNaN(pc)){
+			this._device.sendProgramChange(pc, ch, { time: sync });
+		}
 
 		// send pitchbend message in hires -1 1 at specified channel
 		if (this._bend.length > 0){
@@ -112,6 +120,10 @@ class MonoMidi extends Sequencer {
 		if (c === 'on' || c === 1){
 			this._chord = true;
 		}
+	}
+
+	program(p){
+		this._program = Util.toArray(p);
 	}
 
 	add_fx(...cc){
