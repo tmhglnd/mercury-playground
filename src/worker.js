@@ -144,6 +144,10 @@ async function code({ file, engine, canvas, p5canvas }){
 			engine.addBuffers(args);
 			// args.forEach((a) => {
 			// });
+		},
+		'midiDelay' : (args) => {
+			// set some additional latency for all the midi
+			// TO DO
 		}
 	}
 

@@ -16,6 +16,7 @@ class Sequencer {
 		this._subdiv = [ 1 ];
 		this._offset = 0;
 		this._beat = [ 1 ];
+		this._wait = null;
 		this._human = 0;
 
 		// visual code
@@ -68,7 +69,13 @@ class Sequencer {
 			if (Math.random() < b){
 				// get the count value
 				let c = this._beatCount;
-	
+
+				// get the wait time (delay) convert to seconds
+				if (this._wait !== null){
+					let w = Util.getParam(this._wait, c);
+					time += Util.divToS(w, this.bpm());
+				}
+
 				// trigger some events for this instrument based
 				// on the current count and time
 				this.event(c, time);
@@ -193,7 +200,7 @@ class Sequencer {
 		// set the ratcheting probability and subdivision
 		// for now defaults to the timediv method
 		log(`ratchet() is not yet supported, defaults to timediv() with probability of 1`);
-		this.timediv(s)
+		this.timediv(s);
 	}
 
 	beat(b, r='off'){
@@ -203,6 +210,11 @@ class Sequencer {
 		if (r === 'off' || r < 1){
 			this._reset = -1;
 		}
+	}
+
+	wait(w=[0]){
+		// wait a specified amount of milliseconds before triggering
+		this._wait = Util.toArray(w);
 	}
 
 	human(h){
