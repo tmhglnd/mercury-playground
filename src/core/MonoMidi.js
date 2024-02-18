@@ -33,8 +33,8 @@ class MonoMidi extends Sequencer {
 		// normalized velocity (0 - 1)
 		let g = Util.getParam(this._velocity[0], c);
 				
-		// get the duration
-		let d = Util.divToS(Util.getParam(this._dur, c), this.bpm()) * 1000;
+		// get the duration (minus 1ms to ensure note-off send before note-on)
+		let d = Util.divToS(Util.getParam(this._dur, c), this.bpm()) * 1000 - 1;
 
 		// get the channel
 		let ch = Util.getParam(this._channel, c);
@@ -45,9 +45,10 @@ class MonoMidi extends Sequencer {
 
 		// send program change messages on specified channel
 		// only if the value is an integer
+		// send 1ms earlier than the actual note-on message
 		let pc = Util.getParam(this._program, c);
 		if (!isNaN(pc)){
-			this._device.sendProgramChange(pc, ch, { time: sync });
+			this._device.sendProgramChange(pc, ch, { time: sync - 1 });
 		}
 
 		// send pitchbend message in hires -1 1 at specified channel
