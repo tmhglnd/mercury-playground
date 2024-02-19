@@ -140,6 +140,12 @@
 		"polyphonic"
 	], 
 
+	"program" : [
+		"programChange",
+		"pgm",
+		"pc"
+	],
+
 	"tempo" : [
 		"bpm"
 	],

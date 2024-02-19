@@ -119,6 +119,18 @@ const functionMap = {
 	'rectF' : (...v) => {
 		return Gen.squareFloat(...v);
 	},
+	'binaryBeat' : (...v) => {
+		return Gen.binaryBeat(...v);
+	},
+	'binary' : (...v) => {
+		return Gen.binaryBeat(...v);
+	},
+	'spacingBeat' : (...v) => {
+		return Gen.spacingBeat(...v);
+	},
+	'spacing' : (...v) => {
+		return Gen.spacingBeat(...v);
+	},
 	// 
 	// Algorithmic Methods
 	// 
@@ -576,9 +588,9 @@ const functionMap = {
 	// IMPLEMENTATION NEEDED
 	// maximum
 	// minimum
-	// mean
-	// median
-	// mode
+	// mean / average
+	// median / center
+	// mode / common
 
 	// 
 	// Utility Methods

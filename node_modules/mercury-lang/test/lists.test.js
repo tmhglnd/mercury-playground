@@ -45,6 +45,13 @@ test('Generative List Methods', () => {
 	expect(Mercury(`print cosineFloat()`).parseTree.print[0]).toStrictEqual([1]);
 
 	expect(Mercury(`print cosF()`).parseTree.print[0]).toStrictEqual([1]);
+
+	expect(Mercury(`print binary(358)`).parseTree.print[0]).toStrictEqual([1, 0, 1, 1, 0, 0, 1, 1, 0]);
+
+	expect(Mercury(`print binary(4 3 5)`).parseTree.print[0]).toStrictEqual([1, 0, 0, 1, 1, 1, 0, 1]);
+
+	expect(Mercury(`print spacing(2 3 2)`).parseTree.print[0]).toStrictEqual([1, 0, 1, 0, 0, 1, 0]);
+
 });
 
 test('Algorithmic List Methods', () => {
@@ -254,9 +261,11 @@ test('Translate List Methods', () => {
 	print toScale([0 1 2 3 4 5 6 7 8 9 10 11])
 	print toScale([8 13 -1 20 -6 21 -4 12])
 	print int(toScale([0 4.1 6.5 7.1 9.25]))
+	print toScale([0 1 2 3 4 5 6 7 8 9 10 11] major)
+	print toScale([0 1 2 3 4 5 6 7 8 9 10 11] minor eb)
 	`
 
-	expect(Mercury(code).parseTree.print).toStrictEqual([ 'minor', 'c', [0, 0, 2, 3, 3, 5, 5, 7, 8, 8, 10, 10], [0, 0, 2, 3, 3, 5, 5, 7, 8, 8, 10, 10], [8, 12, -2, 20, -7, 20, -4, 12], [0, 3, 5, 7, 8]]);
+	expect(Mercury(code).parseTree.print).toStrictEqual([ 'minor', 'c', [0, 0, 2, 3, 3, 5, 5, 7, 8, 8, 10, 10], [0, 0, 2, 3, 3, 5, 5, 7, 8, 8, 10, 10], [8, 12, -2, 20, -7, 20, -4, 12], [0, 3, 5, 7, 8], [ 0, 0, 2, 2, 4, 5, 5, 7, 7, 9, 9, 11 ], [ 3, 3, 5, 6, 6, 8, 8, 10, 11, 11, 13, 13 ]]);
 	
 	code = `
 	set tempo 120

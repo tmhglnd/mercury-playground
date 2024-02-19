@@ -1,6 +1,6 @@
 {
   "name": "mercury-lang",
-  "version": "1.9.6",
+  "version": "1.9.7",
   "description": "Parser for the mercury live coding language",
   "main": "index.js",
   "scripts": {
@@ -37,7 +37,7 @@
   "dependencies": {
     "moo": "^0.5.1",
     "nearley": "^2.20.1",
-    "total-serialism": "^2.7.1"
+    "total-serialism": "^2.7.3"
   },
   "devDependencies": {
     "@babel/cli": "^7.17.6",

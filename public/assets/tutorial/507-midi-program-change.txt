@@ -1,0 +1,13 @@
+// === TUTORIAL 507: MIDI Program Change ===
+// With the program() method you can send program change messages
+// to the same device on the specified channel. 
+// The program change is an whole number between 0 and 127.
+// The changes can be sequenced as a list.
+
+set tempo 130
+
+list notes spread(5 0 12)
+list changes [0 10 20]
+
+new midi default time(1/8) note(notes 1) out(1) program(changes)
+// change program changes 0, 10 and 20 to channel 1
