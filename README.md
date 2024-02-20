@@ -163,10 +163,11 @@ new synth triangle fx(reverb '/synth/verb') fx(filter low '/synth/cutoff' 0.4) t
 **AND MANY MORE (TO COME...)**
 
 The browser playground does not have exactly the same functionality as the original Mercury environment running in Max8. See below the 
-differences. You may also encounter some discrepancies in syntax and in the documentation. Please report issues if you find any so they can be fixed. Every item with a `*` is only available in the browser version.
+differences. You may also encounter some discrepancies in syntax and in the documentation. Please report issues if you find any so they can be fixed. Items marked with a `*` are only available in the browser version.
 
 - [x] tempo
 - [x] scale
+- [ ] scalar
 - [x] volume
 - [x] lowpass / highpass
 - [x] randomSeed
@@ -174,18 +175,22 @@ differences. You may also encounter some discrepancies in syntax and in the docu
 - [x] view (*)
 - [x] crossFade (*)
 - [x] list
-	- [x] spread / spreadInclusive / fill
+	- [x] spread / spreadInc / fill / spreadF / spreadIncF
+ 	- [x] binaryBeat / spacingBeat
 	- [x] random / coin / dice / choose / pick / drunk / urn / shuffle / clave
-	- [x] sine / cosine
+	- [x] sine / cosine / sineF / cosineF
 	- [x] join / duplicate / merge / repeat / lace
 	- [x] merge / reverse / invert / palindrome
-	- [x] expand / stretch / clone / spray / unique / 
+	- [x] expand / stretch / clone / spray / unique
 	- [x] fibonacci / pisano / pell / lucas
 	- [x] euclidean / hexBeat
 	- [x] add / subtract / multiply / divide / modulo
 - [x] sample
 	- [x] type
 	- [x] time
+ 	- [x] timediv (*)
+  	- [ ] ratchet
+  	- [ ] warp
 	- [x] shape
 	- [x] play
 	- [x] gain
@@ -195,23 +200,31 @@ differences. You may also encounter some discrepancies in syntax and in the docu
 		- [x] tune (*)
 	- [x] pan
 	- [x] name
+ 	- [ ] group
 	- [x] fx
 - [x] synth
-	- [x] wave
-		- [x] super
+	- [x] super / unison
 	- [x] time
 	- [x] shape
 	- [x] play
+	- [x] timediv (*)
+  	- [ ] ratchet
+  	- [ ] warp
 	- [x] gain
 	- [x] note
 		- [x] map to scale
 	- [x] pan
 	- [x] name
+ 	- [ ] group
 	- [x] fx
 	- [x] slide
 - [ ] sampler
-- [ ] polySynth (work-in-progress)
-- [ ] polySample
+- [x] polySynth
+	- [x] steal
+ 	- [ ] voices 
+- [x] polySample
+	- [x] steal
+ 	- [ ] voices
 - [ ] midi
 	- [x] device
 	- [x] time
@@ -220,7 +233,8 @@ differences. You may also encounter some discrepancies in syntax and in the docu
 	- [x] out
 	- [x] chord
 	- [x] name
-	- [x] change
+	- [x] change / cc
+ 	- [x] program / pc
 	- [ ] bend
 	- [ ] sync
 - [ ] osc
@@ -231,20 +245,19 @@ differences. You may also encounter some discrepancies in syntax and in the docu
 	- [x] delay
 		- [x] stereo feedback delay with damping
 		- [ ] ping pong feedback delay
-	- [x] drive (softclipping distortion)
-	- [x] squash (compress/overdrive)
+	- [x] distort (softclipping distortion)
+	- [x] squash (compression/overdrive)
 	- [ ] kink (waveshaping)
 	- [x] filter
+ 		- [x] filter modulation
 	- [x] triggerFilter
-	- [ ] autoFilter / lfoFilter
 	- [x] lfo
 	- [x] reverb
 		- [x] decaying noise convolution
 		- [ ] dattorro reverb algorithm
 	- [x] shift (pitchshift)
  	- [x] compress 
-	- [ ] chorus
-		- [ ] double
+	- [x] chorus / double
 - [x] visual 
 	- [x] use Hydra code synchronized with instrument triggers (*)
 
@@ -260,9 +273,9 @@ differences. You may also encounter some discrepancies in syntax and in the docu
 - Provide creatives with an hands-on language to create realtime processes
 	- code sound and music
 	- code visuals and let them react to sound
+ 	- control external devices in real-time   
 - Provide creatives with an extensive library of algorithmic composition techniques
-	- released as a seperate Node Package titled [Total-Serialism](https://www.npmjs.com/package/total-serialism)
-	- included in the Mercury environment through Node4Max
+	- released as a seperate package: [total-serialism](https://www.npmjs.com/package/total-serialism)
 - Provide creatives with a multi-purpose non-linear-sequencer 
 	- use OSC to communicate with other platforms (coming soon...)
 	- use MIDI to communicate with other platforms and devices
@@ -270,7 +283,7 @@ differences. You may also encounter some discrepancies in syntax and in the docu
 	- use external OSC to control parameters in the sampler/synthesis
 	- use external MIDI devices and messages to play the sampler/synthesizers (coming soon...)
 - Collaborate in Mercury via the browser with Flok and code music together
-- Extending the Mercury users-community and including extensions on the environment in the master-branch
+- Extending the Mercury users-community and including extensions on the environment
 
 ⭐️ *watch and star this repo to keep up-to-date with the latest changes whenever they're made*
 
