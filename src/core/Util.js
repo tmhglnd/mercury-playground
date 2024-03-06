@@ -1,4 +1,5 @@
 const { noteToMidi, toScale, mtof } = require('total-serialism').Translate;
+const { map } = require('total-serialism').Utility;
 
 // replace defaults with incoming parameters
 function mapDefaults(params, defaults){
@@ -60,10 +61,28 @@ function getOSC(a){
 		// pass through
 		return a;
 	} else if (osc.match(/^\/[^`'"\s]+/g)){
+		// remove any scaling arguments
+		// let scaling;
+		// try {
+		// 	if (osc.match(/\{.+\}/)){
+		// 		// has a scaling pattern
+		// 		scaling = osc.match(/\{(.+)\}/)[1].split(':');
+		// 		osc = osc.replace(/\{.+\}/, '');
+		// 	}
+		// } catch (e) {
+		// 	log(`Not a valid scaling argument for ${osc}`);
+		// }
+		// console.log(scaling, osc);
 		if (!window.oscMessages[osc]){
 			console.log(`No message received on address ${osc}`);
 			return [0];
 		}
+		// let v = window.oscMessages[osc];
+		// if (scaling !== undefined){
+		// 	v = map(v, 0, 1, scaling[0], scaling[1]);
+		// }
+		// console.log(v);
+		// return v;
 		return window.oscMessages[osc];
 	}
 	// pass through

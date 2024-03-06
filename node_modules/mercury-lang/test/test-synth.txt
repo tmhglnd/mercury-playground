@@ -10,19 +10,19 @@ ring bassLine fill(0 16 -3 16)
 ring notes palin( spread(5 0 12) )
 ring jnd join(random(4 0 24) spread(4 0 24) urn(4 4))
 
-new synth [ sine saw ] time(1/4 1/8) note(7 1) env(1 300) beat(0.2) group(sn bass) add_fx(reverb 0.9 11) add_fx(lfo 1/4 up)
+new synth [ sine saw ] time(1/4 1/8) note(7 1) env(1 300) beat(0.2) add_fx(reverb 0.9 11) add_fx(lfo 1/4 up) //group(sn bass)
 
 new sample [ kick_min snare_dub ] time(1/16) shape(1 1/32 2) beat(0.9)
 
 new synth sine name(aSynth)
-	set aSynth note(notes 1) timing(1/16) shape(1000 200) play(0.8) aux(sn ld)
+	set aSynth note(notes 1) timing(1/16) shape(1000 200) play(0.8) //aux(sn ld)
 	set aSynth gain(0.5 100)
 
 	set aSynth osc2(sine 2) withFX(drive 16) addFX(lfo 1/4 sine)
 
 new synth saw name(bSynth)
 	set bSynth note(random(4 0 12) 2) time(1/16) env(300 1000) 
-	set bSynth pan(random) group(bass intro)
+	set bSynth pan(random) //group(bass intro)
 	set bSynth gain(0) beat(0.7)
 
 new sample kick_min name(kck)

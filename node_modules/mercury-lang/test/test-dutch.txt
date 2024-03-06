@@ -9,7 +9,7 @@ lijst bassLine fill(0 16 -3 16)
 // ring notes palin( spread(5 0 12) )
 // ring jnd join(random(4 0 24) spread(4 0 24) urn(4 4))
 
-speel synth [ sine saw ] time(1/4 1/8) note(7 1) env(1 300) beat(0.2) group(sn bass) add_fx(reverb 0.9 11) add_fx(lfo 1/4 up)
+speel synth [ sine saw ] time(1/4 1/8) note(7 1) env(1 300) beat(0.2) add_fx(reverb 0.9 11) add_fx(lfo 1/4 up) //group(sn bass)
 
 new sample [ kick_min snare_dub ] time(1/16) shape(1 1/32 2) beat(0.9)
 

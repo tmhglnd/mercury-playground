@@ -442,6 +442,73 @@ test('Set FX to named Synths', () => {
 	expect(Mercury(code).parseTree.objects).toStrictEqual(expected);
 });
 
+test('Using groups to apply functions', () => {
+	let expected = {
+		'bob' : {
+			'object' : 'synth',
+			'type' : 'saw',
+			'functions' : {
+				'name' : [ 'bob' ],
+				'group' : [ 'bus1', 'bus2' ],
+				'time' : [ '1/8' ],
+				'note' : [[ 6, 10, 0, 10 ]],
+				'env' : [ 1, 250 ],
+				'beat' : [[ 1, 0, 1, 1 ]],
+				'pan' : [ 0 ],
+				'amp' : [ 0.7 ],
+				'wave2' : [ 'saw', 0 ],
+				'add_fx' : [],
+			}
+		},
+		'alice' : {
+			'object' : 'sample',
+			'type' : 'kick',
+			'functions' : {
+				'name' : [ 'alice' ],
+				'group' : [ 'bus1', 'bus3' ],
+				'time' : [ 0.25, 0.5 ],
+				'speed' : [ 1 ],
+				'note' : [ "off" ],
+				'tune' : [ 60 ],
+				'env' : [ -1 ],
+				'pan' : [ 0 ],
+				'beat' : [[ 1, 0, 1, 1 ]],
+				'amp' : [ 0.3 ],
+				'stretch': [0, 1, 1],
+				'add_fx' : [],
+			}
+		},
+		'simon' : {
+			'object' : 'synth',
+			'type' : 'square',
+			'functions' : {
+				'name' : [ 'simon' ],
+				'group' : [ 'bus2', 'bus3' ],
+				'time' : [ '1/1', 0 ],
+				'note' : [[ 6, 10, 0, 10 ]],
+				'env' : [ 1, 250 ],
+				'beat' : [[ 1, 0, 0, 1, 0 ]],
+				'amp' : [ 0.3 ],
+				'pan' : [ 0 ],
+				'wave2' : [ 'saw', 0 ],
+				'add_fx' : [],
+			}
+		}
+	}
+
+	let code = `
+		new synth saw time(1/8) name(bob) group(bus1 bus2) 
+		new sample kick time(0.25 0.5) name(alice) group(bus1 bus3)
+		new synth square play(euclid(5 2)) name(simon) group(bus2 bus3)
+		
+		set bus1 play([1 0 1 1])
+		set bus2 note(sine(4 5.512 0 12))
+		set bus3 gain(0.3)
+	`;
+
+	expect(Mercury(code).parseTree.objects).toStrictEqual(expected);
+});
+
 // test('Instruments with Array Synth/Sample names', () => {
 // 	let expected = {
 // 		'bob' : {

@@ -118,13 +118,21 @@ function traverseTree(tree, code, level, obj){
 			let inst = map['@inst'](el['@inst'], ccode);
 			delete el['@inst'];
 			
+			// generate unique ID name for object before checking the name()
+			// this ID is used for groups if there are any
+			inst.functions.name = [ uniqueID(8) ];
+			
 			Object.keys(el).forEach((k) => {
 				inst = map[k](el[k], ccode, '@object', inst);
 			});
+			// add the name to the all group
+			ccode.groups.all.push(inst.functions.name[0]);
+
 			// generate unique ID name for object if no name()
-			if (!inst.functions.name){
-				inst.functions.name = [ uniqueID(8) ];
-			}
+			// if (!inst.functions.name){
+			// 	inst.functions.name = [ uniqueID(8) ];
+			// }
+			// console.log('code', ccode);
 			// add object to complete code
 			ccode.objects[inst.functions.name] = inst;
 			return ccode;
@@ -142,15 +150,27 @@ function traverseTree(tree, code, level, obj){
 					inst = map[k](el[k], ccode, '@object', inst);
 				});
 				ccode.objects[inst.functions.name] = inst;
-			} else if (name === 'all'){
+			} else if (code.groups[name]){ //name === 'all' 
 				// if set all, set all instrument objects
-				Object.keys(ccode.objects).forEach((o) => {
+				code.groups[name].forEach((o) => {
 					let inst = ccode.objects[o];
-					Object.keys(el).forEach((k) => {
-						inst = map[k](el[k], ccode, '@object', inst);
-					});
-					ccode.objects[inst.functions.name] = inst;
+					if (inst){
+						Object.keys(el).forEach((k) => {
+							inst = map[k](el[k], ccode, '@object', inst);
+						});
+						ccode.objects[inst.functions.name] = inst;
+					}
 				});
+
+				// console.log(ccode.objects);
+
+				// Object.keys(ccode.objects).forEach((o) => {
+				// 	let inst = ccode.objects[o];
+				// 	Object.keys(el).forEach((k) => {
+				// 		inst = map[k](el[k], ccode, '@object', inst);
+				// 	});
+				// 	ccode.objects[inst.functions.name] = inst;
+				// });
 			} else {
 				// if name is part of global settings
 				let args;
@@ -258,12 +278,16 @@ function traverseTree(tree, code, level, obj){
 				if (func === 'add_fx'){
 					funcs[func].push(args);
 				} else {
-					if (func === 'name'){
-						ccode.groups.all.push(...args);
-					}
-					else if (func === 'group'){
-						// TO-DO:
-						// code for group functions
+					// if (func === 'name'){
+						// ccode.groups.all.push(...args);
+					// } else 
+					if (func === 'group'){
+						args.forEach((a) => {
+							// add empty array if the group doesn't exist yet
+							if (!ccode.groups[a]) { ccode.groups[a] = []; }
+							// add the name of the inst to the group array
+							ccode.groups[a].push(funcs.name[0]);
+						});
 					}
 					funcs[func] = args;
 				}
