@@ -288,8 +288,8 @@ async function code({ file, engine, canvas, p5canvas }){
 	if (!sounds.length){
 		startSound(sounds);
 	}
-	startSound(sounds, crossFade);
 	removeSound(_sounds, crossFade);
+	startSound(sounds, crossFade);
 }
 	
 function getSound(){
