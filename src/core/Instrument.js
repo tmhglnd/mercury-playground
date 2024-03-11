@@ -119,11 +119,6 @@ class Instrument extends Sequencer {
 	}
 
 	fadeOut(t){
-		// the progress of the loop before the next time it has
-		// to play. Can I use this to time the fade-out when 
-		// evaluted new code?
-		// console.log('progress', this._loop.progress);
-
 		// fade out the sound upon evaluation of new code
 		this.gain.gain.rampTo(0, t, Tone.now());
 		setTimeout(() => {

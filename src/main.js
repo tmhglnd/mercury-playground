@@ -87,7 +87,8 @@ window.onload = () => {
 			console.log(`Connected for OSC: ${id}`);
 		});
 		socket.on('osc', (msg) => {
-			console.log(`Received: ${msg}`);
+			// need some switch to allow/disable printing, maybe via set
+			// console.log(`Received: ${msg}`);
 			if (msg[0] === '/mercury-code'){
 				try {
 					cm.set(msg[1]);
