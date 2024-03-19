@@ -271,6 +271,40 @@ const functionMap = {
 		v[1] = Math.max(2, (Array.isArray(v[1])) ? v[1][0] : v[1]);
 		return Rand.expand(v[0], v[1]);
 	},
+	// markov chain methods
+	// combine the markovTrain with markovChain
+	// first train the model based on a list
+	// then generate a list output from the chain
+	'markovTrain' : (...v) => {
+		// generate markovchain from the incoming list
+		let markov = new Rand.DeepMarkovChain(...v);
+		// create string of data
+		let data = markov.stringify();
+		// clear data and delete
+		markov.clear();
+		markov = null;
+		// output the table as a string array to use for generating
+		return [ data ];
+	},
+	'markov' : (...v) => {
+		return functionMap['markovTrain'](...v);
+	},
+	'markovChain' : (...v) => {
+		// train from a markov table and generate a chain
+		let markov = new Rand.DeepMarkovChain();
+		markov.parse(v[1]);
+		// set the seed based on the global seed
+		markov.seed(Rand.getSeed());
+		let gen = markov.chain(v[0]);
+		// clear the data and remove markov
+		markov.clear();
+		markov = null;
+		// return generated array
+		return gen;
+	},
+	'chain' : (...v) => {
+		return functionMap['markovChain'](...v);
+	},
 	// 
 	// Transformational Methods
 	// 
