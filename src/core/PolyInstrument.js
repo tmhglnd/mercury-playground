@@ -156,8 +156,8 @@ class PolyInstrument extends Instrument {
 		// delete super class
 		super.delete();
 		// disconnect the sound dispose the player
-		// this.gain.dispose();
-		// this.panner.dispose();
+		this.gain.dispose();
+		this.panner.dispose();
 
 		this.adsrs.map((a) => a.dispose());
 		this.sources.map((s) => s.dispose());

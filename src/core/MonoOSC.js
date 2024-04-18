@@ -61,6 +61,14 @@ class MonoOSC extends Sequencer {
 		this.messages.push(['gain', Util.toArray(a)]);
 	}
 
+	// placeholder for fx() method
 	add_fx(){}	
+
+	delete(){
+		// delete super class
+		super.delete();
+
+		console.log('=> disposed MonoOSC()');
+	}
 }
 module.exports = MonoOSC;
