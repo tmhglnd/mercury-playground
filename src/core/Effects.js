@@ -371,6 +371,7 @@ const Reverb = function(_params){
 // 
 const PitchShift = function(_params){
 	_params = Util.mapDefaults(_params, [ -12, 1 ]);
+	// apply the default values and convert to arrays where necessary
 	this._pitch = Util.toArray(_params[0]);
 	this._wet = Util.toArray(_params[1]);
 
@@ -697,27 +698,35 @@ const TriggerFilter = function(_params){
 }*/
 
 // Custom stereo delay implementation with lowpass filter in feedback loop
+// Delaytimes are set for left and right independently
+// But the feed from the delaylines are fed back into eachother creating
+// A nice rhythmic pingpong delay effect
+// 
 const Delay = function(_params){
+	// apply the default values and convert to arrays where necessary
+	if (_params.length === 1){ _params[1] = _params[0] }
+	else if (_params.length === 2){
+		_params[2] = _params[1];
+		_params[1] = _params[0];
+	}
+
+	_params = Util.mapDefaults(_params, [ '3/16', '2/8', 0.7, 0.6, 0.5 ]);
+	this._timeL = Util.toArray(_params[0]);
+	this._timeR = Util.toArray(_params[1]);
+	this._feedBack = Util.toArray(_params[2]);
+	this._fbDamp = Util.toArray(_params[3]);
+	this._wet = Util.toArray(_params[4]);
+
 	this._fx = new Tone.Gain(1);
 	this._fb = new Tone.Gain(0.5);
 	this._mix = new Tone.CrossFade(0.5);
 	this._split = new Tone.Split(2);
 	this._merge = new Tone.Merge(2);
-	this._maxDelay = 5;
+	this._maxDelay = 3;
 
 	this._delayL = new Tone.Delay({ maxDelay: this._maxDelay });
 	this._delayR = new Tone.Delay({ maxDelay: this._maxDelay });
 	this._flt = new Tone.Filter(1000, 'lowpass', '-12');
-
-	if (_params.length === 2){
-		_params[2] = _params[1];
-		_params[1] = _params[0];
-	}
-	// All params and defaults
-	this._timeL = (_params[0] !== undefined)? Util.toArray(_params[0]) : [ '2/16' ];
-	this._timeR = (_params[1] !== undefined)? Util.toArray(_params[1]) : [ '3/16' ];
-	this._feedBack = (_params[2] !== undefined)? Util.toArray(_params[2]) : [ 0.7 ];
-	this._fbDamp = (_params[3] !== undefined)? Util.toArray(_params[3]) : [ 0.6 ];
 
 	// split the signal
 	this._fx.connect(this._mix.a);
@@ -741,13 +750,16 @@ const Delay = function(_params){
 	this.set = function(c, time, bpm){
 		let dL = Math.min(this._maxDelay, Math.max(0, Util.formatRatio(Util.getParam(this._timeL, c), bpm)));
 		let dR = Math.min(this._maxDelay, Math.max(0, Util.formatRatio(Util.getParam(this._timeR, c), bpm)));
-		let ct = Math.max(10, Util.getParam(this._fbDamp, c) * 5000);
 		let fb = Math.max(0, Math.min(0.99, Util.getParam(this._feedBack, c) * 0.707));
+		let cf = Math.max(10, Util.getParam(this._fbDamp, c) * 8000);
 
-		this._delayL.delayTime.setValueAtTime(dL, time);
-		this._delayR.delayTime.setValueAtTime(dR, time);
-		this._flt.frequency.setValueAtTime(ct, time);
-		this._fb.gain.setValueAtTime(fb, time);
+		this._delayL.delayTime.setValueAtTime(dL + Math.random() * 0.001, time);		
+		this._delayR.delayTime.setValueAtTime(dR + Math.random() * 0.001, time);
+		this._fb.gain.setValueAtTime(Util.assureNum(fb, 0.7), time);
+		this._flt.frequency.setValueAtTime(cf, time);
+
+		const wet = Util.clip(Util.getParam(this._wet, c));
+		this._mix.fade.setValueAtTime(wet, time);
 	}
 
 	this.chain = function(){

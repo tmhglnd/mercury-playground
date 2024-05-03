@@ -3,6 +3,10 @@ const { map } = require('total-serialism').Utility;
 
 // replace defaults with incoming parameters
 function mapDefaults(params, defaults){
+	// params = params.filter((e) => {
+	// 	return e !== undefined;
+	// });
+
 	defaults.splice(0, params.length, ...params);
 	return defaults.map(p => toArray(p));
 }
