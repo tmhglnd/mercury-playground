@@ -183,10 +183,12 @@ const TanhDistortion = function(_params){
 	}
 
 	this.delete = function(){
-		this._fx.disconnect();
-		this._fx.dispose();
-		this._mix.disconnect();
-		this._mix.dispose();
+		let nodes = [ this._fx, this._mix, this._mixDry, this._mixWet ];
+		
+		nodes.forEach((b) => {
+			n.disconnect();
+			n.dispose();
+		});
 	}
 }
 
