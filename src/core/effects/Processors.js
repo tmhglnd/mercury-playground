@@ -1,19 +1,19 @@
 
 // A white noise generator at -6dBFS to test AudioWorkletProcessor
 //
-class NoiseProcessor extends AudioWorkletProcessor {
-	process(inputs, outputs, parameters){
-		const output = outputs[0];
+// class NoiseProcessor extends AudioWorkletProcessor {
+// 	process(inputs, outputs, parameters){
+// 		const output = outputs[0];
 
-		output.forEach((channel) => {
-			for (let i=0; i<channel.length; i++) {
-				channel[i] = Math.random() - 0.5;
-			}
-		});
-		return true;
-	}
-}
-registerProcessor('noise-processor', NoiseProcessor);
+// 		output.forEach((channel) => {
+// 			for (let i=0; i<channel.length; i++) {
+// 				channel[i] = Math.random() - 0.5;
+// 			}
+// 		});
+// 		return true;
+// 	}
+// }
+// registerProcessor('noise-processor', NoiseProcessor);
 
 // A Downsampling Chiptune effect. Downsamples the signal by a specified amount
 // Resulting in a lower samplerate, making it sound more like 8bit/chiptune
@@ -48,6 +48,11 @@ class DownSampleProcessor extends AudioWorkletProcessor {
 				const d = (parameters.down.length > 1) ? parameters.down[i] : parameters.down[0];
 				// for every channel
 				for (let channel=0; channel<input.length; ++channel){
+					// upsampling for better results
+					// for (let s=0; s<4; s++){
+					// 	if (this.count)
+					// }
+
 					// if counter equals 0, sample and hold
 					if (this.count % d === 0){
 						this.sah[channel] = input[channel][i];
