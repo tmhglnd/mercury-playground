@@ -133,37 +133,60 @@ const DownSampler = function(_params){
 // distortion is applied on the overdrive parameter
 //
 const TanhDistortion = function(_params){
-	this._drive = (_params[0])? Util.toArray(_params[0]) : [4];
+	_params = Util.mapDefaults(_params, [2, 1]);
+	// apply the default values and convert to arrays where necessary
+	this._drive = Util.toArray(_params[0]);
+	this._wet = Util.toArray(_params[1]);
+
+	// The crossfader for wet-dry (originally implemented with CrossFade)
+	// this._mix = new Tone.CrossFade();
+	this._mix = new Tone.Add();
+	this._mixWet = new Tone.Gain(0.5).connect(this._mix.input);
+	this._mixDry = new Tone.Gain(0.5).connect(this._mix.addend);	
 
 	// ToneAudioNode has all the tone effect parameters
 	this._fx = new Tone.ToneAudioNode();
 	// A gain node for connecting with input and output
-	this._fx.input = new Tone.Gain(1);
+	this._fx.input = new Tone.Gain(1).connect(this._mixDry); // connects to dry
 	this._fx.output = new Tone.Gain(1);
+
 	// the fx processor
 	this._fx.workletNode = Tone.getContext().createAudioWorkletNode('tanh-distortion-processor');
-	// connect input, fx and output
-	this._fx.input.chain(this._fx.workletNode, this._fx.output);
+
+	// connect input, fx, output to wetdry
+	this._fx.input.chain(this._fx.workletNode, this._fx.output); 
+	this._fx.output.connect(this._mixWet);
 
 	this.set = function(c, time, bpm){
 		// drive amount, minimum drive of 1
-		const d = Util.assureNum(Math.max(1, Math.pow(Util.getParam(this._drive, c), 2) + 1));
+		const d = Util.assureNum(Math.max(0, Util.getParam(this._drive, c)) + 1);
+
 		// preamp gain reduction for linear at drive = 1
-		const p = 0.4;
+		const p = 1.2;
 		// makeup gain
-		const m = 1.0 / p / (d ** 0.6);
-		// set the input gain and output gain reduction
-		this._fx.input.gain.setValueAtTime(p * d, time);
-		this._fx.output.gain.setValueAtTime(m, time);
+		const m = 1.0 / (p * (d ** 0.6));
+
+		// set the parameters in the workletNode
+		const amount = this._fx.workletNode.parameters.get('amount');
+		amount.setValueAtTime(p * d * d, time);
+
+		const makeup = this._fx.workletNode.parameters.get('makeup');
+		makeup.setValueAtTime(m, time);
+
+		const wet = Util.clip(Util.getParam(this._wet, c), 0, 1);
+		this._mixWet.gain.setValueAtTime(wet);
+		this._mixDry.gain.setValueAtTime(1.0 - wet);
 	}
 
 	this.chain = function(){
-		return { 'send' : this._fx, 'return' : this._fx }
+		return { 'send' : this._fx, 'return' : this._mix }
 	}
 
 	this.delete = function(){
 		this._fx.disconnect();
 		this._fx.dispose();
+		this._mix.disconnect();
+		this._mix.dispose();
 	}
 }
 
