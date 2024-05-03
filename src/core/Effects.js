@@ -99,32 +99,52 @@ module.exports = fxMap;
 // Programmed with a custom AudioWorkletProcessor, see effects/Processors.js
 //
 const DownSampler = function(_params){
-	this._down = (_params[0])? Util.toArray(_params[0]) : [0.5];
+	// apply the default values and convert to arrays where necessary
+	_params = Util.mapDefaults(_params, [ 0.5, 1 ]);
+	this._down = Util.toArray(_params[0]);
+	this._wet = Util.toArray(_params[1]);
 
 	// ToneAudioNode has all the tone effect parameters
 	this._fx = new Tone.ToneAudioNode();
+
+	// The crossfader mix
+	this._mix = new Tone.Add();
+	this._mixDry = new Tone.Gain(0.5).connect(this._mix.input);
+	// this._mixWet = new Tone.Gain(0.5).connect(this._mix.addend);
+
 	// A gain node for connecting with input and output
-	this._fx.input = new Tone.Gain(1);
-	this._fx.output = new Tone.Gain(1);
+	this._fx.input = new Tone.Gain(1).connect(this._mixDry);
+	this._fx.output = new Tone.Gain(1).connect(this._mix.addend);
+
 	// the fx processor
 	this._fx.workletNode = Tone.getContext().createAudioWorkletNode('downsampler-processor');
+
 	// connect input, fx and output
 	this._fx.input.chain(this._fx.workletNode, this._fx.output);
 
 	this.set = function(c, time, bpm){
 		// some parameter mapping changing input range 0-1 to 1-inf
-		let p = this._fx.workletNode.parameters.get('down');
-		let d = Math.floor(1 / (1 - Util.clip(Util.getParam(this._down, c) ** 0.25, 0, 0.999)));
+		const p = this._fx.workletNode.parameters.get('down');
+		const d = Math.floor(1 / (1 - Util.clip(Util.getParam(this._down, c) ** 0.25, 0, 0.999)));
+		
 		p.setValueAtTime(Util.assureNum(d), time);
+		
+		const w = Util.clip(Util.getParam(this._wet, c), 0, 1);
+		this._fx.output.gain.setValueAtTime(w, time);
+		this._mixDry.gain.setValueAtTime(1 - w, time);
 	}
 
 	this.chain = function(){
-		return { 'send' : this._fx, 'return' : this._fx }
+		return { 'send' : this._fx, 'return' : this._mix }
 	}
 
 	this.delete = function(){
-		this._fx.disconnect();
-		this._fx.dispose();
+		const nodes = [ this._fx, this._mix, this._mixDry ];
+
+		nodes.forEach((n) => {
+			n.disconnect();
+			n.dispose();
+		});
 	}
 }
 
@@ -133,7 +153,7 @@ const DownSampler = function(_params){
 // distortion is applied on the overdrive parameter
 //
 const TanhDistortion = function(_params){
-	_params = Util.mapDefaults(_params, [2, 1]);
+	_params = Util.mapDefaults(_params, [ 2, 1 ]);
 	// apply the default values and convert to arrays where necessary
 	this._drive = Util.toArray(_params[0]);
 	this._wet = Util.toArray(_params[1]);
@@ -147,22 +167,21 @@ const TanhDistortion = function(_params){
 	// ToneAudioNode has all the tone effect parameters
 	this._fx = new Tone.ToneAudioNode();
 	// A gain node for connecting with input and output
-	this._fx.input = new Tone.Gain(1).connect(this._mixDry); // connects to dry
-	this._fx.output = new Tone.Gain(1);
+	this._fx.input = new Tone.Gain(1).connect(this._mixDry);
+	this._fx.output = new Tone.Gain(1).connect(this._mixWet);
 
 	// the fx processor
 	this._fx.workletNode = Tone.getContext().createAudioWorkletNode('tanh-distortion-processor');
 
 	// connect input, fx, output to wetdry
-	this._fx.input.chain(this._fx.workletNode, this._fx.output); 
-	this._fx.output.connect(this._mixWet);
+	this._fx.input.chain(this._fx.workletNode, this._fx.output);
 
 	this.set = function(c, time, bpm){
 		// drive amount, minimum drive of 1
 		const d = Util.assureNum(Math.max(0, Util.getParam(this._drive, c)) + 1);
 
 		// preamp gain reduction for linear at drive = 1
-		const p = 1.2;
+		const p = 0.8;
 		// makeup gain
 		const m = 1.0 / (p * (d ** 0.6));
 
@@ -175,7 +194,7 @@ const TanhDistortion = function(_params){
 
 		const wet = Util.clip(Util.getParam(this._wet, c), 0, 1);
 		this._mixWet.gain.setValueAtTime(wet);
-		this._mixDry.gain.setValueAtTime(1.0 - wet);
+		this._mixDry.gain.setValueAtTime(1 - wet);
 	}
 
 	this.chain = function(){
@@ -185,7 +204,7 @@ const TanhDistortion = function(_params){
 	this.delete = function(){
 		let nodes = [ this._fx, this._mix, this._mixDry, this._mixWet ];
 		
-		nodes.forEach((b) => {
+		nodes.forEach((n) => {
 			n.disconnect();
 			n.dispose();
 		});
