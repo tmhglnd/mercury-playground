@@ -465,11 +465,11 @@ const Filter = function(_params){
 	// parameter mapping changes based on amount of arguments
 	this._static = true;
 	if (_params.length < 3){
-		_params = [['low']].concat(Util.mapDefaults(_params, [1500, 0.4]));
+		_params = [['low']].concat(Util.mapDefaults(_params, [1200, 0.45]));
 	} else if (_params.length < 4){
-		_params = Util.mapDefaults(_params, ['low', 1500, 0.4]);
+		_params = Util.mapDefaults(_params, ['low', 1200, 0.45]);
 	} else {
-		_params = Util.mapDefaults(_params, ['low', '1/1', 100, 1500, 0.4, 'sine', 1]);
+		_params = Util.mapDefaults(_params, ['low', '1/1', 200, 3000, 0.45, 'sine', 0.5]);
 		this._static = false;
 	}
 
@@ -545,14 +545,14 @@ const Filter = function(_params){
 					// 0=down, 0.5=triangle, 1=up
 					switch(Math.floor(Util.clip(w, 0, 1)*2.99)){
 						case 0: 
-							w = 'sawtooth';
-							// swap hi/lo range for saw down effect
-							let tmp = lo; lo = hi; hi = tmp; break;
+							// regular saw up
+							w = 'sawtooth'; break;
 						case 1:
 							w = 'sine'; break;
 						case 2:
-							// regular saw up
-							w = 'sawtooth'; break;
+							w = 'sawtooth';
+							// swap hi/lo range for saw down effect
+							let tmp = lo; lo = hi; hi = tmp; break;
 					}
 				}
 			}
