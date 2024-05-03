@@ -115,6 +115,11 @@ class SquashProcessor extends AudioWorkletProcessor {
 			defaultValue: 4,
 			minValue: 1,
 			maxValue: 1024
+		}, {
+			name: 'makeup',
+			defaultValue: 0.5,
+			minValue: 0,
+			maxValue: 2
 		}];
 	}
 
@@ -132,10 +137,12 @@ class SquashProcessor extends AudioWorkletProcessor {
 					// (s * a) / ((s * a)^2 * 0.28 + 1) / √a
 					// drive amount, minimum of 1
 					const a = (parameters.amount.length > 1)? parameters.amount[i] : parameters.amount[0];
+					// makeup gain
+					const m = (parameters.makeup.length > 1)? parameters.makeup[i] : parameters.makeup[0];
 					// set the waveshaper effect
 					const s = input[channel][i];
-					const p = (s * a) / ((s * a) * (s * a) * 0.28 + 1.0);
-					output[channel][i] = p;
+					const x = s * a * 1.412;
+					output[channel][i] = (x / (x * x * 0.28 + 1.0)) * m * 0.708;
 				}
 			}
 		}

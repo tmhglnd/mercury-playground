@@ -109,7 +109,7 @@ const DownSampler = function(_params){
 
 	// The crossfader mix
 	this._mix = new Tone.Add();
-	this._mixDry = new Tone.Gain(0.5).connect(this._mix.input);
+	this._mixDry = new Tone.Gain(0).connect(this._mix.input);
 	// this._mixWet = new Tone.Gain(0.5).connect(this._mix.addend);
 
 	// A gain node for connecting with input and output
@@ -161,8 +161,8 @@ const TanhDistortion = function(_params){
 	// The crossfader for wet-dry (originally implemented with CrossFade)
 	// this._mix = new Tone.CrossFade();
 	this._mix = new Tone.Add();
-	this._mixWet = new Tone.Gain(0.5).connect(this._mix.input);
-	this._mixDry = new Tone.Gain(0.5).connect(this._mix.addend);	
+	this._mixWet = new Tone.Gain(0).connect(this._mix.input);
+	this._mixDry = new Tone.Gain(1).connect(this._mix.addend);	
 
 	// ToneAudioNode has all the tone effect parameters
 	this._fx = new Tone.ToneAudioNode();
@@ -289,13 +289,23 @@ const Chorus = function(_params){
 // Based on an algorithm by Peter McCulloch
 // 
 const Squash = function(_params){
-	this._squash = (_params[0])? Util.toArray(_params[0]) : [1];
+	_params = Util.mapDefaults(_params, [ 4, 1, 0.28 ]);
+	// apply the default values and convert to arrays where necessary
+	this._squash = Util.toArray(_params[0]);
+	this._wet = Util.toArray(_params[1]);
+
+	// The crossfader for wet-dry (originally implemented with CrossFade)
+	// this._mix = new Tone.CrossFade();
+	this._mix = new Tone.Add();
+	this._mixDry = new Tone.Gain(0).connect(this._mix.input);
+	// this._mixWet = new Tone.Gain(0.5).connect(this._mix.addend);	
 
 	// ToneAudioNode has all the tone effect parameters
 	this._fx = new Tone.ToneAudioNode();
 	// A gain node for connecting with input and output
-	this._fx.input = new Tone.Gain(1);
-	this._fx.output = new Tone.Gain(1);
+	this._fx.input = new Tone.Gain(1).connect(this._mixDry);
+	this._fx.output = new Tone.Gain(1).connect(this._mix.addend);
+
 	// the fx processor
 	this._fx.workletNode = Tone.getContext().createAudioWorkletNode('squash-processor');
 	// connect input, fx and output
@@ -303,14 +313,21 @@ const Squash = function(_params){
 
 	this.set = function(c, time, bpm){
 		let d = Util.assureNum(Math.max(1, Util.getParam(this._squash, c)));
-		let p = this._fx.workletNode.parameters.get('amount');
 		let m = 1.0 / Math.sqrt(d);
-		p.setValueAtTime(d, time);
+		
+		const amount = this._fx.workletNode.parameters.get('amount');
+		amount.setValueAtTime(d, time);
+
+		const makeup = this._fx.workletNode.parameters.get('makeup');
+		makeup.setValueAtTime(m, time);
+
+		const wet = Util.clip(Util.getParam(this._wet, c));
 		this._fx.output.gain.setValueAtTime(m, time);
+		this._mixDry.gain.setValueAtTime(1 - wet, time);
 	}
 
 	this.chain = function(){
-		return { 'send' : this._fx, 'return' : this._fx }
+		return { 'send' : this._fx, 'return' : this._mix }
 	}
 
 	this.delete = function(){
