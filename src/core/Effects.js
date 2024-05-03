@@ -366,20 +366,21 @@ const Reverb = function(_params){
 }
 
 // PitchShift FX
-// Shift the pitch up or down with semitones
+// Shift the pitch up or down in semitones
+// Utilizes the default PitchShift FX from ToneJS
 // 
 const PitchShift = function(_params){
-	this._fx = new Tone.PitchShift();
+	_params = Util.mapDefaults(_params, [ -12, 1 ]);
+	this._pitch = Util.toArray(_params[0]);
+	this._wet = Util.toArray(_params[1]);
 
-	this._pitch = (_params[0] !== undefined)? Util.toArray(_params[0]) : [-12];
-	this._wet = (_params[1] !== undefined)? Util.toArray(_params[1]) : [1];
+	this._fx = new Tone.PitchShift();
 
 	this.set = function(c, time){
 		let p = Util.getParam(this._pitch, c);
 		let w = Util.getParam(this._wet, c);
 
 		this._fx.pitch = TL.toScale(p);
-		// this._fx.pitch = p;
 		this._fx.wet.setValueAtTime(w, time);
 	}
 
