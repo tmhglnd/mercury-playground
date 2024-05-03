@@ -624,10 +624,10 @@ const TriggerFilter = function(_params){
 		'bandpass': 'bandpass'
 	}
 
-	this.defaults = ['low', 1, '1/16', 4000, 100, 1];
 	// replace defaults with provided arguments
-	this.defaults.splice(0, _params.length, ..._params);
-	_params = this.defaults.map(p => Util.toArray(p));
+	_params = Util.mapDefaults(_params, ['low', 1, '1/16', 4000, 100, 1]);
+	// this.defaults.splice(0, _params.length, ..._params);
+	_params = _params.map(p => Util.toArray(p));
 
 	if (this._types[_params[0][0]]){
 		this._fx.set({ type: this._types[_params[0][0]] });
@@ -650,7 +650,7 @@ const TriggerFilter = function(_params){
 		let max = Util.getParam(this._high, c);
 		let range = Math.abs(max - min);
 		let lower = Math.min(max, min);
-		let exp = Util.getParam(this._exp, c);
+		let exp = 1 / Util.getParam(this._exp, c);
 
 		this._mul.setValueAtTime(range, time);
 		this._add.setValueAtTime(lower, time);
