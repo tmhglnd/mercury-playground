@@ -49,6 +49,9 @@ const fxMap = {
 	'reverb' : (params) => {
 		return new Reverb(params);
 	},
+	'freeverb' : (params) => {
+		return new CustomFreeverb(params);
+	},
 	'shift' : (params) => {
 		return new PitchShift(params);
 	},
@@ -369,12 +372,100 @@ const Reverb = function(_params){
 	}
 }
 
+// A simple allpass filter constructed of a Feedback CombFilter,
+// a gain node and a subtraction. This works because an allpass filter
+// is in the simplest form a feedforward and feedback comb filter combined
+// where the feedforward coefficient is negated.
+// 
+const AllPass = function(dt=10, res=0.5){
+	// params: dt = delaytime, res = resonance
+	this.out = new Tone.Subtract();
+	this.fbcf = new Tone.FeedbackCombFilter(dt, res).connect(this.out.subtrahend);
+	this.in = new Tone.Gain(res).fan(this.fbcf, this.out);
+
+	this.connect = function(to){
+		// connect to the output node via a "regular" Tone method
+		this.out.connect(to);
+	}
+
+	this.disconnect = function(){
+		// disconnect all the nodes
+		[ this.out, this.fbcf, this.in ].forEach(n => n.disconnect());
+	}
+	
+	this.dispose = function(){
+		// dispose all the nodes
+		[ this.out, this.fbcf, this.in ].forEach(n => n.dispose());
+	}
+}
+
+// A custom reverberation algorithm written by Timo Hoogland
+// The algorithm is based on a combination of the popular
+// Freeverb and Schroeder JCRev designs
+// It has the quality like a Freeverb, while being also computationally
+// less expensive, more in the range of the JCRev
+// 
 const CustomFreeverb = function(_params){
-	// _params = Util.mapDefaults(_params, []);
-	// this._fx;
+	this.nodes = [];
+
+	this._apIn = [ 0.01388, 0.00452, 0.00148 ];
+	this._apOut = [ 0.01261, 0.00773 ];
+	this._apQ = 0.523;
+
+	this._delays = [ 0.035306, 0.028957, 0.03667, 0.030749, 
+					0.03381, 0.026938, 0.032245, 0.025306 ];
+	this._fb = 0.97 //0.84;
+
+	// the input allpass diffusion section plus onepole lowpass filter
+	this._lpf = new Tone.OnePoleFilter(2000, "lowpass");
+
+	this._ap3 = new AllPass(this._apIn[2], this._apQ);
+	this._ap3.connect(this._lpf);
+	this._ap2 = new AllPass(this._apIn[1], this._apQ);
+	this._ap2.connect(this._ap3.in);
+	this._ap1 = new AllPass(this._apIn[0], this._apQ);
+	this._ap1.connect(this._ap2.in);
+
+	// the input node
+	this._fx = new Tone.Gain(1).connect(this._ap1.in);
+	
+	// the various outputs for stereo image/mixing
+	this._outA = new Tone.Gain(1);
+	this._outB = new Tone.Subtract();
+	this._outC = new Tone.Subtract();
+
+	// the output outA diffusion section 
+	this._ap5 = new AllPass(this._apOut[1], this._apQ);
+	this._ap5.connect(this._outA);
+	this._ap4 = new AllPass(this._apOut[0], this._apQ);
+	this._ap4.connect(this._ap5.in);
+
+	// sum combfilters 1 & 2
+	this._s1 = new Tone.Gain(0.2);
+	this._s1.fan(this._ap4.in, this._outB, this._outC.subtrahend); 
+	this._s2 = new Tone.Gain(0.2);
+	this._s2.fan(this._ap4.in, this._outB.subtrahend, this._outC);
+
+	this._combs = [];
+	for (var i=0; i<this._delays.length; i++){
+		let comb = new Tone.FeedbackCombFilter(this._delays[i], this._fb);
+		comb.connect((i % 2) ? this._s1 : this._s2);
+		
+		this._ap3.connect(comb);
+		this._combs.push(comb);
+	}
+
+	this.set = function(c, time){
+
+	}
+
+	this.chain = function(){
+		return { 'send' : this._fx, 'return' : this._outA }
+	}
 
 	this.delete = function(){
-		let nodes = [ this._fx ];
+		let nodes = [ this._lpf, this._ap5, this._ap4, this._ap3, this._ap2, this._ap1, this._fx, this._outA, this._outB, this._outC, this._s1, this._s2, ...this._combs ];
+
 		nodes.forEach((n) => { 
 			n.disconnect(); 
 			n.dispose(); 
