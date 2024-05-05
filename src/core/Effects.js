@@ -331,8 +331,12 @@ const Squash = function(_params){
 	}
 
 	this.delete = function(){
-		this._fx.disconnect();
-		this._fx.dispose();
+		let nodes = [ this._fx, this._mix, this._mixDry ];
+
+		nodes.forEach((n) => {
+			n.disconnect();
+			n.dispose();
+		});
 	}
 }
 
@@ -362,6 +366,19 @@ const Reverb = function(_params){
 	this.delete = function(){
 		this._fx.disconnect();
 		this._fx.dispose();
+	}
+}
+
+const CustomFreeverb = function(_params){
+	// _params = Util.mapDefaults(_params, []);
+	// this._fx;
+
+	this.delete = function(){
+		let nodes = [ this._fx ];
+		nodes.forEach((n) => { 
+			n.disconnect(); 
+			n.dispose(); 
+		});
 	}
 }
 
@@ -399,6 +416,12 @@ const PitchShift = function(_params){
 // a Low Frequency Oscillator effect, control tempo, type and depth
 //
 const LFO = function(_params){
+	_params = Util.mapDefaults(_params, [ '1/8', 'sine', 1 ]);
+	_params = _params.map(x => Util.toArray(x));
+	this._speed = _params[0];
+	this._type = _params[1];
+	this._depth = _params[2];
+
 	this._waveMap = {
 		sine : 'sine',
 		saw : 'sawtooth',
@@ -413,10 +436,6 @@ const LFO = function(_params){
 	this._lfo = new Tone.LFO();
 	this._fx = new Tone.Gain();
 	this._lfo.connect(this._fx.gain);
-
-	this._speed = (_params[0]) ? Util.toArray(_params[0]) : ['1/8'];
-	this._type = (_params[1]) ? Util.toArray(_params[1]) : ['sine'];
-	this._depth = (_params[2] !== undefined) ? Util.toArray(_params[2]) : [ 1 ];
 
 	this.set = function(c, time, bpm){
 		let w = Util.getParam(this._type, c);
@@ -448,11 +467,11 @@ const LFO = function(_params){
 	}
 
 	this.delete = function(){
-		let blocks = [ this._fx, this._lfo ];
+		let nodes = [ this._fx, this._lfo ];
 		
-		blocks.forEach((b) => {
-			b.disconnect();
-			b.dispose();
+		nodes.forEach((n) => {
+			n.disconnect();
+			n.dispose();
 		});
 	}
 }
@@ -586,8 +605,12 @@ const Filter = function(_params){
 	}
 
 	this.delete = function(){
-		this._fx.disconnect();
-		this._fx.dispose();
+		let nodes = [ this._fx, this._lfo, this._scale ];
+
+		nodes.forEach((n) => {
+			n?.disconnect();
+			n?.dispose();
+		});
 	}
 }
 
@@ -669,11 +692,11 @@ const TriggerFilter = function(_params){
 	}
 
 	this.delete = function(){
-		let blocks = [ this._fx, this._adsr, this._mul, this._add, this._pow ];
+		let nodes = [ this._fx, this._adsr, this._mul, this._add, this._pow ];
 
-		blocks.forEach((b) => {
-			b.disconnect();
-			b.dispose();
+		nodes.forEach((n) => {
+			n.disconnect();
+			n.dispose();
 		});
 	}
 }
@@ -767,11 +790,11 @@ const Delay = function(_params){
 	}
 
 	this.delete = function(){
-		let blocks = [ this._fx, this._fb, this._mix, this._split, this._merge, this._delayL, this._delayR, this._flt ];
+		let nodes = [ this._fx, this._fb, this._mix, this._split, this._merge, this._delayL, this._delayR, this._flt ];
 
-		blocks.forEach((b) => {
-			b.disconnect();
-			b.dispose();
+		nodes.forEach((n) => {
+			n.disconnect();
+			n.dispose();
 		});
 	}
 }
@@ -816,11 +839,11 @@ const Delay = function(_params){
 // 	}
 
 // 	this.delete = function(){
-// 		let blocks = [ this._fx ];
+// 		let nodes = [ this._fx ];
 
-// 		blocks.forEach((b) => {
-// 			b.disconnect();
-// 			b.dispose();
+// 		nodes.forEach((n) => {
+// 			n.disconnect();
+// 			n.dispose();
 // 		});
 // 	}
 // }
