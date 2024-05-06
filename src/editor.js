@@ -22,6 +22,7 @@ let tutorials = require('./data/tutorials.json');
 console.log('=> tutorials loaded');
 
 let samples = require('./data/samples.json');
+const { mod } = require('total-serialism/src/utility.js');
 
 // the simple mode lexer for Mercury syntax-highlighting
 CodeMirror.defineSimpleMode("mercury", {
@@ -338,7 +339,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 			// 'sounds' : 'https://github.com/tmhglnd/mercury/blob/master/mercury_ide/media/README.md',
 			'help': 'https://tmhglnd.github.io/mercury/reference.html',
 			// 'local version': 'https://github.com/tmhglnd/mercury-playground#-running-without-internet'
-			"collaborate": 'https://next.flok.cc'
+			"collaborate": 'https://flok.cc'
 		}
 
 		let div = document.getElementById('links');
@@ -366,8 +367,11 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 
 		let load = document.createElement('button');
 		load.innerHTML = 'add sounds';
+		// load.innerHTML = 'settings';
 		load.onclick = () => {
 			input.click();
+			// let modal = document.getElementById('modalbox');
+			// modal.style.display = "block";
 		}
 		let input = document.createElement('input');
 		input.style.display = 'none';
@@ -443,25 +447,62 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 	}
 
 	// theme menu for editor
-	this.themeMenu = function(){
-		let div = document.getElementById('menu');
-		let menu = document.createElement('select');
-		menu.id = 'themes';
-		menu.onchange = () => { this.changeTheme() };
+	// this.themeMenu = function(){
+	// 	let div = document.getElementById('menu');
+	// 	let menu = document.createElement('select');
+	// 	menu.id = 'themes';
+	// 	menu.onchange = () => { this.changeTheme() };
 		
+	// 	let themes = ['ayu-dark', 'base16-dark', 'material-darker', 'material-ocean', 'moxer', 'tomorrow-night-eighties', 'panda-syntax', 'yonce'];
+
+	// 	let lightThemes = ['elegant', 'duotone-light', 'base16-light']
+
+	// 	for (let t in themes){
+	// 		let option = document.createElement('option');
+	// 		option.value = themes[t];
+	// 		option.innerHTML = themes[t];
+	// 		menu.appendChild(option);
+	// 	}
+	// 	div.appendChild(menu);
+
+	// 	menu.value = defaultTheme;
+	// }
+
+	// settings menu with more options and some explanation
+	this.settingsMenu = function(){
+		let modal = document.getElementById('modalbox');
+		// let m = document.createElement('div');
+		// m.className = "settings-menu";
+		let m = document.getElementsByClassName('settings-menu')[0];
+		m.innerHTML = `
+		<span class="close">&times;</span>
+		<p>
+			Theme <select id="themes" style="width:30%"></select>
+		</p>`;
+
+		let menu = document.getElementById('themes');
+		menu.onchange = () => { this.changeTheme() };
+
 		let themes = ['ayu-dark', 'base16-dark', 'material-darker', 'material-ocean', 'moxer', 'tomorrow-night-eighties', 'panda-syntax', 'yonce'];
 
-		let lightThemes = ['elegant', 'duotone-light', 'base16-light']
-
-		for (let t in themes){
+		// 	let lightThemes = ['elegant', 'duotone-light', 'base16-light']
+		
+		for (let t=0; t<themes.length; t++){
 			let option = document.createElement('option');
 			option.value = themes[t];
 			option.innerHTML = themes[t];
 			menu.appendChild(option);
 		}
-		div.appendChild(menu);
-
 		menu.value = defaultTheme;
+
+		// close the window when clicking the cross or outside of the box
+		let span = document.getElementsByClassName('close')[0];
+		span.onclick = () => modal.style.display = "none";
+		
+		window.onclick = (event) => {
+			if (event.target === modal) modal.style.display = "none";
+		}
+		modal.appendChild(m);
 	}
 
 	// light/dark mode switcher

@@ -154,7 +154,12 @@ class MonoSample extends Instrument {
 		// delete super class
 		super.delete();
 		// disconnect the sound dispose the player
+		this.source.stop();
+		this.source.disconnect();
 		this.source.dispose();
+
+		this.sample.stop();
+		this.sample.disconnect();
 		this.sample.dispose();
 
 		console.log('=> disposed MonoSample()', this._sound);

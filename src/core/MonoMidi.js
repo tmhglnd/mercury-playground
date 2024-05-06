@@ -150,6 +150,13 @@ class MonoMidi extends Sequencer {
 		// send out midiclock messages to sync external devices
 		// on this specific midi output and channel
 		// this._sync;
-	}	
+	}
+	
+	delete(){
+		// delete super class
+		super.delete();
+
+		console.log('=> disposed MonoMidi()', this._device);
+	}
 }
 module.exports = MonoMidi;

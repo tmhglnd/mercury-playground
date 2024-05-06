@@ -24,16 +24,16 @@ let sounds = [];
 
 // parse and evaluate the inputted code
 // as an asyncronous function with promise
-async function code({ file, engine, canvas, p5canvas }){
+function code({ file, engine, canvas, p5canvas }){
 	let silenced = false;
 	let c = file;
 
 	let t = Tone.Transport.seconds;
-	let parser = new Promise((resolve) => {
-		return resolve(Mercury(c));
-	});
-	let parse = await parser;
-	// let parse = Mercury(c);
+	// let parser = new Promise((resolve) => {
+	// 	return resolve(Mercury(c));
+	// });
+	// let parse = await parser;
+	let parse = Mercury(c);
 	console.log(`Evaluated in: ${((Tone.Transport.seconds - t) * 1000).toFixed(3)}ms`);
 
 	let tree = parse.parseTree;
@@ -262,8 +262,9 @@ async function code({ file, engine, canvas, p5canvas }){
 		return;
 	}
 
-	// copy current sounds over
-	_sounds = sounds.slice();
+	// copy current sounds over with reference
+	// _sounds = sounds.slice();
+	_sounds = [...sounds];
 	// empty previous sounds
 	sounds = [];
 

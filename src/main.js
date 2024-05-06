@@ -136,6 +136,7 @@ window.onload = () => {
 	cm.tutorialMenu();
 	cm.soundsMenu();
 	cm.modeSwitch();
+	// cm.settingsMenu();
 	
 	// Load recent code from localStorage if any
 	if (localStorage.getItem('code')){
