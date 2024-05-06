@@ -1,19 +1,19 @@
 
 // A white noise generator at -6dBFS to test AudioWorkletProcessor
 //
-class NoiseProcessor extends AudioWorkletProcessor {
-	process(inputs, outputs, parameters){
-		const output = outputs[0];
+// class NoiseProcessor extends AudioWorkletProcessor {
+// 	process(inputs, outputs, parameters){
+// 		const output = outputs[0];
 
-		output.forEach((channel) => {
-			for (let i=0; i<channel.length; i++) {
-				channel[i] = Math.random() - 0.5;
-			}
-		});
-		return true;
-	}
-}
-registerProcessor('noise-processor', NoiseProcessor);
+// 		output.forEach((channel) => {
+// 			for (let i=0; i<channel.length; i++) {
+// 				channel[i] = Math.random() - 0.5;
+// 			}
+// 		});
+// 		return true;
+// 	}
+// }
+// registerProcessor('noise-processor', NoiseProcessor);
 
 // A Downsampling Chiptune effect. Downsamples the signal by a specified amount
 // Resulting in a lower samplerate, making it sound more like 8bit/chiptune
@@ -48,6 +48,11 @@ class DownSampleProcessor extends AudioWorkletProcessor {
 				const d = (parameters.down.length > 1) ? parameters.down[i] : parameters.down[0];
 				// for every channel
 				for (let channel=0; channel<input.length; ++channel){
+					// upsampling for better results
+					// for (let s=0; s<4; s++){
+					// 	if (this.count)
+					// }
+
 					// if counter equals 0, sample and hold
 					if (this.count % d === 0){
 						this.sah[channel] = input[channel][i];
@@ -69,6 +74,19 @@ registerProcessor('downsampler-processor', DownSampleProcessor);
 // distortion is applied on the overdrive parameter
 //
 class TanhDistortionProcessor extends AudioWorkletProcessor {
+	static get parameterDescriptors(){
+		return [{
+			name: 'amount',
+			defaultValue: 4,
+			minValue: 1
+		}, {
+			name: 'makeup',
+			defaultValue: 0.5,
+			minValue: 0,
+			maxValue: 2
+		}]
+	}
+
 	constructor(){
 		super();
 	}
@@ -80,8 +98,10 @@ class TanhDistortionProcessor extends AudioWorkletProcessor {
 		if (input.length > 0){
 			for (let channel=0; channel<input.length; ++channel){
 				for (let i=0; i<input[channel].length; i++){
+					const a = (parameters.amount.length > 1)? parameters.amount[i] : parameters.amount[0];
+					const m = (parameters.makeup.length > 1)? parameters.makeup[i] : parameters.makeup[0];
 					// simple waveshaping with tanh
-					output[channel][i] = Math.tanh(input[channel][i]);
+					output[channel][i] = Math.tanh(input[channel][i] * a) * m;
 				}
 			}
 		}
@@ -100,6 +120,11 @@ class SquashProcessor extends AudioWorkletProcessor {
 			defaultValue: 4,
 			minValue: 1,
 			maxValue: 1024
+		}, {
+			name: 'makeup',
+			defaultValue: 0.5,
+			minValue: 0,
+			maxValue: 2
 		}];
 	}
 
@@ -117,10 +142,12 @@ class SquashProcessor extends AudioWorkletProcessor {
 					// (s * a) / ((s * a)^2 * 0.28 + 1) / √a
 					// drive amount, minimum of 1
 					const a = (parameters.amount.length > 1)? parameters.amount[i] : parameters.amount[0];
+					// makeup gain
+					const m = (parameters.makeup.length > 1)? parameters.makeup[i] : parameters.makeup[0];
 					// set the waveshaper effect
 					const s = input[channel][i];
-					const p = (s * a) / ((s * a) * (s * a) * 0.28 + 1.0);
-					output[channel][i] = p;
+					const x = s * a * 1.412;
+					output[channel][i] = (x / (x * x * 0.28 + 1.0)) * m * 0.708;
 				}
 			}
 		}

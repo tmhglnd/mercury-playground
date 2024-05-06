@@ -3,6 +3,10 @@ const { map } = require('total-serialism').Utility;
 
 // replace defaults with incoming parameters
 function mapDefaults(params, defaults){
+	// params = params.filter((e) => {
+	// 	return e !== undefined;
+	// });
+
 	defaults.splice(0, params.length, ...params);
 	return defaults.map(p => toArray(p));
 }
@@ -12,8 +16,8 @@ function atodb(a=0){
 	return 20 * Math.log(a);
 }
 
-// clip a value between a specified range
-function clip(v, l, h){
+// clip a value between a specified range, defaults to 0 and 1 clip
+function clip(v, l=0, h=1){
 	return Math.max(l, Math.min(h, v));
 }
 

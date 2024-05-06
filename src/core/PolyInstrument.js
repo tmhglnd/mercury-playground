@@ -156,11 +156,20 @@ class PolyInstrument extends Instrument {
 		// delete super class
 		super.delete();
 		// disconnect the sound dispose the player
-		// this.gain.dispose();
-		// this.panner.dispose();
+		this.gain.disconnect();
+		this.gain.dispose();
+		this.panner.disconnect();
+		this.panner.dispose();
 
-		this.adsrs.map((a) => a.dispose());
-		this.sources.map((s) => s.dispose());
+		this.adsrs.map((a) => {
+			a.disconnect();
+			a.dispose();
+		});
+		this.sources.map((s) => {
+			s.stop();
+			s.disconnect();
+			s.dispose();
+		});
 		// remove all fx
 		// this._fx.map((f) => f.delete());
 		console.log('=> disposed PolyInstrument() with FX:', this._fx);
