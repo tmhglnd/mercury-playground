@@ -99,7 +99,7 @@ class PolySynth extends PolyInstrument {
 		// delete super class
 		super.delete();
 		
-		console.log('disposed MonoSynth()', this._wave);
+		console.log('disposed PolySynth()', this._wave);
 	}
 }
 module.exports = PolySynth;

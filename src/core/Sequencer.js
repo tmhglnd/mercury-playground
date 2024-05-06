@@ -150,7 +150,8 @@ class Sequencer {
 	}
 
 	delete(){
-		// dispose loop
+		// stop and dispose the loop
+		this._loop.stop();
 		this._loop.dispose();
 		console.log('=> disposed Sequencer()');
 	}

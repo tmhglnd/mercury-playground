@@ -128,6 +128,24 @@ test('Stochastic List Methods', () => {
 	`
 
 	expect(Mercury(code).parseTree.print).toStrictEqual([[7, 3, 6, 3], [7, 9, 4, 3], [1, 3, 0, 2], [0, 3, 2, 5, 4, 7, 10, 13]]);
+
+	code = `
+	set randomSeed 1234
+	list mkv markovTrain([1 2 3 4 3 2 1 3 1 4 2 3 2 4] 4)
+	print markovChain(10 mkv)
+	`
+
+	expect(Mercury(code).parseTree.print).toStrictEqual([[ 3, 1, 4, 2, 3, 2, 4, 4, 2, 3 ]]);
+	
+	code = `
+	set randomSeed 1234
+	list mkv markovTrain([1 2 3 4 3 2 1 3 1 4 2 3 2 4])
+	print markovChain(10 mkv)
+	`
+	
+	expect(Mercury(code).parseTree.print).toStrictEqual([[ 2, 4, 2, 3, 2,
+		1, 3, 1, 4, 2 ]]);
+
 });
 
 test('Transform List Methods', () => {
