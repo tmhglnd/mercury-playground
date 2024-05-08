@@ -10,7 +10,7 @@ class Instrument extends Sequencer {
 		super(engine, canvas);
 
 		// Instrument specific parameters
-		this._gain = [-6, 0];		
+		this._gain = [-70, 0];		
 		this._pan = [ 0 ];
 		this._att = [ 0 ];
 		this._dec = [ 0 ];
@@ -102,6 +102,7 @@ class Instrument extends Sequencer {
 			this.adsr.triggerAttack(time);
 			this.adsr.triggerRelease(time + att + dec);
 		} else {
+			this.adsr.attack = 0;
 			// if shape is 'off' only trigger attack
 			this.adsr.triggerAttack(time);
 		}
