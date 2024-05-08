@@ -542,6 +542,7 @@ const PitchShift = function(_params){
 
 // LFO FX
 // a Low Frequency Oscillator effect, control tempo, type and depth
+// Using Tone.LFO with some specific mappings to fix phase issues
 //
 const LFO = function(_params){
 	_params = Util.mapDefaults(_params, [ '1/8', 'sine', 1 ]);
@@ -550,42 +551,70 @@ const LFO = function(_params){
 	this._type = _params[1];
 	this._depth = _params[2];
 
+	// the waveshape name options
 	this._waveMap = {
 		sine : 'sine',
+		sineUp : 'sine',
+		sineDown : 'sine',
 		saw : 'sawtooth',
+		sawUp: 'sawtooth',
+		sawDown: 'sawtooth',
+		up: 'sawtooth',
+		down: 'sawtooth',
 		square : 'square',
+		squareUp : 'square',
+		squareDown : 'square',
 		rect : 'square',
 		triangle : 'triangle',
 		tri : 'triangle',
-		up: 'sawtooth',
-		sawUp: 'sawtooth'
 	}
 
 	this._lfo = new Tone.LFO();
+	// this._lfo.gain.value = 0;
 	this._fx = new Tone.Gain();
 	this._lfo.connect(this._fx.gain);
 
 	this.set = function(c, time, bpm){
 		let w = Util.getParam(this._type, c);
-		if (this._waveMap[w]){
-			w = this._waveMap[w];
-		} else {
+		if (!this._waveMap[w]){
 			console.log(`'${w} is not a valid waveshape`);
 			// default wave if wave does not exist
 			w = 'sine';
 		}
-		this._lfo.set({ type: w });
+		this._lfo.set({ type: this._waveMap[w] });
 		
 		let s = Util.getParam(this._speed, c);
-		let f = Math.max(0.0001, Util.divToS(s, bpm));
+		let t = Util.divToS(s, bpm);
+		let f = Math.max(0.0001, t);
 		this._lfo.frequency.setValueAtTime(1/f, time);
 
 		let a = Util.getParam(this._depth, c);
-		this._lfo.min = Math.min(1, Math.max(0, 1 - a));		
+		this._lfo.min = Math.min(1, Math.max(0, 1 - a));
+		this._lfo.max = 1;
+		
+		// fix for squarewave not going to 0 fully
+		if (this._waveMap[w] === 'square'){ 
+			this._lfo.min += -0.1 
+		}
+
+		// swap high and low point to create a saw down
+		if (w === 'down' || w === 'sawDown' || w === 'squareUp' || w === 'sineDown' ){
+			let tmp = this._lfo.min;
+			this._lfo.min = this._lfo.max;
+			this._lfo.max = tmp;
+		} 
+
 		if (this._lfo.state !== 'started'){
-			if (w === 'sawtooth') {
-				this._lfo.phase = 180;
-			}
+			// fix incorrect phases for sawtooth sine and triangle
+			// simply by starting them a bit later.
+			switch (this._waveMap[w]) {
+				case 'sine' :
+					time += t * 0.25; break;
+				case 'triangle' :
+					time += t * 0.25; break;
+				case 'sawtooth' :
+					time += t * 0.5; break;
+			}	
 			this._lfo.start(time);
 		}
 	}
