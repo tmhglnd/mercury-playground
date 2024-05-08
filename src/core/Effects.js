@@ -605,10 +605,6 @@ const LFO = function(_params){
 		} 
 
 		if (this._lfo.state !== 'started'){
-			// console.log('time', t);
-			console.log('time', t, 'now', time, 'mod', time % t);
-			console.log('rest', time + (time % t));
-
 			// fix incorrect phases for sawtooth sine and triangle
 			// simply by starting them a bit later.
 			switch (this._waveMap[w]) {
