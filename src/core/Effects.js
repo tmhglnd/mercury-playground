@@ -542,6 +542,7 @@ const PitchShift = function(_params){
 
 // LFO FX
 // a Low Frequency Oscillator effect, control tempo, type and depth
+// Using Tone.LFO with some specific mappings to fix phase issues
 //
 const LFO = function(_params){
 	_params = Util.mapDefaults(_params, [ '1/8', 'sine', 1 ]);
@@ -550,20 +551,26 @@ const LFO = function(_params){
 	this._type = _params[1];
 	this._depth = _params[2];
 
+	// the waveshape name options
 	this._waveMap = {
 		sine : 'sine',
+		sineUp : 'sine',
+		sineDown : 'sine',
 		saw : 'sawtooth',
+		sawUp: 'sawtooth',
+		sawDown: 'sawtooth',
+		up: 'sawtooth',
+		down: 'sawtooth',
 		square : 'square',
+		squareUp : 'square',
+		squareDown : 'square',
 		rect : 'square',
 		triangle : 'triangle',
 		tri : 'triangle',
-		up: 'sawtooth',
-		sawUp: 'sawtooth',
-		down: 'sawtooth',
-		sawDown: 'sawtooth'
 	}
 
 	this._lfo = new Tone.LFO();
+	// this._lfo.gain.value = 0;
 	this._fx = new Tone.Gain();
 	this._lfo.connect(this._fx.gain);
 
@@ -584,18 +591,24 @@ const LFO = function(_params){
 		let a = Util.getParam(this._depth, c);
 		this._lfo.min = Math.min(1, Math.max(0, 1 - a));
 		this._lfo.max = 1;
-
-		// swap high and low point to create a saw down
-		if (w === 'down' || w === 'sawDown'){
-			let tmp = this._lfo.min;
-			this._lfo.min = this._lfo.max;
-			this._lfo.max = tmp;
-		} else if (this._waveMap[w] === 'square'){ 
-			// fix for squarewave not going to 0 fully
+		
+		// fix for squarewave not going to 0 fully
+		if (this._waveMap[w] === 'square'){ 
 			this._lfo.min += -0.1 
 		}
 
+		// swap high and low point to create a saw down
+		if (w === 'down' || w === 'sawDown' || w === 'squareUp' || w === 'sineDown' ){
+			let tmp = this._lfo.min;
+			this._lfo.min = this._lfo.max;
+			this._lfo.max = tmp;
+		} 
+
 		if (this._lfo.state !== 'started'){
+			// console.log('time', t);
+			console.log('time', t, 'now', time, 'mod', time % t);
+			console.log('rest', time + (time % t));
+
 			// fix incorrect phases for sawtooth sine and triangle
 			// simply by starting them a bit later.
 			switch (this._waveMap[w]) {
