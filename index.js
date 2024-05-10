@@ -5,15 +5,29 @@
 // in separate json files under src/data
 //
 
+// Configure variables for custom filepaths and settings through .ini file
+const { parse } = require('ini');
+
 // Read all the audio-files and serve the data sheet
 const fs = require('fs-extra');
 const fg = require('fast-glob');
 const path = require('path');
 
+// make sure the data folder exists, otherwise create it
 fs.ensureDirSync('src/data');
 
-// get soundfile paths
+// load custom paths through ini file
+fs.ensureFileSync('./mercury.ini');
+let ini = fs.readFileSync('./mercury.ini', 'utf-8');
+const config = parse(ini);
+
+// get soundfile paths from default location
+// let samples = {};
 let samples = getFiles('public/assets/samples/**/*.wav');
+// if custom paths are provided load those samples
+// config.samples?.paths.forEach((p) => {
+// 	samples = {...samples, ...getFiles(`${p}/**/*.wav`)}
+// });
 fs.writeJSONSync('src/data/samples.json', samples, {spaces : 2});
 
 // load example
