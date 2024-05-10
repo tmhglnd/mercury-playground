@@ -198,7 +198,6 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		this.flash(this.cm.firstLine(), this.cm.lastLine()+1);
 
 		code({ file: this.cm.getValue(), engine: engine, canvas: canvas, p5canvas: p5canvas });
-		engine.resume();
 		
 		// store code in localstorage upon evaluating
 		localStorage.setItem('code', this.cm.getValue());

@@ -91,8 +91,10 @@ window.onload = () => {
 			// console.log(`Received: ${msg}`);
 			if (msg[0] === '/mercury-code'){
 				try {
-					cm.set(msg[1]);
-					cm.evaluate();
+					if (cm.get() !== msg[1]){
+						cm.set(msg[1]);
+						cm.evaluate();
+					}
 				} catch (e) {
 					log(`Unable to execute code`);
 				}

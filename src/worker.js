@@ -291,6 +291,9 @@ function code({ file, engine, canvas, p5canvas }){
 	}
 	removeSound(_sounds, crossFade);
 	startSound(sounds, crossFade);
+
+	// resume the engine if it's not playing yet
+	engine.resume();
 }
 	
 function getSound(){
