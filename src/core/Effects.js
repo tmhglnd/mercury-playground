@@ -682,15 +682,19 @@ const Filter = function(_params){
 	// available waveforms for the LFO
 	this._waveMap = {
 		sine : 'sine',
+		// sineUp : 'sine',
+		// sineDown : 'sine',
 		saw : 'sawtooth',
-		square : 'square',
-		rect : 'square',
+		sawUp: 'sawtooth',
+		sawDown: 'sawtooth',
+		up: 'sawtooth',
+		down: 'sawtooth',
+		// square : 'square',
+		// squareUp : 'square',
+		// squareDown : 'square',
+		// rect : 'square',
 		triangle : 'triangle',
 		tri : 'triangle',
-		up: 'sawtooth',
-		sawUp: 'sawtooth',
-		// sawDown: 0,
-		// down: 0,
 	}
 
 	this.set = function(c, time, bpm){
@@ -704,7 +708,8 @@ const Filter = function(_params){
 			// let rt = Util.divToS(Util.getParam(this._rt, c), bpm);
 		} else {
 			_q = _params[4];
-			let f = Util.divToF(Util.getParam(_params[1], c), bpm);
+			let t = Util.divToS(Util.getParam(_params[1], c), bpm);
+			let f = 1 / t;
 			let lo = Util.clip(Util.getParam(_params[2], c), 5, 19000);
 			let hi = Util.clip(Util.getParam(_params[3], c), 5, 19000);
 
@@ -741,7 +746,17 @@ const Filter = function(_params){
 			this._scale.exponent = exp;
 			this._lfo.frequency.setValueAtTime(f, time);
 
+			this._lfo.max = 1;
+
 			if (this._lfo.state !== 'started'){
+				switch (w) {
+					case 'sine' :
+						time += t * 0.25; break;
+					case 'triangle' :
+						time += t * 0.25; break;
+					case 'sawtooth' :
+						time += t * 0.5; break;
+				}	
 				this._lfo.start(time);
 			}
 		}
