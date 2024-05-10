@@ -80,13 +80,14 @@ class Instrument extends Sequencer {
 		// if (!play){ return; }
 
 		// fade-out running envelope over 5 ms
-		if (this.adsr.value > 0){
-			let tmp = this.adsr.release;
-			this.adsr.release = 0.004;
-			this.adsr.triggerRelease(time-0.004);
-			this.adsr.release = tmp;
-			// time += 0.010;
-		}
+		// retrigger temporarily disabled to reduce distortion
+		// if (this.adsr.value > 0){
+		// 	let tmp = this.adsr.release;
+		// 	this.adsr.release = 0.004;
+		// 	this.adsr.triggerRelease(time-0.004);
+		// 	this.adsr.release = tmp;
+		// 	time += 0.010;
+		// }
 
 		// set shape for playback (fade-in / out and length)
 		if (this._att){

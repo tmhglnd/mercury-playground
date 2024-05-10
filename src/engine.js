@@ -26,7 +26,6 @@ let loadingID = setInterval(() => {
 }, 2500);
 
 let samples = require('./data/samples.json');
-const { time } = require('console');
 let buffers = new Tone.ToneAudioBuffers({
 	urls: samples,
 	onload: function(){ 
@@ -204,13 +203,10 @@ Tone.Destination.chain(LP, HP, GN);
 function setLowPass(f, t=0){
 	f = (f === 'default')? 18000 : f;
 	t = divToS(t, getBPM());
-
-	// first cancel any parameter changing currently running
-	LP.frequency.cancelScheduledValues(Tone.now());
 	if (t > 0){
-		LP.frequency.rampTo(f, t, Tone.now() + 0.005);
+		LP.frequency.rampTo(f, t, Tone.now());
 	} else {
-		LP.frequency.setValueAtTime(f, Tone.now() + 0.005);
+		LP.frequency.setValueAtTime(f, Tone.now());
 	}
 }
 
@@ -218,13 +214,10 @@ function setLowPass(f, t=0){
 function setHiPass(f, t=0){
 	f = (f === 'default')? 5 : f;
 	t = divToS(t, getBPM());
-
-	// first cancel any parameter changing currently running
-	HP.frequency.cancelScheduledValues(Tone.now());
 	if (t > 0){
-		HP.frequency.rampTo(f, t, Tone.now() + 0.005);
+		HP.frequency.rampTo(f, t, Tone.now());
 	} else {
-		HP.frequency.setValueAtTime(f, Tone.now() + 0.005);
+		HP.frequency.setValueAtTime(f, Tone.now());
 	}
 }
 
@@ -232,13 +225,10 @@ function setHiPass(f, t=0){
 function setVolume(g, t=0){
 	g = (g === 'default')? 1 : g;
 	t = divToS(t, getBPM());
-
-	// first cancel any parameter changing currently running
-	GN.gain.cancelScheduledValues(Tone.now());
 	if (t > 0){
-		GN.gain.rampTo(g, t, Tone.now() + 0.001);
+		GN.gain.rampTo(g, t, Tone.now());
 	} else {
-		GN.gain.setValueAtTime(g, Tone.now() + 0.001);
+		GN.gain.setValueAtTime(g, Tone.now());
 	}
 }
 
