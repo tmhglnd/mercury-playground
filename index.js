@@ -17,9 +17,9 @@ const path = require('path');
 fs.ensureDirSync('src/data');
 
 // load custom paths through ini file
-fs.ensureFileSync('./mercury.ini');
-let ini = fs.readFileSync('./mercury.ini', 'utf-8');
-const config = parse(ini);
+// fs.ensureFileSync('./mercury.ini');
+// let ini = fs.readFileSync('./mercury.ini', 'utf-8');
+// const config = parse(ini);
 
 // get soundfile paths from default location
 // let samples = {};
