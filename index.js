@@ -6,7 +6,7 @@
 //
 
 // Configure variables for custom filepaths and settings through .ini file
-const { parse } = require('ini');
+// const { parse } = require('ini');
 
 // Read all the audio-files and serve the data sheet
 const fs = require('fs-extra');
