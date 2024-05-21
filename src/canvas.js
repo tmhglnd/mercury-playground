@@ -79,15 +79,9 @@ let hydraCanvas = function(c, u) {
 		let btn = document.createElement('button');
 		btn.innerHTML = 'code with Hydra';
 		btn.onclick = () => { window.open('https://hydra.ojack.xyz/', '_blank'); }
-		
-		let btn2 = document.createElement('button');
-		btn2.innerHTML = 'collaborate in Flok';
-		btn2.onclick = () => { window.open('https://next.flok.cc', '_blank'); }
 
 		div.appendChild(text);
 		div.appendChild(btn);
-		div.appendChild(btn2);
-		// div.appendChild(p);	
 	}
 
 	this.engine = loop((dt) => {
