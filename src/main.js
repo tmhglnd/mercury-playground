@@ -56,25 +56,44 @@ window.onload = () => {
 	const Editor = require('./editor.js');	
 	const Canvas = require('./canvas.js');
 	// const p5 = require('p5');
-	const WebMidi = require("webmidi");
-
-	// WebMIDI Setup
-	WebMidi.enable(function (err) {
-		if (err) {
-			console.log("!! error enabling WebMIDI", err);
-		} else {
-			console.log("=> webMidi enabled");
-			WebMidi.inputs.forEach((i) => {
-				console.log(`- inputs: ${i.name}`);
-			});
-			WebMidi.outputs.forEach((i) => {
-				console.log(`- outputs: ${i.name}`);
-			});
-		}
-	});
+	const { WebMidi } = require("webmidi");
 
 	// Empty object to store/update all received oscMessages
 	window.oscMessages = {};
+
+	// WebMIDI Setup
+	WebMidi.enable()
+	.then(() => {
+		console.log("=> webMidi enabled");
+
+		WebMidi.inputs.forEach((i) => {
+			console.log(`- inputs: ${i.name}`);
+		});
+		WebMidi.outputs.forEach((i) => {
+			console.log(`- outputs: ${i.name}`);
+		});
+
+		WebMidi.inputs.forEach((i) => {
+			i.addListener("controlchange", (e) => {
+				// construct an OSC-message from the incoming MIDI cc
+				let cc = e.controller.number;
+				let address =`/${e.port.name.replace(/[ \s]+/, '_').toLowerCase()}/${cc}`;
+				let details = e.value;
+				console.log('message:', address, details);
+
+				window.oscMessages[address] = [details];
+				// let event = new CustomEvent(address, { detail: { value: details, time: Tone.immediate()+0.01 }});
+				// window.dispatchEvent(event);
+			});
+		});
+		// WebMidi.inputs[1].addListener('controlchange', (e) => {
+		// 	console.log(e.channel, e.controller.number, e.rawValue);
+		// })
+	})
+	.catch((err) => {
+		console.log("!! error enabling WebMIDI", err);
+	});
+
 	// Is there a client connected?
 	window.ioClient = false;
 	// Setup osc connection for when running mercury as localhost

@@ -1,0 +1,67 @@
+{
+  "name": "djipevents",
+  "version": "2.0.7",
+  "description": "A clean and opinionated event-handling library for the browser and Node.js.",
+  "main": "./dist/cjs/djipevents.cjs.min.js",
+  "exports": {
+    "require": "./dist/cjs/djipevents.cjs.min.js",
+    "import": "./dist/esm/djipevents.esm.min.js"
+  },
+  "author": "Jean-Philippe Côté <jp@djip.co>",
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/djipco/djipevents",
+  "scripts": {
+    "build-all": "npm run lint && npm run build-cjs && npm run build-esm && npm run build-iife",
+    "build-cjs": "BABEL_ENV=cjs rollup --config",
+    "build-esm": "BABEL_ENV=esm rollup --config",
+    "build-iife": "BABEL_ENV=iife rollup --config",
+    "lint": "eslint ./src/*.js",
+    "release": "npm run build-all && node scripts/release/release.js && npm publish",
+    "test": "mocha ./test/index.js --exit",
+    "test-coverage": "nyc --reporter=text npm run test"
+  },
+  "keywords": [
+    "addEventListener",
+    "addListener",
+    "dispatch",
+    "EventDispatcher",
+    "EventEmitter",
+    "EventTarget",
+    "emit",
+    "emitter",
+    "event",
+    "events",
+    "listener",
+    "observer",
+    "observable",
+    "publish",
+    "subscribe",
+    "trigger"
+  ],
+  "files": [
+    "/dist",
+    "/src"
+  ],
+  "dependencies": {
+    "@babel/runtime": "^7.20.6"
+  },
+  "devDependencies": {
+    "chai": "^4.3.7",
+    "eslint": "^8.29.0",
+    "eslint-config-prettier": "^8.5.0",
+    "foodoc": "^0.0.9",
+    "gulo": "^1.0.2",
+    "gulp": "^4.0.2",
+    "gulp-eslint": "^6.0.0",
+    "gulp-gh-pages": "^0.5.4",
+    "gulp-jsdoc3": "^3.0.0",
+    "jsdoc-export-default-interop": "^0.3.1",
+    "mocha": "^10.2.0",
+    "nyc": "^15.1.0",
+    "rollup": "^2.79.1",
+    "rollup-plugin-license": "^3.0.1",
+    "rollup-plugin-terser": "^7.0.2",
+    "simple-git": "^3.15.1",
+    "sinon": "^15.0.0"
+  }
+}

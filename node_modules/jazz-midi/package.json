@@ -1,0 +1,26 @@
+{
+  "name": "jazz-midi",
+  "version": "1.7.9",
+  "description": "Low-level MIDI support for Node.js",
+  "browser": "skip.js",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "keywords": [
+    "midi",
+    "music",
+    "sound"
+  ],
+  "author": "jazz-soft (https://jazz-soft.net)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jazz-soft/jazz-midi.git"
+  },
+  "engines": {
+    "node": ">=10.0.0"
+  },
+  "homepage": "https://jazz-soft.net",
+  "bugs": "https://jazz-soft.org",
+  "license": "MIT"
+}
