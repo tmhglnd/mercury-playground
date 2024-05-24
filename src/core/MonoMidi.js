@@ -1,7 +1,7 @@
 const Tone = require('tone');
 const Util = require('./Util.js');
 const Sequencer = require('./Sequencer.js');
-const WebMidi = require("webmidi");
+const { WebMidi } = require("webmidi");
 
 class MonoMidi extends Sequencer {
 	constructor(engine, d='default', canvas){
@@ -31,8 +31,8 @@ class MonoMidi extends Sequencer {
 	}
 
 	event(c, time){
-		// normalized velocity (0 - 1)
-		let g = Util.getParam(this._velocity[0], c);
+		// normalized velocity (0 - 1), clip between 0 and 1
+		let g = Util.clip(Util.getParam(this._velocity[0], c));
 				
 		// get the duration (minus 5ms to ensure note-off send before note-on)
 		// when time() equals length() division
@@ -93,7 +93,7 @@ class MonoMidi extends Sequencer {
 		}
 		
 		// play the note(s)!
-		this._device.playNote(n, ch, { duration: d, velocity: g, time: sync });
+		this._device.playNote(n, ch, { duration: d, attack: g, time: sync });
 
 		// }
 	}
@@ -103,7 +103,8 @@ class MonoMidi extends Sequencer {
 		g = Util.toArray(g);
 		r = (r !== undefined)? Util.toArray(r) : [ 0 ];
 		// convert amplitude to velocity range
-		this._velocity[0] = g.map(g => Math.min(1, Math.max(0, g*g)));
+		this._velocity[0] = g;
+		// this._velocity[0] = g.map(g => Math.min(1, Math.max(0, g*g)));
 		// this._velocity[0] = g.map(g => Math.floor(Math.min(127, Math.max(0, g * 127))));
 		this._velocity[1] = r;
 	}
