@@ -12,6 +12,9 @@ let hydraCanvas = function(c, u) {
 	this.canvas.style.display = 'none';
 	this.canvas.style.imageRendering = 'pixelated';
 
+	this.timeout = false;
+	this.timer = 40;
+
 	this.div = document.getElementById(u);
 
 	this.hydra = new HydraSynth({ 
@@ -39,26 +42,27 @@ let hydraCanvas = function(c, u) {
 	}
 
 	this.eval = function(code){
+		if (this.timeout){
+			// the timeout makes sure not too many visuals are evaluated
+			// in a short amount of time
+			return;
+		}
+
 		if (code === ''){
 			this.clear();
 		}
 		try {
-			let b64 = /\?code=(.+)/.exec(code);
-			let decode = decodeURIComponent(atob(b64[1]));
-			eval(decode);
+			eval(code);
 			this.engine.start();
 			this.canvas.style.display = 'inline';
+
+			// start the timeout, wait this.timer ms
+			this.timeout = true;
+			setInterval(() => this.timeout = false, this.timer);
 		} catch (err) {
-			try {
-				console.log(code);
-				eval(code);
-				this.engine.start();
-				this.canvas.style.display = 'inline';
-			} catch (err) {
-				console.log('Not a valid Hydra url-code');
-				console.log(err);
-				this.clear();
-			}
+			console.log('Not a valid Hydra url-code');
+			console.log(err);
+			this.clear();
 		}
 	}
 
