@@ -51,6 +51,14 @@ let hydraCanvas = function(c, u) {
 		if (code === ''){
 			this.clear();
 		}
+		// removed eval from base64 code
+		// try {
+		// 	let b64 = /\?code=(.+)/.exec(code);
+		// 	let decode = decodeURIComponent(atob(b64[1]));
+		// 	eval(decode);
+		// 	this.engine.start();
+		// 	this.canvas.style.display = 'inline';
+		// } catch (err) {
 		try {
 			eval(code);
 			this.engine.start();
