@@ -44,7 +44,7 @@ let hydraCanvas = function(c, u) {
 	this.eval = function(code){
 		if (this.timeout){
 			// the timeout makes sure not too many visuals are evaluated
-			// in a short amount of time
+			// in a short amount of time, the time is set at 40 ms
 			return;
 		}
 
