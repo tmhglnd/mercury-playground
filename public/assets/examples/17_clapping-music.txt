@@ -1,0 +1,20 @@
+// Clapping Music - Steve Reich (1972)
+// An algorithmic music piece where 2 clapping performers start with the same rhythm.
+// After 8 repetitions of the rhythm one performer shifts the pattern by 1 step,
+// while they other performer continues playing the original rhythm.
+// Every 8 repetitions the rhythm shifts by 1, untill in the end they line back up
+
+set tempo 170
+
+// the initial rhythm, played 8 times
+list ptn duplicate([1 1 1 0 1 1 0 1 0 1 1 0] 8)
+
+// the repetitions with shifts for every step
+list ptn2 join(ptn rot(ptn -1) rot(ptn -2) rot(ptn -3) rot(ptn -4) rot(ptn -5) rot(ptn -6) rot(ptn -7) rot(ptn -8) rot(ptn -9) rot(ptn -10) rot(ptn -11))
+
+// play both rhythms, one on the left speaker and one on the right
+new sample clap_909 time(1/8) play(ptn) pan(-0.5) name(player1)
+new sample clap_808 time(1/8) play(ptn2) pan(0.5) name(player2)
+
+// some reverb on both sounds
+set all fx(reverb 0.3 2)
