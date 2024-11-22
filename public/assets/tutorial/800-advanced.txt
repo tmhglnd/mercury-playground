@@ -1,0 +1,8 @@
+// === TUTORIAL 800: Advanced Techniques ===
+// This chapter demonstrates various advanced sound and
+// composition techniques that can be achieved with the 
+// Mercury language.
+
+// You will find topics such as:
+// Granular Synthesis, 
+// (more to do..., suggestions welcome on github issues)
