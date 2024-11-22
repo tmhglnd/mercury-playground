@@ -640,11 +640,17 @@ const LFO = function(_params){
 const Filter = function(_params){
 	// parameter mapping changes based on amount of arguments
 	this._static = true;
-	if (_params.length < 3){
-		_params = [['low']].concat(Util.mapDefaults(_params, [1200, 0.45]));
-	} else if (_params.length < 4){
-		_params = Util.mapDefaults(_params, ['low', 1200, 0.45]);
-	} else {
+	if (_params.length < 4){
+		if (typeof _params[0] === 'string'){
+			_params = Util.mapDefaults(_params, ['low', 1200, 0.45]);
+		} else {
+			_params = [['low']].concat(Util.mapDefaults(_params, [1200, 0.45]));
+		}
+	}
+	//  else if (_params.length < 4){
+	// 	_params = Util.mapDefaults(_params, ['low', 1200, 0.45]);
+	// } 
+	else {
 		_params = Util.mapDefaults(_params, ['low', '1/1', 200, 3000, 0.45, 'sine', 0.5]);
 		this._static = false;
 	}
