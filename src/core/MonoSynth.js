@@ -17,9 +17,6 @@ class MonoSynth extends Instrument {
 			triangle : 'triangle',
 			tri : 'triangle',
 			rect : 'square',
-			fm: 'fmsine',
-			am: 'amsine',
-			pwm: 'pwm',
 			organ: 'sine4',
 		}
 		// synth specific variables;
