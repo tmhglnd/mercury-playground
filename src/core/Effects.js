@@ -647,9 +647,6 @@ const Filter = function(_params){
 			_params = [['low']].concat(Util.mapDefaults(_params, [1200, 0.45]));
 		}
 	}
-	//  else if (_params.length < 4){
-	// 	_params = Util.mapDefaults(_params, ['low', 1200, 0.45]);
-	// } 
 	else {
 		_params = Util.mapDefaults(_params, ['low', '1/1', 200, 3000, 0.45, 'sine', 0.5]);
 		this._static = false;
