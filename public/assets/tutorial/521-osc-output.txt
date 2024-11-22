@@ -4,7 +4,9 @@
 // as osc addresses. The name of the instrument is the base of the address
 //
 // This instrument only works when running Mercury via a localhost. 
-// Follow instructions: https://github.com/tmhglnd/mercury-playground#-install 
+// Follow the instructions on: 
+// https://tmhglnd.github.io/mercury/docs/getting-started#-without-internet
+// (some programming experience with NodeJS is expected)
 
 // Receive OSC messages at port 2440
 

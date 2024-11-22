@@ -46,14 +46,16 @@ fs.writeJSONSync('src/data/tutorials.json', tuts, {spaces : 2});
 
 // return a list of files in json format 
 // with key: filename value: path
+// Using FastGlob, that does not give windows path separators on windows.
 function getFiles(glob){
 	const fold = fg.sync(glob);
 	let files = {};
 
 	for (let f in fold){
-		let file = path.parse(fold[f]);
-		let rel = fold[f].split(path.sep).slice(1).join('/');
-		files[file.name] = rel;
+		let relative_path = fold[f];
+		let separator = (relative_path.includes("/")) ? '/' : '\\';
+		let file = path.parse(relative_path);
+		files[file.name] = fold[f].split(separator).slice(1).join(separator);
 	}
 	return files;
 }
