@@ -1,0 +1,19 @@
+// simple granular timestretching is achieved
+// by quickly playing short grains of a sample
+// changing the offset of the playback point 
+// and detuning the grains
+
+set tempo 120
+
+// a position ramp up-down over 2000 values
+list pos sineFloat(1100 1 0 0.5)
+
+// small detuning for every sample playback
+list detune randomFloat(1000 0.92 1.08)
+
+// try different samples
+new sample bongo name(grain)
+    set grain time(1/32) shape(1 50 1)
+    set grain start(pos) pan(random)
+    set grain fx(delay 2/32 3/32 0.9) fx(reverb 0.4 5)
+    set grain speed(detune) gain(1.2)
