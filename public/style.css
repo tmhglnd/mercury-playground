@@ -15,7 +15,7 @@
 
 	--button-bg: rgb(255, 255, 255, 0.15);
 
-	--textarea: rgb(0, 0, 0, 0.3);
+	--textarea: rgb(0, 0, 0, 0.4);
 	--transparant: rgb(0, 0, 0, 0);
 
 	--cm-line: rgb(0, 0, 0, 1);
@@ -35,7 +35,7 @@
 
 	--button-bg: rgb(0, 0, 0, 0.2);
 
-	--textarea: rgb(0, 0, 0, 0.1);
+	--textarea: rgb(255, 255, 255, 0.4);
 	--transparant: rgb(0, 0, 0, 0);
 
 	--cm-line: var(--bg);
@@ -220,7 +220,7 @@ textarea {
 	border-width: 0px;
 	border-radius: 2px;
 	color: var(--button-bg);
-	background: var(--textarea);
+	background: none;
 	width: 100%;
 	margin: 2px;
 	overflow: hidden;
@@ -228,8 +228,15 @@ textarea {
 }
 
 textarea:focus {
+	color: var(--accent);
+	background: var(--textarea);
 	outline: none !important;
-	border-color: var(--bg);
+	/* border-color: var(--bg); */
+}
+
+textarea:hover {
+	color: var(--accent);
+	background: var(--bg);
 }
 
 .modal {
