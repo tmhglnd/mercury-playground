@@ -99,19 +99,34 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 			'Shift-Ctrl-Enter': () => { this.evaluateBlock() },
 			'Shift-Alt-H': () => { this.hideEditor() },
 			'Shift-Ctrl-H': () => { this.hideEditor() },
-			'Shift-Ctrl-E': () => { this.set(''); this.silence() },
-			'Shift-Alt-E': () => { this.set(''); this.silence() },
+			'Shift-Ctrl-E': () => { this.set('') },
+			'Shift-Alt-E': () => { this.set('') },
 			'Shift-Ctrl-X': () => { this.example() },
 			'Shift-Alt-X': () => { this.example() },
 			'Shift-Ctrl-S': () => { this.save() },
 			'Shift-Alt-S': () => { this.save() },
 			'Shift-Ctrl-R': () => { this.record() },
 			'Shift-Alt-R': () => { this.record() },
+			'Shift-Ctrl-D': () => { document.getElementById('switch').click() },
+			'Shift-Alt-D': () => { document.getElementById('switch').click() },
+			// 'Shift-Ctrl-T': () => { 
+				// let e = new Event('click');
+				// console.log('tutorials!');
+				// document.getElementById('recButton').click();
+				// b.dispatchEvent(e);
+			// }
 			// 'Ctrl-S': () => { this.tutorial() } open tutorial menu ???
 			// 'Ctrl-S': () => { this.sounds() } open sounds menu ???
-			// 'Ctrl-S': () => { this.help() }
-			// 'Ctrl-S': () => { this.collaborate() }
-			// 'Ctrl-S': () => { this.addSounds() }
+			'Shift-Ctrl-P' : () => { 
+				document.getElementById('help').click() },
+			'Shift-Alt-P' : () => { 
+				document.getElementById('help').click() },
+			'Shift-Ctrl-C': () => { 
+				document.getElementById('collaborate').click() },
+			'Shift-Alt-C': () => { 
+				document.getElementById('collaborate').click() },
+			'Shift-Ctrl-A': () => { this.addSounds() },
+			'Shift-Alt-A': () => { this.addSounds() }
 			// 'Ctrl-S': () => { this.hideUI() }
 			// 'Ctrl-S': () => { this.hydra() }
 		}
@@ -316,22 +331,37 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		}
 	}
 
+	this.addSounds = function(){
+		let input = document.createElement('input');
+		// input.id = 'load';
+		input.style.display = 'none';
+		input.type = 'file';
+		input.multiple = true;
+		input.onchange = (e) => {
+			if (e.target.files.length > 0){
+				engine.addBuffers(e.target.files);
+			}
+		}
+		input.click();
+	}
+
 	// play/silence/empty/example/save/record buttons
 	this.controls = function(){
 		let div = document.getElementById('menu');
 		let play = document.createElement('button');
 		play.innerHTML = 'play';
-		play.title = 'Evaluate code Alt/Ctrl-Enter';
+		play.title = 'Evaluate code (Alt/Ctrl-Enter)';
 		play.onclick = () => { this.evaluate() }
 
 		let stop = document.createElement('button');
 		stop.innerHTML = 'silence';
-		stop.title = 'Stop sound Alt/Ctrl-.';
+		stop.title = 'Stop sound (Alt/Ctrl-.)';
 		stop.onclick = () => { this.silence() }
 
 		let clear = document.createElement('button');
+		clear.id = 'emptyButton';
 		clear.innerHTML = 'empty';
-		clear.title = 'Empty editor Alt/Ctrl-Shift-E';
+		clear.title = 'Empty editor (Alt/Ctrl-Shift-E)';
 		clear.onclick = () => { 
 			this.set(''); 
 			this.silence(); 
@@ -339,20 +369,20 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		
 		let example = document.createElement('button');
 		example.innerHTML = 'example';
-		example.title = 'Open random example Alt/Ctrl-Shift-X';
+		example.title = 'Open random example (Alt/Ctrl-Shift-X)';
 		example.onclick = () => { this.example() }
 
 		let save = document.createElement('button');
 		save.style.width = '9%';
 		save.innerHTML = 'save';
-		save.title = 'Download code as text Alt/Ctrl-Shift-S';
+		save.title = 'Download code as text (Alt/Ctrl-Shift-S)';
 		save.onclick = () => { this.save() }
 		
 		let rec = document.createElement('button');
 		rec.id = 'recButton';
 		rec.style.width = '9%';
 		rec.innerHTML = 'record';
-		rec.title = 'Start/Stop recording sound Alt/Ctrl-Shift-R';
+		rec.title = 'Start/Stop recording sound (Alt/Ctrl-Shift-R)';
 		rec.onclick = () => { this.record() }
 
 		div.appendChild(play);
@@ -364,14 +394,6 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 	}
 
 	this.links = function(){
-		let urls = {
-			// 'tutorial': 'https://tmhglnd.github.io/mercury/tutorial.html',
-			// 'sounds' : 'https://github.com/tmhglnd/mercury/blob/master/mercury_ide/media/README.md',
-			'help': 'https://tmhglnd.github.io/mercury/docs/',
-			// 'local version': 'https://github.com/tmhglnd/mercury-playground#-running-without-internet'
-			"collaborate": 'https://flok.cc'
-		}
-
 		let div = document.getElementById('links');
 		let p = document.createElement('p');
 		div.appendChild(p);
@@ -386,31 +408,32 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		snds.onchange = () => { this.insertSound() }
 		p.appendChild(snds);
 
-		Object.keys(urls).forEach((k) => {
-			let btn = document.createElement('button');
-			btn.innerHTML = k;
-			btn.onclick = () => {
-				window.open(urls[k], '_blank');
-			}
-			p.appendChild(btn);
-		});
+		let help = document.createElement('button');
+		help.id = help.innerHTML = 'help';
+		help.title = 'Open the documentation (Alt/Ctrl-Shift-P)';
+		help.onclick = () => { 
+			window.open('https://tmhglnd.github.io/mercury/docs/', '_blank');
+		}
+		p.appendChild(help);
+		
+		let collab = document.createElement('button');
+		collab.id = collab.innerHTML = 'collaborate';
+		collab.title = 'Collaborate in flok.cc (Alt/Ctrl-Shift-C)';
+		collab.onclick = () => {
+			window.open('https://flok.cc', '_blank');
+		}
+		p.appendChild(collab);
 
 		let load = document.createElement('button');
+		load.id = 'load';
 		load.innerHTML = 'add sounds';
+		load.title = 'Load sounds from the computer (Alt/Ctrl-Shift-A)'
 		// load.innerHTML = 'settings';
 		load.onclick = () => {
-			input.click();
+			this.addSounds();
+			// input.click();
 			// let modal = document.getElementById('modalbox');
 			// modal.style.display = "block";
-		}
-		let input = document.createElement('input');
-		input.style.display = 'none';
-		input.type = 'file';
-		input.multiple = true;
-		input.onchange = (e) => {
-			if (e.target.files.length > 0){
-				engine.addBuffers(e.target.files);
-			}
 		}
 		p.appendChild(load);
 	}
@@ -542,7 +565,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		let btn = document.createElement('button');
 		btn.id = 'switch';
 		btn.className = 'themeswitch';
-		btn.title = 'Switch dark/light mode';
+		btn.title = 'Switch display mode Ctrl/Alt-Shift-D';
 		btn.onclick = () => {
 			if (localStorage.getItem('theme') === 'darkmode'){
 				switchTheme('lightmode');
