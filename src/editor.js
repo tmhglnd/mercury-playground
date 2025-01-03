@@ -86,6 +86,8 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		extraKeys: {
 			'Ctrl-/': 'toggleComment',
 			'Alt-/': 'toggleComment',
+			'Shift-Ctrl-7': 'toggleComment',
+			'Shift-Alt-7': 'toggleComment',
 			'Ctrl-Enter': () => { this.evaluate() },
 			'Alt-Enter': () => { this.evaluate() },
 			'Ctrl-.': () => { this.silence() },
@@ -97,6 +99,18 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 			'Shift-Alt-R': () => { this.randomize() },
 			'Shift-Ctrl-R': () => { this.randomize() },
 			'Tab': 'insertSoftTab',
+			'Ctrl-E': () => { this.set(''); this.silence() },
+			'Cmd-E': () => { this.set(''); this.silence() }
+			// 'Ctrl-S': () => { this.example() };
+			// 'Ctrl-S': () => { this.save() };
+			// 'Ctrl-S': () => { this.record() };
+			// 'Ctrl-S': () => { this.tutorial() }; open tutorial menu ???
+			// 'Ctrl-S': () => { this.sounds() }; open sounds menu ???
+			// 'Ctrl-S': () => { this.help() };
+			// 'Ctrl-S': () => { this.collaborate() };
+			// 'Ctrl-S': () => { this.addSounds() };
+			// 'Ctrl-S': () => { this.hideUI() };
+			// 'Ctrl-S': () => { this.hydra() };
 		}
 	}
 
