@@ -126,8 +126,9 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 			'Shift-Alt-C': () => { 
 				document.getElementById('collaborate').click() },
 			'Shift-Ctrl-A': () => { this.addSounds() },
-			'Shift-Alt-A': () => { this.addSounds() }
-			// 'Ctrl-S': () => { this.hideUI() }
+			'Shift-Alt-A': () => { this.addSounds() },
+			'Shift-Ctrl-Z': () => { document.getElementById('zen').click() },
+			'Shift-Alt-Z': () => { document.getElementById('zen').click() }
 			// 'Ctrl-S': () => { this.hydra() }
 		}
 	}
@@ -485,7 +486,9 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		div.appendChild(p);
 
 		let btn = document.createElement('button');
-		btn.innerHTML = 'hide menu';
+		btn.innerHTML = 'zen mode';
+		btn.id = 'zen';
+		btn.title = 'Hide or show the menu bars (Alt/Ctrl-Shift-Z)';
 		btn.onclick = () => {
 			this.menuHidden = !this.menuHidden;
 
@@ -494,7 +497,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 				let d = document.getElementById(divs[i]);
 				d.style.display = this.menuHidden ? 'none' : 'inline';
 			}
-			btn.innerHTML = this.menuHidden ? 'show menu' : 'hide menu';
+			btn.innerHTML = this.menuHidden ? 'exit zen mode' : 'zen mode';
 		}
 		p.appendChild(btn);
 	}
