@@ -8,8 +8,8 @@ set scale minor c
 set tempo 70
 
 // The notes are g, eb, f, d
-list notes repeat([7 3 5 2] [3 1 3 1])
-list lengths repeat([1/16 1/1] [3 1 3 1])
+list notes [7 3 5 2]
+list lengths [1/16 1/1]
 print notes lengths
 
 // Three synths in different octaves playing the same notes
@@ -18,5 +18,5 @@ new synth square note(notes)
 new synth square note(notes -1)
 
 // These settings are set for all the synths above
-set all time(1/4) timediv([4 1 1 1]) play([1 1 1 1 0 0 0]) 
+set all time(1/4) timediv([4 1]) play([0 1 1 1 1 0 0 0 0 0]) 
 set all shape(1 lengths) super(3 0.11) fx(reverb 0.4 5) 
