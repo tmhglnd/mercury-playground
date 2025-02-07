@@ -110,13 +110,13 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 			'Shift-Ctrl-D': () => { document.getElementById('switch').click() },
 			'Shift-Alt-D': () => { document.getElementById('switch').click() },
 			// 'Shift-Ctrl-T': () => { 
-				// let e = new Event('click');
-				// console.log('tutorials!');
-				// document.getElementById('recButton').click();
-				// b.dispatchEvent(e);
-			// }
-			// 'Ctrl-S': () => { this.tutorial() } open tutorial menu ???
-			// 'Ctrl-S': () => { this.sounds() } open sounds menu ???
+			// 	Tutorials, to do
+			// 	For now, go out of the Editor with Alt-Tab and navigate
+			// },
+			// 'Shift-Ctrl-O' : () => {
+			// 	Sounds, to do
+			// 	For now, go out of the Editor with Alt-Tab and navigate
+			// },
 			'Shift-Ctrl-P' : () => { 
 				document.getElementById('help').click() },
 			'Shift-Alt-P' : () => { 
@@ -129,7 +129,6 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 			'Shift-Alt-A': () => { this.addSounds() },
 			'Shift-Ctrl-Z': () => { document.getElementById('zen').click() },
 			'Shift-Alt-Z': () => { document.getElementById('zen').click() }
-			// 'Ctrl-S': () => { this.hydra() }
 		}
 	}
 
@@ -441,6 +440,10 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 
 	this.tutorialMenu = function(){
 		let menu = document.getElementById('tutorials');
+
+		menu.onclick = () => {
+			console.log('clicked tutorials!');
+		}
 
 		Object.keys(tutorials).forEach((t) => {
 			let option = document.createElement('option');

@@ -189,6 +189,21 @@ class Sequencer {
 		}
 	}
 
+	// experiment with multiple tempi in between different instruments
+	// but I think the PPQ of the global transport is in the way
+	// probably needs a way to have multiple transports running or a different
+	// type of scheduler to define events more precisely.
+	// 
+	// tempo(bpm){
+	// 	// check the added tempo compared to the set bpm
+	// 	if (t !== undefined && typeof bpm === 'number'){
+	// 		let ratio = this.bpm() / bpm;
+	// 		this._time = this._time * ratio;
+
+	// 		console.log('bpm', this.bpm(), 'new', bpm, 'ratio', ratio, 'time', this._time);
+	// 	}
+	// }
+
 	timediv(s){
 		// set timing subdivisions for the loop
 		let tmp = Util.toArray(s);
