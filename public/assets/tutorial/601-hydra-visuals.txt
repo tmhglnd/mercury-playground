@@ -1,8 +1,0 @@
-// === TUTORIAL 601: Hydra Visuals ===
-// We can store hydra sketches as a string in a list
-// By creating a list of multiple sketches the instrument
-// will cycle through them for every trigger
-
-list hydras ['osc(10,0.1,2).out()' 'osc(20,-0.5,5).out()' 'osc(5,1,12).out()']
-
-new sample kick_min time(1/16) play([1 0 0 1 0]) visual(hydras)
