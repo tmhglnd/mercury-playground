@@ -12,17 +12,15 @@ const defaultTheme = 'material-darker';
 let _rand;
 
 // get the example code files
-console.log('loading examples...');
-let examples = require('./data/examples.json');
-console.log('=> examples loaded');
+const examples = require('mercury-examples').Examples;
+console.log('=> examples loaded', examples);
 
 // get the tutorial files
-console.log('loading tutorials...');
-let tutorials = require('./data/tutorials.json');
-console.log('=> tutorials loaded');
+const tutorials = require('mercury-examples').Tutorials;
+console.log('=> tutorials loaded', tutorials);
 
+// get the samplefile path data
 let samples = require('./data/samples.json');
-const { mod } = require('total-serialism/src/utility.js');
 
 // the simple mode lexer for Mercury syntax-highlighting
 CodeMirror.defineSimpleMode("mercury", {
