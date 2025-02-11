@@ -86,16 +86,17 @@ class MonoMidi extends Sequencer {
 			i = [ Util.getParam(this._note[0], c) ];
 		}
 		
-		for (let x=0; x<i.length; x++){
-			// reconstruct midi note value, (0, 0) = 36
-			// convert to scale and include the octave
-			n[x] = Util.toMidi(i[x], o);
+		// if the note is 'off' don't play the note
+		// useful when only CC or Programchange is needed
+		if (i[0] !== 'off'){
+			for (let x=0; x<i.length; x++){
+				// reconstruct midi note value, (0, 0) = 36
+				// convert to scale and include the octave
+				n[x] = Util.toMidi(i[x], o);
+			}			
+			// play the note(s)!
+			this._device.playNote(n, ch, { duration: d, velocity: g, time: sync });
 		}
-		
-		// play the note(s)!
-		this._device.playNote(n, ch, { duration: d, velocity: g, time: sync });
-
-		// }
 	}
 
 	amp(g, r){
