@@ -6,6 +6,8 @@ const saver = require('file-saver');
 require('codemirror/mode/javascript/javascript.js');
 require('codemirror/addon/mode/simple.js');
 require('codemirror/addon/comment/comment.js');
+require('codemirror/addon/hint/show-hint.js');
+require('codemirror/addon/hint/anyword-hint.js');
 
 const defaultTheme = 'material-darker';
 
@@ -53,6 +55,10 @@ CodeMirror.defineSimpleMode("mercury", {
 	]
 });
 
+CodeMirror.commands.autocomplete = function(cm) {
+	cm.showHint({ hint: CodeMirror.hint.anyword });
+}
+
 const Editor = function({ context, engine, canvas, p5canvas }) {
 	// this._engine = engine;
 	console.log('=> Created Editor()');
@@ -64,6 +70,8 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 	// document.body.appendChild(container);
 	this.container.appendChild(text);
 	this.container.style.opacity = 1;
+
+	this.showHint = false;
 
 	this.options = {
 		// options for the editor
@@ -80,6 +88,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		mode: "mercury",
 		showCursorWhenSelecting: true,
 		lineWrapping: true,
+		showHint: false,
 		// keymaps for execute/stopping/commenting code
 		extraKeys: {
 			'Tab': 'insertSoftTab',
@@ -126,11 +135,27 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 			'Shift-Ctrl-A': () => { this.addSounds() },
 			'Shift-Alt-A': () => { this.addSounds() },
 			'Shift-Ctrl-Z': () => { document.getElementById('zen').click() },
-			'Shift-Alt-Z': () => { document.getElementById('zen').click() }
+			'Shift-Alt-Z': () => { document.getElementById('zen').click() },
+			'Shift-Ctrl-T': () => { this.showHint = !this.showHint },
+			'Shift-Alt-T': () => { this.showHint = !this.showHint }
 		}
 	}
 
 	this.cm = CodeMirror.fromTextArea(text, this.options);
+
+	this.cm.on('keyup', (cm, e) => {
+		// don't show hints if setting is disabled (default)
+		if (!this.showHint) return;
+		// when a key is pressed show autocompletion hints
+		// don't show if escape, enter or arrow keys are pressed
+		if (e.key === 'Escape' || e.key === 'Enter' || e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'ArrowUp' || e.key === 'ArrowDown'){
+			return;
+		}
+		// if the completion is already open don't show it again
+		if (!cm.state.completionActive && event.keyCode !== 13){
+			cm.showHint({ completeSingle: false });
+		}
+	})
 
 	this.cm.markText({line: 0, ch: 0}, {line: 6, ch: 42}, {className: 'styled-background'})
 
