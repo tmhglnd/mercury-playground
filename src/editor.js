@@ -66,7 +66,8 @@ let mercuryHintList = [
 	'speed', 'start', 'tune', 'stretch',
 	'steal', 'spread', 'length', 'chord', 'midinote', 'program', 'pgm', 'change', 'cc',
 	'range', 'trigger', 'hold',
-	'chorus', 'comb', 'degrade', 'delay', 'distort', 'double', 'filter', 'kink', 'lfo', 'reverb', 'shift', 'squash', 'triggerFilter', 'vibrato', 'vocoder'
+	'chorus', 'comb', 'degrade', 'delay', 'distort', 'double', 'filter', 'kink', 'lfo', 'reverb', 'shift', 'squash', 'triggerFilter', 'vibrato', 'vocoder',
+	'spread', 'spreadF', 'spreadInc', 'spreadIncF', 'sine', 'sineF', 'cosine', 'cosineF', 'saw', 'sawF', 'square', 'squareF', 'binary', 'binaryBeat',  'spacing', 'spacingBeat', 'euclidean', 'euclid', 'hexBeat', 'hex', 'fibonacci', 'pisano', 'pell', 'lucas', 'random', 'randomF', 'drunk', 'drunkF', 'urn', 'coin', 'dice', 'clave', 'twelveTone', 'choose', 'pick', 'shuffle', 'expand', 'markovTrain', 'markovChain', 'clone', 'join', 'copy', 'pad', 'every', 'flat', 'invert', 'lace', 'lookup', 'merge', 'palin', 'repeat', 'reverse', 'rotate', 'rot', 'sort', 'slice', 'split', 'cut', 'spray', 'stretch', 'stretchF', 'thin', 'add', 'subtract', 'sub', 'multiply', 'mul', 'divide', 'div', 'mod', 'clip', 'wrap', 'fold', 'map', 'normalize', 'norm', 'equals', 'eq', 'notEquals', 'neq', 'greater', 'gt', 'less', 'lt', 'greaterEquals', 'gte', 'lessEquals', 'lte', 'size', 'sum', 'midiToNote', 'mton', 'midiToFreq', 'mtof', 'noteToMidi', 'ntom', 'noteToFreq', 'ntof', 'freqToMidi', 'ftom', 'freqToNote', 'fton', 'relativeToMidi', 'rtom', 'relativeToFreq', 'rtof', 'chromaToRelative', 'ctor', 'ratioToCent', 'rtoc', 'makeChords', 'chordsFromNumerals', 'chordsFromNames', 'divisionToMs', 'dtoms', 'divisionToRatio', 'dtor', 'ratioToMs', 'rtoms', 'scaleNames', 'toScale', 'textCode', 'ttoc'
 ].sort();
 
 // let WORD = /[^\d\"\'\s\(\)\[\]]+/;
