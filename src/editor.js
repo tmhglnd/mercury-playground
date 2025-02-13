@@ -59,7 +59,7 @@ CodeMirror.defineSimpleMode("mercury", {
 let mercuryHintList = [
 	'new', 'set', 'list', 'print', 'silence',
 	'tempo', 'scale', 'scalar', 'root', 'randomSeed', 'volume', 'lopass', 'hipass', 'osc', 'midi', 'samples',
-	'sample', 'synth', 'input', 'midi', 'polySample', 'polySynth', 'osc',
+	'sample', 'synth', 'input', 'midi', 'polySample', 'polySynth',
 	'saw', 'sine', 'square', 'triangle',
 	'name', 'solo', 'group', 'time', 'once', 'fx', 'out', 'timediv', 'wait', 'play', 'gain', 'shape', 'pan',
 	'note', 'super', 'slide',
@@ -69,7 +69,8 @@ let mercuryHintList = [
 	'chorus', 'comb', 'degrade', 'delay', 'distort', 'double', 'filter', 'kink', 'lfo', 'reverb', 'shift', 'squash', 'triggerFilter', 'vibrato', 'vocoder'
 ].sort();
 
-let WORD = /[\w$]+/;
+// let WORD = /[^\d\"\'\s\(\)\[\]]+/;
+let WORD = /[\w]+/;
 
 // a hinting function for the Mercury language
 CodeMirror.registerHelper('hint', 'mercury', (editor, options) => {
@@ -98,6 +99,7 @@ CodeMirror.registerHelper('hint', 'mercury', (editor, options) => {
 	return {list: list, from: CodeMirror.Pos(cur.line, start), to: CodeMirror.Pos(cur.line, end)}
 });
 
+// add the hint helper to autocomplete command
 CodeMirror.commands.autocomplete = function(cm) {
 	cm.showHint({ hint: CodeMirror.hint.mercury });
 }
@@ -198,7 +200,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		if (!cm.state.completionActive && event.keyCode !== 13){
 			cm.showHint({ completeSingle: false });
 		}
-	})
+	});
 
 	this.cm.markText({line: 0, ch: 0}, {line: 6, ch: 42}, {className: 'styled-background'})
 

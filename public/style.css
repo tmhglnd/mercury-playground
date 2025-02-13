@@ -314,6 +314,26 @@ textarea:hover {
 	background-color: var(--cm-select) !important;
 }
 
+.CodeMirror-hints {
+	border-radius: 0px;
+	border: 1px solid var(--secundary);
+	padding: 5px;
+	background: var(--bg);
+	color: var(--secundary);
+}
+
+.CodeMirror-hint {
+	color: var(--primary);
+	/* background: var(--bg) !important; */
+	/* font-family: inherit; */
+	/* margin: 0; */
+	/* padding: 0 4px; */
+	/* border-radius: 0px !important; */
+	/* border-color: black; */
+	/* white-space: pre; */
+	/* cursor: pointer; */
+}
+
 .editorFlash {
 	background: var(--cm-flash) !important;
 	/* mix-blend-mode: difference; */
