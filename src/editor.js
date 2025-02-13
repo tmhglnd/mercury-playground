@@ -534,6 +534,8 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		values.forEach((t) => {
 			let option = document.createElement('option');
 			option.value = option.innerHTML = t;
+			// also add the sample names to the hint autocomplete
+			mercuryHintList.push(t);
 			menu.appendChild(option);
 		});
 	}
