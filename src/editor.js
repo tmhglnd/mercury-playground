@@ -55,8 +55,51 @@ CodeMirror.defineSimpleMode("mercury", {
 	]
 });
 
+// list of keywords to allow for autocompletion
+let mercuryHintList = [
+	'new', 'set', 'list', 'print', 'silence',
+	'tempo', 'scale', 'scalar', 'root', 'randomSeed', 'volume', 'lopass', 'hipass', 'osc', 'midi', 'samples',
+	'sample', 'synth', 'input', 'midi', 'polySample', 'polySynth', 'osc',
+	'saw', 'sine', 'square', 'triangle',
+	'name', 'solo', 'group', 'time', 'once', 'fx', 'out', 'timediv', 'wait', 'play', 'gain', 'shape', 'pan',
+	'note', 'super', 'slide',
+	'speed', 'start', 'tune', 'stretch',
+	'steal', 'spread', 'length', 'chord', 'midinote', 'program', 'pgm', 'change', 'cc',
+	'range', 'trigger', 'hold',
+	'chorus', 'comb', 'degrade', 'delay', 'distort', 'double', 'filter', 'kink', 'lfo', 'reverb', 'shift', 'squash', 'triggerFilter', 'vibrato', 'vocoder'
+].sort();
+
+let WORD = /[\w$]+/;
+
+// a hinting function for the Mercury language
+CodeMirror.registerHelper('hint', 'mercury', (editor, options) => {
+	// set word and range parameters
+	let word = options && options.word || WORD;
+	let list = options && options.list || []
+
+	// get current position and text from line
+	let cur = editor.getCursor();
+	let curLine = editor.getLine(cur.line);
+	let end = cur.ch, start = end;
+
+	// get the word (excluding spaces and special characters)
+	while (start && word.test(curLine.charAt(start - 1))){
+		--start;
+	}
+	let curWord = start != end && curLine.slice(start, end);
+
+	// go over the hintlist and select words that match the current found word
+	for (let i=0; i<mercuryHintList.length; i++){
+		if (curWord === mercuryHintList[i].slice(0, curWord.length)){
+			list.push(mercuryHintList[i]);
+		}
+	}
+	// return the hintlist
+	return {list: list, from: CodeMirror.Pos(cur.line, start), to: CodeMirror.Pos(cur.line, end)}
+});
+
 CodeMirror.commands.autocomplete = function(cm) {
-	cm.showHint({ hint: CodeMirror.hint.anyword });
+	cm.showHint({ hint: CodeMirror.hint.mercury });
 }
 
 const Editor = function({ context, engine, canvas, p5canvas }) {
