@@ -61,7 +61,7 @@ let mercuryHintList = [
 	'tempo', 'scale', 'scalar', 'root', 'randomSeed', 'volume', 'lopass', 'hipass', 'osc', 'midi', 'samples',
 	'sample', 'synth', 'input', 'midi', 'polySample', 'polySynth',
 	'saw', 'sine', 'square', 'triangle',
-	'name', 'solo', 'group', 'time', 'once', 'fx', 'out', 'timediv', 'wait', 'play', 'gain', 'shape', 'pan',
+	'name', 'solo', 'group', 'time', 'once', 'fx', 'effect', 'out', 'timediv', 'wait', 'play', 'gain', 'shape', 'pan',
 	'note', 'super', 'slide',
 	'speed', 'start', 'tune', 'stretch',
 	'steal', 'spread', 'length', 'chord', 'midinote', 'program', 'pgm', 'change', 'cc',
@@ -184,7 +184,11 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 			'Shift-Ctrl-Z': () => { document.getElementById('zen').click() },
 			'Shift-Alt-Z': () => { document.getElementById('zen').click() },
 			'Shift-Ctrl-T': () => { this.showHint = !this.showHint },
-			'Shift-Alt-T': () => { this.showHint = !this.showHint }
+			'Shift-Alt-T': () => { this.showHint = !this.showHint },
+			'Shift-Alt-K': () => { 
+				let modal = document.getElementById('sounds-prelisten-box');
+				modal.style.display = "block";
+			}
 		}
 	}
 
@@ -598,6 +602,52 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 
 	// 	menu.value = defaultTheme;
 	// }
+
+	// sounds menu for prelistening sounds by scrolling and clicking
+	this.soundsListenMenu = function(){
+		let modal = document.getElementById('sounds-prelisten-box');
+
+		let m = document.getElementsByClassName('sounds-prelisten')[0];
+		m.innerHTML = `
+		<span class="close">&times;</span>
+		<p>
+			Click to listen the soundfile. Click again to stop playback.
+		</p>
+		<p id="sound-prelisten-items"></p>
+		`
+		
+		let p = document.getElementById('sound-prelisten-items');
+		let sounds = ['sounds'].concat(Object.keys(samples));
+		for (let i=0; i<sounds.length; i++){
+			// skip the keyword sounds that is used for the dropdown menu
+			if (sounds[i] === 'sounds') continue;
+			// create an audio element but don't preload the sound
+			let aud = document.createElement('audio');
+			aud.volume = 0.5;
+			aud.src = samples[sounds[i]];
+			aud.preload = 'none';
+			// create a button element
+			let btn = document.createElement('button');
+			btn.innerHTML = sounds[i];
+			btn.style.width = 'auto';
+			btn.onclick = () => {
+				if (!aud.paused) { aud.pause(); aud.currentTime = 0; }
+				else { aud.play(); }
+			}
+			btn.appendChild(aud);
+			p.appendChild(btn);
+		}
+
+		let span = document.getElementsByClassName('close')[0];
+		span.onclick = () => modal.style.display = 'none';
+
+		window.onclick = (event) => {
+			if (event.target === modal) {
+				modal.style.display = 'none';
+			} 
+		}
+		modal.appendChild(m);
+	}
 
 	// settings menu with more options and some explanation
 	this.settingsMenu = function(){
