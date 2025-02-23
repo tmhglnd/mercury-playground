@@ -185,10 +185,10 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 			'Shift-Alt-Z': () => { document.getElementById('zen').click() },
 			'Shift-Ctrl-T': () => { this.showHint = !this.showHint },
 			'Shift-Alt-T': () => { this.showHint = !this.showHint },
-			'Shift-Alt-K': () => { 
-				let modal = document.getElementById('sounds-prelisten-box');
-				modal.style.display = "block";
-			}
+			'Shift-Alt-L': () => { 
+				this.showListenMenu(!this.listenMenuVisible) },
+			'Shift-Ctrl-L': () => { 
+				this.showListenMenu(!this.listenMenuVisible) }
 		}
 	}
 
@@ -447,14 +447,14 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		example.onclick = () => { this.example() }
 
 		let save = document.createElement('button');
-		save.style.width = '9%';
+		save.style.width = '9.4%';
 		save.innerHTML = 'save';
 		save.title = 'Download code as text (Alt/Ctrl-Shift-S)';
 		save.onclick = () => { this.save() }
 		
 		let rec = document.createElement('button');
 		rec.id = 'recButton';
-		rec.style.width = '9%';
+		rec.style.width = '9.4%';
 		rec.innerHTML = 'record';
 		rec.title = 'Start/Stop recording sound (Alt/Ctrl-Shift-R)';
 		rec.onclick = () => { this.record() }
@@ -472,32 +472,21 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		let p = document.createElement('p');
 		div.appendChild(p);
 
-		let menu = document.createElement('select');
-		menu.id = 'tutorials';
-		menu.onchange = () => { this.loadTutorial() }
-		p.appendChild(menu);
-
+		let tuts = document.createElement('select');
+		tuts.id = 'tutorials';
+		tuts.onchange = () => { this.loadTutorial() }
+		
 		let snds = document.createElement('select');
+		snds.style.width = '9.4%';
 		snds.id = 'sounds';
 		snds.onchange = () => { this.insertSound() }
-		p.appendChild(snds);
 
-		let help = document.createElement('button');
-		help.id = help.innerHTML = 'help';
-		help.title = 'Open the documentation (Alt/Ctrl-Shift-P)';
-		help.onclick = () => { 
-			window.open('https://tmhglnd.github.io/mercury/docs/', '_blank');
-		}
-		p.appendChild(help);
+		let lstn = document.createElement('button');
+		lstn.style.width = '9.4%';
+		lstn.id = lstn.innerHTML = 'prelisten';
+		lstn.title = 'Listen all the sounds (Alt/Ctrl-Shift-L)'
+		lstn.onclick = () => { this.showListenMenu(true) }
 		
-		let collab = document.createElement('button');
-		collab.id = collab.innerHTML = 'collaborate';
-		collab.title = 'Collaborate in flok.cc (Alt/Ctrl-Shift-C)';
-		collab.onclick = () => {
-			window.open('https://flok.cc', '_blank');
-		}
-		p.appendChild(collab);
-
 		let load = document.createElement('button');
 		load.id = 'load';
 		load.innerHTML = 'add sounds';
@@ -509,7 +498,27 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 			// let modal = document.getElementById('modalbox');
 			// modal.style.display = "block";
 		}
+
+		let help = document.createElement('button');
+		help.id = help.innerHTML = 'help';
+		help.title = 'Open the documentation (Alt/Ctrl-Shift-P)';
+		help.onclick = () => {
+			window.open('https://tmhglnd.github.io/mercury/docs/', '_blank');
+		}
+
+		let collab = document.createElement('button');
+		collab.id = collab.innerHTML = 'collaborate';
+		collab.title = 'Collaborate in flok.cc (Alt/Ctrl-Shift-C)';
+		collab.onclick = () => {
+			window.open('https://flok.cc', '_blank');
+		}
+
+		p.appendChild(tuts);
+		p.appendChild(snds);
+		p.appendChild(lstn);
 		p.appendChild(load);
+		p.appendChild(help);
+		p.appendChild(collab);
 	}
 
 	this.tutorialMenu = function(){
@@ -603,6 +612,19 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 	// 	menu.value = defaultTheme;
 	// }
 
+	this.listenMenuVisible = false;
+
+	// toggle the visibility of the sounds prelisten menu
+	this.showListenMenu = function(show){
+		let m = document.getElementById('sounds-prelisten-box');
+		if (show){
+			m.style.display = "block";
+		} else {
+			m.style.display = 'none';
+		}
+		this.listenMenuVisible = show;
+	}
+
 	// sounds menu for prelistening sounds by scrolling and clicking
 	this.soundsListenMenu = function(){
 		let modal = document.getElementById('sounds-prelisten-box');
@@ -618,6 +640,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		
 		let p = document.getElementById('sound-prelisten-items');
 		let sounds = ['sounds'].concat(Object.keys(samples));
+		let audios = [];
 		for (let i=0; i<sounds.length; i++){
 			// skip the keyword sounds that is used for the dropdown menu
 			if (sounds[i] === 'sounds') continue;
@@ -626,6 +649,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 			aud.volume = 0.5;
 			aud.src = samples[sounds[i]];
 			aud.preload = 'none';
+			audios.push(aud);
 			// create a button element
 			let btn = document.createElement('button');
 			btn.innerHTML = sounds[i];
@@ -639,17 +663,16 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		}
 
 		let span = document.getElementsByClassName('close')[0];
-		span.onclick = () => modal.style.display = 'none';
+		span.onclick = () => this.showListenMenu(false);
 
 		window.onclick = (event) => {
-			if (event.target === modal) {
-				modal.style.display = 'none';
-			} 
+			if (event.target === modal) this.showListenMenu(false);
 		}
 		modal.appendChild(m);
 	}
 
 	// settings menu with more options and some explanation
+	// TO-DO, currently not in use
 	this.settingsMenu = function(){
 		let modal = document.getElementById('modalbox');
 		// let m = document.createElement('div');
