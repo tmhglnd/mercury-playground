@@ -477,17 +477,18 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		tuts.onchange = () => { this.loadTutorial() }
 		
 		let snds = document.createElement('select');
-		snds.style.width = '9.4%';
+		snds.style.width = '12.5%';
 		snds.id = 'sounds';
 		snds.onchange = () => { this.insertSound() }
 
 		let lstn = document.createElement('button');
-		lstn.style.width = '9.4%';
+		lstn.style.width = '12.5%';
 		lstn.id = lstn.innerHTML = 'prelisten';
 		lstn.title = 'Listen all the sounds (Alt/Ctrl-Shift-L)'
 		lstn.onclick = () => { this.showListenMenu(true) }
 		
 		let load = document.createElement('button');
+		load.style.width = '12.5%';
 		load.id = 'load';
 		load.innerHTML = 'add sounds';
 		load.title = 'Load sounds from the computer (Alt/Ctrl-Shift-A)'
