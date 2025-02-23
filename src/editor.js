@@ -641,16 +641,14 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		
 		let p = document.getElementById('sound-prelisten-items');
 		let sounds = ['sounds'].concat(Object.keys(samples));
-		let audios = [];
 		for (let i=0; i<sounds.length; i++){
 			// skip the keyword sounds that is used for the dropdown menu
 			if (sounds[i] === 'sounds') continue;
-			// create an audio element but don't preload the sound
+			// create an audio element
 			let aud = document.createElement('audio');
 			aud.volume = 0.5;
 			aud.src = samples[sounds[i]];
-			aud.preload = 'none';
-			audios.push(aud);
+			aud.preload = 'auto';
 			// create a button element
 			let btn = document.createElement('button');
 			btn.innerHTML = sounds[i];
