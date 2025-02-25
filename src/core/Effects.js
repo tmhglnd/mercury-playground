@@ -267,8 +267,10 @@ const Chorus = function(_params){
 		this._fx.frequency.setValueAtTime(f, time);
 		// delaytime/2 because of up and down through center
 		// eg. 25 goes from 0 to 50, 40 goes from 0 to 80, etc.
-		this._fx.delayTime = Util.getParam(_params[1], c) / 2;
-
+		Util.atTime(() => {
+			this._fx.delayTime = Util.getParam(_params[1], c) / 2;
+		}, time);
+		
 		// waveform for chorus is not supported in browser instead change wetdry
 		let w = Util.getParam(_params[2], c);
 		if (isNaN(w)){
