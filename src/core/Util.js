@@ -230,4 +230,4 @@ function toMidi(n=0, o=0){
 	return toScale(n + o * 12 + 36);
 }
 
-module.exports = { mapDefaults, atodb, clip, assureNum, lookup, randLookup, isRandom, getParam, toArray, msToS, formatRatio, divToS, divToF, toMidi, mtof, noteToMidi, noteToFreq, assureWave }
+module.exports = { mapDefaults, atTime, atodb, clip, assureNum, lookup, randLookup, isRandom, getParam, toArray, msToS, formatRatio, divToS, divToF, toMidi, mtof, noteToMidi, noteToFreq, assureWave }

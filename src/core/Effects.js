@@ -852,7 +852,7 @@ const TriggerFilter = function(_params){
 
 		this._mul.setValueAtTime(range, time);
 		this._add.setValueAtTime(lower, time);
-		this._pow.value = exp;
+		Util.atTime(() => { this._pow.value = exp }, time);
 
 		// fade-out running envelope over 5 ms
 		if (this._adsr.value > 0){
