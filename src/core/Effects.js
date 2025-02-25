@@ -270,7 +270,7 @@ const Chorus = function(_params){
 		Util.atTime(() => {
 			this._fx.delayTime = Util.getParam(_params[1], c) / 2;
 		}, time);
-		
+
 		// waveform for chorus is not supported in browser instead change wetdry
 		let w = Util.getParam(_params[2], c);
 		if (isNaN(w)){
@@ -357,7 +357,7 @@ const Reverb = function(_params){
 	this.set = function(c, time){
 		let tmp = Math.min(10, Math.max(0.1, Util.getParam(this._size, c)));
 		if (this._fx.decay != tmp){
-			this._fx.decay = tmp; 
+			Util.atTime(() => this._fx.decay = tmp, time);
 		}
 
 		let wet = Math.min(1, Math.max(0, Util.getParam(this._wet, c)));
@@ -528,7 +528,7 @@ const PitchShift = function(_params){
 		let p = Util.getParam(this._pitch, c);
 		let w = Util.getParam(this._wet, c);
 
-		this._fx.pitch = TL.toScale(p);
+		Util.atTime(() => this._fx.pitch = TL.toScale(p), time);
 		this._fx.wet.setValueAtTime(w, time);
 	}
 
@@ -591,20 +591,21 @@ const LFO = function(_params){
 		this._lfo.frequency.setValueAtTime(1/f, time);
 
 		let a = Util.getParam(this._depth, c);
-		this._lfo.min = Math.min(1, Math.max(0, 1 - a));
-		this._lfo.max = 1;
-		
-		// fix for squarewave not going to 0 fully
-		if (this._waveMap[w] === 'square'){ 
-			this._lfo.min += -0.1 
-		}
-
-		// swap high and low point to create a saw down
-		if (w === 'down' || w === 'sawDown' || w === 'squareUp' || w === 'sineDown' ){
-			let tmp = this._lfo.min;
-			this._lfo.min = this._lfo.max;
-			this._lfo.max = tmp;
-		} 
+		Util.atTime(() => {
+			this._lfo.min = Math.min(1, Math.max(0, 1 - a));
+			this._lfo.max = 1;
+			// fix for squarewave not going to 0 fully
+			if (this._waveMap[w] === 'square'){ 
+				this._lfo.min += -0.1;
+			}
+			
+			// swap high and low point to create a saw down
+			if (w === 'down' || w === 'sawDown' || w === 'squareUp' || w === 'sineDown' ){
+				let tmp = this._lfo.min;
+				this._lfo.min = this._lfo.max;
+				this._lfo.max = tmp;
+			} 
+		}, time);
 
 		if (this._lfo.state !== 'started'){
 			// fix incorrect phases for sawtooth sine and triangle
