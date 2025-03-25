@@ -278,13 +278,22 @@ function code({ file, engine, canvas, p5canvas }){
 		}
 	}
 
+	// get all the current counts and store in dict
+	let countTransfer = {};
+	_sounds.map((s) => {
+		countTransfer[s._name] = {
+			count: s._count,
+			beat: s._beatCount
+		}
+	});
+
 	sounds.map((s) => {
 		// start new loops;
-		s.makeLoop();
+		s.makeLoop(countTransfer);
 	});
 	console.log(`Made instruments in: ${((Tone.Transport.seconds - t) * 1000).toFixed(3)}ms`);
 	
-	transferCount(_sounds, sounds);
+	// transferCount(_sounds, sounds);
 	// when all loops started fade in the new sounds and fade out old
 	if (!sounds.length){
 		startSound(sounds);
