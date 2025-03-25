@@ -1,7 +1,0 @@
-// === TUTORIAL 502: MIDI Duration ===
-// With the length() method we can change the duration.
-// The duration of a midi-note is determined by the interval between 
-// the note-on and note-off message in milliseconds
-
-new midi default time(1/8) note(0 2) length([50 100 150 200])
-// the list in length() will send different durations

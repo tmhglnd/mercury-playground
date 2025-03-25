@@ -1,5 +1,5 @@
+const Tone = require('tone');
 const { noteToMidi, toScale, mtof } = require('total-serialism').Translate;
-const { map } = require('total-serialism').Utility;
 
 // replace defaults with incoming parameters
 function mapDefaults(params, defaults){
@@ -9,6 +9,13 @@ function mapDefaults(params, defaults){
 
 	defaults.splice(0, params.length, ...params);
 	return defaults.map(p => toArray(p));
+}
+
+// Function that is evaluated at a specific time from Tone Transpor
+// More precise than Tone.Transport.ScheduleOnce()
+// Workaround for Tone objects that don't have setValueAtTime
+function atTime(callback, time){
+	setTimeout(callback, (time - Tone.context.currentTime) * 1000);
 }
 
 // convert amplitude to dBFS scale
@@ -223,4 +230,4 @@ function toMidi(n=0, o=0){
 	return toScale(n + o * 12 + 36);
 }
 
-module.exports = { mapDefaults, atodb, clip, assureNum, lookup, randLookup, isRandom, getParam, toArray, msToS, formatRatio, divToS, divToF, toMidi, mtof, noteToMidi, noteToFreq, assureWave }
+module.exports = { mapDefaults, atTime, atodb, clip, assureNum, lookup, randLookup, isRandom, getParam, toArray, msToS, formatRatio, divToS, divToF, toMidi, mtof, noteToMidi, noteToFreq, assureWave }

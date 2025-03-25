@@ -1,9 +1,0 @@
-// === TUTORIAL 604: View & Hydra ===
-// You can access the canvas of the displayed list by
-// initializing a hydra source: s0.init({src: listView})
-
-list cos mod(cosine(2000 60 20) 2)
-view cos
-
-list hydraVisual ['s0.init({src: listView}); src(s0).modulate(noise([2,5,10]), [0.05, 0.1]).out()']
-new sample hat_909 time(1/4) visual(hydraVisual)

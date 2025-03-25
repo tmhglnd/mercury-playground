@@ -1,9 +1,0 @@
-// === TUTORIAL 21: Volume List ===
-// With a volume list we can change the volume over time
-// to create more dynamics in the sound and make it more "human"
-
-list dynamics [0.1 0.4 0.9 0.3 0.15 0.8 0.7 0.1]
-list sounds [tabla_hi tabla_hi_short tabla_mid]
-new sample sounds time(1/16) gain(dynamics)
-
-// Try some different list values
