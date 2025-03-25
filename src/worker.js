@@ -13,7 +13,7 @@ const MonoOSC = require('./core/MonoOSC.js');
 const { divToS } = require('./core/Util.js');
 
 // cross-fade time
-let crossFade = 0.5;
+let crossFade = 2;
 // arrays with the current and previous instruments playing for crossfade
 let _sounds = [];
 let sounds = [];

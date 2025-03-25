@@ -30,7 +30,7 @@ class Instrument extends Sequencer {
 
 	channelStrip(){
 		// gain => output
-		this.gain = new Tone.Gain(0).toDestination();
+		this.gain = new Tone.Gain(0, "normalRange").toDestination();
 		// panning => gain
 		this.panner = new Tone.Panner(0).connect(this.gain);
 		// adsr => panning
@@ -133,6 +133,7 @@ class Instrument extends Sequencer {
 			this._loop.mute = 1;
 			// fade out the sound upon evaluation of new code
 			this.gain.gain.rampTo(0, t, Tone.now());
+
 			setTimeout(() => {
 				this.delete();
 				// wait a little bit extra before deleting to avoid clicks
