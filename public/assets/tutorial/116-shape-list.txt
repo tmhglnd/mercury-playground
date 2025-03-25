@@ -1,9 +1,0 @@
-// === TUTORIAL 116: Shape List ===
-// We can also use a list to change the length of fade-in 
-// and fade-out sequentially
-
-list fadeIn [2 2 500]
-list fadeOut [20 20 100 20 500]
-new sample harp_down time(1/4) shape(fadeIn fadeOut)
-
-// Try some different values in the lists

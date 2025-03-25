@@ -1,9 +1,0 @@
-// === TUTORIAL 103: Sounds ===
-// Code multiple sounds simply by creating extra lines 
-// starting with 'new sample', followed by a sound name
-
-new sample kick_909 time(3/8)
-new sample hat_909 time(1/8)
-new sample snare_909 time(1/2)
-
-// Try various time() arguments and add extra sounds

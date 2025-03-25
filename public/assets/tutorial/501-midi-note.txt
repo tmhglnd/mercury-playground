@@ -1,9 +1,0 @@
-// === TUTORIAL 501: MIDI Note ===
-// We can also output MIDI notes from the browser to external
-// instruments or applications on the computer via WebMidi.
-// This allows us to use Mecruy for generative music while
-// other applications are handling the sound
-
-new midi default time(1/8) note([0 3 7] 2) gain(0.8)
-// this will send a midi-note to the default device
-// a gain of 1 is a velocity of 127, 0.8 = 101

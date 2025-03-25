@@ -1,5 +1,6 @@
 const Tone = require('tone');
 const Util = require('./Util.js');
+const { clip } = require('total-serialism').Utility;
 // const WebMidi = require("webmidi");
 
 // Basic Sequencer class for triggering events
@@ -12,6 +13,7 @@ class Sequencer {
 		// Sequencer specific parameters
 		this._count = 0;
 		this._beatCount = 0;
+		this._subdivCnt = 0;		
 		this._time = 1;
 		this._subdiv = [ 1 ];
 		this._offset = 0;
@@ -58,7 +60,9 @@ class Sequencer {
 			}
 			// set subdivision speeds
 			this._loop.playbackRate = Util.getParam(this._subdiv, this._count);
-	
+			// get the subdivision count (always 0, except when subdividing)
+			this._subdivCnt = (this._subdivCnt + 1) % this._loop.playbackRate;
+			
 			// humanize method is interesting to add
 			this._loop.humanize = Util.getParam(this._human, this._count);
 	
@@ -96,11 +100,17 @@ class Sequencer {
 				if (this._visual.length > 0){
 					this._canvas.eval(Util.getParam(this._visual, c));
 				}
+
 				// increment internal beat counter
-				this._beatCount++;
+				// only increment if ratchetcounter is 0
+				if (this._subdivCnt < 1) { 
+					this._beatCount++; 
+				}
 			}
 			// increment count for sequencing
+			// only increment if subdivcounter is 0
 			this._count++;
+
 			// if the sample is set to only play once mute the loop 
 			// afterwards and dispose
 			if (this._once){ 
@@ -179,6 +189,21 @@ class Sequencer {
 		}
 	}
 
+	// experiment with multiple tempi in between different instruments
+	// but I think the PPQ of the global transport is in the way
+	// probably needs a way to have multiple transports running or a different
+	// type of scheduler to define events more precisely.
+	// 
+	// tempo(bpm){
+	// 	// check the added tempo compared to the set bpm
+	// 	if (t !== undefined && typeof bpm === 'number'){
+	// 		let ratio = this.bpm() / bpm;
+	// 		this._time = this._time * ratio;
+
+	// 		console.log('bpm', this.bpm(), 'new', bpm, 'ratio', ratio, 'time', this._time);
+	// 	}
+	// }
+
 	timediv(s){
 		// set timing subdivisions for the loop
 		let tmp = Util.toArray(s);
@@ -197,10 +222,10 @@ class Sequencer {
 		this._once = (o > 0 || o === 'on') ? true : false;
 	}
 
-	ratchet(p=1, s=[1]){
+	ratchet(s=[1], p=1){
 		// set the ratcheting probability and subdivision
 		// for now defaults to the timediv method
-		log(`ratchet() is not yet supported, defaults to timediv() with probability of 1`);
+		log(`ratchet() probability not yet supported, defaults to timediv() with probability of 1`);
 		this.timediv(s);
 	}
 
