@@ -6,23 +6,23 @@ const saver = require('file-saver');
 require('codemirror/mode/javascript/javascript.js');
 require('codemirror/addon/mode/simple.js');
 require('codemirror/addon/comment/comment.js');
+require('codemirror/addon/hint/show-hint.js');
+require('codemirror/addon/hint/anyword-hint.js');
 
 const defaultTheme = 'material-darker';
 
 let _rand;
 
 // get the example code files
-console.log('loading examples...');
-let examples = require('./data/examples.json');
-console.log('=> examples loaded');
+const examples = require('mercury-examples').Examples;
+console.log('=> examples loaded', examples);
 
 // get the tutorial files
-console.log('loading tutorials...');
-let tutorials = require('./data/tutorials.json');
-console.log('=> tutorials loaded');
+const tutorials = require('mercury-examples').Tutorials;
+console.log('=> tutorials loaded', tutorials);
 
+// get the samplefile path data
 let samples = require('./data/samples.json');
-const { mod } = require('total-serialism/src/utility.js');
 
 // the simple mode lexer for Mercury syntax-highlighting
 CodeMirror.defineSimpleMode("mercury", {
@@ -55,6 +55,57 @@ CodeMirror.defineSimpleMode("mercury", {
 	]
 });
 
+// list of keywords to allow for autocompletion
+let mercuryHintList = [
+	'new', 'set', 'list', 'print', 'silence',
+	'tempo', 'scale', 'scalar', 'root', 'randomSeed', 'volume', 'lopass', 'hipass', 'osc', 'midi', 'samples',
+	'sample', 'synth', 'input', 'midi', 'polySample', 'polySynth',
+	'saw', 'sine', 'square', 'triangle',
+	'name', 'solo', 'group', 'time', 'once', 'fx', 'effect', 'out', 'timediv', 'wait', 'play', 'gain', 'shape', 'pan',
+	'note', 'super', 'slide',
+	'speed', 'start', 'tune', 'stretch',
+	'steal', 'spread', 'length', 'chord', 'midinote', 'program', 'pgm', 'change', 'cc',
+	'range', 'trigger', 'hold',
+	'chorus', 'comb', 'degrade', 'delay', 'distort', 'double', 'filter', 'kink', 'lfo', 'reverb', 'shift', 'squash', 'triggerFilter', 'vibrato', 'vocoder',
+	'spread', 'spreadF', 'spreadInc', 'spreadIncF', 'sine', 'sineF', 'cosine', 'cosineF', 'saw', 'sawF', 'square', 'squareF', 'binary', 'binaryBeat',  'spacing', 'spacingBeat', 'euclidean', 'euclid', 'hexBeat', 'hex', 'fibonacci', 'pisano', 'pell', 'lucas', 'random', 'randomF', 'drunk', 'drunkF', 'urn', 'coin', 'dice', 'clave', 'twelveTone', 'choose', 'pick', 'shuffle', 'expand', 'markovTrain', 'markovChain', 'clone', 'join', 'copy', 'pad', 'every', 'flat', 'invert', 'lace', 'lookup', 'merge', 'palin', 'repeat', 'reverse', 'rotate', 'rot', 'sort', 'slice', 'split', 'cut', 'spray', 'stretch', 'stretchF', 'thin', 'add', 'subtract', 'sub', 'multiply', 'mul', 'divide', 'div', 'mod', 'clip', 'wrap', 'fold', 'map', 'normalize', 'norm', 'equals', 'eq', 'notEquals', 'neq', 'greater', 'gt', 'less', 'lt', 'greaterEquals', 'gte', 'lessEquals', 'lte', 'size', 'sum', 'midiToNote', 'mton', 'midiToFreq', 'mtof', 'noteToMidi', 'ntom', 'noteToFreq', 'ntof', 'freqToMidi', 'ftom', 'freqToNote', 'fton', 'relativeToMidi', 'rtom', 'relativeToFreq', 'rtof', 'chromaToRelative', 'ctor', 'ratioToCent', 'rtoc', 'makeChords', 'chordsFromNumerals', 'chordsFromNames', 'divisionToMs', 'dtoms', 'divisionToRatio', 'dtor', 'ratioToMs', 'rtoms', 'scaleNames', 'toScale', 'textCode', 'ttoc',
+	'on', 'off', 'up', 'down', 'low', 'high', 'band'
+].sort();
+
+// let WORD = /[^\d\"\'\s\(\)\[\]]+/;
+let WORD = /[\w]+/;
+
+// a hinting function for the Mercury language
+CodeMirror.registerHelper('hint', 'mercury', (editor, options) => {
+	// set word and range parameters
+	let word = options && options.word || WORD;
+	let list = options && options.list || []
+
+	// get current position and text from line
+	let cur = editor.getCursor();
+	let curLine = editor.getLine(cur.line);
+	let end = cur.ch, start = end;
+
+	// get the word (excluding spaces and special characters)
+	while (start && word.test(curLine.charAt(start - 1))){
+		--start;
+	}
+	let curWord = start != end && curLine.slice(start, end);
+
+	// go over the hintlist and select words that match the current found word
+	for (let i=0; i<mercuryHintList.length; i++){
+		if (curWord === mercuryHintList[i].slice(0, curWord.length)){
+			list.push(mercuryHintList[i]);
+		}
+	}
+	// return the hintlist
+	return {list: list, from: CodeMirror.Pos(cur.line, start), to: CodeMirror.Pos(cur.line, end)}
+});
+
+// add the hint helper to autocomplete command
+CodeMirror.commands.autocomplete = function(cm) {
+	cm.showHint({ hint: CodeMirror.hint.mercury });
+}
+
 const Editor = function({ context, engine, canvas, p5canvas }) {
 	// this._engine = engine;
 	console.log('=> Created Editor()');
@@ -66,6 +117,8 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 	// document.body.appendChild(container);
 	this.container.appendChild(text);
 	this.container.style.opacity = 1;
+
+	this.showHint = false;
 
 	this.options = {
 		// options for the editor
@@ -82,25 +135,78 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		mode: "mercury",
 		showCursorWhenSelecting: true,
 		lineWrapping: true,
+		showHint: false,
 		// keymaps for execute/stopping/commenting code
 		extraKeys: {
+			'Tab': 'insertSoftTab',
 			'Ctrl-/': 'toggleComment',
 			'Alt-/': 'toggleComment',
+			'Shift-Ctrl-7': 'toggleComment',
+			'Shift-Alt-7': 'toggleComment',
 			'Ctrl-Enter': () => { this.evaluate() },
 			'Alt-Enter': () => { this.evaluate() },
 			'Ctrl-.': () => { this.silence() },
 			'Alt-.': () => { this.silence() },
+			'Alt-R': () => { this.randomize() },
+			'Ctrl-R': () => { this.randomize() },
 			'Shift-Alt-Enter': () => { this.evaluateBlock() },
 			'Shift-Ctrl-Enter': () => { this.evaluateBlock() },
 			'Shift-Alt-H': () => { this.hideEditor() },
 			'Shift-Ctrl-H': () => { this.hideEditor() },
-			'Shift-Alt-R': () => { this.randomize() },
-			'Shift-Ctrl-R': () => { this.randomize() },
-			'Tab': 'insertSoftTab',
+			'Shift-Ctrl-E': () => { this.set('') },
+			'Shift-Alt-E': () => { this.set('') },
+			'Shift-Ctrl-X': () => { this.example() },
+			'Shift-Alt-X': () => { this.example() },
+			'Shift-Ctrl-S': () => { this.save() },
+			'Shift-Alt-S': () => { this.save() },
+			'Shift-Ctrl-R': () => { this.record() },
+			'Shift-Alt-R': () => { this.record() },
+			'Shift-Ctrl-D': () => { document.getElementById('switch').click() },
+			'Shift-Alt-D': () => { document.getElementById('switch').click() },
+			// 'Shift-Ctrl-T': () => { 
+			// 	Tutorials, to do
+			// 	For now, go out of the Editor with Alt-Tab and navigate
+			// },
+			// 'Shift-Ctrl-O' : () => {
+			// 	Sounds, to do
+			// 	For now, go out of the Editor with Alt-Tab and navigate
+			// },
+			'Shift-Ctrl-P' : () => { 
+				document.getElementById('help').click() },
+			'Shift-Alt-P' : () => { 
+				document.getElementById('help').click() },
+			'Shift-Ctrl-C': () => { 
+				document.getElementById('collaborate').click() },
+			'Shift-Alt-C': () => { 
+				document.getElementById('collaborate').click() },
+			'Shift-Ctrl-A': () => { this.addSounds() },
+			'Shift-Alt-A': () => { this.addSounds() },
+			'Shift-Ctrl-Z': () => { document.getElementById('zen').click() },
+			'Shift-Alt-Z': () => { document.getElementById('zen').click() },
+			'Shift-Ctrl-T': () => { this.showHint = !this.showHint },
+			'Shift-Alt-T': () => { this.showHint = !this.showHint },
+			'Shift-Alt-L': () => { 
+				this.showListenMenu(!this.listenMenuVisible) },
+			'Shift-Ctrl-L': () => { 
+				this.showListenMenu(!this.listenMenuVisible) }
 		}
 	}
 
 	this.cm = CodeMirror.fromTextArea(text, this.options);
+
+	this.cm.on('keyup', (cm, e) => {
+		// don't show hints if setting is disabled (default)
+		if (!this.showHint) return;
+		// when a key is pressed show autocompletion hints
+		// don't show if escape, enter or arrow keys are pressed
+		if (e.key === 'Escape' || e.key === 'Enter' || e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'ArrowUp' || e.key === 'ArrowDown'){
+			return;
+		}
+		// if the completion is already open don't show it again
+		if (!cm.state.completionActive && event.keyCode !== 13){
+			cm.showHint({ completeSingle: false });
+		}
+	});
 
 	this.cm.markText({line: 0, ch: 0}, {line: 6, ch: 42}, {className: 'styled-background'})
 
@@ -267,19 +373,68 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		// cEditor.setOption('theme', t);
 	}
 
-	// play/silence/empty buttons
+	this.example = function(){
+		// initialize editor with some code
+		let names = Object.keys(examples);
+		let amount = names.length;
+		let rand = Math.floor(Math.random() * amount);
+		rand = (rand === _rand)? (rand + 1) % amount : rand;
+
+		this.set(examples[names[rand]]);
+		_rand = rand;
+
+		this.evaluate();
+	}
+
+	this.save = function(){
+		let f = `mercury-sketch_${ date() }`;
+		saver.saveAs(new File([this.cm.getValue()], `${f}.txt`, { type: 'text/plain;charset=utf-8' }));
+	}
+
+	this.record = function(){
+		let f = `mercury-recording_${ date() }`;
+		let r = document.getElementById('recButton');
+
+		if (engine.isRecording() !== 'started'){
+			engine.record(true);
+			r.className = 'recording';
+		} else {
+			engine.record(false, f);
+			r.className = 'button';
+		}
+	}
+
+	this.addSounds = function(){
+		let input = document.createElement('input');
+		// input.id = 'load';
+		input.style.display = 'none';
+		input.type = 'file';
+		input.multiple = true;
+		input.onchange = (e) => {
+			if (e.target.files.length > 0){
+				engine.addBuffers(e.target.files);
+			}
+		}
+		input.click();
+	}
+
+	// play/silence/empty/example/save/record buttons
 	this.controls = function(){
 		let div = document.getElementById('menu');
 		let play = document.createElement('button');
 		play.innerHTML = 'play';
-		play.onclick = () => { this.evaluate() };
+		play.title = 'Evaluate code (Alt/Ctrl-Enter)';
+		play.onclick = () => { this.evaluate() }
 
 		let stop = document.createElement('button');
 		stop.innerHTML = 'silence';
-		stop.onclick = () => { this.silence() };
+		stop.title = 'Stop sound (Alt/Ctrl-.)';
+		stop.onclick = () => { this.silence() }
 
 		let clear = document.createElement('button');
+		clear.id = 'emptyButton';
 		clear.innerHTML = 'empty';
+		clear.title = 'Empty editor (Alt/Ctrl-Shift-E)';
 		clear.onclick = () => { 
 			this.set(''); 
 			this.silence(); 
@@ -287,42 +442,21 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		
 		let example = document.createElement('button');
 		example.innerHTML = 'example';
-		example.onclick = () => {
-			// initialize editor with some code
-			let names = Object.keys(examples);
-			let amount = names.length;
-			let rand = Math.floor(Math.random() * amount);
-			rand = (rand === _rand)? (rand + 1) % amount : rand;
-
-			this.set(examples[names[rand]]);
-			_rand = rand;
-
-			this.evaluate();
-		};
+		example.title = 'Open random example (Alt/Ctrl-Shift-X)';
+		example.onclick = () => { this.example() }
 
 		let save = document.createElement('button');
-		save.style.width = '9%';
+		save.style.width = '9.4%';
 		save.innerHTML = 'save';
-		save.onclick = () => {
-			let f = `mercury-sketch_${ date() }`;
-			saver.saveAs(new File([this.cm.getValue()], `${f}.txt`, { type: 'text/plain;charset=utf-8' }));
-		}
+		save.title = 'Download code as text (Alt/Ctrl-Shift-S)';
+		save.onclick = () => { this.save() }
 		
 		let rec = document.createElement('button');
-		// rec.id = 'recButton';
-		rec.style.width = '9%';
+		rec.id = 'recButton';
+		rec.style.width = '9.4%';
 		rec.innerHTML = 'record';
-		rec.onclick = () => {
-			let f = `mercury-recording_${ date() }`;
-
-			if (engine.isRecording() !== 'started'){
-				engine.record(true);
-				rec.className = 'recording';
-			} else {
-				engine.record(false, f);
-				rec.className = 'button';
-			}
-		}
+		rec.title = 'Start/Stop recording sound (Alt/Ctrl-Shift-R)';
+		rec.onclick = () => { this.record() }
 
 		div.appendChild(play);
 		div.appendChild(stop);
@@ -333,59 +467,66 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 	}
 
 	this.links = function(){
-		let urls = {
-			// 'tutorial': 'https://tmhglnd.github.io/mercury/tutorial.html',
-			// 'sounds' : 'https://github.com/tmhglnd/mercury/blob/master/mercury_ide/media/README.md',
-			'help': 'https://tmhglnd.github.io/mercury/docs/',
-			// 'local version': 'https://github.com/tmhglnd/mercury-playground#-running-without-internet'
-			"collaborate": 'https://flok.cc'
-		}
-
 		let div = document.getElementById('links');
 		let p = document.createElement('p');
 		div.appendChild(p);
 
-		let menu = document.createElement('select');
-		menu.id = 'tutorials';
-		menu.onchange = () => { this.loadTutorial() }
-		p.appendChild(menu);
-
+		let tuts = document.createElement('select');
+		tuts.id = 'tutorials';
+		tuts.onchange = () => { this.loadTutorial() }
+		
 		let snds = document.createElement('select');
+		snds.style.width = '12.5%';
 		snds.id = 'sounds';
 		snds.onchange = () => { this.insertSound() }
-		p.appendChild(snds);
 
-		Object.keys(urls).forEach((k) => {
-			let btn = document.createElement('button');
-			btn.innerHTML = k;
-			btn.onclick = () => {
-				window.open(urls[k], '_blank');
-			}
-			p.appendChild(btn);
-		});
-
+		let lstn = document.createElement('button');
+		lstn.style.width = '12.5%';
+		lstn.id = lstn.innerHTML = 'prelisten';
+		lstn.title = 'Listen all the sounds (Alt/Ctrl-Shift-L)'
+		lstn.onclick = () => { this.showListenMenu(true) }
+		
 		let load = document.createElement('button');
+		load.style.width = '12.5%';
+		load.id = 'load';
 		load.innerHTML = 'add sounds';
+		load.title = 'Load sounds from the computer (Alt/Ctrl-Shift-A)'
 		// load.innerHTML = 'settings';
 		load.onclick = () => {
-			input.click();
+			this.addSounds();
+			// input.click();
 			// let modal = document.getElementById('modalbox');
 			// modal.style.display = "block";
 		}
-		let input = document.createElement('input');
-		input.style.display = 'none';
-		input.type = 'file';
-		input.multiple = true;
-		input.onchange = (e) => {
-			if (e.target.files.length > 0){
-				engine.addBuffers(e.target.files);
-			}
+
+		let help = document.createElement('button');
+		help.id = help.innerHTML = 'help';
+		help.title = 'Open the documentation (Alt/Ctrl-Shift-P)';
+		help.onclick = () => {
+			window.open('https://tmhglnd.github.io/mercury/docs/', '_blank');
 		}
+
+		let collab = document.createElement('button');
+		collab.id = collab.innerHTML = 'collaborate';
+		collab.title = 'Collaborate in flok.cc (Alt/Ctrl-Shift-C)';
+		collab.onclick = () => {
+			window.open('https://flok.cc', '_blank');
+		}
+
+		p.appendChild(tuts);
+		p.appendChild(snds);
+		p.appendChild(lstn);
 		p.appendChild(load);
+		p.appendChild(help);
+		p.appendChild(collab);
 	}
 
 	this.tutorialMenu = function(){
 		let menu = document.getElementById('tutorials');
+
+		menu.onclick = () => {
+			console.log('clicked tutorials!');
+		}
 
 		Object.keys(tutorials).forEach((t) => {
 			let option = document.createElement('option');
@@ -408,6 +549,8 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		values.forEach((t) => {
 			let option = document.createElement('option');
 			option.value = option.innerHTML = t;
+			// also add the sample names to the hint autocomplete
+			mercuryHintList.push(t);
 			menu.appendChild(option);
 		});
 	}
@@ -431,7 +574,9 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		div.appendChild(p);
 
 		let btn = document.createElement('button');
-		btn.innerHTML = 'hide menu';
+		btn.innerHTML = 'zen mode';
+		btn.id = 'zen';
+		btn.title = 'Hide or show the menu bars (Alt/Ctrl-Shift-Z)';
 		btn.onclick = () => {
 			this.menuHidden = !this.menuHidden;
 
@@ -440,7 +585,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 				let d = document.getElementById(divs[i]);
 				d.style.display = this.menuHidden ? 'none' : 'inline';
 			}
-			btn.innerHTML = this.menuHidden ? 'show menu' : 'hide menu';
+			btn.innerHTML = this.menuHidden ? 'exit zen mode' : 'zen mode';
 		}
 		p.appendChild(btn);
 	}
@@ -467,7 +612,65 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 	// 	menu.value = defaultTheme;
 	// }
 
+	this.listenMenuVisible = false;
+
+	// toggle the visibility of the sounds prelisten menu
+	this.showListenMenu = function(show){
+		let m = document.getElementById('sounds-prelisten-box');
+		if (show){
+			m.style.display = "block";
+		} else {
+			m.style.display = 'none';
+		}
+		this.listenMenuVisible = show;
+	}
+
+	// sounds menu for prelistening sounds by scrolling and clicking
+	this.soundsListenMenu = function(){
+		let modal = document.getElementById('sounds-prelisten-box');
+
+		let m = document.getElementsByClassName('sounds-prelisten')[0];
+		m.innerHTML = `
+		<span class="close">&times;</span>
+		<p>
+			Click to listen the soundfile. Click again to stop playback.
+		</p>
+		<p id="sound-prelisten-items"></p>
+		`
+		
+		let p = document.getElementById('sound-prelisten-items');
+		let sounds = ['sounds'].concat(Object.keys(samples));
+		for (let i=0; i<sounds.length; i++){
+			// skip the keyword sounds that is used for the dropdown menu
+			if (sounds[i] === 'sounds') continue;
+			// create an audio element
+			let aud = document.createElement('audio');
+			aud.volume = 0.5;
+			aud.src = samples[sounds[i]];
+			aud.preload = 'auto';
+			// create a button element
+			let btn = document.createElement('button');
+			btn.innerHTML = sounds[i];
+			btn.style.width = 'auto';
+			btn.onclick = () => {
+				if (!aud.paused) { aud.pause(); aud.currentTime = 0; }
+				else { aud.play(); }
+			}
+			btn.appendChild(aud);
+			p.appendChild(btn);
+		}
+
+		let span = document.getElementsByClassName('close')[0];
+		span.onclick = () => this.showListenMenu(false);
+
+		window.onclick = (event) => {
+			if (event.target === modal) this.showListenMenu(false);
+		}
+		modal.appendChild(m);
+	}
+
 	// settings menu with more options and some explanation
+	// TO-DO, currently not in use
 	this.settingsMenu = function(){
 		let modal = document.getElementById('modalbox');
 		// let m = document.createElement('div');
@@ -511,6 +714,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		let btn = document.createElement('button');
 		btn.id = 'switch';
 		btn.className = 'themeswitch';
+		btn.title = 'Switch display mode Ctrl/Alt-Shift-D';
 		btn.onclick = () => {
 			if (localStorage.getItem('theme') === 'darkmode'){
 				switchTheme('lightmode');

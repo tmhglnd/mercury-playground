@@ -1,5 +1,0 @@
-// === TUTORIAL 500: External Connections ===
-// It is possible to extend Mercury with external software,
-// hardware, and other tools via MIDI, OSC and Microphone inputs
-// In this chapter we'll go over these different possibilities
-// step-by-step 

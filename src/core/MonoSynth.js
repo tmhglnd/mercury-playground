@@ -18,6 +18,10 @@ class MonoSynth extends Instrument {
 			tri : 'triangle',
 			rect : 'square',
 			organ: 'sine4',
+			// noise: 'white',
+			// white: 'white',
+			// pink: 'pink',
+			// brown: 'brown'
 		}
 		// synth specific variables;
 		this._note = [ 0, 0 ];
@@ -41,8 +45,9 @@ class MonoSynth extends Instrument {
 		// this.source = new Tone.Gain(0).connect(this.channelStrip());
 
 		this.synth = new Tone.FatOscillator().connect(this.channelStrip());
-		// this.synth = new Tone.FatOscillator().connect(this.source);
+		// this.synth = new Tone.Noise('white').connect(this.channelStrip());
 
+		// some ideas for adding the noise oscillator to the synth
 		// this.nxGain = new Tone.Gain(0).connect(this.source);
 		// this.nx = new Tone.Noise("white", { volume: 0.5 }).connect(this.nxGain);
 		// this.nx.connect(this.nxGain);
@@ -50,6 +55,10 @@ class MonoSynth extends Instrument {
 		this.synth.count = 1;
 		this.synth.start();
 		this.source = this.synth;
+
+		// this creates empty functions for the noise oscillator so no errors with note
+		// this.synth.set = this.synth.set ? this.synth.set : ()=>{};
+		// this.synth.frequency = this.synth.frequency ? this.synth.frequency : { setValueAtTime : ()=>{}, rampTo : ()=>{}}
 	}
 
 	sourceEvent(c, e, time){

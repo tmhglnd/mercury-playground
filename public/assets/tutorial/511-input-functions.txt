@@ -1,9 +1,0 @@
-// === TUTORIAL 702: Input Functions ===
-// Similar to the sample and synth you can use functions 
-// to adjust the incoming sound in real time
-// For example this is a stutter effect where the sound
-// is only let through when the envelope is triggered
-
-set tempo 120
-
-new input default shape(1 1/32 1) time(1/16) gain(1)

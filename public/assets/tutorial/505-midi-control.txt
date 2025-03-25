@@ -1,9 +1,0 @@
-// === TUTORIAL 505: MIDI Control Change ===
-// With the cc() method we can send control change messages
-// to the same device, to control other parameters
-// Add multiple cc() methods to make different messages
-
-new midi default time(1/16) note(0 0) name(myMidi)
-	set myMidi cc(10 [50 100]) cc(20 random(4 0 127))
-// Above are two cc() methods, one to control number 10, and 
-// one to 20, both with different values to change. 

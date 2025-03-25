@@ -138,6 +138,7 @@ window.onload = () => {
 	cm.tutorialMenu();
 	cm.soundsMenu();
 	cm.modeSwitch();
+	cm.soundsListenMenu();
 	// cm.settingsMenu();
 	
 	// Load recent code from localStorage if any
