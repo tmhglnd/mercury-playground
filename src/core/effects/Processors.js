@@ -4,7 +4,6 @@
 // class NoiseProcessor extends AudioWorkletProcessor {
 // 	process(inputs, outputs, parameters){
 // 		const output = outputs[0];
-
 // 		output.forEach((channel) => {
 // 			for (let i=0; i<channel.length; i++) {
 // 				channel[i] = Math.random() - 0.5;
@@ -155,3 +154,90 @@ class SquashProcessor extends AudioWorkletProcessor {
 	}
 }
 registerProcessor('squash-processor', SquashProcessor);
+
+// A custom written Delay audioworkletprocessor
+// In the first place as a test for how to write custom delaylines 
+// With the potential to create more complicated FX for the browser
+//
+class DelayProcessor extends AudioWorkletProcessor {
+	static get parameterDescriptors(){
+		return [{
+			name : 'delayTime',
+			defaultValue: 100,
+			minValue: 0,
+			maxValue: 1000
+		}]
+	}
+
+	constructor(){
+		super();
+		// maximum delayline 2 seconds at 48kHz
+		this.maxDelay = 44100 * 5;
+		// the delaybuffer to be used
+		this.delayBuffer = new Float32Array(this.maxDelay);
+		// the delay write index
+		this.writeIndex = 0;
+	}
+
+	process(inputs, outputs, parameters){
+		const input = inputs[0];
+		const output = outputs[0];
+
+		// if there is anything to process
+		if (input.length === 0) return true;
+		
+		// for every channel
+		for (let channel = 0; channel < 1; channel++){
+			// no sound int channel continue to the next channel
+			if (!input[channel]) continue;
+
+			// for every sample in the blocksize
+			for (let i=0; i<input[0].length; i++){
+
+				// calculate delaytime from ms to samples
+				const delayTime = parameters.delayTime.length > 1 ? parameters.delayTime[i] : parameters.delayTime[0];
+				
+				const dt = Math.floor(delayTime * 0.001 * 44100);
+				
+				// read from the delayline at the readindex and output
+				const readIndex = (this.writeIndex + this.maxDelay - dt) % this.maxDelay;
+
+				const delayedSample = this.delayBuffer[readIndex];
+				
+				output[channel][i] = delayedSample;
+
+				// write a value to the delayline at current position
+				this.delayBuffer[this.writeIndex] = input[channel][i] + delayedSample * 0.9;
+				
+				// const delayedSample = this.delayBuffer[readIndex];
+
+				// increment the write index
+				this.writeIndex = (this.writeIndex + 1) % this.maxDelay;
+			}
+		}
+
+		// // for every channel
+		// for (let channel = 0; channel < input.length; ++channel){
+		// 	// for every sample in the blocksize (currently 128)
+		// 	for (let i=0; i<input[channel].length; i++){
+		// 		// calculate delaytime from ms to samples
+		// 		const delayTime = parameters.delayTime.length > 1 ? parameters.delayTime[i] : parameters.delayTime[0];
+		// 		const dt = Math.floor(delayTime * 0.001 * sampleRate);
+
+		// 		const readIndex = (this.writeIndex + this.maxDelay - dt) % this.maxDelay;
+		// 		output[channel][i] = this.delayBuffer[readIndex];
+
+		// 		// write a value to the delayline at current position
+		// 		// with feedback
+		// 		this.delayBuffer[this.writeIndex] = input[channel][i] + output[channel][i] * 0.9;
+
+		// 		// read from the delayline at the readindex and output
+		// 	}
+
+		// 	// increment the write index
+		// 	this.writeIndex = (this.writeIndex + 1) % this.maxDelay;
+		// }
+		return true;
+	}
+}
+registerProcessor('delay-processor', DelayProcessor);

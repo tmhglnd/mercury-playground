@@ -93,9 +93,61 @@ const fxMap = {
 	},
 	'double' : (params) => {
 		return new Chorus(Util.mapDefaults(params, ['8/1', 8, 1]));
+	},
+	'workletdelay' : (params) => {
+		return new WorkletDelay(params);
 	}
 }
 module.exports = fxMap;
+
+const WorkletDelay = function(_params){
+	// apply the default values and convert to arrays where necessary
+	_params = Util.mapDefaults(_params, [ 250, 0.5 ]);
+	this._delayTime = Util.toArray(_params[0]);
+	this._wet = Util.toArray(_params[1]);
+
+	// ToneAudioNode has all the tone effect parameters
+	this._fx = new Tone.ToneAudioNode();
+
+	// The crossfader mix
+	this._mix = new Tone.Add();
+	this._mixDry = new Tone.Gain(0).connect(this._mix.input);
+	this._mixWet = new Tone.Gain(0.5).connect(this._mix.addend);
+
+	// A gain node for connecting with input and output
+	this._fx.input = new Tone.Gain(1).connect(this._mixDry);
+	this._fx.output = new Tone.Gain(1).connect(this._mix.addend);
+
+	// the fx processor
+	this._fx.workletNode = Tone.getContext().createAudioWorkletNode('delay-processor');
+
+	// connect input, fx and output
+	this._fx.input.chain(this._fx.workletNode, this._fx.output);
+
+	this.set = function(c, time, bpm){
+		// some parameter mapping changing input range 0-1 to 1-inf
+		const p = this._fx.workletNode.parameters.get('delayTime');
+		const dt = Util.assureNum(Util.getParam(this._delayTime, c));
+		p.setValueAtTime(dt, time);
+		
+		const w = Util.clip(Util.getParam(this._wet, c), 0, 1);
+		this._fx.output.gain.setValueAtTime(w, time);
+		this._mixDry.gain.setValueAtTime(1 - w, time);
+	}
+
+	this.chain = function(){
+		return { 'send' : this._fx, 'return' : this._mix }
+	}
+
+	this.delete = function(){
+		const nodes = [ this._fx, this._mix, this._mixDry ];
+
+		nodes.forEach((n) => {
+			n.disconnect();
+			n.dispose();
+		});
+	}
+}
 
 // A Downsampling Chiptune effect. Downsamples the signal by a specified amount
 // Resulting in a lower samplerate, making it sound more like 8bit/chiptune
