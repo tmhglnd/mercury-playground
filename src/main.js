@@ -56,21 +56,21 @@ window.onload = () => {
 	const Editor = require('./editor.js');	
 	const Canvas = require('./canvas.js');
 	// const p5 = require('p5');
-	const WebMidi = require("webmidi");
+	const { WebMidi } = require("webmidi");
 
 	// WebMIDI Setup
-	WebMidi.enable(function (err) {
-		if (err) {
-			console.log("!! error enabling WebMIDI", err);
-		} else {
-			console.log("=> webMidi enabled");
-			WebMidi.inputs.forEach((i) => {
-				console.log(`- inputs: ${i.name}`);
-			});
-			WebMidi.outputs.forEach((i) => {
-				console.log(`- outputs: ${i.name}`);
-			});
-		}
+	WebMidi.enable()
+	.then(() => {
+		console.log("=> WebMIDI enabled!");
+		WebMidi.inputs.forEach((i) => {
+			console.log(`- inputs: ${i.name}`);
+		});
+		WebMidi.outputs.forEach((i) => {
+			console.log(`- outputs: ${i.name}`);
+		});
+	})
+	.catch((err) => {
+		console.log("!!! Error enabling WebMIDI !!!", err);
 	});
 
 	// Empty object to store/update all received oscMessages

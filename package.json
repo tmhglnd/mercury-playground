@@ -34,7 +34,7 @@
     "socket.io-client": "^4.5.3",
     "tone": "^14.7.77",
     "total-serialism": "^2.7.5",
-    "webmidi": "^2.5.3"
+    "webmidi": "^3.1.12"
   },
   "devDependencies": {
     "brfs": "^2.0.2",
