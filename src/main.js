@@ -98,18 +98,19 @@ window.onload = () => {
 	WebMidi.enable()
 	.then(() => {
 		console.log("=> WebMIDI enabled!");
-		WebMidi.inputs.forEach((i) => {
-			console.log(`- inputs: ${i.name}`);
-			
+		
+		printMidiDevices();
+
+		WebMidi.inputs.forEach((i) => {			
 			// add a listener for all incoming midi messages on all devices
 			i.addListener('midimessage', (midi) => {
 				let type = midi.message.type;
 				let data = midi.message.dataBytes;
-				let msg = [];
 
-				console.log('midi in:', type, data);
+				if (window.logMidi) log(`midi in: ${type} ${data}`);
 				
 				if (type === 'controlchange'){
+					// normalize midi values to 0-1 range
 					forwardOSC([ `/cc/${data[0]}`, data[1] / 127 ]);
 				}
 				else if (type === 'noteon'){
@@ -125,21 +126,21 @@ window.onload = () => {
 						// forwardOSC([ `/note/trigger`, 1 ]);
 					}
 				}
-				// if (msg.length){
-					// forwardOSC(msg);
-					// let event = new CustomEvent(msg[0], { detail: { value: msg[1], time: Tone.immediate()+0.01 }});
-					// window.dispatchEvent(event);
-				// }
 			});
 		});
-		WebMidi.outputs.forEach((i) => {
-			console.log(`- outputs: ${i.name}`);
-		});
-
 	})
 	.catch((err) => {
 		console.log("!!! Error enabling WebMIDI !!!", err);
 	});
+
+	window.printMidiDevices = function(){
+		WebMidi.inputs.forEach((i) => {
+			log(`- midi input: ${i.name}`);
+		});
+		WebMidi.outputs.forEach((i) => {
+			log(`- midi output: ${i.name}`);
+		});
+	}
 
 	function forwardOSC(msg){
 		let address = msg.shift();
