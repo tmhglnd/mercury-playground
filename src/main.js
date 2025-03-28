@@ -98,7 +98,11 @@ window.onload = () => {
 
 	// WebMIDI Setup
 	const { WebMidi } = require("webmidi");
-	
+
+	// global midi settings
+	window.midiLog = false;
+	window.midiEnable = true;
+
 	WebMidi.enable()
 	.then(() => {
 		console.log("=> WebMIDI enabled!");
@@ -108,10 +112,12 @@ window.onload = () => {
 		WebMidi.inputs.forEach((i) => {			
 			// add a listener for all incoming midi messages on all devices
 			i.addListener('midimessage', (midi) => {
+				if (!window.midiEnable) return;
+
 				let type = midi.message.type;
 				let data = midi.message.dataBytes;
 
-				if (window.logMidi) log(`midi in: ${type} ${data}`);
+				if (window.midiLog) log(`midi in: ${type} ${data}`);
 				
 				if (type === 'controlchange'){
 					// normalize midi values to 0-1 range
@@ -121,11 +127,11 @@ window.onload = () => {
 					let pitch = data[0];
 					let velocity = data[1];
 
-					if (vel > 0){
+					if (velocity > 0){
 						// console.log('noteon', note);
 
 						forwardOSC([ `/pitch`, pitch ]);
-						forwardOSC([ `/note`, note-36 ]);
+						forwardOSC([ `/note`, pitch-36 ]);
 						forwardOSC([ `/velocity`, velocity / 127 ]);
 						// forwardOSC([ `/note/trigger`, 1 ]);
 					}

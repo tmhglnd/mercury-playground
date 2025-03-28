@@ -149,14 +149,21 @@ function code({ file, engine, canvas, p5canvas }){
 			// set some additional latency for all the midi
 			// TO DO
 		},
-		'logMidi' : (args) => {
+		'midiLog' : (args) => {
 			if (isNaN(args[0])){
-				window.logMidi = args[0] === 'on' ? 1 : 0;
+				window.midiLog = args[0] === 'on' ? 1 : 0;
 			} else {
-				window.logMidi = (args[0] > 0);
+				window.midiLog = (args[0] > 0);
 			}
-			if (window.logMidi){
+			if (window.midiLog){
 				printMidiDevices();
+			}
+		},
+		'midiEnable' : (args) => {
+			if (isNaN(args[0])){
+				window.midiEnable = args[0] === 'on' ? 1 : 0;
+			} else {
+				window.midiLog = (args[0] > 0);
 			}
 		}
 	}

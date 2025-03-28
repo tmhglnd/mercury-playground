@@ -407,8 +407,8 @@ textarea:hover {
 	z-index: 1000;
 	margin-left: 20px;
 	margin-top: 20px;
-	max-height: 150px;
-	overflow-y: auto;
+	max-height: 170px;
+	overflow-y: scroll;
 }
 
 .hideLoad {
