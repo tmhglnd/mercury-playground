@@ -77,7 +77,6 @@ function getOSC(a){
 		let scaling;
 		try {
 			if (osc.match(/\{.*\}/)){
-				console.log('matches scaling', osc);
 				// has a scaling pattern in the form of {inlo:inhi:outlo:outhi}
 				scaling = osc.match(/\{(.*)\}/)[1].split(':');
 				osc = osc.replace(/\{.*\}/, '');
@@ -96,8 +95,6 @@ function getOSC(a){
 		// apply the scaling and return the value
 		if (scaling !== undefined){
 			scaling = [0, 1, 0, 1].slice(0, -scaling.length).concat(scaling);
-			console.log('scaling:', scaling);
-
 			v = scale(v, ...scaling.map(x => Number(x)));
 		}
 		return v;

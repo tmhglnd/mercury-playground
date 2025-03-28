@@ -954,8 +954,8 @@ const Delay = function(_params){
 		let fb = Math.max(0, Math.min(0.99, Util.getParam(this._feedBack, c) * 0.707));
 		let cf = Math.max(10, Util.getParam(this._fbDamp, c) * 8000);
 
-		this._delayL.delayTime.setValueAtTime(dL + Math.random() * 0.001, time);		
-		this._delayR.delayTime.setValueAtTime(dR + Math.random() * 0.001, time);
+		this._delayL.delayTime.setValueAtTime(dL - Math.random() * 0.005, time);		
+		this._delayR.delayTime.setValueAtTime(dR - Math.random() * 0.005, time);
 		this._fb.gain.setValueAtTime(Util.assureNum(fb, 0.7), time);
 		this._flt.frequency.setValueAtTime(cf, time);
 
