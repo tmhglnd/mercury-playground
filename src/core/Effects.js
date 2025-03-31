@@ -93,9 +93,97 @@ const fxMap = {
 	},
 	'double' : (params) => {
 		return new Chorus(Util.mapDefaults(params, ['8/1', 8, 1]));
+	},
+	'vowel' : (params) => {
+		return new FormantFilter(params);
 	}
 }
 module.exports = fxMap;
+
+// A formant/vowel filter. With this filter you can imitate the vowels of human 
+// speech. 
+// 
+const FormantFilter = function(_params){
+	// default values for the effect and separate parameters
+	_params = Util.mapDefaults(_params, [ 'o', 0, 1, 1 ]);
+	this._vowel = _params[0];
+	this._slide = _params[1];
+	this._shift = _params[2];
+	this._wet = _params[3];
+
+	// the input and output nodes
+	this._fx = new Tone.Gain(1);
+	this._mix = new Tone.Gain(1);
+	
+	// 3 bandpass biquadfilters for the formants
+	// mix the filters together to one output
+	this._formants = [];
+	for (let f=0; f<3; f++){
+		this._formants[f] = new Tone.BiquadFilter(300, 'bandpass')
+		// parallel processing of the filters from the input
+		this._fx.connect(this._formants[f]);
+		this._formants[f].connect(this._mix);
+	}
+	// this._f1 = new Tone.BiquadFilter(300, 'bandpass').connect(this._mix);
+	// this._f2 = new Tone.BiquadFilter(1200, 'bandpass').connect(this._mix);
+	// this._f3 = new Tone.BiquadFilter(2400, 'bandpass').connect(this._mix);
+	
+	// this._fx.fan(this._f1, this._f2, this._f3);
+
+	// data collected from various sources, please see the research on
+	// https://github.com/tmhglnd/vowel-formants-graph
+	this._formantData = {
+		"oo" : [ 299, 850,  2250, "book", "loop" ],
+		"u"  : [ 438, 998,  2250, "foot", "shoot" ],
+		"oh" : [ 569, 856,  2410, "pot", "bought" ],
+		"uh" : [ 518, 1189, 2390, "bug", "but" ],
+		"er" : [ 490, 1358, 1690, "bird", "pert" ],
+		"a"  : [ 730, 1102, 2440, "part" ],
+		"ae" : [ 660, 1702, 2410, "lap", "bat" ],
+		"e"  : [ 528, 1855, 2480, "let", "bet" ],
+		"i"  : [ 400, 2002, 2250, "bit" ],
+		"ee" : [ 270, 2296, 3010, "leap", "iy" ],
+		"o"  : [ 399, 709,  2420, "fold" ],
+		"oe" : [ 360, 1546, 2346, "new", "you" ]
+	}
+	this._vowels = Object.keys(this._formantData);
+	console.log(this._vowels);
+
+	this.set = function(c, time, bpm){
+		let v = Util.getParam(this._vowel, c);
+		let freqs = this._formantData['oo'];
+		console.log('vowel', v);
+
+		// get the formantdata from the object
+		v = (!isNaN(v)) ? 
+			this._vowels[Util.clip(v, 0, this._vowels.length)] : v;
+		
+		if (this._formantData.hasOwnProperty(v)){
+			freqs = this._formantData[v];
+		} else {
+			// throw error if not valid and use defaults
+			log(`fx(vowel): ${v} is not a valid vowel selection, using default "o"`);
+		}
+
+		for (let f=0; f<this._formants.length; f++){
+			this._formants[f].frequency.setValueAtTime(freqs[f], time);
+			this._formants[f].Q.setValueAtTime(40, time);
+		}
+	}
+
+	this.chain = function(){
+		return { 'send' : this._fx, 'return' : this._mix }
+	}
+
+	this.delete = function(){
+		const nodes = [ this._fx, this._mix, ...this._formants ];
+
+		nodes.forEach((n) => {
+			n.disconnect();
+			n.dispose();
+		});
+	}
+}
 
 // A Downsampling Chiptune effect. Downsamples the signal by a specified amount
 // Resulting in a lower samplerate, making it sound more like 8bit/chiptune

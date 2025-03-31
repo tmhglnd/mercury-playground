@@ -9,7 +9,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
-    "watch": "watchify -t brfs src/main.js -o public/bundle.js -v | terser public/bundle.js -o public/bundle.min.js -c -m --comments 'false'",
+    "watch": "watchify -t brfs src/main.js -o public/bundle.js -v | terser public/bundle.js -o public/bundle.min.js -c -m --comments 'false' & node server.js --log && fg",
     "build": "npm run data && npm run browserify && npm run uglify",
     "data": "node index.js",
     "browserify": "browserify -t brfs src/main.js -o public/bundle.js",
