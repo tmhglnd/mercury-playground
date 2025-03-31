@@ -111,9 +111,12 @@ const FormantFilter = function(_params){
 	this._shift = _params[2];
 	this._wet = _params[3];
 
-	// the input and output nodes
-	this._fx = new Tone.Gain(1);
-	this._mix = new Tone.Gain(1);
+	// the input and wetdry output nodes
+	this._fx = new Tone.Gain(1);	
+	this._mix = new Tone.Add();
+	this._mixWet = new Tone.Gain(0).connect(this._mix);
+	this._mixDry = new Tone.Gain(1).connect(this._mix.addend);
+	this._fx.connect(this._mixDry);
 
 	// data collected from various sources, please see the research on
 	// https://github.com/tmhglnd/vowel-formants-graph
@@ -134,8 +137,8 @@ const FormantFilter = function(_params){
 	this._vowels = Object.keys(this._formantData);
 	
 	// a -12dB/octave lowpass filter for preserving low end
-	this._fundamental = new Tone.Filter(85, 'lowpass', -12).connect(this._mix);
-	this._fx.connect(this._fundamental);
+	this._lopass = new Tone.Filter(85, 'lowpass', -12).connect(this._mixWet);
+	this._fx.connect(this._lopass);
 
 	// 3 bandpass biquadfilters for the formants
 	// mix the filters together to one output
@@ -144,18 +147,17 @@ const FormantFilter = function(_params){
 		this._formants[f] = new Tone.Filter(this._formantData['o'][f], 'bandpass');
 		// parallel processing of the filters from the input
 		this._fx.connect(this._formants[f]);
-		this._formants[f].connect(this._mix);
+		this._formants[f].connect(this._mixWet);
 	}
 
 	this.set = function(c, time, bpm){
 		let v = Util.getParam(this._vowel, c);
 		let r = Util.divToS(Util.getParam(this._slide, c), bpm);
 		let s = Util.clip(Util.getParam(this._shift, c), 0.17, 6);
-
-		let freqs = this._formantData['oo'];
-		console.log('vowel', v);
+		let w = Util.clip(Util.getParam(this._wet, c));
 
 		// get the formantdata from the object
+		let freqs = this._formantData['oo'];
 		v = (!isNaN(v)) ? 
 			this._vowels[Util.clip(v, 0, this._vowels.length)] : v;
 		// make sure vowel is a valid option
@@ -165,7 +167,7 @@ const FormantFilter = function(_params){
 			log(`fx(vowel): ${v} is not a valid vowel selection, using default "o"`);
 		}
 
-		// apply the frequencies, Q's and gain to the individual formant filter
+		// apply the frequencies, Q's and gain to the individual formant filters
 		for (let f=0; f<this._formants.length; f++){
 			// the frequency is the formant freq * shift factor
 			if (r > 0) {
@@ -176,11 +178,13 @@ const FormantFilter = function(_params){
 			// Q = (Freq * Shift) / (BandWidthHz / 2)
 			// Default bandwidth set to 50Hz 
 			this._formants[f].Q.setValueAtTime(freqs[f] * s * 0.05, time);
-			// Apply the gain based on the formant number
+			// Apply gain compensation based on formant number, +18dB, +5, +2
 			this._formants[f].output.gain.setValueAtTime(18 * (0.31 ** f), time);
-			// this._formants[f].output.gain.setValueAtTime(8, time);
 		}
-		// this._mix.gain.setValueAtTime(6, time);
+		
+		// apply wetdry mix
+		this._mixWet.gain.setValueAtTime(w, time);
+		this._mixDry.gain.setValueAtTime(1 - w, time);
 	}
 
 	this.chain = function(){
@@ -188,7 +192,7 @@ const FormantFilter = function(_params){
 	}
 
 	this.delete = function(){
-		const nodes = [ this._fx, this._mix, ...this._formants ];
+		const nodes = [ this._fx, this._mix, ...this._formants, this._lopass ];
 
 		nodes.forEach((n) => {
 			n.disconnect();
