@@ -114,61 +114,73 @@ const FormantFilter = function(_params){
 	// the input and output nodes
 	this._fx = new Tone.Gain(1);
 	this._mix = new Tone.Gain(1);
-	
-	// 3 bandpass biquadfilters for the formants
-	// mix the filters together to one output
-	this._formants = [];
-	for (let f=0; f<3; f++){
-		this._formants[f] = new Tone.BiquadFilter(300, 'bandpass')
-		// parallel processing of the filters from the input
-		this._fx.connect(this._formants[f]);
-		this._formants[f].connect(this._mix);
-	}
-	// this._f1 = new Tone.BiquadFilter(300, 'bandpass').connect(this._mix);
-	// this._f2 = new Tone.BiquadFilter(1200, 'bandpass').connect(this._mix);
-	// this._f3 = new Tone.BiquadFilter(2400, 'bandpass').connect(this._mix);
-	
-	// this._fx.fan(this._f1, this._f2, this._f3);
 
 	// data collected from various sources, please see the research on
 	// https://github.com/tmhglnd/vowel-formants-graph
 	this._formantData = {
-		"oo" : [ 299, 850,  2250, "book", "loop" ],
-		"u"  : [ 438, 998,  2250, "foot", "shoot" ],
-		"oh" : [ 569, 856,  2410, "pot", "bought" ],
-		"uh" : [ 518, 1189, 2390, "bug", "but" ],
-		"er" : [ 490, 1358, 1690, "bird", "pert" ],
+		"oo" : [ 299, 850,  2250, "book" ],
+		"u"  : [ 438, 998,  2250, "foot" ],
+		"oh" : [ 569, 856,  2410, "pot" ],
+		"uh" : [ 518, 1189, 2390, "bug" ],
+		"er" : [ 490, 1358, 1690, "bird" ],
 		"a"  : [ 730, 1102, 2440, "part" ],
-		"ae" : [ 660, 1702, 2410, "lap", "bat" ],
-		"e"  : [ 528, 1855, 2480, "let", "bet" ],
+		"ae" : [ 660, 1702, 2410, "lap" ],
+		"e"  : [ 528, 1855, 2480, "let" ],
 		"i"  : [ 400, 2002, 2250, "bit" ],
-		"ee" : [ 270, 2296, 3010, "leap", "iy" ],
+		"ee" : [ 270, 2296, 3010, "leap" ],
 		"o"  : [ 399, 709,  2420, "fold" ],
-		"oe" : [ 360, 1546, 2346, "new", "you" ]
+		"oe" : [ 360, 1546, 2346, "you" ]
 	}
 	this._vowels = Object.keys(this._formantData);
-	console.log(this._vowels);
+	
+	// a -12dB/octave lowpass filter for preserving low end
+	this._fundamental = new Tone.Filter(85, 'lowpass', -12).connect(this._mix);
+	this._fx.connect(this._fundamental);
+
+	// 3 bandpass biquadfilters for the formants
+	// mix the filters together to one output
+	this._formants = [];
+	for (let f=0; f<3; f++){
+		this._formants[f] = new Tone.Filter(this._formantData['o'][f], 'bandpass');
+		// parallel processing of the filters from the input
+		this._fx.connect(this._formants[f]);
+		this._formants[f].connect(this._mix);
+	}
 
 	this.set = function(c, time, bpm){
 		let v = Util.getParam(this._vowel, c);
+		let r = Util.divToS(Util.getParam(this._slide, c), bpm);
+		let s = Util.clip(Util.getParam(this._shift, c), 0.17, 6);
+
 		let freqs = this._formantData['oo'];
 		console.log('vowel', v);
 
 		// get the formantdata from the object
 		v = (!isNaN(v)) ? 
 			this._vowels[Util.clip(v, 0, this._vowels.length)] : v;
-		
+		// make sure vowel is a valid option
 		if (this._formantData.hasOwnProperty(v)){
 			freqs = this._formantData[v];
 		} else {
-			// throw error if not valid and use defaults
 			log(`fx(vowel): ${v} is not a valid vowel selection, using default "o"`);
 		}
 
+		// apply the frequencies, Q's and gain to the individual formant filter
 		for (let f=0; f<this._formants.length; f++){
-			this._formants[f].frequency.setValueAtTime(freqs[f], time);
-			this._formants[f].Q.setValueAtTime(40, time);
+			// the frequency is the formant freq * shift factor
+			if (r > 0) {
+				this._formants[f].frequency.rampTo(freqs[f] * s, r, time);
+			} else {
+				this._formants[f].frequency.setValueAtTime(freqs[f] * s, time);
+			}
+			// Q = (Freq * Shift) / (BandWidthHz / 2)
+			// Default bandwidth set to 50Hz 
+			this._formants[f].Q.setValueAtTime(freqs[f] * s * 0.05, time);
+			// Apply the gain based on the formant number
+			this._formants[f].output.gain.setValueAtTime(18 * (0.31 ** f), time);
+			// this._formants[f].output.gain.setValueAtTime(8, time);
 		}
+		// this._mix.gain.setValueAtTime(6, time);
 	}
 
 	this.chain = function(){
