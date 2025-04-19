@@ -96,6 +96,12 @@ const fxMap = {
 	},
 	'vowel' : (params) => {
 		return new FormantFilter(params);
+	},
+	'formant' : (params) => {
+		return new FormantFilter(params);
+	},
+	'speak' : (params) => {
+		return new FormantFilter(params);
 	}
 }
 module.exports = fxMap;
