@@ -320,12 +320,10 @@ function getSound(){
 }
 
 function transferCount(prevSounds, newSounds){
-	console.log('transferCount()', prevSounds, newSounds);
 	// transfer the time of the previous sound to the new sound object
 	// to preserve continuity when re-evaluating code
 	// first just go over all the existing instruments and transfer the counts
 	for (let s=0; s<prevSounds.length; s++){
-		console.log(prevSounds[s]._count, prevSounds[s]._beatCount);
 		if (newSounds[s]){
 			console.log(newSounds[s]._count, newSounds[s]._beatCount);
 			newSounds[s]._count = prevSounds[s]._count;
