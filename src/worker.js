@@ -57,6 +57,9 @@ function code({ file, engine, canvas, p5canvas }){
 
 	tree.print.forEach((p) => {
 		log(p);
+		// log('\n');
+		// log(Util.plot(p, { log: false, data: false, height: 8 }));
+		// log('\n');
 	});
 
 	// hide canvas and noLoop

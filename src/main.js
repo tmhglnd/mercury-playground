@@ -48,6 +48,7 @@ window.onload = () => {
 	window.log = (print) => {
 		// console.log('printing', typeof print);
 		let p = JSON.stringify(print).replace(/\,/g, ' ').replace(/\"/g, '');
+		p = p.replace(/\\n/g, '<br>');
 		document.getElementById('console-log').innerHTML += `${p}<br>`;
 		// automatically scroll to bottom when new prints are added
 		let e = document.getElementById('postWindow');
