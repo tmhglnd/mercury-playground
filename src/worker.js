@@ -317,12 +317,19 @@ function getSound(){
 	return sounds;
 }
 
-function transferCount(_s, s){
+function transferCount(prevSounds, newSounds){
 	// transfer the time of the previous sound to the new sound object
 	// to preserve continuity when re-evaluating code
-	// this works only for instruments that have a name()
-	_s.map((prev) => {
-		s.map((cur) => {
+	// first just go over all the existing instruments and transfer the counts
+	for (let s=0; s<prevSounds.length; s++){
+		if (newSounds[s]){
+			newSounds[s]._count = prevSounds[s]._count;
+			newSounds[s]._beatCount = prevSounds[s]._beatCount;
+		}
+	}	
+	// But also check for specific names and apply those where needed
+	prevSounds.map((prev) => {
+		newSounds.map((cur) => {
 			if (cur._name === prev._name){
 				cur._count = prev._count;
 				cur._beatCount = prev._beatCount;
