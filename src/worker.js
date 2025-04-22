@@ -325,7 +325,6 @@ function transferCount(prevSounds, newSounds){
 	// first just go over all the existing instruments and transfer the counts
 	for (let s=0; s<prevSounds.length; s++){
 		if (newSounds[s]){
-			console.log(newSounds[s]._count, newSounds[s]._beatCount);
 			newSounds[s]._count = prevSounds[s]._count;
 			newSounds[s]._beatCount = prevSounds[s]._beatCount;
 		}
