@@ -39,7 +39,6 @@ class Sequencer {
 	}
 
 	makeLoop(stepcount){
-		console.log('=> makeLoop()');
 		// dispose of previous loop if active
 		if (this._loop){
 			this._loop.dispose();
