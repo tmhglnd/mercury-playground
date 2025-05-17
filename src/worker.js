@@ -28,13 +28,13 @@ function code({ file, engine, canvas, p5canvas }){
 	let silenced = false;
 	let c = file;
 
-	let t = Tone.Transport.seconds;
+	let t = window.performance.now();
 	// let parser = new Promise((resolve) => {
 	// 	return resolve(Mercury(c));
 	// });
 	// let parse = await parser;
 	let parse = Mercury(c);
-	console.log(`Evaluated in: ${((Tone.Transport.seconds - t) * 1000).toFixed(3)}ms`);
+	console.log(`Evaluated in: ${(window.performance.now() - t).toFixed(1)}ms`);
 
 	let tree = parse.parseTree;
 	let errors = parse.errors;
@@ -57,6 +57,9 @@ function code({ file, engine, canvas, p5canvas }){
 
 	tree.print.forEach((p) => {
 		log(p);
+		// log('\n');
+		// log(Util.plot(p, { log: false, data: false, height: 8 }));
+		// log('\n');
 	});
 
 	// hide canvas and noLoop
@@ -70,7 +73,7 @@ function code({ file, engine, canvas, p5canvas }){
 	});
 
 	// set timer to check 
-	t = Tone.Transport.seconds;
+	t = window.performance.now();
 
 	const globalMap = {
 		'crossFade' : (args) => {
@@ -148,6 +151,23 @@ function code({ file, engine, canvas, p5canvas }){
 		'midiDelay' : (args) => {
 			// set some additional latency for all the midi
 			// TO DO
+		},
+		'midiLog' : (args) => {
+			if (isNaN(args[0])){
+				window.midiLog = args[0] === 'on' ? 1 : 0;
+			} else {
+				window.midiLog = (args[0] > 0);
+			}
+			if (window.midiLog){
+				printMidiDevices();
+			}
+		},
+		'midiEnable' : (args) => {
+			if (isNaN(args[0])){
+				window.midiEnable = args[0] === 'on' ? 1 : 0;
+			} else {
+				window.midiLog = (args[0] > 0);
+			}
 		}
 	}
 
@@ -288,10 +308,9 @@ function code({ file, engine, canvas, p5canvas }){
 	});
 
 	sounds.map((s) => {
-		// start new loops;
+		// create and start new loops
 		s.makeLoop(countTransfer);
 	});
-	console.log(`Made instruments in: ${((Tone.Transport.seconds - t) * 1000).toFixed(3)}ms`);
 	
 	// transferCount(_sounds, sounds);
 	// when all loops started fade in the new sounds and fade out old
@@ -299,22 +318,31 @@ function code({ file, engine, canvas, p5canvas }){
 		startSound(sounds);
 	}
 	removeSound(_sounds, crossFade);
-	startSound(sounds, crossFade);
+	// startSound(sounds, crossFade);
 
 	// resume the engine if it's not playing yet
 	engine.resume();
+
+	console.log(`Made instruments in: ${(window.performance.now() - t).toFixed(1)}ms`);
 }
 	
 function getSound(){
 	return sounds;
 }
 
-function transferCount(_s, s){
+function transferCount(prevSounds, newSounds){
 	// transfer the time of the previous sound to the new sound object
 	// to preserve continuity when re-evaluating code
-	// this works only for instruments that have a name()
-	_s.map((prev) => {
-		s.map((cur) => {
+	// first just go over all the existing instruments and transfer the counts
+	for (let s=0; s<prevSounds.length; s++){
+		if (newSounds[s]){
+			newSounds[s]._count = prevSounds[s]._count;
+			newSounds[s]._beatCount = prevSounds[s]._beatCount;
+		}
+	}	
+	// But also check for specific names and apply those where needed
+	prevSounds.map((prev) => {
+		newSounds.map((cur) => {
 			if (cur._name === prev._name){
 				cur._count = prev._count;
 				cur._beatCount = prev._beatCount;

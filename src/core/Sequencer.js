@@ -28,7 +28,7 @@ class Sequencer {
 		this._event;
 		this._loop;
 		this._once = false;
-		this.makeLoop();
+		// this.makeLoop();
 
 		console.log('=> class Sequencer()');
 	}
@@ -39,6 +39,7 @@ class Sequencer {
 	}
 
 	makeLoop(stepcount){
+		console.log('=> makeLoop()');
 		// dispose of previous loop if active
 		if (this._loop){
 			this._loop.dispose();

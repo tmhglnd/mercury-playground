@@ -1,4 +1,5 @@
 const Tone = require('tone');
+const { scale } = require('total-serialism').Utility;
 const { noteToMidi, toScale, mtof } = require('total-serialism').Translate;
 
 // replace defaults with incoming parameters
@@ -72,29 +73,31 @@ function getOSC(a){
 		// pass through
 		return a;
 	} else if (osc.match(/^\/[^`'"\s]+/g)){
-		// remove any scaling arguments
-		// let scaling;
-		// try {
-		// 	if (osc.match(/\{.+\}/)){
-		// 		// has a scaling pattern
-		// 		scaling = osc.match(/\{(.+)\}/)[1].split(':');
-		// 		osc = osc.replace(/\{.+\}/, '');
-		// 	}
-		// } catch (e) {
-		// 	log(`Not a valid scaling argument for ${osc}`);
-		// }
-		// console.log(scaling, osc);
+		// check and remove any scaling arguments
+		let scaling;
+		try {
+			if (osc.match(/\{.*\}/)){
+				// has a scaling pattern in the form of {inlo:inhi:outlo:outhi}
+				scaling = osc.match(/\{(.*)\}/)[1].split(':');
+				osc = osc.replace(/\{.*\}/, '');
+			}
+		} catch (e) {
+			log(`Not a valid scaling argument for ${osc}, ${e}`);
+		}
+
+		// return 0 if no osc message is received yet
 		if (!window.oscMessages[osc]){
-			console.log(`No message received on address ${osc}`);
+			log(`No message received on address ${osc}`);
 			return [0];
 		}
-		// let v = window.oscMessages[osc];
-		// if (scaling !== undefined){
-		// 	v = map(v, 0, 1, scaling[0], scaling[1]);
-		// }
-		// console.log(v);
-		// return v;
-		return window.oscMessages[osc];
+		// get the value from the message
+		let v = window.oscMessages[osc];
+		// apply the scaling and return the value
+		if (scaling !== undefined){
+			scaling = [0, 1, 0, 1].slice(0, -scaling.length).concat(scaling);
+			v = scale(v, ...scaling.map(x => Number(x)));
+		}
+		return v;
 	}
 	// pass through
 	return a;

@@ -383,6 +383,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		this.set(examples[names[rand]]);
 		_rand = rand;
 
+		this.silence();
 		this.evaluate();
 	}
 
@@ -539,6 +540,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 	this.loadTutorial = function(){
 		let t = document.getElementById('tutorials').value;
 		this.set(tutorials[t]);
+		this.silence();
 		this.evaluate();
 	}
 

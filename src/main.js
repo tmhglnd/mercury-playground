@@ -48,7 +48,12 @@ window.onload = () => {
 	window.log = (print) => {
 		// console.log('printing', typeof print);
 		let p = JSON.stringify(print).replace(/\,/g, ' ').replace(/\"/g, '');
+		p = p.replace(/\\n/g, '<br>');
 		document.getElementById('console-log').innerHTML += `${p}<br>`;
+		// automatically scroll to bottom when new prints are added
+		let e = document.getElementById('postWindow');
+		e.scrollTop = e.scrollHeight;
+
 		console.log(print);
 	}
 
@@ -56,22 +61,6 @@ window.onload = () => {
 	const Editor = require('./editor.js');	
 	const Canvas = require('./canvas.js');
 	// const p5 = require('p5');
-	const WebMidi = require("webmidi");
-
-	// WebMIDI Setup
-	WebMidi.enable(function (err) {
-		if (err) {
-			console.log("!! error enabling WebMIDI", err);
-		} else {
-			console.log("=> webMidi enabled");
-			WebMidi.inputs.forEach((i) => {
-				console.log(`- inputs: ${i.name}`);
-			});
-			WebMidi.outputs.forEach((i) => {
-				console.log(`- outputs: ${i.name}`);
-			});
-		}
-	});
 
 	// Empty object to store/update all received oscMessages
 	window.oscMessages = {};
@@ -99,15 +88,8 @@ window.onload = () => {
 					log(`Unable to execute code`);
 				}
 			} else {
-				let address = msg.shift();
-				let details = msg;
-				// store the osc message values in the object
-				window.oscMessages[address] = details;
-
-				// emit an event to the listener if there is one 
-				// add a little latency for scheduling safety to reduce clicks
-				let event = new CustomEvent(address, { detail: { value: details, time: Tone.immediate()+0.01 }});
-				window.dispatchEvent(event);
+				// forward the msg through a window dispatchEvent 
+				forwardOSC(msg);
 			}
 		});
 		window.emit = (msg) => {
@@ -115,6 +97,74 @@ window.onload = () => {
 		}
 	} catch (e) {
 		console.log('Unable to use OSC connection. Clone Mercury from github and run as localhost');
+	}
+
+	// WebMIDI Setup
+	const { WebMidi } = require("webmidi");
+
+	// global midi settings
+	window.midiLog = false;
+	window.midiEnable = true;
+
+	WebMidi.enable()
+	.then(() => {
+		console.log("=> WebMIDI enabled!");
+		
+		printMidiDevices();
+
+		WebMidi.inputs.forEach((i) => {			
+			// add a listener for all incoming midi messages on all devices
+			i.addListener('midimessage', (midi) => {
+				if (!window.midiEnable) return;
+
+				let type = midi.message.type;
+				let data = midi.message.dataBytes;
+
+				if (window.midiLog) log(`midi in: ${type} ${data}`);
+				
+				if (type === 'controlchange'){
+					// normalize midi values to 0-1 range
+					forwardOSC([ `/cc/${data[0]}`, data[1] / 127 ]);
+				}
+				else if (type === 'noteon'){
+					let pitch = data[0];
+					let velocity = data[1];
+
+					if (velocity > 0){
+						// console.log('noteon', note);
+
+						forwardOSC([ `/pitch`, pitch ]);
+						forwardOSC([ `/note`, pitch-36 ]);
+						forwardOSC([ `/velocity`, velocity / 127 ]);
+						// forwardOSC([ `/note/trigger`, 1 ]);
+					}
+				}
+			});
+		});
+	})
+	.catch((err) => {
+		console.log("!!! Error enabling WebMIDI !!!", err);
+	});
+
+	window.printMidiDevices = function(){
+		WebMidi.inputs.forEach((i) => {
+			log(`- midi input: ${i.name}`);
+		});
+		WebMidi.outputs.forEach((i) => {
+			log(`- midi output: ${i.name}`);
+		});
+	}
+
+	function forwardOSC(msg){
+		let address = msg.shift();
+		let details = msg;
+		// store the osc message values in the object
+		window.oscMessages[address] = details;
+
+		// emit an event to the listener if there is one 
+		// add a little latency for scheduling safety to reduce clicks
+		let event = new CustomEvent(address, { detail: { value: details, time: Tone.immediate() + 0.001 }});
+		window.dispatchEvent(event);
 	}
 
 	// Initialize random BPM
