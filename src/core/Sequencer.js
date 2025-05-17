@@ -38,13 +38,18 @@ class Sequencer {
 		return Tone.Transport.bpm.value;
 	}
 
-	makeLoop(stepcount){
+	makeLoop(stepcount, unnamedCount){
 		// dispose of previous loop if active
 		if (this._loop){
 			this._loop.dispose();
 		}
 
 		// transfer the stepcount to count and beatcount if provided
+		if (unnamedCount){
+			this._count = unnamedCount.count;
+			this._beatCount = unnamedCount.beat;
+		}		
+		// replace count if a name is given.
 		// this works through giving the instrument the same name
 		if (stepcount){
 			if (stepcount[this._name]){

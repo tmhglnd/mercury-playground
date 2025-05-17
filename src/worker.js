@@ -306,13 +306,10 @@ function code({ file, engine, canvas, p5canvas }){
 			beat: s._beatCount
 		}
 	});
-
-	sounds.map((s) => {
-		// create and start new loops
-		s.makeLoop(countTransfer);
-	});
-	
-	// transferCount(_sounds, sounds);
+	// create and start new loops, transfer the counts
+	for (let s = 0; s < sounds.length; s++){
+		sounds[s].makeLoop(countTransfer, Object.values(countTransfer)[s]);
+	}
 	// when all loops started fade in the new sounds and fade out old
 	if (!sounds.length){
 		startSound(sounds);
