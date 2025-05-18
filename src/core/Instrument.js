@@ -115,7 +115,7 @@ class Instrument extends Sequencer {
 		console.log('Instrument()', this._name, c);
 	}
 
-	fadeIn(t){
+	fadeIn(t=0){
 		// fade in the sound upon evaluation of code
 		// this.gain.gain.rampTo(1, t, Tone.now());
 		// fade in the sound directly in 5 ms
@@ -138,7 +138,7 @@ class Instrument extends Sequencer {
 				this.delete();
 				// wait a little bit extra before deleting to avoid clicks
 			}, t * 1000 + 100);
-		}, restTime * 1000 - 5);
+		}, restTime * 1000 - 25);
 
 		// // fade out the sound upon evaluation of new code
 		// this.gain.gain.rampTo(0, t, Tone.now());

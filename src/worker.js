@@ -12,8 +12,8 @@ const Tempos = require('./data/genre-tempos.json');
 const MonoOSC = require('./core/MonoOSC.js');
 const { divToS } = require('./core/Util.js');
 
-// cross-fade time
-let crossFade = 2;
+// cross-fade time, depracted, is now fadeOut
+let crossFade = 3;
 // arrays with the current and previous instruments playing for crossfade
 let _sounds = [];
 let sounds = [];
@@ -29,10 +29,6 @@ function code({ file, engine, canvas, p5canvas }){
 	let c = file;
 
 	let t = window.performance.now();
-	// let parser = new Promise((resolve) => {
-	// 	return resolve(Mercury(c));
-	// });
-	// let parse = await parser;
 	let parse = Mercury(c);
 	console.log(`Evaluated in: ${(window.performance.now() - t).toFixed(1)}ms`);
 
@@ -45,9 +41,7 @@ function code({ file, engine, canvas, p5canvas }){
 	// handle .print and .errors
 	let l = document.getElementById('console-log');
 	l.innerHTML = '';
-	errors.forEach((e) => {
-		log(e);
-	});
+	errors.forEach((e) => log(e) );
 	if (errors.length > 0){
 		// return if the code contains any syntax errors
 		log(`Could not run because of syntax error`);
@@ -80,7 +74,12 @@ function code({ file, engine, canvas, p5canvas }){
 			// set crossFade time in ms
 			crossFade = divToS(args[0], engine.getBPM());
 			// crossFade = Number(args[0])/1000;
-			log(`crossfade time is ${crossFade}ms`);
+			log(`crossFade is deprecated, setting fadeOut time to ${crossFade}ms`);
+		},
+		'fadeOut' : (args) => {
+			fadeOut = divToS(args[0], engine.getBPM());
+
+			log(`setting fadeOut time to ${crossFade}`);
 		},
 		'tempo' : (args) => {
 			let t = args[0];
@@ -315,7 +314,7 @@ function code({ file, engine, canvas, p5canvas }){
 		startSound(sounds);
 	}
 	removeSound(_sounds, crossFade);
-	startSound(sounds, crossFade);
+	startSound(sounds);
 
 	// resume the engine if it's not playing yet
 	engine.resume();
@@ -325,27 +324,6 @@ function code({ file, engine, canvas, p5canvas }){
 	
 function getSound(){
 	return sounds;
-}
-
-function transferCount(prevSounds, newSounds){
-	// transfer the time of the previous sound to the new sound object
-	// to preserve continuity when re-evaluating code
-	// first just go over all the existing instruments and transfer the counts
-	for (let s=0; s<prevSounds.length; s++){
-		if (newSounds[s]){
-			newSounds[s]._count = prevSounds[s]._count;
-			newSounds[s]._beatCount = prevSounds[s]._beatCount;
-		}
-	}	
-	// But also check for specific names and apply those where needed
-	prevSounds.map((prev) => {
-		newSounds.map((cur) => {
-			if (cur._name === prev._name){
-				cur._count = prev._count;
-				cur._beatCount = prev._beatCount;
-			}
-		});
-	});
 }
 
 function startSound(s, f=0){
