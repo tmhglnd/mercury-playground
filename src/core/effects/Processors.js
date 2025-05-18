@@ -176,7 +176,7 @@ class DelayProcessor extends AudioWorkletProcessor {
 		// the delaybuffer to be used
 		this.delayBuffer = new Float32Array(this.maxDelay);
 		// the delay write index
-		this.writeIndex = 0;
+		this.index = 0;
 	}
 
 	process(inputs, outputs, parameters){
@@ -198,45 +198,14 @@ class DelayProcessor extends AudioWorkletProcessor {
 				const delayTime = parameters.delayTime.length > 1 ? parameters.delayTime[i] : parameters.delayTime[0];
 				
 				const dt = Math.floor(delayTime * 0.001 * 44100);
-				
 				// read from the delayline at the readindex and output
-				const readIndex = (this.writeIndex + this.maxDelay - dt) % this.maxDelay;
-
-				const delayedSample = this.delayBuffer[readIndex];
-				
-				output[channel][i] = delayedSample;
-
+				output[channel][i] = this.delayBuffer[this.index];
 				// write a value to the delayline at current position
-				this.delayBuffer[this.writeIndex] = input[channel][i] + delayedSample * 0.9;
-				
-				// const delayedSample = this.delayBuffer[readIndex];
-
+				this.delayBuffer[this.index] = input[channel][i] + output[channel][i] * 0.9;
 				// increment the write index
-				this.writeIndex = (this.writeIndex + 1) % this.maxDelay;
+				this.index = (this.index + 1) % dt;
 			}
 		}
-
-		// // for every channel
-		// for (let channel = 0; channel < input.length; ++channel){
-		// 	// for every sample in the blocksize (currently 128)
-		// 	for (let i=0; i<input[channel].length; i++){
-		// 		// calculate delaytime from ms to samples
-		// 		const delayTime = parameters.delayTime.length > 1 ? parameters.delayTime[i] : parameters.delayTime[0];
-		// 		const dt = Math.floor(delayTime * 0.001 * sampleRate);
-
-		// 		const readIndex = (this.writeIndex + this.maxDelay - dt) % this.maxDelay;
-		// 		output[channel][i] = this.delayBuffer[readIndex];
-
-		// 		// write a value to the delayline at current position
-		// 		// with feedback
-		// 		this.delayBuffer[this.writeIndex] = input[channel][i] + output[channel][i] * 0.9;
-
-		// 		// read from the delayline at the readindex and output
-		// 	}
-
-		// 	// increment the write index
-		// 	this.writeIndex = (this.writeIndex + 1) % this.maxDelay;
-		// }
 		return true;
 	}
 }
