@@ -62,6 +62,9 @@ window.onload = () => {
 	const Canvas = require('./canvas.js');
 	// const p5 = require('p5');
 
+	const Genish = require('./lib/gen.lib.js');
+	Genish.export(window);
+
 	// Empty object to store/update all received oscMessages
 	window.oscMessages = {};
 	// Is there a client connected?

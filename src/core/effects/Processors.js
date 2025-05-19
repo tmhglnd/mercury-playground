@@ -155,3 +155,53 @@ class SquashProcessor extends AudioWorkletProcessor {
 	}
 }
 registerProcessor('squash-processor', SquashProcessor);
+
+class sineProcessorProcessor extends AudioWorkletProcessor {
+
+  static get parameterDescriptors() {
+    const params = [
+            
+    ]
+    return params
+  }
+ 
+  constructor( options ) {
+    super( options )
+    this.port.onmessage = this.handleMessage.bind( this )
+    this.initialized = false
+    
+  }
+
+  handleMessage( event ) {
+    if( event.data.key === 'init' ) {
+      this.memory = event.data.memory
+      this.initialized = true
+    }else if( event.data.key === 'set' ) {
+      this.memory[ event.data.idx ] = event.data.value
+    }else if( event.data.key === 'get' ) {
+      this.port.postMessage({ key:'return', idx:event.data.idx, value:this.memory[event.data.idx] })     
+    }
+  }
+
+  process( inputs, outputs, parameters ) {
+    if( this.initialized === true ) {
+      const output = outputs[0]
+      const channel0 = output[ 0 ]
+		
+      const len    = channel0.length
+      const memory = this.memory 
+      
+
+      for( let i = 0; i < len; ++i ) {
+              
+        memory[0]  = cycle(200)
+      
+        channel0[ i ] = memory[ 0 ]
+		
+      }
+    }
+    return true
+  }
+}
+    
+registerProcessor( 'sineProcessor', sineProcessorProcessor)

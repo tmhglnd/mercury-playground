@@ -102,6 +102,9 @@ const fxMap = {
 	},
 	'speak' : (params) => {
 		return new FormantFilter(params);
+	},
+	'genish' : () => {
+		return new Genish();
 	}
 }
 module.exports = fxMap;
@@ -1084,6 +1087,26 @@ const Delay = function(_params){
 			n.disconnect();
 			n.dispose();
 		});
+	}
+}
+
+const Genish = function(){
+	this._fx = new Tone.ToneAudioNode();
+	this._fx.input = new Tone.Gain(1);
+	this._fx.output = new Tone.Gain(1);
+
+	this._fx.workletNode = Tone.getContext().createAudioWorkletNode('sineProcessor');
+
+	this._fx.input.chain(this._fx.workletNode, this._fx.output);
+
+	this.set = () => {}
+
+	this.chain = () => {
+		return { 'send' : this._fx, 'return' : this._fx }
+	}
+
+	this.delete = () => {
+		[ this._fx ].forEach(n => n.dispose());
 	}
 }
 
