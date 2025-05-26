@@ -350,6 +350,12 @@ textarea:hover {
 	/* cursor: pointer; */
 }
 
+.CodeMirror-matchingbracket { 
+	text-decoration: none !important;
+	background: var(--secundary) !important; 
+	/* color: var(--accent) !important;  */
+}
+
 .editorFlash {
 	background: var(--cm-flash) !important;
 	/* mix-blend-mode: difference; */

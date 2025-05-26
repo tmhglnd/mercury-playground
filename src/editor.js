@@ -8,6 +8,8 @@ require('codemirror/addon/mode/simple.js');
 require('codemirror/addon/comment/comment.js');
 require('codemirror/addon/hint/show-hint.js');
 require('codemirror/addon/hint/anyword-hint.js');
+require('codemirror/addon/edit/matchbrackets.js');
+require('codemirror/addon/edit/closebrackets.js');
 
 const defaultTheme = 'material-darker';
 
@@ -30,24 +32,31 @@ CodeMirror.defineSimpleMode("mercury", {
 		lineComment: '//'
 	},
 	start: [
-		// string
-		{ regex: /["'`](?:\\["\\]|[^\n"'``])*["'`]/, token: "string" },
-		// keywords
-		{ regex: /(?:new|make|ring|list|array|set|apply|give)\b/, token: "keyword", next: "object" },
-		// global
-		{ regex: /(?:print|post|log|display|view|audio|record|silence|mute|killAll|default)\b/, token: "operator" },
-		// numbers
-		{ regex: /0x[a-f\d]+|[-+]?(?:\.\d+|\d+\.?\d*)(?:e[-+]?\d+)?/i, token: "number" },
 		// comments
-		{ regex: /(?:\/\/|\$).*?$/, token: "comment" },
-		// osc-addresses
-		{ regex: /(\/[^0-9/\s)][^/)\s]*){1,}/, token: "string" },
-		// operators
-		{ regex: /[-+\/*=:]+/, token: "number" },
+		{ regex: /\/\/.*$/, token: "comment" },
+		// strings
+		{ regex: /\"[^"]*\"/, token: 'string' },
+		{ regex: /\'[^']*\'/, token: 'string' },
+		{ regex: /\`[^`]*\`/, token: 'string' },
+		// parenthesis for functions
+		{ regex: /[(){}]/, token: "variable-3" },
 		// brackets for array
 		{ regex: /[\[\]<>!]+/, token: "operator" },
-		// parenthesis for functions
-		{ regex: /[()]/, token: "variable-3" }
+		// functions
+		// { regex: /([^0-9\s][^\s\(\)\[\]]*)(\s*)(\()/,
+			// token: [ "def", null, "variable-3" ] },
+		// osc-addresses
+		{ regex: /(\/[^0-9/\s)][^/)\s]*){1,}/, token: "string" },
+		// keywords
+		{ regex: /(new|make|ring|list|array|set|apply|give)(\s+)([^0-9\s][^\s\(\)\[\]]*)\b/, token: [ "keyword", null, "tag" ] },
+		// global
+		{ regex: /(?:print|post|log|display|view|audio|record|silence|mute|killAll|default)\b/, token: "operator" },
+		// operators
+		{ regex: /[+\-*:/=><!?&^%$#@;,]+/, token: "number" },
+		// numbers
+		{ regex: /0x[a-f\d]+|[-+]?(?:\.\d+|\d+\.?\d*)(?:e[-+]?\d+)?/i, token: "number" },
+		// // any other word
+		{ regex: /[^0-9\s][^\s\(\)\[\]]*/, token: "variable-1" }
 	], 
 	object: [
 		// instrument and variable names after keywords
@@ -136,6 +145,8 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		showCursorWhenSelecting: true,
 		lineWrapping: true,
 		showHint: false,
+		matchBrackets: true,
+		autoCloseBrackets: true,
 		// keymaps for execute/stopping/commenting code
 		extraKeys: {
 			'Tab': 'insertSoftTab',
