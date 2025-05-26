@@ -12,6 +12,7 @@
 	--accent: white;
 	--primary: rgb(180, 180, 180);
 	--secundary: rgb(255, 255, 255, 0.6);
+	--ternairy: rgb(255, 255, 255, 0.2);
 
 	--button-bg: rgb(255, 255, 255, 0.15);
 
@@ -32,6 +33,7 @@
 	--accent: black;
 	--primary: rgb(75, 75, 75);
 	--secundary: rgb(0, 0, 0, 0.6);
+	--ternairy: rgb(0, 0, 0, 0.2);
 
 	--button-bg: rgb(0, 0, 0, 0.2);
 
@@ -352,8 +354,8 @@ textarea:hover {
 
 .CodeMirror-matchingbracket { 
 	text-decoration: none !important;
-	background: var(--secundary) !important; 
-	/* color: var(--accent) !important;  */
+	background: var(--ternairy) !important; 
+	outline: 1px solid var(--accent) !important;
 }
 
 .editorFlash {

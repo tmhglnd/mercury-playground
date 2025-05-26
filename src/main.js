@@ -6,8 +6,14 @@ switchTheme = (t) => {
 	localStorage.setItem('theme', t);
 	document.documentElement.className = t;
 }
-// initial dark mode theme on startup
-switchTheme('darkmode');
+
+// load the theme from localstorage
+if (localStorage.getItem('theme')){
+	switchTheme(localStorage.getItem('theme'))
+} else {
+	// initial dark mode theme on startup
+	switchTheme('darkmode');
+}
 
 // global variable for device storage and recall of microphone inputs
 window.devices;
@@ -180,9 +186,9 @@ window.onload = () => {
 
 	// Load all the buttons/menus
 	cm.controls();
-	// cm.themeMenu();
-	cm.links();
+	cm.menuBottom();
 	cm.hide();
+	cm.themeMenu();
 	cm.tutorialMenu();
 	cm.soundsMenu();
 	cm.modeSwitch();
@@ -195,6 +201,8 @@ window.onload = () => {
 	} else {
 		cm.clear();
 	}
+
+	cm.setMode(localStorage.getItem('theme'));
 
 	// or load the hash if this is provided in the url
 	let url = new URL(window.location);
