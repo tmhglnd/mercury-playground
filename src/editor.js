@@ -11,6 +11,14 @@ require('codemirror/addon/hint/anyword-hint.js');
 require('codemirror/addon/edit/matchbrackets.js');
 require('codemirror/addon/edit/closebrackets.js');
 
+if (!localStorage.getItem('lightSyntax')){ 
+	localStorage.setItem('lightSyntax', 'neat');
+}
+
+if (!localStorage.getItem('darkSyntax')){
+	localStorage.setItem('darkSyntax', 'blackboard');
+}
+
 let _rand;
 
 // get the example code files
@@ -39,7 +47,7 @@ CodeMirror.defineSimpleMode("mercury", {
 		// parenthesis for functions
 		{ regex: /[(){}]/, token: "operator" },
 		// brackets for array
-		{ regex: /[\[\]!]+/, token: "def" },
+		{ regex: /[\[\]!]+/, token: "atom" },
 		// functions
 		{ regex: /([^0-9\s][^\s\(\)\[\]]*)(\s*)(\()/,
 			token: [ "def", null, "operator" ] },
@@ -50,7 +58,7 @@ CodeMirror.defineSimpleMode("mercury", {
 		// global
 		{ regex: /(?:print|post|log|display|view|audio|record|silence|mute|killAll|default)\b/, token: "builtin" },
 		// operators
-		{ regex: /[+\-*:/=><!?&^%$#@;,]+/, token: "operator" },
+		{ regex: /[+\-*:/=><!?&^%$#@;,]+/, token: "number" },
 		// numbers
 		{ regex: /0x[a-f\d]+|[-+]?(?:\.\d+|\d+\.?\d*)(?:e[-+]?\d+)?/i, token: "number" },
 		// any other word
@@ -128,7 +136,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		cursorHeight: 0.85,
 		cursorWidth: 0.5,
 		lineNumbers: true,
-		theme: 'monokai',
+		theme: 'blackboard',
 		cursorHeight: 1,
 		indentUnit: 4,
 		indentWithTabs: false,
