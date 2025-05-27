@@ -9,7 +9,7 @@ require('codemirror/addon/comment/comment.js');
 require('codemirror/addon/hint/show-hint.js');
 require('codemirror/addon/hint/anyword-hint.js');
 require('codemirror/addon/edit/matchbrackets.js');
-require('codemirror/addon/edit/closebrackets.js');
+// require('codemirror/addon/edit/closebrackets.js');
 
 if (!localStorage.getItem('lightSyntax')){ 
 	localStorage.setItem('lightSyntax', 'neat');
@@ -148,7 +148,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		lineWrapping: true,
 		showHint: false,
 		matchBrackets: true,
-		autoCloseBrackets: true,
+		// autoCloseBrackets: true,
 		// keymaps for execute/stopping/commenting code
 		extraKeys: {
 			'Tab': 'insertSoftTab',
