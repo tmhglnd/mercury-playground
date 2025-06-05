@@ -1,5 +1,5 @@
 const Tone = require('tone');
-const Util = require('./Util.js');
+const { toArray, getParam } = require('./Util.js');
 const Sequencer = require('./Sequencer.js');
 // const { globalMap } = require('./../worker.js');
 
@@ -14,18 +14,15 @@ class Modifier extends Sequencer {
 	}
 
 	event(c, time){
-		Object.keys(this._change).forEach((k) => {
-			let setting = k;
-			let value = Util.getParam(this._change[k], c);
-
+		// for every change that is in the object
+		Object.keys(this._change).forEach((setting) => {
+			// get the value from the array based on the counter
+			let value = getParam(this._change[setting], c);
+			// apply the value to the setting via globalMap method
 			if (this._globalMap[setting]){
 				setTimeout(() => {
 					this._globalMap[setting]([value]);
 				}, (time - Tone.context.currentTime) * 1000 + 5);
-				// }, (time * 1000);
-				// Tone.Transport.scheduleOnce(() => {
-				// 	this._globalMap[setting]([value]);
-				// }, time);
 			}
 		});
 	}
@@ -38,19 +35,18 @@ class Modifier extends Sequencer {
 			if (!isNaN(s[0])){
 				log(`${s[0]} is not a name or string`)
 			} else {
-				this._change[s[0]] = s[1];
+				this._change[s[0]] = toArray(s[1]);
 			}
 		});
 		console.log(this._change);
 	}
 
+	// placeholders
 	amp(){}
 	env(){}
 	
 	delete(){
-		// delete super class
 		super.delete();
-
 		console.log('=> disposed Modifier()', this._device);
 	}
 }
