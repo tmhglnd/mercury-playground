@@ -6,6 +6,7 @@ const MonoSample = require('./core/MonoSample.js');
 const MonoMidi = require('./core/MonoMidi.js');
 const MonoSynth = require('./core/MonoSynth.js');
 const MonoInput = require('./core/MonoInput.js');
+const Modifier = require('./core/Modifier.js');
 const PolySynth = require('./core/PolySynth.js');
 const PolySample = require('./core/PolySample.js');
 const Tempos = require('./data/genre-tempos.json');
@@ -223,6 +224,11 @@ function code({ file, engine, canvas, p5canvas }){
 			let inst = new MonoMidi(engine, device, canvas);
 
 			objectMap.applyFunctions(args, inst, device);
+			return inst;
+		},
+		'modifier' : (obj) => {
+			let inst = new Modifier(engine, obj.type, canvas, globalMap);
+			objectMap.applyFunctions(obj.functions, inst, obj.type);
 			return inst;
 		},
 		'applyFunctions' : (args, inst, type) => {
