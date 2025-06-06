@@ -20,7 +20,7 @@ class PolySample extends PolyInstrument {
 		this._pos = [ 0 ];
 
 		this.sample;
-		this._note = [ 0, 0 ];
+		this._note = [ 0, 2 ];
 		this._tune = [ 261.6255653 ];
 
 		// this._slide = [ 0 ];
@@ -128,7 +128,7 @@ class PolySample extends PolyInstrument {
 		});
 	}
 
-	note(i=0, o=0){
+	note(i=0, o=2){
 		// set the note as semitone interval and octave offset
 		// (0, 0) = MidiNote 36
 		this._note = [Util.toArray(i), Util.toArray(o)];
