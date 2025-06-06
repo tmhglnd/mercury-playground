@@ -1,6 +1,5 @@
 const Tone = require('tone');
 const Util = require('./Util.js');
-// const fxMap = require('./Effects.js');
 const Instrument = require('./Instrument.js');
 
 class MonoSample extends Instrument {
