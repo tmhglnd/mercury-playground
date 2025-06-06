@@ -59,10 +59,10 @@ class PolySample extends PolyInstrument {
 			this.sources[id].buffer.dispose();
 		}
 		if (this._bufs.has(b)){	
-			this.sources[id].buffer = this._bufs.get(b);
+			this.sources[id].buffer = this._bufs.get(b).slice(0);
 		} else {
 			// default sample if file does not exist
-			this.sources[id].buffer = this._bufs.get('kick_min');
+			this.sources[id].buffer = this._bufs.get('kick_min').slice(0);
 		}
 		// the duration of the buffer in seconds
 		let dur = this.sources[id].buffer.duration;
@@ -88,7 +88,7 @@ class PolySample extends PolyInstrument {
 		// reversing seems to reverse every time the 
 		// value is set to true (so after 2 times reverse
 		// it becomes normal playback again) no fix yet
-		// this.sample.reverse = s < 0.0;
+		this.sources[id].reverse = s < 0.0;
 
 		let l = Util.lookup(this._stretch, c);
 		let n = 1;
