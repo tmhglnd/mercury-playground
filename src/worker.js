@@ -80,7 +80,7 @@ function code({ file, engine, canvas, p5canvas }){
 			// set crossFade time in ms
 			crossFade = divToS(args[0], engine.getBPM());
 			// crossFade = Number(args[0])/1000;
-			log(`crossfade time is ${crossFade}ms`);
+			log(`crossfade time is ${crossFade}s`);
 		},
 		'tempo' : (args) => {
 			let t = args[0];

@@ -499,6 +499,8 @@ const DattorroReverb = function(_params){
 	_params = Util.mapDefaults(_params, [ 0.5, 10, 0, 0.5 ]);
 	this._gain = Util.toArray(_params[0]);
 	this._size = Util.toArray(_params[1]);
+	// unused currently, but here for compatibility with Mercury4Max code
+	// this._slide = Util.toArray(_params[2]); 
 	this._wet = Util.toArray(_params[3]);
 
 	// The crossfader for wet-dry (originally implemented with CrossFade)
