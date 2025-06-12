@@ -94,44 +94,102 @@ const fxMap = {
 	'double' : (params) => {
 		return new Chorus(Util.mapDefaults(params, ['8/1', 8, 1]));
 	},
-	'workletdelay' : (params) => {
-		return new WorkletDelay(params);
+	'vowel' : (params) => {
+		return new FormantFilter(params);
+	},
+	'formant' : (params) => {
+		return new FormantFilter(params);
+	},
+	'speak' : (params) => {
+		return new FormantFilter(params);
 	}
 }
 module.exports = fxMap;
 
-const WorkletDelay = function(_params){
-	// apply the default values and convert to arrays where necessary
-	_params = Util.mapDefaults(_params, [ 250, 0.5 ]);
-	this._delayTime = Util.toArray(_params[0]);
-	this._wet = Util.toArray(_params[1]);
+// A formant/vowel filter. With this filter you can imitate the vowels of human 
+// speech. 
+// 
+const FormantFilter = function(_params){
+	// default values for the effect and separate parameters
+	_params = Util.mapDefaults(_params, [ 'o', 0, 1, 1 ]);
+	this._vowel = _params[0];
+	this._slide = _params[1];
+	this._shift = _params[2];
+	this._wet = _params[3];
 
-	// ToneAudioNode has all the tone effect parameters
-	this._fx = new Tone.ToneAudioNode();
-
-	// The crossfader mix
+	// the input and wetdry output nodes
+	this._fx = new Tone.Gain(1);	
 	this._mix = new Tone.Add();
-	this._mixDry = new Tone.Gain(0).connect(this._mix.input);
-	this._mixWet = new Tone.Gain(0.5).connect(this._mix.addend);
+	this._mixWet = new Tone.Gain(0).connect(this._mix);
+	this._mixDry = new Tone.Gain(1).connect(this._mix.addend);
+	this._fx.connect(this._mixDry);
 
-	// A gain node for connecting with input and output
-	this._fx.input = new Tone.Gain(1).connect(this._mixDry);
-	this._fx.output = new Tone.Gain(1).connect(this._mix.addend);
+	// data collected from various sources, please see the research on
+	// https://github.com/tmhglnd/vowel-formants-graph
+	this._formantData = {
+		"oo" : [ 299, 850,  2250, "book" ],
+		"u"  : [ 438, 998,  2250, "foot" ],
+		"oh" : [ 569, 856,  2410, "pot" ],
+		"uh" : [ 518, 1189, 2390, "bug" ],
+		"er" : [ 490, 1358, 1690, "bird" ],
+		"a"  : [ 730, 1102, 2440, "part" ],
+		"ae" : [ 660, 1702, 2410, "lap" ],
+		"e"  : [ 528, 1855, 2480, "let" ],
+		"i"  : [ 400, 2002, 2250, "bit" ],
+		"ee" : [ 270, 2296, 3010, "leap" ],
+		"o"  : [ 399, 709,  2420, "fold" ],
+		"oe" : [ 360, 1546, 2346, "you" ]
+	}
+	this._vowels = Object.keys(this._formantData);
+	
+	// a -12dB/octave lowpass filter for preserving low end
+	this._lopass = new Tone.Filter(85, 'lowpass', -12).connect(this._mixWet);
+	this._fx.connect(this._lopass);
 
-	// the fx processor
-	this._fx.workletNode = Tone.getContext().createAudioWorkletNode('delay-processor');
-
-	// connect input, fx and output
-	this._fx.input.chain(this._fx.workletNode, this._fx.output);
+	// 3 bandpass biquadfilters for the formants
+	// mix the filters together to one output
+	this._formants = [];
+	for (let f=0; f<3; f++){
+		this._formants[f] = new Tone.Filter(this._formantData['o'][f], 'bandpass');
+		// parallel processing of the filters from the input
+		this._fx.connect(this._formants[f]);
+		this._formants[f].connect(this._mixWet);
+	}
 
 	this.set = function(c, time, bpm){
-		// some parameter mapping changing input range 0-1 to 1-inf
-		const p = this._fx.workletNode.parameters.get('delayTime');
-		const dt = Util.assureNum(Util.getParam(this._delayTime, c));
-		p.setValueAtTime(dt, time);
+		let v = Util.getParam(this._vowel, c);
+		let r = Util.divToS(Util.getParam(this._slide, c), bpm);
+		let s = Util.clip(Util.getParam(this._shift, c), 0.17, 6);
+		let w = Util.clip(Util.getParam(this._wet, c));
+
+		// get the formantdata from the object
+		let freqs = this._formantData['oo'];
+		v = (!isNaN(v)) ? 
+			this._vowels[Util.clip(v, 0, this._vowels.length)] : v;
+		// make sure vowel is a valid option
+		if (this._formantData.hasOwnProperty(v)){
+			freqs = this._formantData[v];
+		} else {
+			log(`fx(vowel): ${v} is not a valid vowel selection, using default "o"`);
+		}
+
+		// apply the frequencies, Q's and gain to the individual formant filters
+		for (let f=0; f<this._formants.length; f++){
+			// the frequency is the formant freq * shift factor
+			if (r > 0) {
+				this._formants[f].frequency.rampTo(freqs[f] * s, r, time);
+			} else {
+				this._formants[f].frequency.setValueAtTime(freqs[f] * s, time);
+			}
+			// Q = (Freq * Shift) / (BandWidthHz / 2)
+			// Default bandwidth set to 50Hz 
+			this._formants[f].Q.setValueAtTime(freqs[f] * s * 0.05, time);
+			// Apply gain compensation based on formant number, +18dB, +5, +2
+			this._formants[f].output.gain.setValueAtTime(18 * (0.31 ** f), time);
+		}
 		
-		const w = Util.clip(Util.getParam(this._wet, c), 0, 1);
-		this._fx.output.gain.setValueAtTime(w, time);
+		// apply wetdry mix
+		this._mixWet.gain.setValueAtTime(w, time);
 		this._mixDry.gain.setValueAtTime(1 - w, time);
 	}
 
@@ -140,7 +198,7 @@ const WorkletDelay = function(_params){
 	}
 
 	this.delete = function(){
-		const nodes = [ this._fx, this._mix, this._mixDry ];
+		const nodes = [ this._fx, this._mix, ...this._formants, this._lopass ];
 
 		nodes.forEach((n) => {
 			n.disconnect();
@@ -1006,8 +1064,8 @@ const Delay = function(_params){
 		let fb = Math.max(0, Math.min(0.99, Util.getParam(this._feedBack, c) * 0.707));
 		let cf = Math.max(10, Util.getParam(this._fbDamp, c) * 8000);
 
-		this._delayL.delayTime.setValueAtTime(dL + Math.random() * 0.001, time);		
-		this._delayR.delayTime.setValueAtTime(dR + Math.random() * 0.001, time);
+		this._delayL.delayTime.setValueAtTime(dL - Math.random() * 0.005, time);		
+		this._delayR.delayTime.setValueAtTime(dR - Math.random() * 0.005, time);
 		this._fb.gain.setValueAtTime(Util.assureNum(fb, 0.7), time);
 		this._flt.frequency.setValueAtTime(cf, time);
 

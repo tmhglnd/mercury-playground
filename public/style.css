@@ -129,6 +129,11 @@ p {
 	display: inline-block;
 }
 
+#console-log {
+	white-space: pre-wrap; 
+	margin: 0px;
+}
+
 button {
 	/* display: block; */
 	/* font-family: "Andale Mono"; */
@@ -345,6 +350,13 @@ textarea:hover {
 	/* cursor: pointer; */
 }
 
+.CodeMirror-matchingbracket { 
+	color: var(--secundary) !important;
+	text-decoration: none !important;
+	background: none !important;
+	outline: 1px solid var(--accent) !important;
+}
+
 .editorFlash {
 	background: var(--cm-flash) !important;
 	/* mix-blend-mode: difference; */
@@ -400,6 +412,16 @@ textarea:hover {
 	margin-top: 20px;
 	/* margin-right: auto; */
 	/* margin-top: 150px; */
+}
+
+#postWindow {
+	font-family: monospace;
+	float: center;
+	z-index: 1000;
+	margin-left: 20px;
+	margin-top: 20px;
+	max-height: 300px;
+	overflow-y: scroll;
 }
 
 .hideLoad {

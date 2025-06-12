@@ -8,8 +8,16 @@ require('codemirror/addon/mode/simple.js');
 require('codemirror/addon/comment/comment.js');
 require('codemirror/addon/hint/show-hint.js');
 require('codemirror/addon/hint/anyword-hint.js');
+require('codemirror/addon/edit/matchbrackets.js');
+// require('codemirror/addon/edit/closebrackets.js');
 
-const defaultTheme = 'material-darker';
+if (!localStorage.getItem('lightSyntax')){ 
+	localStorage.setItem('lightSyntax', 'neat');
+}
+
+if (!localStorage.getItem('darkSyntax')){
+	localStorage.setItem('darkSyntax', 'blackboard');
+}
 
 let _rand;
 
@@ -30,28 +38,31 @@ CodeMirror.defineSimpleMode("mercury", {
 		lineComment: '//'
 	},
 	start: [
-		// string
-		{ regex: /["'`](?:\\["\\]|[^\n"'``])*["'`]/, token: "string" },
-		// keywords
-		{ regex: /(?:new|make|ring|list|array|set|apply|give)\b/, token: "keyword", next: "object" },
-		// global
-		{ regex: /(?:print|post|log|display|view|audio|record|silence|mute|killAll|default)\b/, token: "operator" },
-		// numbers
-		{ regex: /0x[a-f\d]+|[-+]?(?:\.\d+|\d+\.?\d*)(?:e[-+]?\d+)?/i, token: "number" },
 		// comments
-		{ regex: /(?:\/\/|\$).*?$/, token: "comment" },
+		{ regex: /\/\/.*$/, token: "comment" },
+		// strings
+		{ regex: /\"[^"]*\"/, token: 'string' },
+		{ regex: /\'[^']*\'/, token: 'string' },
+		{ regex: /\`[^`]*\`/, token: 'string' },
+		// parenthesis for functions
+		{ regex: /[(){}]/, token: "operator" },
+		// brackets for array
+		{ regex: /[\[\]!]+/, token: "atom" },
+		// functions
+		{ regex: /([^0-9\s][^\s\(\)\[\]]*)(\s*)(\()/,
+			token: [ "def", null, "operator" ] },
 		// osc-addresses
 		{ regex: /(\/[^0-9/\s)][^/)\s]*){1,}/, token: "string" },
+		// keywords
+		{ regex: /(new|make|ring|list|array|set|apply|give)(\s+)([^0-9\s][^\s\(\)\[\]/]*)\b/, token: [ "keyword", null, "atom" ] },
+		// global
+		{ regex: /(?:print|post|log|display|view|audio|record|silence|mute|killAll|default)\b/, token: "builtin" },
 		// operators
-		{ regex: /[-+\/*=:]+/, token: "number" },
-		// brackets for array
-		{ regex: /[\[\]<>!]+/, token: "operator" },
-		// parenthesis for functions
-		{ regex: /[()]/, token: "variable-3" }
-	], 
-	object: [
-		// instrument and variable names after keywords
-		{ regex: /[^0-9\s][^\s\(\)\[\]]*/, token: "tag", next: "start" }
+		{ regex: /[+\-*:/=><!?&^%$#@;,]+/, token: "number" },
+		// numbers
+		{ regex: /0x[a-f\d]+|[-+]?(?:\.\d+|\d+\.?\d*)(?:e[-+]?\d+)?/i, token: "number" },
+		// any other word
+		{ regex: /[^0-9\s][^\s\(\)\[\]/]*/, token: "attribute" }
 	]
 });
 
@@ -125,7 +136,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		cursorHeight: 0.85,
 		cursorWidth: 0.5,
 		lineNumbers: true,
-		theme: defaultTheme,
+		theme: 'blackboard',
 		cursorHeight: 1,
 		indentUnit: 4,
 		indentWithTabs: false,
@@ -136,6 +147,8 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		showCursorWhenSelecting: true,
 		lineWrapping: true,
 		showHint: false,
+		matchBrackets: true,
+		// autoCloseBrackets: true,
 		// keymaps for execute/stopping/commenting code
 		extraKeys: {
 			'Tab': 'insertSoftTab',
@@ -371,7 +384,14 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 	this.changeTheme = function(){
 		let t = document.getElementById('themes').value;
 		this.cm.setOption('theme', t);
-		// cEditor.setOption('theme', t);
+
+		if (localStorage.getItem('theme') === 'darkmode'){
+			localStorage.setItem('darkSyntax', t);
+		} else {
+			localStorage.setItem('lightSyntax', t);
+		}
+
+		// console.log('local storage', localStorage.getItem('theme'), localStorage.getItem('darkSyntax'), localStorage.getItem('lightSyntax'))
 	}
 
 	this.example = function(){
@@ -384,6 +404,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		this.set(examples[names[rand]]);
 		_rand = rand;
 
+		this.silence();
 		this.evaluate();
 	}
 
@@ -467,19 +488,19 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		div.appendChild(rec);
 	}
 
-	this.links = function(){
-		let div = document.getElementById('links');
+	this.menuBottom = function(){
+		let div = document.getElementById('menu-bottom');
 		let p = document.createElement('p');
 		div.appendChild(p);
-
+		
 		let tuts = document.createElement('select');
+		tuts.title = 'Load a tutorial in the code editor';
 		tuts.id = 'tutorials';
-		tuts.onchange = () => { this.loadTutorial() }
 		
 		let snds = document.createElement('select');
 		snds.style.width = '12.5%';
+		snds.title = 'Insert a sound at the cursor position or replace the selection';
 		snds.id = 'sounds';
-		snds.onchange = () => { this.insertSound() }
 
 		let lstn = document.createElement('button');
 		lstn.style.width = '12.5%';
@@ -492,17 +513,12 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		load.id = 'load';
 		load.innerHTML = 'add sounds';
 		load.title = 'Load sounds from the computer (Alt/Ctrl-Shift-A)'
-		// load.innerHTML = 'settings';
-		load.onclick = () => {
-			this.addSounds();
-			// input.click();
-			// let modal = document.getElementById('modalbox');
-			// modal.style.display = "block";
-		}
+		load.onclick = () => { this.addSounds() }
 
 		let help = document.createElement('button');
 		help.id = help.innerHTML = 'help';
 		help.title = 'Open the documentation (Alt/Ctrl-Shift-P)';
+		help.style.width = "12.5%";
 		help.onclick = () => {
 			window.open('https://tmhglnd.github.io/mercury/docs/', '_blank');
 		}
@@ -510,9 +526,15 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		let collab = document.createElement('button');
 		collab.id = collab.innerHTML = 'collaborate';
 		collab.title = 'Collaborate in flok.cc (Alt/Ctrl-Shift-C)';
+		collab.style.width = "12.5%";
 		collab.onclick = () => {
 			window.open('https://flok.cc', '_blank');
 		}
+
+		let thms = document.createElement('select');
+		thms.style.width = '12.5%';
+		thms.title = 'Choose a syntax highlighting theme';
+		thms.id = 'themes';
 
 		p.appendChild(tuts);
 		p.appendChild(snds);
@@ -520,14 +542,12 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		p.appendChild(load);
 		p.appendChild(help);
 		p.appendChild(collab);
+		p.appendChild(thms);
 	}
 
 	this.tutorialMenu = function(){
 		let menu = document.getElementById('tutorials');
-
-		menu.onclick = () => {
-			console.log('clicked tutorials!');
-		}
+		menu.onchange = () => this.loadTutorial();
 
 		Object.keys(tutorials).forEach((t) => {
 			let option = document.createElement('option');
@@ -540,11 +560,13 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 	this.loadTutorial = function(){
 		let t = document.getElementById('tutorials').value;
 		this.set(tutorials[t]);
+		this.silence();
 		this.evaluate();
 	}
 
 	this.soundsMenu = function(){
 		let menu = document.getElementById('sounds');
+		menu.onchange = () => this.insertSound();
 
 		let values = ['sounds'].concat(Object.keys(samples));
 		values.forEach((t) => {
@@ -581,7 +603,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		btn.onclick = () => {
 			this.menuHidden = !this.menuHidden;
 
-			let divs = [ 'header', 'settings', 'menu', 'links', 'hydra-ui', 'switch' ];
+			let divs = [ 'header', 'settings', 'menu', 'menu-bottom', 'hydra-ui', 'switch' ];
 			for (let i=0; i<divs.length; i++){
 				let d = document.getElementById(divs[i]);
 				d.style.display = this.menuHidden ? 'none' : 'inline';
@@ -592,26 +614,34 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 	}
 
 	// theme menu for editor
-	// this.themeMenu = function(){
-	// 	let div = document.getElementById('menu');
-	// 	let menu = document.createElement('select');
-	// 	menu.id = 'themes';
-	// 	menu.onchange = () => { this.changeTheme() };
-		
-	// 	let themes = ['ayu-dark', 'base16-dark', 'material-darker', 'material-ocean', 'moxer', 'tomorrow-night-eighties', 'panda-syntax', 'yonce'];
+	this.themeMenu = function(){
+		let menu = document.getElementById('themes');
+		// clear the menu when redrawing because of switch darkmode
+		menu.innerHTML = '';
+		menu.onchange = () => this.changeTheme();
 
-	// 	let lightThemes = ['elegant', 'duotone-light', 'base16-light']
+		// dark themes
+		let themes = [ 'material-darker', 'ayu-dark', 'base16-dark', '3024-night', 'abbott', 'bespin', 'blackboard', 'cobalt', 'moxer', 'monokai', 'gruvbox-dark', 'panda-syntax', 'shadowfox', 'duotone-dark', 'night', 'rubyblue', 'yonce', 'console-dark', 'tomorrow-night-bright', 'hopscotch' ].sort();
 
-	// 	for (let t in themes){
-	// 		let option = document.createElement('option');
-	// 		option.value = themes[t];
-	// 		option.innerHTML = themes[t];
-	// 		menu.appendChild(option);
-	// 	}
-	// 	div.appendChild(menu);
+		// light themes
+		let lightThemes = [ 'eclipse', 'base16-light', 'duotone-light', 'elegant', 'idea', 'juejin', 'paraiso-light', 'solarized', 'ttcn', 'console-light', 'yeti', 'neat' ].sort();
 
-	// 	menu.value = defaultTheme;
-	// }
+		let selectedMode = localStorage.getItem('theme');
+
+		// display light themes fi lightmode is used
+		if (selectedMode === 'lightmode'){
+			themes = lightThemes;
+		}
+
+		for (let t of themes){
+			let option = document.createElement('option');
+			option.value = t;
+			option.innerHTML = t;
+			menu.appendChild(option);
+		}
+
+		menu.value = localStorage.getItem(selectedMode === 'lightmode' ? 'lightSyntax' : 'darkSyntax');
+	}
 
 	this.listenMenuVisible = false;
 
@@ -672,60 +702,66 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 
 	// settings menu with more options and some explanation
 	// TO-DO, currently not in use
-	this.settingsMenu = function(){
-		let modal = document.getElementById('modalbox');
-		// let m = document.createElement('div');
-		// m.className = "settings-menu";
-		let m = document.getElementsByClassName('settings-menu')[0];
-		m.innerHTML = `
-		<span class="close">&times;</span>
-		<p>
-			Theme <select id="themes" style="width:30%"></select>
-		</p>`;
+	// this.settingsMenu = function(){
+	// 	let modal = document.getElementById('modalbox');
+	// 	// let m = document.createElement('div');
+	// 	// m.className = "settings-menu";
+	// 	let m = document.getElementsByClassName('settings-menu')[0];
+	// 	m.innerHTML = `
+	// 	<span class="close">&times;</span>
+	// 	<p>
+	// 		Theme <select id="themes" style="width:30%"></select>
+	// 	</p>`;
 
-		let menu = document.getElementById('themes');
-		menu.onchange = () => { this.changeTheme() };
+	// 	let menu = document.getElementById('themes');
+	// 	menu.onchange = () => { this.changeTheme() };
 
-		let themes = ['ayu-dark', 'base16-dark', 'material-darker', 'material-ocean', 'moxer', 'tomorrow-night-eighties', 'panda-syntax', 'yonce'];
+	// 	let themes = ['ayu-dark', 'base16-dark', 'material-darker', 'material-ocean', 'moxer', 'tomorrow-night-eighties', 'panda-syntax', 'yonce'];
 
-		// 	let lightThemes = ['elegant', 'duotone-light', 'base16-light']
+	// 	// 	let lightThemes = ['elegant', 'duotone-light', 'base16-light']
 		
-		for (let t=0; t<themes.length; t++){
-			let option = document.createElement('option');
-			option.value = themes[t];
-			option.innerHTML = themes[t];
-			menu.appendChild(option);
-		}
-		menu.value = defaultTheme;
+	// 	for (let t=0; t<themes.length; t++){
+	// 		let option = document.createElement('option');
+	// 		option.value = themes[t];
+	// 		option.innerHTML = themes[t];
+	// 		menu.appendChild(option);
+	// 	}
+	// 	menu.value = defaultTheme;
 
-		// close the window when clicking the cross or outside of the box
-		let span = document.getElementsByClassName('close')[0];
-		span.onclick = () => modal.style.display = "none";
+	// 	// close the window when clicking the cross or outside of the box
+	// 	let span = document.getElementsByClassName('close')[0];
+	// 	span.onclick = () => modal.style.display = "none";
 		
-		window.onclick = (event) => {
-			if (event.target === modal) modal.style.display = "none";
-		}
-		modal.appendChild(m);
-	}
+	// 	window.onclick = (event) => {
+	// 		if (event.target === modal) modal.style.display = "none";
+	// 	}
+	// 	modal.appendChild(m);
+	// }
 
 	// light/dark mode switcher
 	this.modeSwitch = function(){
-		// let b = document.body;
 		let b = document.getElementById('ui');
 		let btn = document.createElement('button');
 		btn.id = 'switch';
 		btn.className = 'themeswitch';
 		btn.title = 'Switch display mode Ctrl/Alt-Shift-D';
 		btn.onclick = () => {
-			if (localStorage.getItem('theme') === 'darkmode'){
-				switchTheme('lightmode');
-				this.cm.setOption('theme', 'elegant');
-			} else {
-				switchTheme('darkmode');
-				this.cm.setOption('theme', 'material-darker');
-			}
+			switchTheme(localStorage.getItem('theme') === 'darkmode' ? 'lightmode' : 'darkmode');
+
+			this.setMode(localStorage.getItem('theme'));
 		}
 		b.appendChild(btn);
+	}
+
+	// set the light/dark mode based on string value
+	this.setMode = function(mode){
+		switchTheme(mode);
+		this.themeMenu();
+		if (mode === 'lightmode'){
+			this.cm.setOption('theme', localStorage.getItem('lightSyntax'));
+		} else {
+			this.cm.setOption('theme', localStorage.getItem('darkSyntax'));
+		}
 	}
 }
 module.exports = Editor;

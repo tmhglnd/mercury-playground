@@ -1,7 +1,5 @@
 const Tone = require('tone');
 const Util = require('./Util.js');
-const { clip } = require('total-serialism').Utility;
-// const WebMidi = require("webmidi");
 
 // Basic Sequencer class for triggering events
 class Sequencer {
@@ -28,7 +26,7 @@ class Sequencer {
 		this._event;
 		this._loop;
 		this._once = false;
-		this.makeLoop();
+		// this.makeLoop();
 
 		console.log('=> class Sequencer()');
 	}
@@ -39,6 +37,7 @@ class Sequencer {
 	}
 
 	makeLoop(){
+		console.log('=> makeLoop()');
 		// dispose of previous loop if active
 		if (this._loop){
 			this._loop.dispose();
