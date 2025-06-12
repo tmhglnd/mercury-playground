@@ -40,14 +40,17 @@ const fxMap = {
 	'degrade' : (params) => {
 		return new DownSampler(params);
 	},
-	'room' : (params) => {
+	'converb' : (params) => {
 		return new Reverb(params);
+	},
+	'room' : (params) => {
+		return new DattorroReverb(params);
 	},
 	'hall' : (params) => {
-		return new Reverb(params);
+		return new DattorroReverb(params);
 	},
 	'reverb' : (params) => {
-		return new Reverb(params);
+		return new DattorroReverb(params);
 	},
 	'tverb' : (params) => {
 		return new CustomFreeverb(params);
@@ -457,6 +460,8 @@ const Squash = function(_params){
 
 // Reverb FX
 // Add a reverb to the sound to give it a feel of space
+// Uses the default Tone.Reverb, which uses a decaying noise convolution
+// Seems to leak memory and slowly increases browser RAM over time...
 // 
 const Reverb = function(_params){
 	this._fx = new Tone.Reverb();
@@ -483,6 +488,91 @@ const Reverb = function(_params){
 		this._fx.dispose();
 	}
 }
+
+// Dattorro Reverb FX
+// Good sound plate reverb emulation
+// Based on the paper by Jon Dattorro and the code from Khoin
+// https://ccrma.stanford.edu/~dattorro/EffectDesignPart1.pdf 
+// https://github.com/khoin/DattorroReverbNode 
+//
+const DattorroReverb = function(_params){
+	_params = Util.mapDefaults(_params, [ 0.5, 10, 0, 0.5 ]);
+	this._gain = Util.toArray(_params[0]);
+	this._size = Util.toArray(_params[1]);
+	this._wet = Util.toArray(_params[3]);
+
+	// The crossfader for wet-dry (originally implemented with CrossFade)
+	this._mix = new Tone.Add();
+	this._mixWet = new Tone.Gain(0).connect(this._mix);
+	this._mixDry = new Tone.Gain(1).connect(this._mix.addend);
+
+	// a custom tone audio node with input/output gain and worklet effect
+	this._fx = new Tone.ToneAudioNode();
+	this._fx.input = new Tone.Gain(1).connect(this._mixDry);
+	this._fx.output = new Tone.Gain(1).connect(this._mixWet);
+	this._fx.workletNode = Tone.getContext().createAudioWorkletNode('dattorro-reverb');
+	this._fx.input.chain(this._fx.workletNode, this._fx.output);
+
+	this.set = (c, time) => {
+		const gn = Math.max(Util.getParam(this._gain, c), 0);
+		const meta = Util.clip(Util.getParam(this._size, c), 0, 30);
+		const wet = Util.clip(Util.getParam(this._wet, c));
+
+		const dc = Util.remap(meta, 0, 20, 0.01, 0.99, 0.8);
+		const df = Util.remap(meta, 0, 20, 0.2, 0.75, 0.5);
+		const dp = Util.remap(meta, 0, 20, 0.2, 0.65, 2.5);
+		const pd = Util.remap(meta, 0, 20, 700, 100);
+
+		this._fx.workletNode.parameters.get('decay').setValueAtTime(dc, time);
+		this._fx.workletNode.parameters.get('decayDiffusion1').setValueAtTime(df, time);
+		this._fx.workletNode.parameters.get('damping').setValueAtTime(dp, time);
+		this._fx.workletNode.parameters.get('preDelay').setValueAtTime(pd, time);
+
+		this._fx.workletNode.parameters.get('wet').setValueAtTime(gn, time);
+		// this._fx.workletNode.parameters.get('dry').setValueAtTime(0.7, time);
+
+		// apply wetdry mix
+		this._mixWet.gain.setValueAtTime(wet, time);
+		this._mixDry.gain.setValueAtTime(1 - wet, time);
+	}
+
+	this.chain = () => {
+		return { 'send' : this._fx, 'return' : this._mix }
+	}
+
+	this.delete = () => {
+		const nodes = [ this._fx, this._mix, this._mixDry ];
+		nodes.forEach(n => { n.disconnect(); n.dispose() });
+	}
+}
+
+// class WorkletNode {
+// 	constructor(worklet){
+// 		this._fx = new Tone.ToneAudioNode();
+// 		this._fx.input = new Tone.Gain(1);
+// 		this._fx.output = new Tone.Gain(1);
+// 		this._fx.workletNode = new Tone.getContext().createAudioWorkletNode(worklet);
+// 		this._fx.chain(this._fx.workletNode, this._fx.output);
+	
+// 		this.workletNode = this._fx.workletNode;	
+// 	}
+
+// 	// get = () => {
+// 	// 	return this._fx;
+// 	// }
+
+// 	// connect = (to) => {
+// 	// 	this._fx.output.connect(to);
+// 	// }
+
+// 	disconnect = () => {
+// 		this._fx.disconnect();
+// 	}
+	
+// 	dispose = () => {
+// 		this._fx.dispose();
+// 	}
+// }
 
 // A simple allpass filter constructed of a Feedback CombFilter,
 // a gain node and a subtraction. This works because an allpass filter
