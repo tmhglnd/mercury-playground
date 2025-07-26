@@ -141,6 +141,8 @@ class Instrument extends Sequencer {
 		// remove all fx
 		this._fx.map((f) => f.delete());
 		console.log('=> disposed Instrument() with FX:', this._fx);
+
+		this.deleteScope();
 	}
 
 	amp(g, r){
@@ -218,6 +220,72 @@ class Instrument extends Sequencer {
 			// pfx.return.connect(Tone.Destination);
 			pfx.return.connect(this.gain);
 		}
+	}
+
+	scope(){
+		this._waveform = new Tone.Waveform(4096);
+		this._mono = new Tone.Mono().connect(this._waveform);
+		this.gain.connect(this._mono);
+
+		this._waveCnv = document.createElement('canvas');
+		let ui = document.getElementById('ui');
+		ui.appendChild(this._waveCnv);
+
+		this._waveCnv.width = window.innerWidth * 0.9;
+		this._waveCnv.height = 30;
+		this._waveCnv.style.color = 'var(--accent)';
+
+		// console.log(window.cm.cm.addLineWidget());
+		this._waveWidget = window.cm.cm.addLineWidget(window.cm.cm.lineCount()-1, this._waveCnv);
+
+		this._scopeMax = -Infinity;
+
+		let drawWaveform = () => {
+			// console.log(this._waveform.getValue());
+			let wave = this._waveform.getValue();
+	
+			let downsample = 1, sum = 0, downArr = [];
+			// let max = -Infinity;
+			for (let i = 0; i < wave.length; i++){
+				// min = Math.min(min, wave[i]);
+				this._scopeMax = Math.max(this._scopeMax, Math.abs(wave[i]));
+				sum += wave[i];
+				if (i % downsample === downsample - 1){
+					downArr.push(sum / downsample); 
+					sum = 0;
+				}
+			}
+			let ctx = this._waveCnv.getContext('2d');
+			let halfHeight = this._waveCnv.height / 2;
+			let width = this._waveCnv.width;
+
+			ctx.clearRect(0, 0, this._waveCnv.width, this._waveCnv.height);
+			ctx.beginPath();
+			for (let i = 0; i < downArr.length; i++){
+				let a = downArr[i] * (1 / this._scopeMax) * halfHeight + halfHeight;
+				if (i === 0) {
+					ctx.moveTo(0, a);
+				} else {
+					ctx.lineTo(i * (width / downArr.length), a);
+				}
+			}			
+			ctx.lineWidth = 2;
+			ctx.strokeStyle = window.getComputedStyle(document.documentElement).getPropertyValue('--accent');
+			ctx.stroke();
+
+			requestAnimationFrame(drawWaveform);
+		}
+		this._wvfrm = requestAnimationFrame(drawWaveform);
+	}
+
+	deleteScope(){
+		this._waveCnv?.remove();
+		this._mono?.disconnect();
+		this._mono?.dispose();
+		this._waveform?.disconnect();
+		this._waveform?.dispose();
+		this._waveWidget?.clear();
+		cancelAnimationFrame(this._wvfrm);
 	}
 }
 module.exports = Instrument;
