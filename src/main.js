@@ -1,6 +1,9 @@
 // The Mercury Playground main code loader
 // 
 
+// check if the browser is Safari
+window.isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
 // switch theme in css
 switchTheme = (t) => {
 	localStorage.setItem('theme', t);

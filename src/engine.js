@@ -30,10 +30,9 @@ let buffers = new Tone.ToneAudioBuffers({
 	urls: samples,
 	onload: function(){ 
 		clearInterval(loadingID);
-		console.log('=> sounds loaded');
+		console.log('=> sounds loaded', buffers);
 		// remove the logging function to the innerHTML from here on
 		console.log = console.olog;
-		// console.log(buffers);
 		// init();
 		// remove loading screen, because probably this
 		// is the last thing that is done
@@ -233,8 +232,11 @@ function setVolume(g, t=0){
 }
 
 // create a Tone Recording and connect to the final output Node
-const Recorder = new Tone.Recorder({ mimeType: 'audio/webm' });
-GN.connect(Recorder);
+// console.log('creating recording', window.isSafari);
+const Recorder = window.isSafari ? null : new Tone.Recorder({ mimeType: 'audio/webm' });
+if (Recorder){
+	GN.connect(Recorder);
+}
 
 function isRecording(){
 	// returns 'started' if the recording is recording
@@ -242,6 +244,10 @@ function isRecording(){
 }
 
 async function record(on, f){
+	if (window.isSafari){
+		log('Recording not supported by Safari Browser');
+		return;
+	}
 	if (on){
 		// start the recording process
 		Recorder.start();
