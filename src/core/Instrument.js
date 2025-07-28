@@ -26,6 +26,9 @@ class Instrument extends Sequencer {
 		// The source to be defined by inheriting class
 		this.source;
 
+		// A place to add widgets to
+		this._widgets = [];
+
 		console.log('=> class Instrument()');
 	}
 
@@ -141,11 +144,11 @@ class Instrument extends Sequencer {
 		// this.adsr.dispose();
 		// remove all fx
 		this._fx.map((f) => f.delete());
-		console.log('=> disposed Instrument() with FX:', this._fx);
+		this._widgets.map(w => w?.delete());
+
+		console.log('=> disposed Instrument() with FX:', this._fx, 'and widgets:', this._widgets);
 
 		this.deleteScope();
-
-		this._scope?.delete();
 	}
 
 	amp(g, r){
@@ -226,9 +229,10 @@ class Instrument extends Sequencer {
 	}
 
 	classScope(){
-		this._scope = new Widget.Scope();
-		this.gain.connect(this._scope.input());
-		// this._scope.draw();
+		// this._scope = new Widget.Scope();
+		let w = new Widget.Scope();
+		this._widgets.push(w);
+		this.gain.connect(w.input());
 	}
 
 	scope(){

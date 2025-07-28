@@ -2,6 +2,7 @@ const Tone = require('tone');
 
 class Scope {
 	constructor(){
+		console.log('=> class Scope()');
 		this.waveform = new Tone.Waveform(4096);
 		this.mono = new Tone.Mono().connect(this.waveform);
 
@@ -19,10 +20,9 @@ class Scope {
 		
 		this.scopeScale = -Infinity;
 
-		// this.anim = requestAnimationFrame(this.draw);
 		let framedraw = () => {
 			this.draw();
-			requestAnimationFrame(framedraw);
+			this.anim = requestAnimationFrame(framedraw);
 		}
 		this.anim = requestAnimationFrame(framedraw);
 	}
@@ -75,6 +75,7 @@ class Scope {
 	}
 
 	delete(){
+		// console.log('Scope deleted');
 		cancelAnimationFrame(this.anim);
 		this.widget?.clear();
 		this.cnv?.remove();
