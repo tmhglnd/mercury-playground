@@ -147,8 +147,6 @@ class Instrument extends Sequencer {
 		this._widgets.map(w => w?.delete());
 
 		console.log('=> disposed Instrument() with FX:', this._fx, 'and widgets:', this._widgets);
-
-		this.deleteScope();
 	}
 
 	amp(g, r){
@@ -229,110 +227,15 @@ class Instrument extends Sequencer {
 	}
 
 	classScope(){
-		// this._scope = new Widget.Scope();
 		let w = new Widget.Scope();
 		this._widgets.push(w);
 		this.gain.connect(w.input());
 	}
 
-	scope(){
-		// this._waveform = new Tone.Waveform(4096);
-		this._meter = new Tone.Meter();
-		this._meter.normalRange = true;
-		this._meter.smoothing = 0;
-
-		// this._mono = new Tone.Mono().connect(this._waveform);
-		this._mono = new Tone.Mono().connect(this._meter);
-		this.gain.connect(this._mono);
-
-		this._waveCnv = document.createElement('canvas');
-		let ui = document.getElementById('ui');
-		ui.appendChild(this._waveCnv);
-
-		this._waveCnv.width = window.innerWidth * 0.9;
-		this._waveCnv.height = 30;
-
-		this._waveWidget = window.cm.cm.addLineWidget(window.cm.cm.lineCount()-1, this._waveCnv);
-
-		this._scopeMax = 0.00001;
-
-		this._historySize = 128;
-		this._history = new Array(this._historySize).fill(0);
-
-		let drawWaveform = () => {
-			// console.log(this._meter.getValue());
-			// let wave = this._waveform.getValue();
-	
-			// let downsample = 1, sum = 0, downArr = [];
-			// for (let i = 0; i < wave.length; i++){
-			// 	// min = Math.min(min, wave[i]);
-			// 	this._scopeMax = Math.max(this._scopeMax, Math.abs(wave[i]));
-			// 	sum += wave[i];
-			// 	if (i % downsample === downsample - 1){
-			// 		downArr.push(sum / downsample); 
-			// 		sum = 0;
-			// 	}
-			// }
-
-			let mtr = this._meter.getValue();
-			this._history.push(mtr);
-			this._scopeMax = Math.max(mtr, this._scopeMax);
-			this._history = this._history.slice(this._history.length - this._historySize, this._history.length);
-
-			let ctx = this._waveCnv.getContext('2d');
-			let halfHeight = this._waveCnv.height / 2;
-			let width = this._waveCnv.width;
-
-			ctx.clearRect(0, 0, this._waveCnv.width, this._waveCnv.height);
-			ctx.lineWidth = 2;
-			ctx.strokeStyle = window.getComputedStyle(document.documentElement).getPropertyValue('--accent');
-			ctx.beginPath();
-			// for (let i = 0; i < downArr.length; i++){
-			// 	let a = downArr[i] * (1 / this._scopeMax) * halfHeight + halfHeight;
-			// 	if (i === 0) {
-			// 		ctx.moveTo(0, a);
-			// 	} else {
-			// 		ctx.lineTo(i * (width / downArr.length), a);
-			// 	}
-			// }	
-			for (let i = 0; i < this._history.length; i++){
-				// let inv = (i % 2) ? -1 : 1;
-				let a = this._history[i] * (1 / this._scopeMax) * halfHeight + halfHeight;
-				if (i === 0){
-					ctx.moveTo(0, a);
-				} else {
-					ctx.lineTo(i * (width / this._history.length), a);
-				}
-			}
-			ctx.stroke();
-
-			ctx.beginPath();
-			for (let i = 0; i < this._history.length; i++){
-				// let inv = (i % 2) ? -1 : 1;
-				let a = -this._history[i] * (1 / this._scopeMax) * halfHeight + halfHeight;
-				if (i === 0){
-					ctx.moveTo(0, a);
-				} else {
-					ctx.lineTo(i * (width / this._history.length), a);
-				}
-			}
-			ctx.stroke();
-
-			requestAnimationFrame(drawWaveform);
-		}
-		this._wvfrm = requestAnimationFrame(drawWaveform);
-	}
-
-	deleteScope(){
-		this._waveCnv?.remove();
-		this._mono?.disconnect();
-		this._mono?.dispose();
-		this._waveform?.disconnect();
-		this._waveform?.dispose();
-		this._meter?.disconnect();
-		this._meter?.dispose();
-		this._waveWidget?.clear();
-		cancelAnimationFrame(this._wvfrm);
+	classWaveform(){
+		let w = new Widget.WaveForm();
+		this._widgets.push(w);
+		this.gain.connect(w.input());
 	}
 }
 module.exports = Instrument;

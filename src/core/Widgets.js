@@ -1,35 +1,87 @@
 const Tone = require('tone');
 
-class Scope {
+// The main widget class has some starting points,
+// like a mono input connection for sound analysis later
+// a canvas that will be added as a line widget
+// a drawing loop, and some drawing functions like line
+class Widget {
 	constructor(){
-		console.log('=> class Scope()');
-		this.waveform = new Tone.Waveform(4096);
-		this.mono = new Tone.Mono().connect(this.waveform);
-
+		// console.log('=> class Widget()');
+		// to connect the source to and make it to mono for analysis
+		this.mono = new Tone.Mono();
+		// the canvas to display the visual in, adjust width and height
 		this.cnv = document.createElement('canvas');
-		let ui = document.getElementById('ui');
-		ui.appendChild(this.cnv);
-
 		this.cnv.width = window.innerWidth * 0.9;
-		this.cnv.height = 25;
+		this.cnv.height = 30;
 
 		// get the 2d context from canvas
 		this.ctx = this.cnv.getContext('2d');
-
+		// create a new widget between the editor lines
 		this.widget = window.cm.cm.addLineWidget(window.cm.cm.lineCount() - 1, this.cnv);
-		
+		// the auto scaling for the scope
 		this.scopeScale = -Infinity;
-
-		let framedraw = () => {
-			this.draw();
-			this.anim = requestAnimationFrame(framedraw);
-		}
-		this.anim = requestAnimationFrame(framedraw);
 	}
 
 	// connect the scope to a Tone Audio Node with node.connect(scope.input())
 	input(){
 		return this.mono;
+	}
+
+	// start the rendering of the animation based on AnimationFrame
+	start(){
+		let framedraw = () => {
+			this.draw();
+			this.anim = requestAnimationFrame(framedraw);
+		}
+		// store in variable for canceling later
+		this.anim = requestAnimationFrame(framedraw);
+	}
+
+	// to be replaced by the draw() of inheriting class
+	draw(){}
+
+	// draw a line with a scaling factor based on an array of y values
+	line(arr, scale=1){
+		this.ctx.lineWidth = 2;
+		this.ctx.strokeStyle = window.getComputedStyle(document.documentElement).getPropertyValue('--accent');
+
+		let halfHeight = this.cnv.height / 2;
+		// begin the stroke, for every point draw a line, then end the stroke
+		this.ctx.beginPath();
+		for (let i = 0; i < arr.length; i++){
+			let a = arr[i] * scale * (1 / this.scopeScale) * halfHeight + halfHeight;
+			if (i === 0) {
+				this.ctx.moveTo(0, a);
+			} else {
+				this.ctx.lineTo(i * (this.cnv.width / arr.length), a);
+			}
+		}
+		this.ctx.stroke();
+	}
+
+	// remove all traces
+	delete(){
+		cancelAnimationFrame(this.anim);
+		this.widget.clear();
+		this.cnv.remove();
+		this.mono.disconnect();
+		this.mono.dispose();
+	}
+}
+
+// A scope widget, displays the audio signal with a fast
+// zoomed in scope. Has more erratic behaviour than waveform
+class Scope extends Widget {
+	constructor(){
+		console.log('=> class Scope()');
+		super();
+
+		// create the waveform analysis from Tone
+		this.waveform = new Tone.Waveform(4096);
+		this.mono.connect(this.waveform);
+
+		// start the animation
+		this.start();
 	}
 
 	draw(){
@@ -42,6 +94,8 @@ class Scope {
 		this.line(downArr);
 	}
 
+	// the downsample lets you take a array of values and reduce the 
+	// amount of values, while averaging them
 	downsample(arr, down=1){
 		let sum = 0, out = [];
 		for (let i = 0; i < arr.length; i++){
@@ -56,33 +110,60 @@ class Scope {
 		return out;
 	}
 
-	line(arr){
-		this.ctx.lineWidth = 2;
-		this.ctx.strokeStyle = window.getComputedStyle(document.documentElement).getPropertyValue('--accent');
+	delete(){
+		super.delete();
 
-		let halfHeight = this.cnv.height / 2;
-		// begin the stroke, for every point draw a line, then end the stroke
-		this.ctx.beginPath();
-		for (let i = 0; i < arr.length; i++){
-			let a = arr[i] * (1 / this.scopeScale) * halfHeight + halfHeight;
-			if (i === 0) {
-				this.ctx.moveTo(0, a);
-			} else {
-				this.ctx.lineTo(i * (this.cnv.width / arr.length), a);
-			}
-		}
-		this.ctx.stroke();
+		this.waveform.disconnect();
+		this.waveform.dispose();
+	}
+}
+
+// The waveform class is a slower analysis that shows the RMS Amplitude
+// of the signal measured of a short period of time
+// This visualisation looks more like a waveform display in a DAW
+class WaveForm extends Widget {
+	constructor(){
+		console.log('=> class WaveForm()');
+		super();
+		
+		// create the meter and use 0-1 range for values instead of dB
+		this.meter = new Tone.Meter();
+		this.meter.normalRange = true;
+		this.meter.smoothing = 0;
+
+		this.mono.connect(this.meter);
+
+		// an array to keep a history of amplitude values, initially 0'ed
+		this._historySize = 128;
+		this._history = new Array(this._historySize).fill(0);
+
+		// start the animation
+		this.start();
+	}
+
+	draw(){
+		// get the waveform amplitude value from meter
+		let mtr = this.meter.getValue();
+		// push to history array and slice the history
+		this._history.push(mtr);
+		this._history = this._history.slice(this._history.length - this._historySize, this._history.length);
+		// check if this is a higher amplitude for auto-scaling
+		this.scopeScale = Math.max(mtr, this.scopeScale);
+
+		// erase the previous drawn line
+		this.ctx.clearRect(0, 0, this.cnv.width, this.cnv.height);
+		// draw the line from downsamples values
+		this.line(this._history);
+		// draw the same line, but inversed, to get a waveform outline
+		this.line(this._history, -1);
 	}
 
 	delete(){
-		// console.log('Scope deleted');
-		cancelAnimationFrame(this.anim);
-		this.widget?.clear();
-		this.cnv?.remove();
-		this.waveform?.disconnect();
-		this.waveform?.dispose();
-		this.mono?.disconnect();
-		this.mono?.dispose();
+		super.delete();
+
+		this.meter.disconnect();
+		this.meter.dispose();
 	}
 }
-module.exports = { Scope };
+
+module.exports = { Scope, WaveForm };
