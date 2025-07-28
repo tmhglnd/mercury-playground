@@ -237,5 +237,11 @@ class Instrument extends Sequencer {
 		this._widgets.push(w);
 		this.gain.connect(w.input());
 	}
+
+	spectrum(){
+		let w = new Widget.Spectrum();
+		this._widgets.push(w);
+		this.gain.connect(w.input());
+	}
 }
 module.exports = Instrument;

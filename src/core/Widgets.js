@@ -38,13 +38,17 @@ class Widget {
 	}
 
 	// to be replaced by the draw() of inheriting class
-	draw(){}
+	draw(){
+		// erase the previous drawn line
+		this.ctx.clearRect(0, 0, this.cnv.width, this.cnv.height);
+
+		this.ctx.lineCap = "round";
+		this.ctx.lineWidth = 2;
+		this.ctx.strokeStyle = window.getComputedStyle(document.documentElement).getPropertyValue('--accent');
+	}
 
 	// draw a line with a scaling factor based on an array of y values
 	line(arr, scale=1){
-		this.ctx.lineWidth = 2;
-		this.ctx.strokeStyle = window.getComputedStyle(document.documentElement).getPropertyValue('--accent');
-
 		let halfHeight = this.cnv.height / 2;
 		// begin the stroke, for every point draw a line, then end the stroke
 		this.ctx.beginPath();
@@ -85,11 +89,10 @@ class Scope extends Widget {
 	}
 
 	draw(){
+		super.draw();
 		// get the waveform array and downsample
 		let wave = this.waveform.getValue();
 		let downArr = this.downsample(wave, 1);
-		// erase the previous drawn line
-		this.ctx.clearRect(0, 0, this.cnv.width, this.cnv.height);
 		// draw the line from downsamples values
 		this.line(downArr);
 	}
@@ -142,6 +145,7 @@ class WaveForm extends Widget {
 	}
 
 	draw(){
+		super.draw();
 		// get the waveform amplitude value from meter
 		let mtr = this.meter.getValue();
 		// push to history array and slice the history
@@ -150,8 +154,6 @@ class WaveForm extends Widget {
 		// check if this is a higher amplitude for auto-scaling
 		this.scopeScale = Math.max(mtr, this.scopeScale);
 
-		// erase the previous drawn line
-		this.ctx.clearRect(0, 0, this.cnv.width, this.cnv.height);
 		// draw the line from downsamples values
 		this.line(this._history);
 		// draw the same line, but inversed, to get a waveform outline
@@ -166,4 +168,32 @@ class WaveForm extends Widget {
 	}
 }
 
-module.exports = { Scope, WaveForm };
+class Spectrum extends Widget {
+	constructor(){
+		super();
+		this.fft = new Tone.FFT(1024);
+		this.fft.normalRange = true;
+		this.fft.smoothing = 0;
+
+		this.mono.connect(this.fft);
+		// this.scopeScale = ;
+		this.start();
+	}
+
+	draw(){
+		// get the waveform array and downsample
+		let spectrum = this.fft.getValue();
+		// console.log('spectrum', Math.max(...spectrum));
+		this.scopeScale = Math.max(this.scopeScale, Math.max(...spectrum));
+		// draw the line from downsamples values
+		this.line(spectrum);
+	}
+
+	delete(){
+		super.delete();
+		this.fft.disconnect();
+		this.fft.dispose();
+	}
+}
+
+module.exports = { Scope, WaveForm, Spectrum };
