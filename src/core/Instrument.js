@@ -6,9 +6,9 @@ const Sequencer = require('./Sequencer.js');
 
 // Basic class for all instruments
 class Instrument extends Sequencer {
-	constructor(engine, canvas){
+	constructor(engine, canvas, line){
 		// Inherit from Sequencer
-		super(engine, canvas);
+		super(engine, canvas, line);
 
 		// Instrument specific parameters
 		this._gain = [-6, 0];		
@@ -226,22 +226,22 @@ class Instrument extends Sequencer {
 		}
 	}
 
-	classScope(){
-		let w = new Widget.Scope();
+	scope(){
+		let w = new Widget.Scope(this._line);
 		this._widgets.push(w);
 		this.gain.connect(w.input());
 	}
 
-	classWaveform(){
-		let w = new Widget.WaveForm();
+	waveform(){
+		let w = new Widget.WaveForm(this._line);
 		this._widgets.push(w);
 		this.gain.connect(w.input());
 	}
 
-	spectrum(){
-		let w = new Widget.Spectrum();
-		this._widgets.push(w);
-		this.gain.connect(w.input());
-	}
+	// spectrum(){
+	// 	let w = new Widget.Spectrum(this._line);
+	// 	this._widgets.push(w);
+	// 	this.gain.connect(w.input());
+	// }
 }
 module.exports = Instrument;

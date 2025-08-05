@@ -5,8 +5,8 @@ const Tone = require('tone');
 // a canvas that will be added as a line widget
 // a drawing loop, and some drawing functions like line
 class Widget {
-	constructor(){
-		// console.log('=> class Widget()');
+	constructor(line){
+		// console.log('=> class Widget()', line);
 		// to connect the source to and make it to mono for analysis
 		this.mono = new Tone.Mono();
 		// the canvas to display the visual in, adjust width and height
@@ -17,7 +17,8 @@ class Widget {
 		// get the 2d context from canvas
 		this.ctx = this.cnv.getContext('2d');
 		// create a new widget between the editor lines
-		this.widget = window.cm.cm.addLineWidget(window.cm.cm.lineCount() - 1, this.cnv);
+		this.widget = window.cm.cm.addLineWidget(line-1, this.cnv);
+		// this.widget = window.cm.cm.addLineWidget(line, this.cnv);		
 		// the auto scaling for the scope
 		this.scopeScale = -Infinity;
 	}
@@ -76,9 +77,9 @@ class Widget {
 // A scope widget, displays the audio signal with a fast
 // zoomed in scope. Has more erratic behaviour than waveform
 class Scope extends Widget {
-	constructor(){
-		console.log('=> class Scope()');
-		super();
+	constructor(...args){
+		// console.log('=> class Scope()');
+		super(...args);
 
 		// create the waveform analysis from Tone
 		this.waveform = new Tone.Waveform(4096);
@@ -125,9 +126,9 @@ class Scope extends Widget {
 // of the signal measured of a short period of time
 // This visualisation looks more like a waveform display in a DAW
 class WaveForm extends Widget {
-	constructor(){
-		console.log('=> class WaveForm()');
-		super();
+	constructor(...args){
+		// console.log('=> class WaveForm()');
+		super(...args);
 		
 		// create the meter and use 0-1 range for values instead of dB
 		this.meter = new Tone.Meter();

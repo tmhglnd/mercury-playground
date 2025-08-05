@@ -3,9 +3,9 @@ const Util = require('./Util.js');
 const Instrument = require('./Instrument.js');
 
 class MonoSample extends Instrument {
-	constructor(engine, s, canvas){
-		super(engine, canvas);
-
+	constructor(engine, s, canvas, line){
+		super(engine, canvas, line);
+		
 		this._bufs = this._engine.getBuffers();
 		this._sound;
 		this.sound(s);

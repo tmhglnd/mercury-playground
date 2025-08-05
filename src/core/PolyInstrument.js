@@ -7,9 +7,9 @@ const Instrument = require('./Instrument.js');
 
 // Basic class for a poly-instrument
 class PolyInstrument extends Instrument {
-	constructor(engine, canvas){
+	constructor(engine, canvas, line){
 		// Inherit from Instrument
-		super(engine, canvas);
+		super(engine, canvas, line);
 
 		// The source to be defined by inheriting class
 		this.sources = [];
