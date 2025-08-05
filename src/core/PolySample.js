@@ -3,9 +3,9 @@ const Util = require('./Util.js');
 const PolyInstrument = require('./PolyInstrument.js');
 
 class PolySample extends PolyInstrument {
-	constructor(engine, s, canvas){
+	constructor(engine, s, canvas, line){
 		// Inherit from PolyInstrument
-		super(engine, canvas);
+		super(engine, canvas, line);
 
 		this._bufs = this._engine.getBuffers();
 		this._sound;

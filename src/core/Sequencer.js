@@ -3,10 +3,13 @@ const Util = require('./Util.js');
 
 // Basic Sequencer class for triggering events
 class Sequencer {
-	constructor(engine, canvas){
+	constructor(engine, canvas, line){
 		// The Tone engine
 		this._engine = engine;
+		// The Hydra canvas
 		this._canvas = canvas;
+		// The line position in the editor of the instrument
+		this._line = line;
 		
 		// Sequencer specific parameters
 		this._count = 0;

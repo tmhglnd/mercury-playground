@@ -5,9 +5,9 @@ const TL = require('total-serialism').Translate;
 const Instrument = require('./Instrument');
 
 class MonoSynth extends Instrument {
-	constructor(engine, t='saw', canvas){
+	constructor(engine, t='saw', canvas, line){
 		// Inherit from Instrument
-		super(engine, canvas);
+		super(engine, canvas, line);
 
 		this._wave = Util.toArray(t);
 		this._waveMap = {

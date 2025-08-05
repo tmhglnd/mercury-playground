@@ -1,13 +1,14 @@
 const Tone = require('tone');
 const Util = require('./Util.js');
+const Widget = require('./Widgets.js');
 const fxMap = require('./Effects.js');
 const Sequencer = require('./Sequencer.js');
 
 // Basic class for all instruments
 class Instrument extends Sequencer {
-	constructor(engine, canvas){
+	constructor(engine, canvas, line){
 		// Inherit from Sequencer
-		super(engine, canvas);
+		super(engine, canvas, line);
 
 		// Instrument specific parameters
 		this._gain = [-6, 0];		
@@ -24,6 +25,9 @@ class Instrument extends Sequencer {
 
 		// The source to be defined by inheriting class
 		this.source;
+
+		// A place to add widgets to
+		this._widgets = [];
 
 		console.log('=> class Instrument()');
 	}
@@ -140,7 +144,9 @@ class Instrument extends Sequencer {
 		// this.adsr.dispose();
 		// remove all fx
 		this._fx.map((f) => f.delete());
-		console.log('=> disposed Instrument() with FX:', this._fx);
+		this._widgets.map(w => w?.delete());
+
+		console.log('=> disposed Instrument() with FX:', this._fx, 'and widgets:', this._widgets);
 	}
 
 	amp(g, r){
@@ -218,6 +224,24 @@ class Instrument extends Sequencer {
 			// pfx.return.connect(Tone.Destination);
 			pfx.return.connect(this.gain);
 		}
+	}
+
+	scope(h=30){
+		let w = new Widget.Scope(this._line, h);
+		this._widgets.push(w);
+		this.gain.connect(w.input());
+	}
+
+	waveform(h=30){
+		let w = new Widget.WaveForm(this._line, h);
+		this._widgets.push(w);
+		this.gain.connect(w.input());
+	}
+
+	spectrum(h=30){
+		let w = new Widget.Spectrum(this._line, h);
+		this._widgets.push(w);
+		this.gain.connect(w.input());
 	}
 }
 module.exports = Instrument;
