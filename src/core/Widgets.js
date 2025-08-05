@@ -103,7 +103,7 @@ class Scope extends Widget {
 		let sum = 0, out = [];
 		for (let i = 0; i < arr.length; i++){
 			let amp = Math.abs(arr[i])
-			this.scopeScale = Math.max(this.scopeScale, amp > 0.01 ? amp : 0);
+			this.scopeScale = Math.max(this.scopeScale, amp > 0.001 ? amp : 0);
 			sum += arr[i];
 
 			if (i % down === down - 1){
