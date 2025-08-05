@@ -5,20 +5,19 @@ const Tone = require('tone');
 // a canvas that will be added as a line widget
 // a drawing loop, and some drawing functions like line
 class Widget {
-	constructor(line){
+	constructor(line, height=10){
 		// console.log('=> class Widget()', line);
 		// to connect the source to and make it to mono for analysis
 		this.mono = new Tone.Mono();
 		// the canvas to display the visual in, adjust width and height
 		this.cnv = document.createElement('canvas');
 		this.cnv.width = window.innerWidth * 0.9;
-		this.cnv.height = 30;
+		this.cnv.height = height;
 
 		// get the 2d context from canvas
 		this.ctx = this.cnv.getContext('2d');
 		// create a new widget between the editor lines
-		this.widget = window.cm.cm.addLineWidget(line-1, this.cnv);
-		// this.widget = window.cm.cm.addLineWidget(line, this.cnv);		
+		this.widget = window.cm.cm.addLineWidget(line - 1, this.cnv);		
 		// the auto scaling for the scope
 		this.scopeScale = -Infinity;
 	}
@@ -103,7 +102,8 @@ class Scope extends Widget {
 	downsample(arr, down=1){
 		let sum = 0, out = [];
 		for (let i = 0; i < arr.length; i++){
-			this.scopeScale = Math.max(this.scopeScale, Math.abs(arr[i]));
+			let amp = Math.abs(arr[i])
+			this.scopeScale = Math.max(this.scopeScale, amp > 0.01 ? amp : 0);
 			sum += arr[i];
 
 			if (i % down === down - 1){
@@ -116,7 +116,6 @@ class Scope extends Widget {
 
 	delete(){
 		super.delete();
-
 		this.waveform.disconnect();
 		this.waveform.dispose();
 	}
@@ -163,29 +162,34 @@ class WaveForm extends Widget {
 
 	delete(){
 		super.delete();
-
 		this.meter.disconnect();
 		this.meter.dispose();
 	}
 }
 
 class Spectrum extends Widget {
-	constructor(){
-		super();
+	constructor(...args){
+		super(...args);
 		this.fft = new Tone.FFT(1024);
-		this.fft.normalRange = true;
-		this.fft.smoothing = 0;
+		this.fft.smoothing = 0.7;
 
 		this.mono.connect(this.fft);
-		// this.scopeScale = ;
 		this.start();
 	}
 
 	draw(){
+		super.draw();
 		// get the waveform array and downsample
 		let spectrum = this.fft.getValue();
-		// console.log('spectrum', Math.max(...spectrum));
-		this.scopeScale = Math.max(this.scopeScale, Math.max(...spectrum));
+
+		// get the min and max values of the spectrum for scaling
+		const min = Math.min(0.0001, ...spectrum);
+		const max = Math.max(-0.0001, ...spectrum);
+		this.scopeScale = 1;
+		// scale the spectrum accordingly
+		spectrum = spectrum.map(x => {
+			return (((x - min) / (max - min)) ** 0.5) * -2 + 1;
+		});
 		// draw the line from downsamples values
 		this.line(spectrum);
 	}

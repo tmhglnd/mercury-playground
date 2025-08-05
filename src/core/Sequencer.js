@@ -6,7 +6,9 @@ class Sequencer {
 	constructor(engine, canvas, line){
 		// The Tone engine
 		this._engine = engine;
+		// The Hydra canvas
 		this._canvas = canvas;
+		// The line position in the editor of the instrument
 		this._line = line;
 		
 		// Sequencer specific parameters
@@ -29,7 +31,7 @@ class Sequencer {
 		this._once = false;
 		// this.makeLoop();
 
-		console.log('=> class Sequencer()', this._line);
+		console.log('=> class Sequencer()');
 	}
 
 	bpm(){

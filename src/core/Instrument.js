@@ -226,22 +226,22 @@ class Instrument extends Sequencer {
 		}
 	}
 
-	scope(){
-		let w = new Widget.Scope(this._line);
+	scope(h=30){
+		let w = new Widget.Scope(this._line, h);
 		this._widgets.push(w);
 		this.gain.connect(w.input());
 	}
 
-	waveform(){
-		let w = new Widget.WaveForm(this._line);
+	waveform(h=30){
+		let w = new Widget.WaveForm(this._line, h);
 		this._widgets.push(w);
 		this.gain.connect(w.input());
 	}
 
-	// spectrum(){
-	// 	let w = new Widget.Spectrum(this._line);
-	// 	this._widgets.push(w);
-	// 	this.gain.connect(w.input());
-	// }
+	spectrum(h=30){
+		let w = new Widget.Spectrum(this._line, h);
+		this._widgets.push(w);
+		this.gain.connect(w.input());
+	}
 }
 module.exports = Instrument;
