@@ -135,13 +135,21 @@ class Instrument extends Sequencer {
 	delete(){
 		// delete super class
 		super.delete();
-		// disconnect the sound dispose the player
+		// disconnect the gain, panner and adsr and dispose
 		this.gain.disconnect();
 		this.gain.dispose();
+
 		this.panner.disconnect();
 		this.panner.dispose();
+
 		this.adsr?.disconnect();
 		this.adsr?.dispose();
+
+		// dispose the sound source (depending on inheriting class)
+		this.source?.stop();
+		this.source?.disconnect();
+		this.source?.dispose();
+
 		// remove all fx
 		this._fx.map((f) => f.delete());
 		this._widgets.map(w => w?.delete());
