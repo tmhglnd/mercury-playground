@@ -11,7 +11,7 @@ class Instrument extends Sequencer {
 		super(engine, canvas, line);
 
 		// Instrument specific parameters
-		this._gain = [-6, 0];		
+		this._gain = [ 0.5, 0 ];		
 		this._pan = [ 0 ];
 		this._att = [ 0 ];
 		this._dec = [ 0 ];
@@ -44,19 +44,7 @@ class Instrument extends Sequencer {
 	}
 
 	envelope(d){
-		// return an Envelope and connect to next node
-		// return new Tone.AmplitudeEnvelope({
-		// 	attack: 0,
-		// 	attackCurve: "linear",
-		// 	decay: 0,
-		// 	decayCurve: "linear",
-		// 	sustain: 1,
-		// 	release: 0.001,
-		// 	releaseCurve: "linear"
-		// }).connect(d);
-
-		// the adsr is now a basic Gain node with rampTo functions 
-		// applied to it and a short retrigger if necessary
+		// the adsr is a basic Gain node with lin/exp rampTo functions 
 		return new Tone.Gain(0).connect(d);
 	}
 
@@ -65,33 +53,24 @@ class Instrument extends Sequencer {
 		// end position for playback
 		let e = this._time;
 
-		// fade-out running envelope over 2 ms
-		// use the retrigger time to schedule the event a bit later as well
-		let retrigger = 0;
-		if (this.adsr.gain.getValueAtTime(time) > 0){
-			this.adsr.gain.exponentialRampTo(0.0, 0.005, time);
-			retrigger = 0.005;
-		}
-
 		// set FX parameters
 		if (this._fx){
-			for (let f=0; f<this._fx.length; f++){
-				this._fx[f].set(c, time + retrigger, this.bpm());
+			for (let f = 0; f < this._fx.length; f++){
+				this._fx[f].set(c, time, this.bpm());
 			}
 		}
 		
 		// set panning
 		let p = getParam(this._pan, c);
 		p = isRandom(p, -1, 1);
-		this.panner.pan.setValueAtTime(p, time + retrigger);
+		this.panner.pan.setValueAtTime(p, time);
 
 		// ramp volume
 		let g = atodb(getParam(this._gain[0], c) * 0.707);
 		let r = msToS(Math.max(0, getParam(this._gain[1], c)));
-		this.source.volume.rampTo(g, r, time + retrigger);
-		// this.source.gain.rampTo(g, r, time);
+		this.source.volume.rampTo(g, r, time);
 
-		this.sourceEvent(c, e, time + retrigger);
+		this.sourceEvent(c, e, time);
 		// let play = this.sourceEvent(c, e, time);
 		// if (!play){ return; }
 
@@ -101,11 +80,18 @@ class Instrument extends Sequencer {
 			const dec = Math.max(divToS(getParam(this._dec, c), this.bpm()), 0);
 			const rel = Math.max(divToS(getParam(this._rel, c), this.bpm()), 0.001);
 
-			
-
+			// fade-out running envelope over 2 ms
+			// use the retrigger time to schedule the event a bit later as well
+			// let retrigger = 0;
+			// if (this.adsr.gain.getValueAtTime(time) > 0){
+			// 	this.adsr.gain.linearRampTo(0, 0.002, time);
+			// 	retrigger = 0.002;
+			// }
 			// trigger the envelope and release after specified time
-			this.adsr.gain.rampTo(1.0, att, time + retrigger);
-			this.adsr.gain.rampTo(0.0, rel, time + att + dec);
+			this.adsr.gain.linearRampTo(1.0, att, time);
+			// exponential rampto * 5 for a good sounding exponential ramp
+			this.adsr.gain.exponentialRampTo(0.0, rel * 5, time + att + dec);
+			// this.adsr.gain.linearRampTo(0.0, rel, time + att + dec);
 		} else {
 			// if shape is 'off' turn on the gain of the envelope
 			this.adsr.gain.setValueAtTime(1.0, time);
