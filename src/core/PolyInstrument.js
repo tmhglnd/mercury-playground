@@ -111,10 +111,19 @@ class PolyInstrument extends Instrument {
 					const att = Math.max(divToS(getParam(this._att, c), this.bpm()), 0.001);
 					const dec = Math.max(divToS(getParam(this._dec, c), this.bpm()), 0);
 					const rel = Math.max(divToS(getParam(this._rel, c), this.bpm()), 0.001);
-
+					
+					// short ramp for retrigger, fades out the envelope over 
+					// 2 ms. use the retrigger time to schedule the event
+					//  a bit later as well
+					let retrigger = 0;
+					if (this.adsrs[i].gain.getValueAtTime(time) > 0.01){
+						retrigger = 0.002;
+						// short ramp for retrigger, fades out the previous ramp
+						this.adsrs[i].gain.linearRampTo(0.0, retrigger, time);
+					}
 					// trigger the envelope and release after specified time
-					this.adsrs[i].gain.linearRampTo(1.0, att, time);
-					this.adsrs[i].gain.exponentialRampTo(0.0, rel * 5, time + att + dec);
+					this.adsrs[i].gain.linearRampTo(1.0, att, time + retrigger);
+					this.adsrs[i].gain.exponentialRampTo(0.0, rel * 5, time + att + dec + retrigger);
 				} else {
 					// if shape is off only trigger attack
 					// when voice stealing is 'off' this will lead to all 
