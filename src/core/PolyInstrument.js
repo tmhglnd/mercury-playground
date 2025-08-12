@@ -1,5 +1,5 @@
 const Tone = require('tone');
-const Util = require('./Util.js');
+const { toArray, getParam, isRandom, lookup, divToS } = require('./Util.js');
 const Instrument = require('./Instrument.js');
 // const fxMap = require('./Effects.js');
 // const TL = require('total-serialism').Translate;
@@ -56,8 +56,8 @@ class PolyInstrument extends Instrument {
 		}
 		
 		// set panning
-		let p = Util.getParam(this._pan, c);
-		p = Util.isRandom(p, -1, 1);
+		let p = getParam(this._pan, c);
+		p = isRandom(p, -1, 1);
 		this.panner.pan.setValueAtTime(p, time);
 
 		// use notes from array to trigger multiple voices
@@ -79,7 +79,9 @@ class PolyInstrument extends Instrument {
 		
 		// set all busymaps based on current amplitude value
 		for (let i=0; i<this.busymap.length; i++){
-			this.busymap[i] = this.adsrs[i].value > 0;
+			// consider the voice busy if amplitude is > -40dB
+			// because of exponential ramp otherwise voice stays busy too long
+			this.busymap[i] = this.adsrs[i].gain.getValueAtTime(time) > 0.01;
 			if (!this.busymap[i]){
 				free.push(i);
 			}
@@ -87,10 +89,9 @@ class PolyInstrument extends Instrument {
 
 		// get the notes from the note array to know how many voices
 		// need to be triggered at once
-		let notes = Util.toArray(Util.lookup(this._note[0], c));
-		// console.log('notes to trigger', notes);
+		let notes = toArray(lookup(this._note[0], c));
 
-		for (let n=0; n<notes.length; n++){
+		for (let n = 0; n < notes.length; n++){
 			// if any voices are free
 			if (free.length > 0 || this._steal){
 				let i;
@@ -107,26 +108,28 @@ class PolyInstrument extends Instrument {
 				
 				// set shape for playback (fade-in / out and length)
 				if (this._att){
-					let att = Util.divToS(Util.lookup(this._att, c), this.bpm());
-					let dec = Util.divToS(Util.lookup(this._dec, c), this.bpm());
-					let rel = Util.divToS(Util.lookup(this._rel, c), this.bpm());
-		
-					this.adsrs[i].attack = Math.max(0.001, att);
-					this.adsrs[i].decay = dec;
-					this.adsrs[i].release = Math.max(0.001, rel);
+					const att = Math.max(divToS(getParam(this._att, c), this.bpm()), 0.001);
+					const dec = Math.max(divToS(getParam(this._dec, c), this.bpm()), 0);
+					const rel = Math.max(divToS(getParam(this._rel, c), this.bpm()), 0.001);
 					
-					// e = Math.min(this._time, att + dec + rel);
-					// let rt = Math.max(0.001, e - this.adsrs[i].release);
-					// this.adsrs[i].triggerAttackRelease(rt, time);
-
-					// trigger the envelope
-					this.adsrs[i].triggerAttack(time);
-					this.adsrs[i].triggerRelease(time + att + dec);
+					// short ramp for retrigger, fades out the envelope over 
+					// 2 ms. use the retrigger time to schedule the event
+					//  a bit later as well
+					let retrigger = 0;
+					if (this.adsrs[i].gain.getValueAtTime(time) > 0.01){
+						retrigger = 0.002;
+						// short ramp for retrigger, fades out the previous ramp
+						this.adsrs[i].gain.linearRampTo(0.0, retrigger, time);
+					}
+					// trigger the envelope and release after specified time
+					this.adsrs[i].gain.linearRampTo(1.0, att, time + retrigger);
+					this.adsrs[i].gain.exponentialRampTo(0.0, rel * 5, time + att + dec + retrigger);
 				} else {
 					// if shape is off only trigger attack
 					// when voice stealing is 'off' this will lead to all 
 					// voices set to busy!
-					this.adsrs[i].triggerAttack(time);
+					// if shape is 'off' turn on the gain of the envelope
+					this.adsrs[i].gain.setValueAtTime(1.0, time);
 				}
 			}
 		}
