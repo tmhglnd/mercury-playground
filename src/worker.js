@@ -176,7 +176,7 @@ function code({ file, engine, canvas, p5canvas }){
 			// console.log('make sample', obj);
 			let type = obj.type;
 			let args = obj.functions;			
-			let inst = new MonoSample(engine, type, canvas);
+			let inst = new MonoSample(engine, type, canvas, obj.line);
 
 			objectMap.applyFunctions(args, inst, type);
 			return inst;
@@ -185,7 +185,7 @@ function code({ file, engine, canvas, p5canvas }){
 			// console.log('make sample', obj);
 			let type = obj.type;
 			let args = obj.functions;			
-			let inst = new MonoSample(engine, type, canvas);
+			let inst = new MonoSample(engine, type, canvas, obj.line);
 
 			objectMap.applyFunctions(args, inst, type);
 			return inst;
@@ -194,7 +194,7 @@ function code({ file, engine, canvas, p5canvas }){
 			// console.log('make synth', obj);
 			let type = obj.type;
 			let args = obj.functions;			
-			let inst = new MonoSynth(engine, type, canvas);
+			let inst = new MonoSynth(engine, type, canvas, obj.line);
 
 			objectMap.applyFunctions(args, inst, type);
 			return inst;
@@ -202,7 +202,7 @@ function code({ file, engine, canvas, p5canvas }){
 		'polySynth' : (obj) => {
 			let type = obj.type;
 			let args = obj.functions;
-			let inst = new PolySynth(engine, type, canvas);
+			let inst = new PolySynth(engine, type, canvas, obj.line);
 			// let inst = new PolySample(engine, type, canvas);
 
 			objectMap.applyFunctions(args, inst, type);
@@ -211,7 +211,7 @@ function code({ file, engine, canvas, p5canvas }){
 		'polySample' : (obj) => {
 			let type = obj.type;
 			let args = obj.functions;
-			let inst = new PolySample(engine, type, canvas);
+			let inst = new PolySample(engine, type, canvas, obj.line);
 			
 			objectMap.applyFunctions(args, inst, type);
 			return inst;
@@ -220,7 +220,7 @@ function code({ file, engine, canvas, p5canvas }){
 			// console.log('make midi', obj);
 			let device = obj.type;
 			let args = obj.functions;
-			let inst = new MonoMidi(engine, device, canvas);
+			let inst = new MonoMidi(engine, device, canvas, obj.line);
 
 			objectMap.applyFunctions(args, inst, device);
 			return inst;

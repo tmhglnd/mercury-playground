@@ -3,9 +3,9 @@ const Util = require('./Util.js');
 const Instrument = require('./Instrument.js');
 
 class MonoSample extends Instrument {
-	constructor(engine, s, canvas){
-		super(engine, canvas);
-
+	constructor(engine, s, canvas, line){
+		super(engine, canvas, line);
+		
 		this._bufs = this._engine.getBuffers();
 		this._sound;
 		this.sound(s);
@@ -152,14 +152,6 @@ class MonoSample extends Instrument {
 	delete(){
 		// delete super class
 		super.delete();
-		// disconnect the sound dispose the player
-		this.source.stop();
-		this.source.disconnect();
-		this.source.dispose();
-
-		this.sample.stop();
-		this.sample.disconnect();
-		this.sample.dispose();
 
 		console.log('=> disposed MonoSample()', this._sound);
 	}

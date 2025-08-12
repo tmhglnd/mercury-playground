@@ -1,6 +1,9 @@
 // The Mercury Playground main code loader
 // 
 
+// check if the browser is Safari
+window.isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
 // switch theme in css
 switchTheme = (t) => {
 	localStorage.setItem('theme', t);
@@ -182,7 +185,7 @@ window.onload = () => {
 	// the code Editor
 	// also loads the parser and the worker
 	// gets passed the Tone context and Engine
-	let cm = new Editor({ context: Tone, engine: Engine, canvas: Hydra, p5canvas: sketchP5 });
+	window.cm = new Editor({ context: Tone, engine: Engine, canvas: Hydra, p5canvas: sketchP5 });
 
 	// Load all the buttons/menus
 	cm.controls();

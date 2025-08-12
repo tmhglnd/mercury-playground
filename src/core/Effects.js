@@ -201,7 +201,7 @@ const FormantFilter = function(_params){
 	}
 
 	this.delete = function(){
-		const nodes = [ this._fx, this._mix, ...this._formants, this._lopass ];
+		const nodes = [ this._fx, this._mix, this._mixWet, this._mixDry, ...this._formants, this._lopass ];
 
 		nodes.forEach((n) => {
 			n.disconnect();
@@ -255,7 +255,7 @@ const DownSampler = function(_params){
 	}
 
 	this.delete = function(){
-		const nodes = [ this._fx, this._mix, this._mixDry ];
+		const nodes = [ this._fx, this._fx.input, this._fx.output, this._mix, this._mixDry ];
 
 		nodes.forEach((n) => {
 			n.disconnect();
@@ -318,7 +318,7 @@ const TanhDistortion = function(_params){
 	}
 
 	this.delete = function(){
-		let nodes = [ this._fx, this._mix, this._mixDry, this._mixWet ];
+		let nodes = [ this._fx, this._fx.input, this._fx.output, this._mix, this._mixDry, this._mixWet ];
 		
 		nodes.forEach((n) => {
 			n.disconnect();
@@ -449,7 +449,7 @@ const Squash = function(_params){
 	}
 
 	this.delete = function(){
-		let nodes = [ this._fx, this._mix, this._mixDry ];
+		let nodes = [ this._fx.input, this._fx.output, this._fx, this._mix, this._mixDry ];
 
 		nodes.forEach((n) => {
 			n.disconnect();
