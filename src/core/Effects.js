@@ -543,7 +543,7 @@ const DattorroReverb = function(_params){
 	}
 
 	this.delete = () => {
-		const nodes = [ this._fx, this._mix, this._mixDry ];
+		const nodes = [ this._fx, this._mix, this._mixDry, this._fx.input, this._fx.output ];
 		nodes.forEach(n => { n.disconnect(); n.dispose() });
 	}
 }

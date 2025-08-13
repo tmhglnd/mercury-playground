@@ -52,7 +52,7 @@ function code({ file, engine, canvas, p5canvas }){
 		// return if the code contains any syntax errors
 		log(`Could not run because of syntax error`);
 		log(`Please see Help for more information`);
-		return;
+		return false;
 	}
 
 	tree.print.forEach((p) => {
@@ -313,6 +313,8 @@ function code({ file, engine, canvas, p5canvas }){
 	removeSound(_sounds, crossFade);
 
 	console.log(`Made instruments in: ${(window.performance.now() - t).toFixed(1)}ms`);
+
+	return true;
 }
 	
 function getSound(){

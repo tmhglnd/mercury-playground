@@ -314,11 +314,12 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 	}
 
 	this.evaluate = function(){
-		this.flash(this.cm.firstLine(), this.cm.lastLine()+1);
-
-		code({ file: this.cm.getValue(), engine: engine, canvas: canvas, p5canvas: p5canvas });
+		let noError = code({ file: this.cm.getValue(), engine: engine, canvas: canvas, p5canvas: p5canvas });
 		engine.resume();
-		
+
+		// if an error occured, flash red!
+		this.flash(this.cm.firstLine(), this.cm.lastLine()+1, !noError);
+
 		// store code in localstorage upon evaluating
 		localStorage.setItem('code', this.cm.getValue());
 
@@ -330,10 +331,11 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 
 	this.evaluateBlock = function(){
 		let c = this.getCurrentBlock();
-		this.flash(c.start.line, c.end.line);
-
-		code({ file: c.text, engine: engine, canvas: canvas, p5canvas: p5canvas });
+		
+		let noError = code({ file: c.text, engine: engine, canvas: canvas, p5canvas: p5canvas });
 		engine.resume();
+
+		this.flash(c.start.line, c.end.line, !noError);
 	}
 
 	// thanks to graham wakefield + gibber
@@ -354,12 +356,12 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		return { start: p1, end: p2, text: block };
 	}
 
-	this.flash = function(from, to){
+	this.flash = function(from, to, error){
 		let start = { line: from, ch: 0 };
 		let end = { line: to, ch: 0 };
 		// console.log(start, end);
 
-		let marker = this.cm.markText(start, end, { className: 'editorFlash' });
+		let marker = this.cm.markText(start, end, { className: error ? 'errorFlash' : 'editorFlash'});
 
 		setTimeout(() => marker.clear(), 250);
 	}
