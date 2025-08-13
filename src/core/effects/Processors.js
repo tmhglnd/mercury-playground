@@ -184,7 +184,7 @@ class DattorroReverb extends AudioWorkletProcessor {
 			["excursionRate", 0.5, 0, 2, "k-rate"],
 			["excursionDepth", 0.7, 0, 2, "k-rate"],
 			["wet", 0.7, 0, 2, "k-rate"],
-			["dry", 0.7, 0, 2, "k-rate"]
+			// ["dry", 0.7, 0, 2, "k-rate"]
 		].map(x => new Object({
 			name: x[0],
 			defaultValue: x[1],
@@ -277,24 +277,25 @@ class DattorroReverb extends AudioWorkletProcessor {
 			dp = 1 - parameters.damping[0],
 			ex = parameters.excursionRate[0] / sampleRate,
 			ed = parameters.excursionDepth[0] * sampleRate / 1000,
-			we = parameters.wet[0], //* 0.6, // lo & ro both mult. by 0.6 anyways
-			dr = parameters.dry[0];
+			we = parameters.wet[0]; //* 0.6, // lo & ro both mult. by 0.6 anyways
+			// dr = parameters.dry[0];
 
 		// write to predelay and dry output
 		if (inputs[0].length == 2) {
 			for (let i = 127; i >= 0; i--) {
 				this._preDelay[this._pDWrite + i] = (inputs[0][0][i] + inputs[0][1][i]) * 0.5;
 
-				outputs[0][0][i] = inputs[0][0][i] * dr;
-				outputs[0][1][i] = inputs[0][1][i] * dr;
+				// removed the dry parameter, this is handled in the Tone Node
+				// outputs[0][0][i] = inputs[0][0][i] * dr;
+				// outputs[0][1][i] = inputs[0][1][i] * dr;
 			}
 		} else if (inputs[0].length > 0) {
 			this._preDelay.set(
 				inputs[0][0],
 				this._pDWrite
 			);
-			for (let i = 127; i >= 0; i--)
-				outputs[0][0][i] = outputs[0][1][i] = inputs[0][0][i] * dr;
+			// for (let i = 127; i >= 0; i--)
+			// 	outputs[0][0][i] = outputs[0][1][i] = inputs[0][0][i] * dr;
 		} else {
 			this._preDelay.set(
 				new Float32Array(128),

@@ -517,7 +517,7 @@ const DattorroReverb = function(_params){
 
 	this.set = (c, time) => {
 		const gn = Math.max(Util.getParam(this._gain, c), 0);
-		const meta = Util.clip(Util.getParam(this._size, c), 0, 30);
+		const meta = Util.clip(Util.getParam(this._size, c), 0, 20);
 		const wet = Util.clip(Util.getParam(this._wet, c));
 
 		const dc = Util.remap(meta, 0, 20, 0.01, 0.99, 0.8);
