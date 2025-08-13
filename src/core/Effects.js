@@ -530,7 +530,7 @@ const DattorroReverb = function(_params){
 		this._fx.workletNode.parameters.get('damping').setValueAtTime(dp, time);
 		this._fx.workletNode.parameters.get('preDelay').setValueAtTime(pd, time);
 
-		this._fx.workletNode.parameters.get('wet').setValueAtTime(gn, time);
+		this._fx.workletNode.parameters.get('wet').setValueAtTime(gn * 0.7, time);
 		// this._fx.workletNode.parameters.get('dry').setValueAtTime(0.7, time);
 
 		// apply wetdry mix
