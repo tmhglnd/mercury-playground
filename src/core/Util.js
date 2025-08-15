@@ -29,6 +29,12 @@ function clip(v, l=0, h=1){
 	return Math.max(l, Math.min(h, v));
 }
 
+// scale values between an input and output range with exponent
+function remap(val=0, inLo=0, inHi=1, outLo=0, outHi=1, exp=1){
+	let temp = ((val - inLo) / (inHi - inLo)) ** exp;
+	return temp * (outHi - outLo) + outLo;
+}
+
 // make sure the output is a number, else output a default value
 function assureNum(v, d=1){
 	return isNaN(v) ? d : v;
@@ -183,7 +189,7 @@ function noteToFreq(i, o){
 			log(`${i} is not a valid number or name`);
 			i = 0;
 		} else {
-			i = _i - 48;
+			i = _i - 36;
 		}
 	}
 	// reconstruct midi note value, (0, 0) = 36
@@ -233,4 +239,4 @@ function toMidi(n=0, o=0){
 	return toScale(n + o * 12 + 36);
 }
 
-module.exports = { mapDefaults, atTime, atodb, clip, assureNum, lookup, randLookup, isRandom, getParam, toArray, msToS, formatRatio, divToS, divToF, toMidi, mtof, noteToMidi, noteToFreq, assureWave }
+module.exports = { mapDefaults, atTime, atodb, clip, assureNum, lookup, randLookup, isRandom, getParam, toArray, msToS, formatRatio, divToS, divToF, toMidi, mtof, noteToMidi, noteToFreq, assureWave, remap }

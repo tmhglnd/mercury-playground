@@ -20,6 +20,7 @@
 
 	--cm-line: rgb(0, 0, 0, 1);
 	--cm-flash: rgb(255, 255, 255, 0.3);
+	--cm-error-flash: rgb(255, 0, 0, 0.3);
 	--cm-gutter: var(--transparant);
 	--cm-select: rgb(255, 255, 255, 0.2);
 
@@ -40,6 +41,7 @@
 
 	--cm-line: var(--bg);
 	--cm-flash: rgb(255, 255, 255, 0.5);
+	--cm-error-flash: rgb(255, 0, 0, 0.3);
 	--cm-gutter: var(--transparant);
 	--cm-select: rgba(0, 0, 0, 0.3);
 
@@ -350,9 +352,20 @@ textarea:hover {
 	/* cursor: pointer; */
 }
 
+.CodeMirror-matchingbracket { 
+	color: var(--secundary) !important;
+	text-decoration: none !important;
+	background: none !important;
+	outline: 1px solid var(--accent) !important;
+}
+
 .editorFlash {
 	background: var(--cm-flash) !important;
 	/* mix-blend-mode: difference; */
+}
+
+.errorFlash {
+	background: var(--cm-error-flash) !important;
 }
 
 .canvas {

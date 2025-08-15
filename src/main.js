@@ -1,13 +1,22 @@
 // The Mercury Playground main code loader
 // 
 
+// check if the browser is Safari
+window.isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
 // switch theme in css
 switchTheme = (t) => {
 	localStorage.setItem('theme', t);
 	document.documentElement.className = t;
 }
-// initial dark mode theme on startup
-switchTheme('darkmode');
+
+// load the theme from localstorage
+if (localStorage.getItem('theme')){
+	switchTheme(localStorage.getItem('theme'))
+} else {
+	// initial dark mode theme on startup
+	switchTheme('darkmode');
+}
 
 // global variable for device storage and recall of microphone inputs
 window.devices;
@@ -178,13 +187,13 @@ window.onload = () => {
 	// the code Editor
 	// also loads the parser and the worker
 	// gets passed the Tone context and Engine
-	let cm = new Editor({ context: Tone, engine: Engine, canvas: Hydra, p5canvas: sketchP5 });
+	window.cm = new Editor({ context: Tone, engine: Engine, canvas: Hydra, p5canvas: sketchP5 });
 
 	// Load all the buttons/menus
 	cm.controls();
-	// cm.themeMenu();
-	cm.links();
+	cm.menuBottom();
 	cm.hide();
+	cm.themeMenu();
 	cm.tutorialMenu();
 	cm.soundsMenu();
 	cm.modeSwitch();
@@ -197,6 +206,8 @@ window.onload = () => {
 	} else {
 		cm.clear();
 	}
+
+	cm.setMode(localStorage.getItem('theme'));
 
 	// or load the hash if this is provided in the url
 	let url = new URL(window.location);
