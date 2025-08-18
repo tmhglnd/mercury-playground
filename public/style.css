@@ -10,10 +10,10 @@
 .darkmode {
 	--bg: black;
 	--accent: white;
-	--primary: rgb(180, 180, 180);
-	--secundary: rgb(255, 255, 255, 0.6);
+	--primary: rgb(200, 200, 200);
+	--secundary: rgb(180, 180, 180);
 
-	--button-bg: rgb(255, 255, 255, 0.15);
+	--button-bg: rgb(255, 255, 255, 0.2);
 
 	--textarea: rgb(0, 0, 0, 0.4);
 	--transparant: rgb(0, 0, 0, 0);
@@ -32,7 +32,7 @@
 	--bg: rgb(230, 230, 230);
 	--accent: black;
 	--primary: rgb(75, 75, 75);
-	--secundary: rgb(0, 0, 0, 0.6);
+	--secundary: rgb(55, 55, 55);
 
 	--button-bg: rgb(0, 0, 0, 0.2);
 
@@ -40,7 +40,8 @@
 	--transparant: rgb(0, 0, 0, 0);
 
 	--cm-line: var(--bg);
-	--cm-flash: rgb(255, 255, 255, 0.5);
+	/* --cm-flash: rgb(255, 255, 255, 0.5); */
+	--cm-flash: rgb(0, 0, 0, 0.5);
 	--cm-error-flash: rgb(255, 0, 0, 0.3);
 	--cm-gutter: var(--transparant);
 	--cm-select: rgba(0, 0, 0, 0.3);
@@ -172,7 +173,9 @@ button {
 button:hover {
 	/* background: black; */
 	color: var(--accent);
+	font-weight: bolder;
 	background: var(--transparant);
+	cursor: pointer;
 	/* background: rgb(255, 255, 255, 0.15); */
 }
 
@@ -218,6 +221,8 @@ select:hover, select:focus {
 	/* background: rgb(50, 50, 50); */
 	color: var(--accent);
 	background: var(--bg);
+	font-weight: bolder;
+	cursor: pointer;
 	/* background: rgb(255, 255, 255, 0.15); */
 }
 
@@ -226,7 +231,7 @@ textarea {
 	/* border-color: darkgrey; */
 	border-width: 0px;
 	border-radius: 2px;
-	color: var(--button-bg);
+	color: var(--cm-flash);
 	background: none;
 	width: 100%;
 	margin: 2px;

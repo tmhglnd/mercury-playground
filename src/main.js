@@ -113,7 +113,7 @@ window.onload = () => {
 	window.midiLog = false;
 	window.midiEnable = true;
 
-	WebMidi.enable()
+	WebMidi.enable({ sysex: true })
 	.then(() => {
 		console.log("=> WebMIDI enabled!");
 		
