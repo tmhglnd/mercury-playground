@@ -113,52 +113,55 @@ window.onload = () => {
 	window.midiLog = false;
 	window.midiEnable = true;
 
-	WebMidi.enable({ sysex: true })
-	.then(() => {
-		console.log("=> WebMIDI enabled!");
-		
-		printMidiDevices();
-
-		WebMidi.inputs.forEach((i) => {			
-			// add a listener for all incoming midi messages on all devices
-			i.addListener('midimessage', (midi) => {
-				if (!window.midiEnable) return;
-
-				let type = midi.message.type;
-				let data = midi.message.dataBytes;
-
-				if (window.midiLog) log(`midi in: ${type} ${data}`);
-				
-				if (type === 'controlchange'){
-					// normalize midi values to 0-1 range
-					forwardOSC([ `/cc/${data[0]}`, data[1] / 127 ]);
-				}
-				else if (type === 'noteon'){
-					let pitch = data[0];
-					let velocity = data[1];
-
-					if (velocity > 0){
-						// console.log('noteon', note);
-
-						forwardOSC([ `/pitch`, pitch ]);
-						forwardOSC([ `/note`, pitch-36 ]);
-						forwardOSC([ `/velocity`, velocity / 127 ]);
-						// forwardOSC([ `/note/trigger`, 1 ]);
-					}
-				}
-			});
-		});
-	})
-	.catch((err) => {
-		console.log("!!! Error enabling WebMIDI !!!", err);
-	});
-
 	window.printMidiDevices = function(){
 		WebMidi.inputs.forEach((i) => {
 			log(`- midi input: ${i.name}`);
 		});
 		WebMidi.outputs.forEach((i) => {
 			log(`- midi output: ${i.name}`);
+		});
+	}
+
+	// If Web MIDI API is available to us
+	if ("requestMIDIAccess" in navigator) {
+		WebMidi.enable({ sysex: true })
+		.then(() => {
+			console.log("=> WebMIDI enabled!");
+			
+			printMidiDevices();
+	
+			WebMidi.inputs.forEach((i) => {			
+				// add a listener for all incoming midi messages on all devices
+				i.addListener('midimessage', (midi) => {
+					if (!window.midiEnable) return;
+	
+					let type = midi.message.type;
+					let data = midi.message.dataBytes;
+	
+					if (window.midiLog) log(`midi in: ${type} ${data}`);
+					
+					if (type === 'controlchange'){
+						// normalize midi values to 0-1 range
+						forwardOSC([ `/cc/${data[0]}`, data[1] / 127 ]);
+					}
+					else if (type === 'noteon'){
+						let pitch = data[0];
+						let velocity = data[1];
+	
+						if (velocity > 0){
+							// console.log('noteon', note);
+	
+							forwardOSC([ `/pitch`, pitch ]);
+							forwardOSC([ `/note`, pitch-36 ]);
+							forwardOSC([ `/velocity`, velocity / 127 ]);
+							// forwardOSC([ `/note/trigger`, 1 ]);
+						}
+					}
+				});
+			});
+		})
+		.catch((err) => {
+			console.log("Error enabling WebMIDI", err);
 		});
 	}
 
@@ -173,9 +176,6 @@ window.onload = () => {
 		let event = new CustomEvent(address, { detail: { value: details, time: Tone.immediate() + 0.001 }});
 		window.dispatchEvent(event);
 	}
-
-	// Initialize random BPM
-	Engine.randomBPM();
 
 	// Hydra sketch background loader
 	const Hydra = new Canvas.hydraCanvas('hydra-canvas');
@@ -204,14 +204,17 @@ window.onload = () => {
 	} else {
 		cm.clear();
 	}
-
-	cm.setMode(localStorage.getItem('theme'));
-
 	// or load the hash if this is provided in the url
 	let url = new URL(window.location);
 	if (url.hash !== ''){
 		cm.setHash(url.hash);
 	}
-	
+
+	// Set the theme if in local storage
+	cm.setMode(localStorage.getItem('theme'));
+
 	Hydra.link('hydra-ui');
+
+	// Initialize with random BPM
+	Engine.randomBPM();
 }
