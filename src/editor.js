@@ -368,7 +368,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 
 	this.silence = function(){
 		// console.log('silence code');
-		// fade out and remove code after 0.1
+		// fade out immediately and remove code after 0.1s
 		removeSound(getSound(), 0.1, true);
 		engine.silence();
 		canvas.clear();
