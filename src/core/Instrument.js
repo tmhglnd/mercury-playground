@@ -111,10 +111,12 @@ class Instrument extends Sequencer {
 		this.gain.gain.rampTo(1, 0.005, Tone.now());
 	}
 
-	fadeOut(t){
+	fadeOut(t, immediately=false){
 		// get the remaining time till the next trigger in the loop
 		// cancel the loop before that trigger happens and fade-out
 		let restTime = (1 - this._loop.progress) * this._loop.interval;
+		// if immediately is true, fade-out immediately instead of waiting
+		restTime = immediately ? 0 : restTime;
 		// console.log('rest', restTime);
 
 		setTimeout(() => {

@@ -334,10 +334,11 @@ function startSound(s, f=0){
 	});
 }
 
-function removeSound(s, f=0) {
+function removeSound(s, f=0, im=false) {
 	s.map((_s) => {
 		// fade out and delete after fade
-		_s.fadeOut(f);
+		// second parameter sets immediate fade-out, otherwise wait till trigger
+		_s.fadeOut(f, im);
 	});
 	// empty array to trigger garbage collection
 	s.length = 0;
