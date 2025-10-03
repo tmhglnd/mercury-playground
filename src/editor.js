@@ -569,7 +569,11 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 
 	this.soundsMenu = function(){
 		let menu = document.getElementById('sounds');
-		menu.onchange = () => this.insertSound();
+		menu.onchange = () => {
+			let s = document.getElementById('sounds').value;
+			document.getElementById('sounds').value = 'sounds';
+			this.insertSound(s);
+		}
 
 		let values = ['sounds'].concat(Object.keys(samples));
 		values.forEach((t) => {
@@ -581,10 +585,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		});
 	}
 
-	this.insertSound = function(){
-		let s = document.getElementById('sounds').value;
-		document.getElementById('sounds').value = 'sounds';
-		// console.log(this.cm.getSelection());
+	this.insertSound = function(s){
 		if (this.cm.getSelection() !== ''){
 			this.cm.replaceSelection(s);
 		} else {
@@ -665,15 +666,17 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 
 		let m = document.getElementsByClassName('sounds-prelisten')[0];
 		m.innerHTML = `
+		<span><button id="add-prelisten" style="width:auto">Add to code:</button></span>
 		<span class="close">&times;</span>
 		<p>
-			Click to listen the soundfile. Click again to stop playback.
+			Click to listen the soundfile. Click again to stop playback. Click "add" to add the last played sound to your code.
 		</p>
 		<p id="sound-prelisten-items"></p>
 		`
 		
 		let p = document.getElementById('sound-prelisten-items');
 		let sounds = ['sounds'].concat(Object.keys(samples));
+		let last = '';
 		for (let i=0; i<sounds.length; i++){
 			// skip the keyword sounds that is used for the dropdown menu
 			if (sounds[i] === 'sounds') continue;
@@ -681,6 +684,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 			let aud = document.createElement('audio');
 			aud.volume = 0.5;
 			aud.src = samples[sounds[i]];
+			aud.name = sounds[i];
 			aud.preload = 'auto';
 			// create a button element
 			let btn = document.createElement('button');
@@ -688,15 +692,25 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 			btn.style.width = 'auto';
 			btn.onclick = () => {
 				if (!aud.paused) { aud.pause(); aud.currentTime = 0; }
-				else { aud.play(); }
+				else { 
+					aud.play();
+					let b = document.getElementById('add-prelisten');
+					b.innerHTML = `Add to code: ${last = aud.name}`
+				}
 			}
 			btn.appendChild(aud);
 			p.appendChild(btn);
 		}
-
+		// add the text to the code when clicking add, also close window
+		let b = document.getElementById('add-prelisten');
+		b.onclick = () => { 
+			this.showListenMenu(false);
+			this.insertSound(last);
+		}
+		// close the window when clicking X
 		let span = document.getElementsByClassName('close')[0];
 		span.onclick = () => this.showListenMenu(false);
-
+		// close the window also when clicking outside the box
 		window.onclick = (event) => {
 			if (event.target === modal) this.showListenMenu(false);
 		}
