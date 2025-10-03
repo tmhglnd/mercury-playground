@@ -368,8 +368,8 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 
 	this.silence = function(){
 		// console.log('silence code');
-		// fade out and remove code after 0.1
-		removeSound(getSound(), 0.1);
+		// fade out immediately and remove code after 0.1s
+		removeSound(getSound(), 0.1, true);
 		engine.silence();
 		canvas.clear();
 	}
@@ -397,6 +397,8 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 	}
 
 	this.example = function(){
+		this.silence();
+
 		// initialize editor with some code
 		let names = Object.keys(examples);
 		let amount = names.length;
@@ -406,7 +408,6 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		this.set(examples[names[rand]]);
 		_rand = rand;
 
-		this.silence();
 		this.evaluate();
 	}
 

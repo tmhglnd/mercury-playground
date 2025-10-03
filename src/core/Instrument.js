@@ -34,7 +34,7 @@ class Instrument extends Sequencer {
 
 	channelStrip(){
 		// gain => output
-		this.gain = new Tone.Gain(0).toDestination();
+		this.gain = new Tone.Gain(0, "normalRange").toDestination();
 		// panning => gain
 		this.panner = new Tone.Panner(0).connect(this.gain);
 		// adsr => panning
@@ -104,18 +104,39 @@ class Instrument extends Sequencer {
 		console.log('Instrument()', this._name, c);
 	}
 
-	fadeIn(t){
+	fadeIn(t=0){
 		// fade in the sound upon evaluation of code
-		this.gain.gain.rampTo(1, t, Tone.now());
+		// this.gain.gain.rampTo(1, t, Tone.now());
+		// fade in the sound directly in 5 ms
+		this.gain.gain.rampTo(1, 0.005, Tone.now());
 	}
 
-	fadeOut(t){
-		// fade out the sound upon evaluation of new code
-		this.gain.gain.rampTo(0, t, Tone.now());
+	fadeOut(t, immediately=false){
+		// get the remaining time till the next trigger in the loop
+		// cancel the loop before that trigger happens and fade-out
+		let restTime = (1 - this._loop.progress) * this._loop.interval;
+		// if immediately is true, fade-out immediately instead of waiting
+		restTime = immediately ? 0 : restTime;
+		// console.log('rest', restTime);
+
 		setTimeout(() => {
-			this.delete();
-			// wait a little bit extra before deleting to avoid clicks
-		}, t * 1000 + 100);
+			// stop the loop
+			this._loop.mute = 1;
+			// fade out the sound upon evaluation of new code
+			this.gain.gain.rampTo(0, t, Tone.now());
+
+			setTimeout(() => {
+				this.delete();
+				// wait a little bit extra before deleting to avoid clicks
+			}, t * 1000 + 100);
+		}, restTime * 1000 - 25);
+
+		// // fade out the sound upon evaluation of new code
+		// this.gain.gain.rampTo(0, t, Tone.now());
+		// setTimeout(() => {
+		// 	this.delete();
+		// 	// wait a little bit extra before deleting to avoid clicks
+		// }, t * 1000 + 100);
 	}
 
 	delete(){
