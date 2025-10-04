@@ -21,7 +21,7 @@ Mercury currently has 2 versions:
 
 [**💬 Join the Mercury Community on Discord**](https://discord.gg/vt59NYU)
 
-![The Mercury playground in the browser](media/screenshot4.png)
+![The Mercury playground in the browser](media/mercury-windows.png)
 
 ## 📋 Table of Contents
 
@@ -301,7 +301,7 @@ Most of the sounds in Mercury are from [freesound.org](http://www.freesound.org)
 
 You can load Hydra visuals by pasting the code in the textarea below the Editor. Removing the code will disable the visual rendering. [Hydra](https://hydra.ojack.xyz/) is a Live coding visual synthesizer developed Olivia Jack.
 
-![The Mercury playground in the browser](media/screenshot5.png)
+![The Mercury playground in the browser](media/hydra-visuals.png)
 
 [*Visual by Olivia Jack*](https://hydra.ojack.xyz/?code=JTJGJTJGJTIwbGljZW5zZWQlMjB3aXRoJTIwQ0MlMjBCWS1OQy1TQSUyMDQuMCUyMGh0dHBzJTNBJTJGJTJGY3JlYXRpdmVjb21tb25zLm9yZyUyRmxpY2Vuc2VzJTJGYnktbmMtc2ElMkY0LjAlMkYlMEElMkYlMkYlMjBieSUyME9saXZpYSUyMEphY2slMEElMkYlMkYlMjBodHRwcyUzQSUyRiUyRm9qYWNrLmdpdGh1Yi5pbyUwQSUwQW9zYyg0JTJDJTIwMC4xJTJDJTIwMC44KS5jb2xvcigxLjA0JTJDMCUyQyUyMC0xLjEpLnJvdGF0ZSgwLjMwJTJDJTIwMC4xKS5waXhlbGF0ZSgyJTJDJTIwMjApLm1vZHVsYXRlKG5vaXNlKDIuNSklMkMlMjAoKSUyMCUzRCUzRSUyMDEuNSUyMColMjBNYXRoLnNpbigwLjA4JTIwKiUyMHRpbWUpKS5vdXQobzApJTIwJTBB)
 
