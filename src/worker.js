@@ -77,7 +77,7 @@ function code({ file, engine, canvas, p5canvas }){
 			log(`crossFade is deprecated, setting fadeOut time to ${crossFade}ms`);
 		},
 		'fadeOut' : (args) => {
-			fadeOut = divToS(args[0], engine.getBPM());
+			crossFade = divToS(args[0], engine.getBPM());
 			log(`setting fadeOut time to ${crossFade}`);
 		},
 		'tempo' : (args) => {
