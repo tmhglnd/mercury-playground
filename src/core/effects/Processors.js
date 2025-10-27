@@ -95,7 +95,7 @@ class TanhDistortionProcessor extends AudioWorkletProcessor {
 		const output = outputs[0];
 
 		if (input.length > 0){
-			for (let channel=0; channel<input.length; ++channel){
+			for (let channel=0; channel<input.length; channel++){
 				for (let i=0; i<input[channel].length; i++){
 					const a = (parameters.amount.length > 1)? parameters.amount[i] : parameters.amount[0];
 					const m = (parameters.makeup.length > 1)? parameters.makeup[i] : parameters.makeup[0];
@@ -108,6 +108,41 @@ class TanhDistortionProcessor extends AudioWorkletProcessor {
 	}
 }
 registerProcessor('tanh-distortion-processor', TanhDistortionProcessor);
+
+
+class ArctanDistortionProcessor extends AudioWorkletProcessor {
+	static get parameterDescriptors(){
+		return [{
+			name: 'amount',
+			defaultValue: 5,
+			minValue: 1
+		}]
+	}
+
+	constructor(){
+		super();
+	}
+
+	process(inputs, outputs, parameters){
+		const input = inputs[0];
+		const output = outputs[0];
+
+		const QUARTER_PI = 0.25 * Math.PI;
+
+		const gain = parameters.amount[0];
+		const makeup = Math.min(1, Math.max(0, 1 - ((Math.atan(gain) - QUARTER_PI) / QUARTER_PI * 0.82)));
+
+		if (input.length > 0){
+			for (let channel=0; channel<input.length; channel++){
+				for (let i=0; i<input[channel].length; i++){
+					output[channel][i] = Math.atan(input[channel][i] * gain) * makeup;
+				}
+			}
+		}
+		return true;
+	}
+}
+registerProcessor('arctan-distortion-processor', ArctanDistortionProcessor);
 
 // A distortion/compression effect of an incoming signal
 // Based on an algorithm by Peter McCulloch

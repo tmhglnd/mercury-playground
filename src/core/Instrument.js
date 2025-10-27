@@ -35,8 +35,11 @@ class Instrument extends Sequencer {
 	channelStrip(){
 		// gain => output
 		this.gain = new Tone.Gain(0, "normalRange").toDestination();
+		// postfx-gain => gain
+		// this.postAmp = new Tone.Gain(0).connect(this.gain);
 		// panning => gain
 		this.panner = new Tone.Panner(0).connect(this.gain);
+		// this.panner = new Tone.Panner(0).connect(this.postAmp);
 		// adsr => panning
 		this.adsr = this.envelope(this.panner);
 		// return Node to connect source => adsr
@@ -67,8 +70,11 @@ class Instrument extends Sequencer {
 
 		// ramp volume
 		let g = atodb(getParam(this._gain[0], c) * 0.707);
+		// let g = getParam(this._gain[0], c) * 0.707;
 		let r = msToS(Math.max(0, getParam(this._gain[1], c)));
 		this.source.volume.rampTo(g, r, time);
+		// this.source.volume.setValueAtTime(1, time);
+		// this.postAmp.gain.rampTo(g, r, time);
 
 		this.sourceEvent(c, e, time);
 		// let play = this.sourceEvent(c, e, time);
