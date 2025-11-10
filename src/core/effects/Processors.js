@@ -1,5 +1,6 @@
 
-// A white noise generator at -6dBFS to test AudioWorkletProcessor
+// Various noise type processors for the MonoNoise source
+// Type 2 is Pink noise, used from Tone.Noise('pink') instead of calc
 //
 class NoiseProcessor extends AudioWorkletProcessor {
 	static get parameterDescriptors(){
@@ -20,8 +21,11 @@ class NoiseProcessor extends AudioWorkletProcessor {
 		super();
 		// sample previous value
 		this.prev = 0;
-		// delta sample
+		// latch to a sample 
 		this.latch = 0;
+		// phasor ramp
+		this.phasor = 0;
+		this.delta = 0;
 	}
 
 	process(inputs, outputs, parameters){
@@ -58,10 +62,23 @@ class NoiseProcessor extends AudioWorkletProcessor {
 					this.prev = Math.asin(Math.sin(this.prev * HALF_PI)) / HALF_PI;
 					out = this.prev * 0.707;
 				}
-				// Lofi noise
-				// ToDo
+				// Lo-Fi (sampled) noise
+				// creates random values at a specified frequency and slowly 
+				// ramps to that new value
 				else if (t < 4){
-					out = 0;
+					// create a ramp from 0-1 at specific frequency/density
+					this.phasor = (this.phasor + d * d * 0.5) % 1;
+					// calculate the delta
+					let dlt = this.phasor - this.delta;
+					this.delta = this.phasor;
+					// when ramp resets, latch a new noise value
+					if (dlt < 0){
+						this.prev = this.latch;
+						this.latch = biNoise;
+					}
+					// linear interpolation from previous to next point
+					out = this.prev + this.phasor * (this.latch - this.prev);
+					out *= 0.707;
 				}
 				// Dust noise
 				// randomly generate an impulse/click of value 1 depending 

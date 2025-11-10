@@ -12,13 +12,14 @@ class MonoNoise extends Instrument {
 		// synth specific variables;
 		this._type = toArray(t);
 		this._typeMap = {
-			white : 'white',
-			pink : 'pink',
-			lofi : 'white'
+			'white' : 0,
+			'pink' : 1,
+			'brownian' : 2,
+			'lofi' : 3,
+			'dust' : 4,
+			'crackle' : 5
 		}
 		this._density = [ 0.125 ];
-
-		// this.synth;
 		this.started = false;
 		this.createSource();
 
@@ -43,46 +44,31 @@ class MonoNoise extends Instrument {
 		// a pink noise source based on a buffer noise 
 		// to reduce complex calculation
 		this.pink = new Tone.Noise('pink').connect(this.source);
-		this.pink.start();
 	}
 
 	sourceEvent(c, e, time){
-		if (!this.started){
-			// this.source.start();
-			this.started = true;
-		}
-
-		let d = clip(getParam(this._density, c), 0, 1);
-
-		let density = this.source.workletNode.parameters.get('density');
-		density.setValueAtTime(d, time);
-
-		return; 
 		// set noise type for the generator
-
 		let t = getParam(this._type, c);
-
-		d = 1;
-		if (t !== 'white' && t !== 'pink'){
-			d = clip(getParam(this._density, c), 0, 1);
-		}
-
-		if (this._typeMap[t]){
+		if (Object.hasOwn(this._typeMap, t)){
 			t = this._typeMap[t];
 		} else {
 			log(`${t} is not a valid noise type`);
 			// default wave if wave does not exist
-			t = 'white';
+			t = 0;
 		}
+		let type = this.source.workletNode.parameters.get('type');
+		type.setValueAtTime(t, time);
 
-		setTimeout(() => {
-			if (!this.started){
-				this.source.start(Tone.now());
-				this.started = true;
-			}
-			this.source.type = t;
-			this.source.playbackRate = d * d;
-		}, (time - Tone.context.currentTime) * 1000);
+		// set the density amount (only valid for brownian, lofi, dust, crackle)
+		let d = clip(getParam(this._density, c), 0, 1);
+		let density = this.source.workletNode.parameters.get('density');
+		density.setValueAtTime(d, time);
+
+		// start the pink noise source also
+		if (!this.started){
+			this.pink.start(time);
+			this.started = true;
+		}
 	}
 
 	density(d){
@@ -97,11 +83,10 @@ class MonoNoise extends Instrument {
 		this.source.input.dispose();
 		this.source.output.disconnect();
 		this.source.output.dispose();
-
 		this.pink.disconnect();
 		this.pink.dispose();
 		
-		console.log('disposed MonoNoise()', this._wave);
+		console.log('disposed MonoNoise()');
 	}
 }
 module.exports = MonoNoise;
