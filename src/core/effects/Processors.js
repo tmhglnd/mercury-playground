@@ -1,18 +1,92 @@
 
 // A white noise generator at -6dBFS to test AudioWorkletProcessor
 //
-// class NoiseProcessor extends AudioWorkletProcessor {
-// 	process(inputs, outputs, parameters){
-// 		const output = outputs[0];
-// 		output.forEach((channel) => {
-// 			for (let i=0; i<channel.length; i++) {
-// 				channel[i] = Math.random() - 0.5;
-// 			}
-// 		});
-// 		return true;
-// 	}
-// }
-// registerProcessor('noise-processor', NoiseProcessor);
+class NoiseProcessor extends AudioWorkletProcessor {
+	static get parameterDescriptors(){
+		return [{
+			name: 'type',
+			defaultValue: 5,
+			minValue: 0,
+			maxValue: 5
+		},{
+			name: 'density',
+			defaultValue: 0.125,
+			minValue: 0,
+			maxValue: 1
+		}];
+	}
+	
+	constructor(){
+		super();
+		// sample previous value
+		this.prev = 0;
+		// delta sample
+		this.latch = 0;
+	}
+
+	process(inputs, outputs, parameters){
+		// input is not used because this is a source
+		const input = inputs[0];
+		const output = outputs[0];
+		const HALF_PI = Math.PI/2;
+
+		// for one output channel generate some noise	
+		if (input.length > 0){
+			for (let i = 0; i < input[0].length; i++){
+				const t = (parameters.type.length > 1) ? parameters.type[i] : parameters.type[0];
+				const d = (parameters.density.length > 1) ? parameters.density[i] : parameters.density[0];
+			
+				// some bipolar white noise -1 to 1
+				const biNoise = Math.random() * 2 - 1;
+				// empty output
+				let out = 0;
+
+				// White noise, Use for every other choice
+				if (t < 1){
+					out = biNoise * 0.707;
+				}
+				// Pink noise,  use Tone.Noise('pink') object for simplicity
+				else if (t < 2){
+					out = input[0][i] * 1.413;
+				}
+				// Brownian noise
+				// calculate a random next value in "step size" and add to 
+				// the previous noise signal value creating a "drunk walk" 
+				// or brownian motion
+				else if (t < 3){		
+					this.prev += biNoise * d*d;
+					this.prev = Math.asin(Math.sin(this.prev * HALF_PI)) / HALF_PI;
+					out = this.prev * 0.707;
+				}
+				// Lofi noise
+				// ToDo
+				else if (t < 4){
+					out = 0;
+				}
+				// Dust noise
+				// randomly generate an impulse/click of value 1 depending 
+				// on the density, average amount of impulses per second
+				else if (t < 5){
+					out = Math.random() > (1 - d*d*d * 0.5);
+				}
+				// Crackle noise
+				// Pink generator with "wave-loss" leaving gaps
+				else {
+					let delta = input[0][i] - this.prev;
+					this.prev = input[0][i];
+					if (delta > 0){
+						this.latch = Math.random();
+					}
+					out = (this.latch < (1 - d*d*d)) ? 0 : input[0][i] * 1.413;
+				}
+				// send to output whichever noise type was chosen
+				output[0][i] = out;
+			}
+		}		
+		return true;
+	}
+}
+registerProcessor('noise-processor', NoiseProcessor);
 
 // A Downsampling Chiptune effect. Downsamples the signal by a specified amount
 // Resulting in a lower samplerate, making it sound more like 8bit/chiptune
