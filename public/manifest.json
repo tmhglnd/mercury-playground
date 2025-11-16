@@ -1,0 +1,21 @@
+{
+	"name" : "Mercury Playground",
+	"short_name" : "Mercury Playground",
+	"icons" : [
+		{
+			"src" : "assets/icon/mercury-logo-512px.png",
+			"type" : "image/png",
+			"sizes" : "512x512"
+		},
+		{
+			"src" : "assets/icon/mercury-logo-192px.png",
+			"type" : "image/png",
+			"sizes" : "192x192"
+		}
+	],
+	"display" : "standalone",
+	"start_url" : "./",
+	"prefer_related_applications" : false,
+	"theme_color" : "rgb(0 0 0)",
+	"background_color" : "rgb(0 0 0)"
+}

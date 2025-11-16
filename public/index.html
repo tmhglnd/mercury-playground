@@ -7,6 +7,7 @@
 
 	<link rel="icon" type="image/x-icon" href="./assets/icon/favicon.ico">
 
+	<link rel="manifest" href="manifest.json">
 	<!-- <script src="https://cdn.jsdelivr.net/npm/p5@1.4.2/lib/p5.min.js"></script> -->
 
 	<link rel="preconnect" href="https://fonts.gstatic.com">
@@ -73,6 +74,12 @@
 
 
 <body>
+	<script>
+		if ('serviceworker' in navigator){
+			navigator.serviceWorker.register('/service-worker.js');
+		}
+	</script>
+
 	<script type="text/javascript" src="./bundle.js"></script>
 	<!-- <script type="text/javascript" src="./bundle.min.js"></script> -->
 
