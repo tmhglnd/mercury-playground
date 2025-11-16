@@ -75,9 +75,8 @@
 
 <body>
 	<script>
-		if ('serviceworker' in navigator){
-			navigator.serviceWorker.register('/service-worker.js');
-		}
+		navigator.serviceWorker.register('/service-worker.js');
+		console.log('service-worker loaded');
 	</script>
 
 	<script type="text/javascript" src="./bundle.js"></script>
