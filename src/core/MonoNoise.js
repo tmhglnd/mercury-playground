@@ -60,7 +60,7 @@ class MonoNoise extends Instrument {
 		type.setValueAtTime(t, time);
 
 		// set the density amount (only valid for brownian, lofi, dust, crackle)
-		let d = clip(getParam(this._density, c), 0, 1);
+		let d = clip(getParam(this._density, c), 0.01, 1);
 		let density = this.source.workletNode.parameters.get('density');
 		density.setValueAtTime(d, time);
 
