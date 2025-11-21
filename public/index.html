@@ -75,8 +75,10 @@
 
 <body>
 	<script>
-		navigator.serviceWorker.register('/service-worker.js');
-		console.log('service-worker loaded');
+		if (typeof navigator.serviceWorker !== 'undefined'){
+			navigator.serviceWorker.register('service-worker.js');
+			// console.log('[serviceworker] registered');
+		}
 	</script>
 
 	<script type="text/javascript" src="./bundle.js"></script>
