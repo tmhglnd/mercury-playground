@@ -19,7 +19,7 @@ class MonoNoise extends Instrument {
 			'dust' : 4,
 			'crackle' : 5
 		}
-		this._density = [ 0.125 ];
+		this._density = [ 0.25 ];
 		this.started = false;
 		this.createSource();
 

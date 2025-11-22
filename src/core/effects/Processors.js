@@ -240,6 +240,54 @@ class ArctanDistortionProcessor extends AudioWorkletProcessor {
 }
 registerProcessor('arctan-distortion-processor', ArctanDistortionProcessor);
 
+// A fuzz distortion effect in modelled after the Big Muff Pi pedal 
+// by Electro Harmonics. Using three stages of distortion: 
+// 1 soft-clipping stage, 2 half-wave rectifier, 3 hard-clipping stage
+// 
+class FuzzProcessor extends AudioWorkletProcessor {
+	static get parameterDescriptors() {
+		return [{
+			name: 'amount',
+			defaultValue: 15,
+			minValue: 1
+		}]
+	}
+
+	constructor(){ 
+		super(); 
+
+		this.history = [0, 0];
+	}
+
+	process(inputs, outputs, parameters){
+		const input = inputs[0];
+		const output = outputs[0];
+
+		const gain = parameters.amount[0];
+		const makeup = Math.max((1-Math.pow((gain-1)/63, 0.13)) * 0.395 + 0.605, 0.605);
+
+		if (input.length > 0){
+			for (let channel = 0; channel < input.length; channel++){
+				for (let i = 0; i < input[channel].length; i++){
+					// soft-clipping
+					const sc = Math.atan(input[channel][i]*gain*2) * 0.6;
+					// half-wave rectification and add for 
+					// asymmetric distortion
+					const hw = ((sc > 0) ? sc : 0) + input[channel][i];
+					// hard-clipping
+					const hc = Math.max(-0.707, Math.min(0.707, hw));
+					// onepole lowpass filter for dc-block
+					this.history[channel] = (hc - this.history[channel]) * 0.0015 + this.history[channel];
+					// dc-block and gain compensation and output
+					output[channel][i] = (hc - this.history[channel]) * makeup;
+				}
+			}
+		}
+		return true;
+	}
+}
+registerProcessor('fuzz-processor', FuzzProcessor);
+
 // A distortion/compression effect of an incoming signal
 // Based on an algorithm by Peter McCulloch
 // 
@@ -285,7 +333,6 @@ class SquashProcessor extends AudioWorkletProcessor {
 	}
 }
 registerProcessor('squash-processor', SquashProcessor);
-
 
 // Dattorro Reverberator
 // Thanks to port by khoin, taken from:
