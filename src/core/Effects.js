@@ -5,13 +5,13 @@ const TL = require('total-serialism').Translate;
 // all the available effects
 const fxMap = {
 	'drive' : (params) => {
-		return new TanhDistortion(params);
+		return new Overdrive(params);
 	},
 	'distort' : (params) => {
-		return new TanhDistortion(params);
+		return new Overdrive(params);
 	},
 	'overdrive' : (params) => {
-		return new TanhDistortion(params);
+		return new Overdrive(params);
 	},
 	'squash' : (params) => {
 		return new Squash(params);
@@ -264,11 +264,11 @@ const DownSampler = function(_params){
 	}
 }
 
-// A distortion algorithm using the tanh (hyperbolic-tangent) as a 
+// An overdrive/saturation algorithm using the arctan function as a 
 // waveshaping technique. Some mapping to apply a more equal loudness 
-// distortion is applied on the overdrive parameter
+// on the overdrive parameter when increasing the amount
 //
-const TanhDistortion = function(_params){
+const Overdrive = function(_params){
 	_params = Util.mapDefaults(_params, [ 2, 1 ]);
 	// apply the default values and convert to arrays where necessary
 	this._drive = Util.toArray(_params[0]);
@@ -287,8 +287,8 @@ const TanhDistortion = function(_params){
 	this._fx.output = new Tone.Gain(1).connect(this._mixWet);
 
 	// the fx processor
-	this._fx.workletNode = Tone.getContext().createAudioWorkletNode('tanh-distortion-processor');
-	// this._fx.workletNode = Tone.getContext().createAudioWorkletNode('arctan-distortion-processor');
+	// this._fx.workletNode = Tone.getContext().createAudioWorkletNode('tanh-distortion-processor');
+	this._fx.workletNode = Tone.getContext().createAudioWorkletNode('arctan-distortion-processor');
 
 	// connect input, fx, output to wetdry
 	this._fx.input.chain(this._fx.workletNode, this._fx.output);
@@ -296,22 +296,10 @@ const TanhDistortion = function(_params){
 	this.set = function(c, time, bpm){
 		// drive amount, minimum drive of 1
 		const d = Util.assureNum(Math.max(0, Util.getParam(this._drive, c)) + 1);
-		console.log('drive', d);
-
-		console.log('makeup', 1 - (Math.atan(d) - 0.25 * Math.PI) / (0.25 * Math.PI) * 0.82 );
-
-		// preamp gain reduction for linear at drive = 1
-		const p = 0.8;
-		// makeup gain
-		const m = 1.0 / (p * (d ** 1.1));
 
 		// set the parameters in the workletNode
 		const amount = this._fx.workletNode.parameters.get('amount');
-		amount.setValueAtTime(p * d * d, time);
-		// amount.setValueAtTime(d, time);
-
-		const makeup = this._fx.workletNode.parameters.get('makeup');
-		makeup.setValueAtTime(m, time);
+		amount.setValueAtTime(d, time);
 
 		const wet = Util.clip(Util.getParam(this._wet, c), 0, 1);
 		this._mixWet.gain.setValueAtTime(wet);

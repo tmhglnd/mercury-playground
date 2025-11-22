@@ -200,7 +200,10 @@ class TanhDistortionProcessor extends AudioWorkletProcessor {
 }
 registerProcessor('tanh-distortion-processor', TanhDistortionProcessor);
 
-
+// A distortion algorithm using the arctan function as a 
+// waveshaping technique. Some mapping to apply a more equal loudness 
+// distortion is applied on the overdrive parameter
+//
 class ArctanDistortionProcessor extends AudioWorkletProcessor {
 	static get parameterDescriptors(){
 		return [{
@@ -212,16 +215,18 @@ class ArctanDistortionProcessor extends AudioWorkletProcessor {
 
 	constructor(){
 		super();
+
+		// quarter pi constant and inverse
+		this.Q_PI = 0.7853981633974483; // 0.25 * Math.PI;
+		this.INVQ_PI = 1.2732395447351628; //1.0 / this.Q_PI;
 	}
 
 	process(inputs, outputs, parameters){
 		const input = inputs[0];
 		const output = outputs[0];
 
-		const QUARTER_PI = 0.25 * Math.PI;
-
 		const gain = parameters.amount[0];
-		const makeup = Math.min(1, Math.max(0, 1 - ((Math.atan(gain) - QUARTER_PI) / QUARTER_PI * 0.82)));
+		const makeup = Math.min(1, Math.max(0, 1 - ((Math.atan(gain) - this.Q_PI) * this.INVQ_PI * 0.823)));
 
 		if (input.length > 0){
 			for (let channel=0; channel<input.length; channel++){
