@@ -16,6 +16,7 @@ class MonoNoise extends Instrument {
 			'pink' : 1,
 			'brownian' : 2,
 			'brown' : 2,
+			'browny' : 2,
 			'red' : 2,
 			'lofi' : 3,
 			'dust' : 4,

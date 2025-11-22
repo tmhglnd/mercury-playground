@@ -337,7 +337,7 @@ const Overdrive = function(_params){
 // 1 soft-clipping stage, 2 half-wave rectifier, 3 hard-clipping stage
 // 
 const Fuzz = function(_params){
-	_params = Util.mapDefaults(_params, [ 5, 1 ]);
+	_params = Util.mapDefaults(_params, [ 10, 1 ]);
 	// apply the default values and convert to arrays where necessary
 	this._drive = Util.toArray(_params[0]);
 	this._wet = Util.toArray(_params[1]);
