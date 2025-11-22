@@ -15,7 +15,15 @@
     "browserify": "browserify -t brfs src/main.js -o public/bundle.js",
     "uglify": "terser public/bundle.js -o public/bundle.min.js -c -m --comments 'false'"
   },
-  "keywords": [ "live coding", "algorithmic", "composition", "electronic music", "algorave", "experimental", "web audio" ],
+  "keywords": [
+    "live coding",
+    "algorithmic",
+    "composition",
+    "electronic music",
+    "algorave",
+    "experimental",
+    "web audio"
+  ],
   "author": "Timo Hoogland",
   "license": "ISC",
   "dependencies": {
@@ -25,7 +33,7 @@
     "file-saver": "^2.0.5",
     "fs-extra": "^9.1.0",
     "hydra-synth": "1.3.17",
-    "mercury-examples": "^1.0.9",
+    "mercury-examples": "^1.0.10",
     "mercury-lang": "^1.11.0",
     "node-osc": "^8.0.6",
     "p5": "^1.4.2",
