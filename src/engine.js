@@ -231,6 +231,13 @@ function setVolume(g, t=0){
 	}
 }
 
+// a meter to see the volume of the sound
+const MTR = new Tone.Meter(0.7);
+MTR.normalRange = true;
+GN.connect(MTR);
+
+setInterval(() => { console.log(`volume: ${Math.round(MTR.getValue(), 0.01)}`) }, 25);
+
 // create a Tone Recording and connect to the final output Node
 // console.log('creating recording', window.isSafari);
 const Recorder = window.isSafari ? null : new Tone.Recorder({ mimeType: 'audio/webm' });
