@@ -5,6 +5,7 @@ const Mercury = require('mercury-lang');
 const MonoSample = require('./core/MonoSample.js');
 const MonoMidi = require('./core/MonoMidi.js');
 const MonoSynth = require('./core/MonoSynth.js');
+const MonoNoise = require('./core/MonoNoise.js');
 const MonoInput = require('./core/MonoInput.js');
 const PolySynth = require('./core/PolySynth.js');
 const PolySample = require('./core/PolySample.js');
@@ -77,7 +78,7 @@ function code({ file, engine, canvas, p5canvas }){
 			log(`crossFade is deprecated, setting fadeOut time to ${crossFade}ms`);
 		},
 		'fadeOut' : (args) => {
-			fadeOut = divToS(args[0], engine.getBPM());
+			crossFade = divToS(args[0], engine.getBPM());
 			log(`setting fadeOut time to ${crossFade}`);
 		},
 		'tempo' : (args) => {
@@ -195,6 +196,13 @@ function code({ file, engine, canvas, p5canvas }){
 			let inst = new MonoSynth(engine, type, canvas, obj.line);
 
 			objectMap.applyFunctions(args, inst, type);
+			return inst;
+		},
+		'noise' : (obj) => {
+			let { type, functions, line } = obj;
+			let inst = new MonoNoise(engine, type, canvas, line);
+			
+			objectMap.applyFunctions(functions, inst, type);
 			return inst;
 		},
 		'polySynth' : (obj) => {

@@ -1,18 +1,109 @@
 
-// A white noise generator at -6dBFS to test AudioWorkletProcessor
+// Various noise type processors for the MonoNoise source
+// Type 2 is Pink noise, used from Tone.Noise('pink') instead of calc
 //
-// class NoiseProcessor extends AudioWorkletProcessor {
-// 	process(inputs, outputs, parameters){
-// 		const output = outputs[0];
-// 		output.forEach((channel) => {
-// 			for (let i=0; i<channel.length; i++) {
-// 				channel[i] = Math.random() - 0.5;
-// 			}
-// 		});
-// 		return true;
-// 	}
-// }
-// registerProcessor('noise-processor', NoiseProcessor);
+class NoiseProcessor extends AudioWorkletProcessor {
+	static get parameterDescriptors(){
+		return [{
+			name: 'type',
+			defaultValue: 5,
+			minValue: 0,
+			maxValue: 5
+		},{
+			name: 'density',
+			defaultValue: 0.125,
+			minValue: 0,
+			maxValue: 1
+		}];
+	}
+	
+	constructor(){
+		super();
+		// sample previous value
+		this.prev = 0;
+		// latch to a sample 
+		this.latch = 0;
+		// phasor ramp
+		this.phasor = 0;
+		this.delta = 0;
+	}
+
+	process(inputs, outputs, parameters){
+		// input is not used because this is a source
+		const input = inputs[0];
+		const output = outputs[0];
+		const HALF_PI = Math.PI/2;
+
+		// for one output channel generate some noise	
+		if (input.length > 0){
+			for (let i = 0; i < input[0].length; i++){
+				const t = (parameters.type.length > 1) ? parameters.type[i] : parameters.type[0];
+				const d = (parameters.density.length > 1) ? parameters.density[i] : parameters.density[0];
+			
+				// some bipolar white noise -1 to 1
+				const biNoise = Math.random() * 2 - 1;
+				// empty output
+				let out = 0;
+
+				// White noise, Use for every other choice
+				if (t < 1){
+					out = biNoise * 0.707;
+				}
+				// Pink noise,  use Tone.Noise('pink') object for simplicity
+				else if (t < 2){
+					out = input[0][i] * 1.413;
+				}
+				// Brownian noise
+				// calculate a random next value in "step size" and add to 
+				// the previous noise signal value creating a "drunk walk" 
+				// or brownian motion
+				else if (t < 3){		
+					this.prev += biNoise * d*d;
+					this.prev = Math.asin(Math.sin(this.prev * HALF_PI)) / HALF_PI;
+					out = this.prev * 0.707;
+				}
+				// Lo-Fi (sampled) noise
+				// creates random values at a specified frequency and slowly 
+				// ramps to that new value
+				else if (t < 4){
+					// create a ramp from 0-1 at specific frequency/density
+					this.phasor = (this.phasor + d * d * 0.5) % 1;
+					// calculate the delta
+					let dlt = this.phasor - this.delta;
+					this.delta = this.phasor;
+					// when ramp resets, latch a new noise value
+					if (dlt < 0){
+						this.prev = this.latch;
+						this.latch = biNoise;
+					}
+					// linear interpolation from previous to next point
+					out = this.prev + this.phasor * (this.latch - this.prev);
+					out *= 0.707;
+				}
+				// Dust noise
+				// randomly generate an impulse/click of value 1 depending 
+				// on the density, average amount of impulses per second
+				else if (t < 5){
+					out = Math.random() > (1 - d*d*d * 0.5);
+				}
+				// Crackle noise
+				// Pink generator with "wave-loss" leaving gaps
+				else {
+					let delta = input[0][i] - this.prev;
+					this.prev = input[0][i];
+					if (delta > 0){
+						this.latch = Math.random();
+					}
+					out = (this.latch < (1 - d*d*d)) ? 0 : input[0][i] * 1.413;
+				}
+				// send to output whichever noise type was chosen
+				output[0][i] = out;
+			}
+		}		
+		return true;
+	}
+}
+registerProcessor('noise-processor', NoiseProcessor);
 
 // A Downsampling Chiptune effect. Downsamples the signal by a specified amount
 // Resulting in a lower samplerate, making it sound more like 8bit/chiptune
@@ -95,7 +186,7 @@ class TanhDistortionProcessor extends AudioWorkletProcessor {
 		const output = outputs[0];
 
 		if (input.length > 0){
-			for (let channel=0; channel<input.length; ++channel){
+			for (let channel=0; channel<input.length; channel++){
 				for (let i=0; i<input[channel].length; i++){
 					const a = (parameters.amount.length > 1)? parameters.amount[i] : parameters.amount[0];
 					const m = (parameters.makeup.length > 1)? parameters.makeup[i] : parameters.makeup[0];
@@ -108,6 +199,95 @@ class TanhDistortionProcessor extends AudioWorkletProcessor {
 	}
 }
 registerProcessor('tanh-distortion-processor', TanhDistortionProcessor);
+
+// A distortion algorithm using the arctan function as a 
+// waveshaping technique. Some mapping to apply a more equal loudness 
+// distortion is applied on the overdrive parameter
+//
+class ArctanDistortionProcessor extends AudioWorkletProcessor {
+	static get parameterDescriptors(){
+		return [{
+			name: 'amount',
+			defaultValue: 5,
+			minValue: 1
+		}]
+	}
+
+	constructor(){
+		super();
+
+		// quarter pi constant and inverse
+		this.Q_PI = 0.7853981633974483; // 0.25 * Math.PI;
+		this.INVQ_PI = 1.2732395447351628; //1.0 / this.Q_PI;
+	}
+
+	process(inputs, outputs, parameters){
+		const input = inputs[0];
+		const output = outputs[0];
+
+		const gain = parameters.amount[0];
+		const makeup = Math.min(1, Math.max(0, 1 - ((Math.atan(gain) - this.Q_PI) * this.INVQ_PI * 0.823)));
+
+		if (input.length > 0){
+			for (let channel=0; channel<input.length; channel++){
+				for (let i=0; i<input[channel].length; i++){
+					output[channel][i] = Math.atan(input[channel][i] * gain) * makeup;
+				}
+			}
+		}
+		return true;
+	}
+}
+registerProcessor('arctan-distortion-processor', ArctanDistortionProcessor);
+
+// A fuzz distortion effect in modelled after the Big Muff Pi pedal 
+// by Electro Harmonics. Using three stages of distortion: 
+// 1 soft-clipping stage, 2 half-wave rectifier, 3 hard-clipping stage
+// Based on: https://github.com/hazza-music/EHX-Big-Muff-Pi-Emulation/blob/main/Technical%20Essay.pdf
+// 
+class FuzzProcessor extends AudioWorkletProcessor {
+	static get parameterDescriptors() {
+		return [{
+			name: 'amount',
+			defaultValue: 5,
+			minValue: 1
+		}]
+	}
+
+	constructor(){ 
+		super(); 
+		// history for onepole filter for dcblocking
+		this.history = [0, 0];
+	}
+
+	process(inputs, outputs, parameters){
+		const input = inputs[0];
+		const output = outputs[0];
+
+		const gain = parameters.amount[0];
+		const makeup = Math.max((1 - Math.pow((gain-1) / 63, 0.13)) * 0.395 + 0.605, 0.605);
+
+		if (input.length > 0){
+			for (let channel = 0; channel < input.length; channel++){
+				for (let i = 0; i < input[channel].length; i++){
+					// soft-clipping
+					const sc = Math.atan(input[channel][i] * gain * 2) * 0.6;
+					// half-wave rectification and add for 
+					// asymmetric distortion
+					const hw = ((sc > 0) ? sc : 0) + input[channel][i];
+					// hard-clipping
+					const hc = Math.max(-0.707, Math.min(0.707, hw));
+					// onepole lowpass filter for dc-block
+					this.history[channel] = (hc - this.history[channel]) * 0.0015 + this.history[channel];
+					// dc-block and gain compensation and output
+					output[channel][i] = (hc - this.history[channel]) * makeup;
+				}
+			}
+		}
+		return true;
+	}
+}
+registerProcessor('fuzz-processor', FuzzProcessor);
 
 // A distortion/compression effect of an incoming signal
 // Based on an algorithm by Peter McCulloch
@@ -154,7 +334,6 @@ class SquashProcessor extends AudioWorkletProcessor {
 	}
 }
 registerProcessor('squash-processor', SquashProcessor);
-
 
 // Dattorro Reverberator
 // Thanks to port by khoin, taken from:

@@ -189,12 +189,12 @@ class Sequencer {
 
 	start(){
 		// restart at offset
-		this._loop.start(this._offset);
+		this._loop?.start(this._offset);
 	}
 
 	stop(){
 		// stop sequencer
-		this._loop.stop();
+		this._loop?.stop();
 	}
 
 	time(t, o=0, s=[1]){

@@ -21,6 +21,7 @@ class Instrument extends Sequencer {
 		this.adsr;
 		this.panner;
 		this.gain;
+		this.post;
 		this._fx;
 
 		// The source to be defined by inheriting class
@@ -33,11 +34,14 @@ class Instrument extends Sequencer {
 	}
 
 	channelStrip(){
-		// gain => output
+		// gain => output (for fade-in/out from evaluation)
 		this.gain = new Tone.Gain(0, "normalRange").toDestination();
+		// postfx-gain => gain (for gain() function in instrument)
+		this.post = new Tone.Gain(1, "gain").connect(this.gain);
 		// panning => gain
-		this.panner = new Tone.Panner(0).connect(this.gain);
-		// adsr => panning
+		// this.panner = new Tone.Panner(0).connect(this.gain);
+		this.panner = new Tone.Panner(0).connect(this.post);
+		// adsr => panning (for shape() function)
 		this.adsr = this.envelope(this.panner);
 		// return Node to connect source => adsr
 		return this.adsr;
@@ -66,9 +70,10 @@ class Instrument extends Sequencer {
 		this.panner.pan.setValueAtTime(p, time);
 
 		// ramp volume
-		let g = atodb(getParam(this._gain[0], c) * 0.707);
+		let g = getParam(this._gain[0], c) * 0.707;
 		let r = msToS(Math.max(0, getParam(this._gain[1], c)));
-		this.source.volume.rampTo(g, r, time);
+		this.source.volume.setValueAtTime(1, time);
+		this.post.gain.rampTo(g, r, time);
 
 		this.sourceEvent(c, e, time);
 		// let play = this.sourceEvent(c, e, time);
@@ -112,16 +117,18 @@ class Instrument extends Sequencer {
 	}
 
 	fadeOut(t, immediately=false){
-		// get the remaining time till the next trigger in the loop
-		// cancel the loop before that trigger happens and fade-out
-		let restTime = (1 - this._loop.progress) * this._loop.interval;
 		// if immediately is true, fade-out immediately instead of waiting
-		restTime = immediately ? 0 : restTime;
-		// console.log('rest', restTime);
+		let restTime = 0;
+
+		if (this._loop && !immediately){
+			// get the remaining time till the next trigger in the loop
+			// cancel the loop before that trigger happens and fade-out
+			restTime = (1 - this._loop.progress) * this._loop.interval;
+		}
 
 		setTimeout(() => {
 			// stop the loop
-			this._loop.mute = 1;
+			if (this._loop) this._loop.mute = 1;
 			// fade out the sound upon evaluation of new code
 			this.gain.gain.rampTo(0, t, Tone.now());
 
@@ -145,6 +152,9 @@ class Instrument extends Sequencer {
 		// disconnect the gain, panner and adsr and dispose
 		this.gain.disconnect();
 		this.gain.dispose();
+
+		this.post.disconnect();
+		this.post.dispose();
 
 		this.panner.disconnect();
 		this.panner.dispose();
@@ -237,7 +247,8 @@ class Instrument extends Sequencer {
 				pfx = this._ch[f];
 			}
 			// pfx.return.connect(Tone.Destination);
-			pfx.return.connect(this.gain);
+			// pfx.return.connect(this.gain);
+			pfx.return.connect(this.post);
 		}
 	}
 
