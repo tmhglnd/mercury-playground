@@ -70,9 +70,9 @@ class Instrument extends Sequencer {
 		this.panner.pan.setValueAtTime(p, time);
 
 		// ramp volume
-		let g = getParam(this._gain[0], c) * 0.707;
+		let g = getParam(this._gain[0], c) * 0.7079;
 		let r = msToS(Math.max(0, getParam(this._gain[1], c)));
-		this.source.volume.setValueAtTime(1, time);
+		// this.source.volume.setValueAtTime(1, time);
 		this.post.gain.rampTo(g, r, time);
 
 		this.sourceEvent(c, e, time);
@@ -260,6 +260,12 @@ class Instrument extends Sequencer {
 
 	waveform(h=30){
 		let w = new Widget.WaveForm(this._line, h);
+		this._widgets.push(w);
+		this.gain.connect(w.input());
+	}
+
+	meter(h=20){
+		let w = new Widget.Meter(this._line, h);
 		this._widgets.push(w);
 		this.gain.connect(w.input());
 	}

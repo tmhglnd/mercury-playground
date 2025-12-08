@@ -195,7 +195,7 @@ async function addBufferFromJson(url){
 // master effects chain for Tone
 const GN = new Tone.Gain(1);
 const LP = new Tone.Filter(18000, 'lowpass');
-const HP = new Tone.Filter(5, 'highpass');
+const HP = new Tone.Filter(15, 'highpass');
 Tone.Destination.chain(LP, HP, GN);
 
 // set the lowpass frequency cutoff and ramptime

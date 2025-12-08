@@ -47,7 +47,7 @@ class NoiseProcessor extends AudioWorkletProcessor {
 
 				// White noise, Use for every other choice
 				if (t < 1){
-					out = biNoise * 0.707;
+					out = biNoise * 0.7079;
 				}
 				// Pink noise,  use Tone.Noise('pink') object for simplicity
 				else if (t < 2){
@@ -60,7 +60,7 @@ class NoiseProcessor extends AudioWorkletProcessor {
 				else if (t < 3){		
 					this.prev += biNoise * d*d;
 					this.prev = Math.asin(Math.sin(this.prev * HALF_PI)) / HALF_PI;
-					out = this.prev * 0.707;
+					out = this.prev * 0.7079;
 				}
 				// Lo-Fi (sampled) noise
 				// creates random values at a specified frequency and slowly 
@@ -78,7 +78,7 @@ class NoiseProcessor extends AudioWorkletProcessor {
 					}
 					// linear interpolation from previous to next point
 					out = this.prev + this.phasor * (this.latch - this.prev);
-					out *= 0.707;
+					out *= 0.7079;
 				}
 				// Dust noise
 				// randomly generate an impulse/click of value 1 depending 

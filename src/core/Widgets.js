@@ -1,4 +1,5 @@
 const Tone = require('tone');
+const { atodb } = require('./Util.js');
 
 // The main widget class has some starting points,
 // like a mono input connection for sound analysis later
@@ -167,6 +168,99 @@ class WaveForm extends Widget {
 	}
 }
 
+class Meter extends Widget {
+	constructor(...args){
+		super(...args);
+
+		// create a RAW meter and use 0-1 range for values instead of dB
+		this.meter = new Tone.Analyser("waveform", 256);
+		this.meter.normalRange = true;
+		this.meter.smoothing = 0;
+		// sum stereo channels to mono and connect to meter
+		this.mono.connect(this.meter);
+
+		this.cnv.style['image-rendering'] = 'pixelated';
+		// this.cnv.style['image-rendering'] = 'high-quality';
+		// this.cnv.style['image-rendering'] = 'crisp-edges';
+
+		// the peak value measured for history/smoothing
+		this.fast = 0;
+		this.slow = 0;
+		this.fastSmooth = 0.95;
+		this.slowSmooth = 0.999;
+
+		// dB scale parameters
+		this.dbs = [-48, -24, -12, -6, 0];
+		this.scaling = 5;
+
+		// start the animation
+		this.start();
+	}
+
+	draw(){
+		// super.draw();
+		// erase the previous drawn things
+		this.ctx.clearRect(0, 0, this.cnv.width, this.cnv.height);
+		// get the waveform amplitude value from meter
+		// get the raw amplitude value
+		let raw = Math.max(...this.meter.getValue().map(x => Math.abs(x)));
+
+		this.fast = raw > this.fast ? raw : this.fast;
+		this.slow = raw > this.slow ? raw : this.slow;
+
+		let mtr = atodb(this.fast);
+		let hold = atodb(this.slow);
+
+		this.fast *= this.fastSmooth;
+		this.slow *= this.slowSmooth;
+				
+		
+		// this.ctx.lineCap = "round";
+		this.ctx.font = `8px Verdana`;
+		this.ctx.textBaseline = 'top';
+		this.ctx.lineWidth = 1;
+		this.ctx.strokeStyle = this.ctx.fillStyle = window.getComputedStyle(document.documentElement).getPropertyValue('--secundary');
+
+		this.ctx.beginPath();
+		for (let i = 0; i < this.dbs.length; i++){
+			let x = (Math.abs(this.dbs[0]) + this.dbs[i]) * this.scaling;
+			this.ctx.moveTo(x, 0);
+			this.ctx.lineTo(x, this.cnv.height);
+			this.ctx.stroke();
+			this.ctx.fillText(`${this.dbs[i]}`, x + 2, 0);
+		}
+
+		// create a gradient for the level meters
+		const grad = this.ctx.createLinearGradient(0, 0, Math.abs(this.dbs[0]) * this.scaling, 0);
+		grad.addColorStop(0.00, 'rgb(9, 248, 100)');
+		grad.addColorStop(0.58, 'rgb(195, 249, 100)');
+		grad.addColorStop(0.83, 'rgb(255, 193, 9)');
+		grad.addColorStop(1.00, 'rgb(255, 8, 11)');
+		this.ctx.fillStyle = grad;
+
+		// this.ctx.fillStyle = 'white';
+		let dBwidth = (Math.abs(this.dbs[0]) + mtr) * this.scaling; 
+		this.ctx.fillRect(0, 9, dBwidth, this.cnv.height);
+
+		let dBhold = (Math.abs(this.dbs[0]) + hold) * this.scaling;
+		this.ctx.lineWidth = 3;
+		this.ctx.beginPath();
+		this.ctx.moveTo(dBhold, 9)
+		this.ctx.lineTo(dBhold, this.cnv.height);
+		this.ctx.strokeStyle = window.getComputedStyle(document.documentElement).getPropertyValue('--accent');
+		this.ctx.stroke();
+
+		// this.ctx.font = `${Math.min(12, this.cnv.height)}px Verdana`;
+		// this.ctx.textBaseline = "top";
+		// this.ctx.fillStyle = window.getComputedStyle(document.documentElement).getPropertyValue('--accent');
+		// this.ctx.fillText(`${(Math.round(mtr * 100) / 100).toFixed(2)}dB`, 70 * this.scaling + 10, 0);
+	}
+
+	delete(){
+		super.delete();
+	}
+}
+
 class Spectrum extends Widget {
 	constructor(...args){
 		super(...args);
@@ -201,4 +295,4 @@ class Spectrum extends Widget {
 	}
 }
 
-module.exports = { Scope, WaveForm, Spectrum };
+module.exports = { Scope, WaveForm, Spectrum, Meter };
