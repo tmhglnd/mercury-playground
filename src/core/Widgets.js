@@ -14,7 +14,8 @@ class Widget {
 		this.cnv = document.createElement('canvas');
 		this.cnv.width = window.innerWidth * 0.9;
 		this.cnv.height = height;
-
+		// the color for the widget, or undefined
+		this.color = color;
 		// get the 2d context from canvas
 		this.ctx = this.cnv.getContext('2d');
 		// create a new widget between the editor lines
@@ -45,7 +46,7 @@ class Widget {
 
 		this.ctx.lineCap = "round";
 		this.ctx.lineWidth = 2;
-		this.ctx.strokeStyle = window.getComputedStyle(document.documentElement).getPropertyValue('--accent');
+		this.ctx.strokeStyle = this.color ? this.color : window.getComputedStyle(document.documentElement).getPropertyValue('--accent');
 	}
 
 	// draw a line with a scaling factor based on an array of y values
@@ -171,8 +172,6 @@ class WaveForm extends Widget {
 class Meter extends Widget {
 	constructor(...args){
 		super(...args);
-		// if a color is added
-		this.color = args[2];
 		// create a RAW meter and use 0-1 range for values instead of dB
 		this.meter = new Tone.Analyser("waveform", 256);
 		// sum stereo channels to mono and connect to meter
@@ -186,6 +185,12 @@ class Meter extends Widget {
 		// dB scale parameters in visualisation
 		this.dbs = [-48, -24, -12, -6, 0];
 		this.scaling = 5;
+		// the meter gradient
+		this.grad = this.ctx.createLinearGradient(0, 0, Math.abs(this.dbs[0]) * this.scaling, 0);
+		this.grad.addColorStop(0.00, 'rgb(9, 248, 100)');
+		this.grad.addColorStop(0.58, 'rgb(195, 249, 100)');
+		this.grad.addColorStop(0.83, 'rgb(255, 193, 9)');
+		this.grad.addColorStop(1.00, 'rgb(255, 8, 11)');
 		// start the animation
 		this.start();
 		// console.log('class => Meter');
@@ -227,12 +232,7 @@ class Meter extends Widget {
 		// create a gradient for the level meter if now color
 		this.ctx.beginPath();
 		if (this.color === undefined){			
-			const grad = this.ctx.createLinearGradient(0, 0, Math.abs(this.dbs[0]) * this.scaling, 0);
-			grad.addColorStop(0.00, 'rgb(9, 248, 100)');
-			grad.addColorStop(0.58, 'rgb(195, 249, 100)');
-			grad.addColorStop(0.83, 'rgb(255, 193, 9)');
-			grad.addColorStop(1.00, 'rgb(255, 8, 11)');
-			this.ctx.fillStyle = grad;
+			this.ctx.fillStyle = this.grad;
 		} else {
 			this.ctx.fillStyle = this.color;
 		}

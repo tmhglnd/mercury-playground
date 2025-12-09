@@ -252,13 +252,13 @@ class Instrument extends Sequencer {
 		}
 	}
 
-	scope(h=30){
+	scope(h=30, c){
 		let w = new Widget.Scope(this._line, h, c);
 		this._widgets.push(w);
 		this.gain.connect(w.input());
 	}
 
-	waveform(h=30){
+	waveform(h=30, c){
 		let w = new Widget.WaveForm(this._line, h, c);
 		this._widgets.push(w);
 		this.gain.connect(w.input());
@@ -270,7 +270,7 @@ class Instrument extends Sequencer {
 		this.gain.connect(w.input());
 	}
 
-	spectrum(h=30){
+	spectrum(h=30, c){
 		let w = new Widget.Spectrum(this._line, h, c);
 		this._widgets.push(w);
 		this.gain.connect(w.input());
