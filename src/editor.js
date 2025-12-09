@@ -70,14 +70,15 @@ CodeMirror.defineSimpleMode("mercury", {
 let mercuryHintList = [
 	'new', 'set', 'list', 'print', 'silence',
 	'tempo', 'scale', 'scalar', 'root', 'randomSeed', 'volume', 'lopass', 'hipass', 'osc', 'midi', 'samples',
-	'sample', 'synth', 'input', 'midi', 'polySample', 'polySynth',
+	'sample', 'synth', 'input', 'midi', 'polySample', 'polySynth', 'noise',
 	'saw', 'sine', 'square', 'triangle',
+	'white', 'pink', 'brown', 'lofi', 'crackle', 'dust',
 	'name', 'solo', 'group', 'time', 'once', 'fx', 'effect', 'out', 'timediv', 'wait', 'play', 'gain', 'shape', 'pan',
 	'note', 'super', 'slide',
 	'speed', 'start', 'tune', 'stretch',
 	'steal', 'spread', 'length', 'chord', 'midinote', 'program', 'pgm', 'change', 'cc',
 	'range', 'trigger', 'hold',
-	'chorus', 'comb', 'degrade', 'delay', 'distort', 'double', 'filter', 'kink', 'lfo', 'reverb', 'shift', 'squash', 'triggerFilter', 'vibrato', 'vocoder',
+	'chorus', 'comb', 'degrade', 'delay', 'distort', 'double', 'filter', 'kink', 'lfo', 'reverb', 'shift', 'squash', 'triggerFilter', 'vibrato', 'vocoder', 'fuzz',
 	'spread', 'spreadF', 'spreadInc', 'spreadIncF', 'sine', 'sineF', 'cosine', 'cosineF', 'saw', 'sawF', 'square', 'squareF', 'binary', 'binaryBeat',  'spacing', 'spacingBeat', 'euclidean', 'euclid', 'hexBeat', 'hex', 'fibonacci', 'pisano', 'pell', 'lucas', 'random', 'randomF', 'drunk', 'drunkF', 'urn', 'coin', 'dice', 'clave', 'twelveTone', 'choose', 'pick', 'shuffle', 'expand', 'markovTrain', 'markovChain', 'clone', 'join', 'copy', 'pad', 'every', 'flat', 'invert', 'lace', 'lookup', 'merge', 'palin', 'repeat', 'reverse', 'rotate', 'rot', 'sort', 'slice', 'split', 'cut', 'spray', 'stretch', 'stretchF', 'thin', 'add', 'subtract', 'sub', 'multiply', 'mul', 'divide', 'div', 'mod', 'clip', 'wrap', 'fold', 'map', 'normalize', 'norm', 'equals', 'eq', 'notEquals', 'neq', 'greater', 'gt', 'less', 'lt', 'greaterEquals', 'gte', 'lessEquals', 'lte', 'size', 'sum', 'midiToNote', 'mton', 'midiToFreq', 'mtof', 'noteToMidi', 'ntom', 'noteToFreq', 'ntof', 'freqToMidi', 'ftom', 'freqToNote', 'fton', 'relativeToMidi', 'rtom', 'relativeToFreq', 'rtof', 'chromaToRelative', 'ctor', 'ratioToCent', 'rtoc', 'makeChords', 'chordsFromNumerals', 'chordsFromNames', 'divisionToMs', 'dtoms', 'divisionToRatio', 'dtor', 'ratioToMs', 'rtoms', 'scaleNames', 'toScale', 'textCode', 'ttoc',
 	'on', 'off', 'up', 'down', 'low', 'high', 'band'
 ].sort();
