@@ -253,25 +253,25 @@ class Instrument extends Sequencer {
 	}
 
 	scope(h=30){
-		let w = new Widget.Scope(this._line, h);
+		let w = new Widget.Scope(this._line, h, c);
 		this._widgets.push(w);
 		this.gain.connect(w.input());
 	}
 
 	waveform(h=30){
-		let w = new Widget.WaveForm(this._line, h);
+		let w = new Widget.WaveForm(this._line, h, c);
 		this._widgets.push(w);
 		this.gain.connect(w.input());
 	}
 
-	meter(h=20){
-		let w = new Widget.Meter(this._line, h);
+	meter(h=20, c){
+		let w = new Widget.Meter(this._line, h, c);
 		this._widgets.push(w);
 		this.gain.connect(w.input());
 	}
 
 	spectrum(h=30){
-		let w = new Widget.Spectrum(this._line, h);
+		let w = new Widget.Spectrum(this._line, h, c);
 		this._widgets.push(w);
 		this.gain.connect(w.input());
 	}

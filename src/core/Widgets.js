@@ -6,7 +6,7 @@ const { atodb } = require('./Util.js');
 // a canvas that will be added as a line widget
 // a drawing loop, and some drawing functions like line
 class Widget {
-	constructor(line, height=10){
+	constructor(line, height=10, color){
 		// console.log('=> class Widget()', line);
 		// to connect the source to and make it to mono for analysis
 		this.mono = new Tone.Mono();
@@ -171,93 +171,93 @@ class WaveForm extends Widget {
 class Meter extends Widget {
 	constructor(...args){
 		super(...args);
-
+		// if a color is added
+		this.color = args[2];
 		// create a RAW meter and use 0-1 range for values instead of dB
 		this.meter = new Tone.Analyser("waveform", 256);
-		this.meter.normalRange = true;
-		this.meter.smoothing = 0;
 		// sum stereo channels to mono and connect to meter
 		this.mono.connect(this.meter);
-
-		this.cnv.style['image-rendering'] = 'pixelated';
-		// this.cnv.style['image-rendering'] = 'high-quality';
-		// this.cnv.style['image-rendering'] = 'crisp-edges';
-
 		// the peak value measured for history/smoothing
 		this.fast = 0;
 		this.slow = 0;
+		// smoothing param
 		this.fastSmooth = 0.95;
 		this.slowSmooth = 0.999;
-
-		// dB scale parameters
+		// dB scale parameters in visualisation
 		this.dbs = [-48, -24, -12, -6, 0];
 		this.scaling = 5;
-
 		// start the animation
 		this.start();
+		// console.log('class => Meter');
 	}
 
 	draw(){
-		// super.draw();
 		// erase the previous drawn things
 		this.ctx.clearRect(0, 0, this.cnv.width, this.cnv.height);
 		// get the waveform amplitude value from meter
 		// get the raw amplitude value
 		let raw = Math.max(...this.meter.getValue().map(x => Math.abs(x)));
-
+		// if raw is greater than peak, set new peak
 		this.fast = raw > this.fast ? raw : this.fast;
 		this.slow = raw > this.slow ? raw : this.slow;
-
+		// convert raw amplitude to dB value
 		let mtr = atodb(this.fast);
 		let hold = atodb(this.slow);
-
+		let absdB = Math.abs(this.dbs[0]);
+		// slowly ramp back to 0 with smoothing
 		this.fast *= this.fastSmooth;
 		this.slow *= this.slowSmooth;
-				
-		
+
+		// draw the lines and dB levels
 		// this.ctx.lineCap = "round";
 		this.ctx.font = `8px Verdana`;
 		this.ctx.textBaseline = 'top';
 		this.ctx.lineWidth = 1;
-		this.ctx.strokeStyle = this.ctx.fillStyle = window.getComputedStyle(document.documentElement).getPropertyValue('--secundary');
+		this.ctx.strokeStyle = this.color ? this.color : this.ctx.fillStyle = window.getComputedStyle(document.documentElement).getPropertyValue('--accent');
 
 		this.ctx.beginPath();
 		for (let i = 0; i < this.dbs.length; i++){
-			let x = (Math.abs(this.dbs[0]) + this.dbs[i]) * this.scaling;
+			let x = (absdB + this.dbs[i]) * this.scaling;
 			this.ctx.moveTo(x, 0);
 			this.ctx.lineTo(x, this.cnv.height);
 			this.ctx.stroke();
 			this.ctx.fillText(`${this.dbs[i]}`, x + 2, 0);
 		}
 
-		// create a gradient for the level meters
-		const grad = this.ctx.createLinearGradient(0, 0, Math.abs(this.dbs[0]) * this.scaling, 0);
-		grad.addColorStop(0.00, 'rgb(9, 248, 100)');
-		grad.addColorStop(0.58, 'rgb(195, 249, 100)');
-		grad.addColorStop(0.83, 'rgb(255, 193, 9)');
-		grad.addColorStop(1.00, 'rgb(255, 8, 11)');
-		this.ctx.fillStyle = grad;
-
-		// this.ctx.fillStyle = 'white';
-		let dBwidth = (Math.abs(this.dbs[0]) + mtr) * this.scaling; 
+		// create a gradient for the level meter if now color
+		this.ctx.beginPath();
+		if (this.color === undefined){			
+			const grad = this.ctx.createLinearGradient(0, 0, Math.abs(this.dbs[0]) * this.scaling, 0);
+			grad.addColorStop(0.00, 'rgb(9, 248, 100)');
+			grad.addColorStop(0.58, 'rgb(195, 249, 100)');
+			grad.addColorStop(0.83, 'rgb(255, 193, 9)');
+			grad.addColorStop(1.00, 'rgb(255, 8, 11)');
+			this.ctx.fillStyle = grad;
+		} else {
+			this.ctx.fillStyle = this.color;
+		}
+		
+		let dBwidth = (absdB + mtr) * this.scaling; 
 		this.ctx.fillRect(0, 9, dBwidth, this.cnv.height);
 
-		let dBhold = (Math.abs(this.dbs[0]) + hold) * this.scaling;
+		// create a thick line for the slow dB meter
+		let dBhold = (absdB + hold) * this.scaling;
 		this.ctx.lineWidth = 3;
 		this.ctx.beginPath();
 		this.ctx.moveTo(dBhold, 9)
 		this.ctx.lineTo(dBhold, this.cnv.height);
-		this.ctx.strokeStyle = window.getComputedStyle(document.documentElement).getPropertyValue('--accent');
 		this.ctx.stroke();
 
-		// this.ctx.font = `${Math.min(12, this.cnv.height)}px Verdana`;
+		// this.ctx.font = `6px Verdana`;
 		// this.ctx.textBaseline = "top";
 		// this.ctx.fillStyle = window.getComputedStyle(document.documentElement).getPropertyValue('--accent');
-		// this.ctx.fillText(`${(Math.round(mtr * 100) / 100).toFixed(2)}dB`, 70 * this.scaling + 10, 0);
+		// this.ctx.fillText(`${(Math.round(mtr * 100) / 100).toFixed(2)}dB`, absdB * this.scaling + 10, 10);
 	}
 
 	delete(){
 		super.delete();
+		this.meter.disconnect();
+		this.meter.dispose();
 	}
 }
 
