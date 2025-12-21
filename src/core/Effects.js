@@ -28,6 +28,9 @@ const fxMap = {
 	'comp' : (params) => {
 		return new Compressor(params);
 	},
+	'comb' : (params) => {
+		return new CombFilter(params);
+	},
 	'lfo' : (params) => {
 		return new LFO(params);
 	},
@@ -119,6 +122,41 @@ function disposeNodes(nodes=[]) {
 		n?.disconnect();
 		n?.dispose();
 	});
+}
+
+const CombFilter = function(_params) {
+	_params = Util.mapDefaults(_params, ['5', '0.8', '0.5']);
+
+	// ToneAudioNode has all the tone effect parameters
+	this._fx = new Tone.ToneAudioNode();
+	// A gain node for connecting with input and output
+	this._fx.input = new Tone.Gain(1);
+	this._fx.output = new Tone.Gain(1);
+	// the fx processor
+	// this._fx.workletNode = Tone.getContext().createAudioWorkletNode('combfilter-processor');
+	this._fx.workletNode = Tone.getContext().createAudioWorkletNode('combfilter-processor');
+	// connect input, fx and output
+	this._fx.input.chain(this._fx.workletNode, this._fx.output);
+
+	this.set = (count, time, bpm) => {
+		// get parameter from workletprocessor
+		const dt = this._fx.workletNode.parameters.get('time');	
+		dt.setValueAtTime(Util.getParam(_params[0], count), time);
+
+		const fb = this._fx.workletNode.parameters.get('feedback');	
+		fb.setValueAtTime(Util.getParam(_params[1], count), time);
+
+		const dm = this._fx.workletNode.parameters.get('damping');	
+		dm.setValueAtTime(Util.getParam(_params[2], count), time);
+	}
+
+	this.chain = () => {
+		return { 'send' : this._fx, 'return' : this._fx }
+	}
+
+	this.delete = () => {
+		disposeNodes([this._fx.input, this._fx.output, this._fx]);
+	}
 }
 
 // A formant/vowel filter. With this filter you can imitate the vowels of human 

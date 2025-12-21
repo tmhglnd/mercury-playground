@@ -335,6 +335,91 @@ class SquashProcessor extends AudioWorkletProcessor {
 }
 registerProcessor('squash-processor', SquashProcessor);
 
+// Comb Filter processor
+class CombFilterProcessor extends AudioWorkletProcessor {
+	static get parameterDescriptors() {
+		return [
+			[ 'time', 5, 0, 100, "k-rate" ],
+			[ 'feedback', 0.8, 0, 0.999, "k-rate" ],
+			[ 'damping', 0.5, 0, 1, "k-rate" ]
+		].map(x => new Object({
+			name: x[0],
+			defaultValue: x[1],
+			minValue: x[2],
+			maxValue: x[3],
+			automationRate: x[4]
+		}));
+	}
+	
+	constructor() {
+		super();
+
+		// make a delay
+		this.delay = this.makeDelay(100);
+
+		this.lpf = [ 0, 0 ];
+	}
+
+	makeDelay(length) {
+		let size = Math.round(length * 0.001 * sampleRate);
+		let nextPow2 = 2 ** Math.ceil(Math.log2((size)));
+		return [
+			new Float32Array(nextPow2), size - 1, 0 | 0, nextPow2 - 1
+		];
+	}
+
+	writeDelay(data) {
+		return this.delay[0][this.delay[1]] = data;
+	}
+
+	writeDelayAt(data, ms) {
+		let i = Math.round(ms * 0.001 * sampleRate)
+		return this.delay[0][(this.delay[2] + i) & this.delay[3]] = data;
+	}
+
+	readDelay() {
+		return this.delay[0][this.delay[2]];
+	}
+
+	readDelayAt(ms) {
+		let i = Math.round(ms * 0.001 * sampleRate);
+		return this.delay[0][(this.delay[2] + i) & this.delay[3]];
+	}
+
+	moveHeads(){
+		// increment read and write heads in delay
+		this.delay[1] = (this.delay[1] + 1) & this.delay[3];
+		this.delay[2] = (this.delay[2] + 1) & this.delay[3];
+	}
+
+	process(inputs, outputs, parameters){
+		const input = inputs[0];
+		const output = outputs[0];
+
+		if (input.length > 0){
+			// for (let channel = 0; channel < input.length; channel++){
+				for (let i = 0; i < input[0].length; i++){
+					// process for every channel and every sample in the channel
+					const t = (parameters.time.length > 1)? parameters.time[i] : parameters.time[0];
+					const fb = (parameters.feedback.length > 1)? parameters.feedback[i] : parameters.feedback[0];
+					const dm = (parameters.damping.length > 1)? parameters.damping[i] : parameters.damping[0];
+
+					// a onepole lowpass filter
+					const lp = this.readDelay() * (1 - dm) + this.lpf[0] * dm;
+					this.lpf[0] = lp;
+
+					// write to the delayline
+					output[0][i] = this.writeDelayAt(input[0][i] + lp * fb, t);
+
+					this.moveHeads();
+				}
+			// }
+		}
+		return true;
+	}
+}
+registerProcessor('combfilter-processor', CombFilterProcessor);
+
 // Dattorro Reverberator
 // Thanks to port by khoin, taken from:
 // https://github.com/khoin/DattorroReverbNode
@@ -407,6 +492,11 @@ class DattorroReverb extends AudioWorkletProcessor {
 		this._Delays.push([
 			new Float32Array(nextPow2), len - 1, 0 | 0, nextPow2 - 1
 		]);
+		// 0=Float32Array, 1=lastindexDelayTime, 2=0, 3=lastIndexPowerOf2
+		// example: delaytime = 0.004771345
+		// len = 210
+		// nextPow2 = 256
+		// result: [new Float32Array(256), 209, 0, 255]
 	}
 
 	writeDelay(index, data) {
