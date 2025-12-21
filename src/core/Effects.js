@@ -151,7 +151,7 @@ const CombFilter = function(_params) {
 	this._fx.input = new Tone.Gain(1);
 	this._fx.output = new Tone.Gain(1);
 	// the fx processor
-	this._fx.workletNode = Tone.getContext().createAudioWorkletNode('combfilter-processor', { channelCountMode: 'max' });
+	this._fx.workletNode = Tone.getContext().createAudioWorkletNode('combfilter-processor');
 	// connect input, fx and output
 	this._fx.input.chain(this._fx.workletNode, this._fx.output);
 
@@ -159,20 +159,19 @@ const CombFilter = function(_params) {
 		const pitch = Util.toMidi(Util.getParam(this._pitch, count));
 		const _dt = 1000 / Util.mtof(pitch);
 		
-		const _fb = Util.clip(Util.getParam(this._fback, count) ** 0.25, -0.999, 0.999);
+		const _fb = Util.clip(Math.pow(Util.getParam(this._fback, count), 0.3), -0.999, 0.999);
 		const _dm = Util.clip(Util.getParam(this._damp, count));
 		const _dw = Util.clip(Util.getParam(this._wet, count));
+
+		// console.log('conb', _fb, _dm, _dw, _dt);
 		
 		// get parameters from workletprocessor
 		const dt = this._fx.workletNode.parameters.get('time');	
 		dt.setValueAtTime(_dt, time);
-
 		const fb = this._fx.workletNode.parameters.get('feedback');	
 		fb.setValueAtTime(_fb, time);
-
 		const dm = this._fx.workletNode.parameters.get('damping');	
 		dm.setValueAtTime(_dm, time);
-
 		const dw = this._fx.workletNode.parameters.get('drywet');	
 		dw.setValueAtTime(_dw, time);
 	}
