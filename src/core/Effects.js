@@ -129,12 +129,13 @@ const CombFilter = function(_params) {
 
 	// ToneAudioNode has all the tone effect parameters
 	this._fx = new Tone.ToneAudioNode();
+
 	// A gain node for connecting with input and output
 	this._fx.input = new Tone.Gain(1);
 	this._fx.output = new Tone.Gain(1);
 	// the fx processor
 	// this._fx.workletNode = Tone.getContext().createAudioWorkletNode('combfilter-processor');
-	this._fx.workletNode = Tone.getContext().createAudioWorkletNode('combfilter-processor');
+	this._fx.workletNode = Tone.getContext().createAudioWorkletNode('combfilter-processor', { channelCountMode: 'max' });
 	// connect input, fx and output
 	this._fx.input.chain(this._fx.workletNode, this._fx.output);
 

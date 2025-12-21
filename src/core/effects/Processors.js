@@ -336,12 +336,18 @@ class SquashProcessor extends AudioWorkletProcessor {
 registerProcessor('squash-processor', SquashProcessor);
 
 // Comb Filter processor
+// A LowPass FeedBack CombFilter effect (LBCF)
+// Uses a onepole lowpass filter in the feedback delay for damping
+// Feedback amount can be positive or negative 
+// (negative creates odd harmonics one octave lower)
+// 
 class CombFilterProcessor extends AudioWorkletProcessor {
 	static get parameterDescriptors() {
 		return [
-			[ 'time', 5, 0, 100, "k-rate" ],
-			[ 'feedback', 0.8, 0, 0.999, "k-rate" ],
-			[ 'damping', 0.5, 0, 1, "k-rate" ]
+			[ 'time', 5, 0, 500, "k-rate" ],
+			[ 'feedback', 0.8, -0.999, 0.999, "k-rate" ],
+			[ 'damping', 0.5, 0, 1, "k-rate" ],
+			[ 'drywet', 0.8, 0, 1, "k-rate" ]
 		].map(x => new Object({
 			name: x[0],
 			defaultValue: x[1],
@@ -351,69 +357,76 @@ class CombFilterProcessor extends AudioWorkletProcessor {
 		}));
 	}
 	
-	constructor() {
+	constructor(info) {
+		console.log('[CombFilterProcessor]', info);
 		super();
 
-		// make a delay
-		this.delay = this.makeDelay(100);
+		const numChannels = info.channelCount;
+		const delaySize = 500;
 
-		this.lpf = [ 0, 0 ];
+		// make delays for amount of channels and
+		// initialize history values for lowpass
+		this.delays = [];
+		this.lpf = [];
+		for (let i = 0; i < numChannels; i++){
+			this.delays[i] = this.delayLine(delaySize);
+			this.lpf[i] = 0;
+		}
 	}
 
-	makeDelay(length) {
+	// Delayline code inspired on Dattorro Reverberator
+	// Thanks to khoin: https://github.com/khoin
+	delayLine(length) {
 		let size = Math.round(length * 0.001 * sampleRate);
 		let nextPow2 = 2 ** Math.ceil(Math.log2((size)));
 		return [
-			new Float32Array(nextPow2), size - 1, 0 | 0, nextPow2 - 1
+			new Float32Array(nextPow2), nextPow2-1, 0, nextPow2 - 1
 		];
 	}
-
-	writeDelay(data) {
-		return this.delay[0][this.delay[1]] = data;
+	// write to specific delayline at delaysize
+	writeDelay(i, data) {
+		return this.delays[i][0][this.delays[i][1]] = data;
 	}
 
-	writeDelayAt(data, ms) {
-		let i = Math.round(ms * 0.001 * sampleRate)
-		return this.delay[0][(this.delay[2] + i) & this.delay[3]] = data;
+	// read from delayline at specified time
+	readDelayAt(i, ms) {
+		let s = Math.round(ms * 0.001 * sampleRate);
+		return this.delays[i][0][(this.delays[i][2] - s) & this.delays[i][3]];
 	}
 
-	readDelay() {
-		return this.delay[0][this.delay[2]];
-	}
-
-	readDelayAt(ms) {
-		let i = Math.round(ms * 0.001 * sampleRate);
-		return this.delay[0][(this.delay[2] + i) & this.delay[3]];
-	}
-
-	moveHeads(){
+	// move the read and writeheads of the delayline
+	moveReadWriteHeads(i){
 		// increment read and write heads in delay
-		this.delay[1] = (this.delay[1] + 1) & this.delay[3];
-		this.delay[2] = (this.delay[2] + 1) & this.delay[3];
+		this.delays[i][1] = (this.delays[i][1] + 1) & this.delays[i][3];
+		this.delays[i][2] = (this.delays[i][2] + 1) & this.delays[i][3];
 	}
 
 	process(inputs, outputs, parameters){
 		const input = inputs[0];
 		const output = outputs[0];
 
+		const dt = parameters.time[0];
+		const fb = parameters.feedback[0];
+		const dm = Math.max(0, parameters.damping[0]);
+		const dw = parameters.drywet[0];
+
 		if (input.length > 0){
-			// for (let channel = 0; channel < input.length; channel++){
+			for (let channel = 0; channel < input.length; channel++){
 				for (let i = 0; i < input[0].length; i++){
 					// process for every channel and every sample in the channel
-					const t = (parameters.time.length > 1)? parameters.time[i] : parameters.time[0];
-					const fb = (parameters.feedback.length > 1)? parameters.feedback[i] : parameters.feedback[0];
-					const dm = (parameters.damping.length > 1)? parameters.damping[i] : parameters.damping[0];
 
 					// a onepole lowpass filter
-					const lp = this.readDelay() * (1 - dm) + this.lpf[0] * dm;
-					this.lpf[0] = lp;
+					const lp = this.readDelayAt(channel, dt) * (1 - dm) + this.lpf[channel] * dm;
+					this.lpf[channel] = lp;
 
 					// write to the delayline
-					output[0][i] = this.writeDelayAt(input[0][i] + lp * fb, t);
+					const out = this.writeDelay(channel, input[channel][i] + lp * fb);
 
-					this.moveHeads();
+					output[channel][i] = out * dw + input[channel][i] * (1-dw);
+
+					this.moveReadWriteHeads(channel);
 				}
-			// }
+			}
 		}
 		return true;
 	}
