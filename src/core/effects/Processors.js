@@ -344,7 +344,7 @@ registerProcessor('squash-processor', SquashProcessor);
 class CombFilterProcessor extends AudioWorkletProcessor {
 	static get parameterDescriptors() {
 		return [
-			[ 'time', 5, 0, 500, "k-rate" ],
+			[ 'time', 5, 0, 120, "k-rate" ],
 			[ 'feedback', 0.8, -0.999, 0.999, "k-rate" ],
 			[ 'damping', 0.5, 0, 1, "k-rate" ],
 			[ 'drywet', 0.8, 0, 1, "k-rate" ]
@@ -358,25 +358,23 @@ class CombFilterProcessor extends AudioWorkletProcessor {
 	}
 	
 	constructor(info) {
-		console.log('[CombFilterProcessor]', info);
 		super();
 
 		const numChannels = info.channelCount;
-		const delaySize = 500;
-
+		const delaySize = 120;
 		// make delays for amount of channels and
 		// initialize history values for lowpass
 		this.delays = [];
 		this.lpf = [];
 		for (let i = 0; i < numChannels; i++){
-			this.delays[i] = this.delayLine(delaySize);
+			this.delays[i] = this.makeDelay(delaySize);
 			this.lpf[i] = 0;
 		}
 	}
 
-	// Delayline code inspired on Dattorro Reverberator
+	// makeDelay code based on Dattorro Reverberator delays
 	// Thanks to khoin: https://github.com/khoin
-	delayLine(length) {
+	makeDelay(length) {
 		let size = Math.round(length * 0.001 * sampleRate);
 		let nextPow2 = 2 ** Math.ceil(Math.log2((size)));
 		return [
@@ -395,8 +393,8 @@ class CombFilterProcessor extends AudioWorkletProcessor {
 	}
 
 	// move the read and writeheads of the delayline
-	moveReadWriteHeads(i){
-		// increment read and write heads in delay
+	updateReadWriteHeads(i){
+		// increment read and write heads in delay and wrap at delaysize
 		this.delays[i][1] = (this.delays[i][1] + 1) & this.delays[i][3];
 		this.delays[i][2] = (this.delays[i][2] + 1) & this.delays[i][3];
 	}
@@ -410,21 +408,18 @@ class CombFilterProcessor extends AudioWorkletProcessor {
 		const dm = Math.max(0, parameters.damping[0]);
 		const dw = parameters.drywet[0];
 
+		// process for every channel and every sample in the channel
 		if (input.length > 0){
 			for (let channel = 0; channel < input.length; channel++){
 				for (let i = 0; i < input[0].length; i++){
-					// process for every channel and every sample in the channel
-
-					// a onepole lowpass filter
-					const lp = this.readDelayAt(channel, dt) * (1 - dm) + this.lpf[channel] * dm;
-					this.lpf[channel] = lp;
-
-					// write to the delayline
-					const out = this.writeDelay(channel, input[channel][i] + lp * fb);
-
-					output[channel][i] = out * dw + input[channel][i] * (1-dw);
-
-					this.moveReadWriteHeads(channel);
+					// a onepole lowpass filter after delay
+					this.lpf[channel] = this.readDelayAt(channel, dt) * (1 - dm) + this.lpf[channel] * dm;
+					// write to the delayline 
+					this.writeDelay(channel, input[channel][i] + this.lpf[channel] * fb);
+					// apply drywet and send output from the filter
+					output[channel][i] = this.lpf[channel] * dw + input[channel][i] * (1-dw);
+					// update the read and write heads of the delaylines
+					this.updateReadWriteHeads(channel);
 				}
 			}
 		}

@@ -31,6 +31,12 @@ const fxMap = {
 	'comb' : (params) => {
 		return new CombFilter(params);
 	},
+	'fbcf' : (params) => {
+		return new CombFilter(params);
+	},
+	'karplus' : (params) => {
+		return new CombFilter(params);
+	},
 	'lfo' : (params) => {
 		return new LFO(params);
 	},
@@ -124,8 +130,19 @@ function disposeNodes(nodes=[]) {
 	});
 }
 
+// A Lowpass Feedback CombFiltering effect
+// Adds a short feedback delay to the sound based on a specific note
+// resulting in a tonal output, like the resonating sound of a string 
+// sometimes also called Karplus Strong String Synthesis.
+// Negative feedback is possible for generating odd harmonics
+//
 const CombFilter = function(_params) {
-	_params = Util.mapDefaults(_params, ['5', '0.8', '0.5']);
+	// the default parameters
+	_params = Util.mapDefaults(_params, [0, 0.9, 0.5, 1]);
+	this._pitch = Util.toArray(_params[0]);
+	this._fback = Util.toArray(_params[1]);
+	this._damp = Util.toArray(_params[2]);
+	this._wet = Util.toArray(_params[3]);
 
 	// ToneAudioNode has all the tone effect parameters
 	this._fx = new Tone.ToneAudioNode();
@@ -134,21 +151,30 @@ const CombFilter = function(_params) {
 	this._fx.input = new Tone.Gain(1);
 	this._fx.output = new Tone.Gain(1);
 	// the fx processor
-	// this._fx.workletNode = Tone.getContext().createAudioWorkletNode('combfilter-processor');
 	this._fx.workletNode = Tone.getContext().createAudioWorkletNode('combfilter-processor', { channelCountMode: 'max' });
 	// connect input, fx and output
 	this._fx.input.chain(this._fx.workletNode, this._fx.output);
 
 	this.set = (count, time, bpm) => {
-		// get parameter from workletprocessor
+		const pitch = Util.toMidi(Util.getParam(this._pitch, count));
+		const _dt = 1000 / Util.mtof(pitch);
+		
+		const _fb = Util.clip(Util.getParam(this._fback, count) ** 0.25, -0.999, 0.999);
+		const _dm = Util.clip(Util.getParam(this._damp, count));
+		const _dw = Util.clip(Util.getParam(this._wet, count));
+		
+		// get parameters from workletprocessor
 		const dt = this._fx.workletNode.parameters.get('time');	
-		dt.setValueAtTime(Util.getParam(_params[0], count), time);
+		dt.setValueAtTime(_dt, time);
 
 		const fb = this._fx.workletNode.parameters.get('feedback');	
-		fb.setValueAtTime(Util.getParam(_params[1], count), time);
+		fb.setValueAtTime(_fb, time);
 
 		const dm = this._fx.workletNode.parameters.get('damping');	
-		dm.setValueAtTime(Util.getParam(_params[2], count), time);
+		dm.setValueAtTime(_dm, time);
+
+		const dw = this._fx.workletNode.parameters.get('drywet');	
+		dw.setValueAtTime(_dw, time);
 	}
 
 	this.chain = () => {
