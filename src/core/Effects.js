@@ -163,8 +163,6 @@ const CombFilter = function(_params) {
 
 		const _dm = Util.clip(Util.getParam(this._damp, count));
 		const _dw = Util.clip(Util.getParam(this._wet, count));
-
-		// console.log('conb', _fb, _dm, _dw, _dt);
 		
 		// get parameters from workletprocessor
 		const dt = this._fx.workletNode.parameters.get('time');	

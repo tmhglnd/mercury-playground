@@ -1,6 +1,6 @@
 {
   "name": "mercury-playground",
-  "version": "1.9.2",
+  "version": "1.9.3",
   "description": "A beginner-friendly, minimal and human-readable language for the live coding of algorithmic electronic music performances",
   "engines": {
     "node": "12.x"
