@@ -31,9 +31,6 @@ const fxMap = {
 	'comb' : (params) => {
 		return new CombFilter(params);
 	},
-	'fbcf' : (params) => {
-		return new CombFilter(params);
-	},
 	'karplus' : (params) => {
 		return new CombFilter(params);
 	},
@@ -138,7 +135,7 @@ function disposeNodes(nodes=[]) {
 //
 const CombFilter = function(_params) {
 	// the default parameters
-	_params = Util.mapDefaults(_params, [0, 0.9, 0.5, 1]);
+	_params = Util.mapDefaults(_params, [0, 0.8, 0.5, 0.5]);
 	this._pitch = Util.toArray(_params[0]);
 	this._fback = Util.toArray(_params[1]);
 	this._damp = Util.toArray(_params[2]);
