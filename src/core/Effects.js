@@ -159,7 +159,11 @@ const CombFilter = function(_params) {
 		const pitch = Util.toMidi(Util.getParam(this._pitch, count));
 		const _dt = 1000 / Util.mtof(pitch);
 		
-		const _fb = Util.clip(Math.pow(Util.getParam(this._fback, count), 0.3), -0.999, 0.999);
+		// some mapping for the feedback to make it logarithmic in length
+		let _fb = Util.getParam(this._fback, count);
+		let sign = _fb < 0 ? -1 : 1;
+		_fb = Util.clip(Math.pow(Math.abs(_fb), 0.1) * sign, -0.999, 0.999);
+
 		const _dm = Util.clip(Util.getParam(this._damp, count));
 		const _dw = Util.clip(Util.getParam(this._wet, count));
 
