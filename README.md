@@ -241,10 +241,12 @@ The playground (browser version) does not have exactly the same functionality as
 		- [ ] ping pong feedback delay
 	- [x] distort (softclipping distortion)
 	- [x] squash (compression/overdrive)
-	- [ ] kink (waveshaping)
 	- [x] filter
  		- [x] filter modulation
 	- [x] triggerFilter
+	- [x] fuzz
+	- [ ] freeze
+	- [ ] looper
 	- [x] lfo
 	- [x] reverb
 		- [x] decaying noise convolution
@@ -252,6 +254,7 @@ The playground (browser version) does not have exactly the same functionality as
 	- [x] shift (pitchshift)
  	- [x] compress 
 	- [x] chorus / double
+	- [x] karplus / comb
 - [x] visual 
 	- [x] use Hydra code synchronized with instrument triggers (*)
 
