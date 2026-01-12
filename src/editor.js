@@ -605,6 +605,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		btn.innerHTML = 'zen mode';
 		btn.id = 'zen';
 		btn.title = 'Hide or show the menu bars (Alt/Ctrl-Shift-Z)';
+		btn.style.width = 'auto';
 		btn.onclick = () => {
 			this.menuHidden = !this.menuHidden;
 

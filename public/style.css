@@ -176,6 +176,7 @@ button:hover {
 	font-weight: bolder;
 	background: var(--transparant);
 	cursor: pointer;
+	border: 1pt solid var(--accent);
 	/* background: rgb(255, 255, 255, 0.15); */
 }
 
@@ -223,6 +224,7 @@ select:hover, select:focus {
 	background: var(--bg);
 	font-weight: bolder;
 	cursor: pointer;
+	border: 1pt solid var(--accent);
 	/* background: rgb(255, 255, 255, 0.15); */
 }
 
