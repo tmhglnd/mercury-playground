@@ -1,3 +1,153 @@
+// some constants needed for calculations
+const PI = Math.PI;
+const HALF_PI = PI / 2;
+const TWO_PI = Math.PI * 2;
+const INV_SR = 1 / sampleRate;
+
+// function to retrieve a parameter value from array if any exists
+const pv = (param, i) => param[i] ?? param[0];
+// get the sign of the signal -1/1
+const sign = (sig) => sig < 0 ? -1 : 1;
+// truncate the signal (removing fractional component)
+const trunc = (sig) => sig | 0;
+// return the fractional component of a signal
+const frac = (sig) => sig - trunc(sig);
+// fix Not a Number
+const fixnan = (sig) => isNaN(sig) ? 0 : sig;
+
+// A polyBlep Oscillator Worklet
+// Generates various anti-aliased waveforms with a polyBlep function.
+// Based on code from various sources listed below:
+// PolyBLEP function by Tale from kvraudio forum (slightly modified):
+// http://www.kvraudio.com/forum/viewtopic.php?t=375517
+// Other resource and explanation about polyBLEPs for anti-aliasing oscillators:
+// https://www.martin-finke.de/articles/audio-plugins-018-polyblep-oscillator/
+// https://www.metafunction.co.uk/post/all-about-digital-oscillators-part-2-blits-bleps
+// Also thanks to some webaudio code from Synthlet and SuperDough 
+// https://github.com/danigb/synthlet/blob/main/packages/polyblep-oscillator/src/dsp.ts
+// https://codeberg.org/uzu/strudel/src/branch/main/packages/superdough/worklets.mjs
+class polyBlepOscillator extends AudioWorkletProcessor {
+	static get parameterDescriptors(){
+		return [
+			[ 'freq', 80, -sampleRate, sampleRate, "a-rate" ],
+			[ 'wave', 3, 0, 3, "k-rate" ],
+			[ 'voices', 1, 1, 11, "k-rate" ],
+			[ 'detune' , 0, 0, 36, "k-rate" ]
+		].map(x => new Object({
+			name: x[0],
+			defaultValue: x[1],
+			minValue: x[2],
+			maxValue: x[3],
+			automationRate: x[4]
+		}));
+	}
+
+	constructor(){
+		super();
+		// the oscillator phase
+		// this.phase = 0;
+		this.phase = [];
+		this.y = [];
+	}
+
+	// A polynomial Band-Limited stEP function
+	polyBlep(t, dt){
+		// t - t^2 / 2 + 1/2 for 0 < t <= 1
+		// discontinuities between 0 & 1
+		if (t < dt){
+			t = t / dt;
+			return t+t - t*t - 1;
+		} 
+		// t^2 / 2 + t + 1/2 for -1 <= t <= 0
+		// discontinuities between -1 & 0
+		else if (t > (1 - dt)){
+			t = (t - 1) / dt;
+			return t*t + t+t + 1;
+		}
+		// when no discontinuities, return 0
+		else { 
+			return 0;
+		}
+	}
+
+	process(inputs, outputs, parameters){
+		const input = inputs[0];
+		const output = outputs[0];
+
+		if (output[0].length > 1){
+			for (let i = 0; i < output[0].length; i++){
+				// get number of voices for unison
+				const vcs = trunc(pv(parameters.voices, i));
+				// get detuning value for voices in unision
+				const dtn = pv(parameters.detune, i);
+				// get the wave parameter
+				const w = pv(parameters.wave, i);
+				// get the frequency
+				const f = pv(parameters.freq, i);
+				// take the sign from the frequency for negative freqs
+				const sgn = sign(f);
+				// calculate the dt (phase always moves forward)
+				// const dt = INV_SR * Math.abs(f);
+				// // initialize phase at 0
+				// this.phase = this.phase ?? 0;
+
+				// sum all the voices before output
+				let sum = 0;
+
+				// for all the voices
+				for (let v=0; v<vcs; v++){
+					// initialize random phase and history
+					this.phase[v] = this.phase[v] ?? Math.random();
+					this.y[v] = this.y[v] ?? 0;
+					// generate voice index from negative to positive
+					const idx = v - trunc(vcs / 2);
+					// calculate the dt per phase and frequency/detune
+					const dt = INV_SR * Math.abs(f) * Math.pow(2, -dtn * idx / 12);
+
+					// 0: calculate a cosine waveform
+					if (w < 1){
+						sum += Math.sin(this.phase[v] * TWO_PI) * sgn;
+					}
+					// 1: calculate anti-aliased sawtooth waveform with polyBLEP
+					else if (w < 2){
+						// generate a pure sawtooth wave with aliasing
+						let saw = this.phase[v] * 2 - 1;
+						// subtract the polyBlep
+						saw -= this.polyBlep(this.phase[v], dt);
+						// multiply by sign for negative frequencies
+						sum += saw * sgn;
+					}
+					// 2: calculate anti-aliased squarewave with 2 polyBLEPs
+					else if (w < 4){
+						// generate a pure squarewave with aliasing
+						let square = this.phase[v] < 0.5 ? 1 : -1;
+						// subtract and add polyBleps for up/down-transitions
+						square += this.polyBlep(this.phase[v], dt);
+						square -= this.polyBlep(frac(this.phase[v] + 0.5), dt);
+						// 3: the triangle is generated from the anti-aliased square
+						// by applying a leaky integrator
+						if (w >= 3){
+							this.y[v] = square * dt + (1 - dt) * this.y[v];
+							// just replace the square for the triangle
+							// with gain compensation due to loss by integrating
+							square = this.y[v] * 4;
+						}
+						// multiply by sign for negative frequencies
+						sum += square * sgn;
+					}
+
+					// increment the phase per voice and reset to 0 at end
+					this.phase[v] = this.phase[v] + dt;
+					if (this.phase[v] >= 1.0){ this.phase[v] -= trunc(this.phase[v]); }
+				}
+				// send to output but also include some normalisation
+				output[0][i] = fixnan(sum / Math.sqrt(vcs));
+			}
+		}
+		return true;
+	}
+}
+registerProcessor('polyblep-oscillator', polyBlepOscillator);
 
 // Various noise type processors for the MonoNoise source
 // Type 2 is Pink noise, used from Tone.Noise('pink') instead of calc
@@ -32,7 +182,6 @@ class NoiseProcessor extends AudioWorkletProcessor {
 		// input is not used because this is a source
 		const input = inputs[0];
 		const output = outputs[0];
-		const HALF_PI = Math.PI/2;
 
 		// for one output channel generate some noise	
 		if (input.length > 0){
