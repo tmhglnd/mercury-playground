@@ -10,6 +10,7 @@ require('codemirror/addon/hint/show-hint.js');
 require('codemirror/addon/hint/anyword-hint.js');
 require('codemirror/addon/edit/matchbrackets.js');
 // require('codemirror/addon/edit/closebrackets.js');
+require('codemirror/addon/search/search.js');
 
 if (!localStorage.getItem('lightSyntax')){ 
 	localStorage.setItem('lightSyntax', 'neat');
@@ -131,6 +132,9 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 	this.container.style.opacity = 1;
 
 	this.showHint = false;
+
+	// array for makers containing custom html nodes such as slider
+	this.markers = [];
 
 	this.options = {
 		// options for the editor
@@ -315,6 +319,67 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 	}
 
 	this.evaluate = function(){
+		// first check for custom widgets in the code
+		// console.log(this.cm.getAllMarks());
+		// this.markers = this.cm.getAllMarks();
+		// this.markers.forEach(m => m.clear());
+
+		// if it has a slider, replace it by a slider widget, then forward code
+		// if it already has a slider widget, get the value from it as well
+		// find some way to forward a reference to the slider value to have it
+		// automatically update.
+		let c = this.cm.getValue();
+
+		let tokens = /slider\([^()]*\)/g;
+
+		while ((find = tokens.exec(c)) !== null) {
+			console.log('found', find);
+			let s = find[0];
+			let args = s.match(/[^A-Za-z()\s\t\n]+/g);
+			console.log('args', args);
+
+			let slider = document.createElement('input');
+			slider.type = 'range';
+			slider.style.height = '10px';
+			slider.style.cursor = 'pointer';
+			slider.style.display = 'inline';
+			slider.step = 0.001;
+			slider.min = args[0] ?? 0;
+			slider.max = args[1] ?? 1;
+			slider.value = args[2] ?? slider.min;
+			let id = `/slider${Math.floor(Math.random() * 10000)}`
+			slider.oninput = () => {
+				// generate unique slider ID
+				// create a "fake" osc message internally with event emitter
+				forwardOSC([id, slider.value]);
+			}
+			window.addEventListener(id, (event) => {
+				console.log('using slider', event.type, event.detail.value);
+			});
+
+			// get the line and position:
+			let lines = c.substring(0, find.index).split('\n');
+			let line = lines.length-1;
+			let pos = lines[line].length;
+			let end = pos + s.length;
+			// console.log('found', s, { line: line, pos: pos, end: pos + s.length });
+
+			// check if there is already a marker present at the function
+			let markers = this.cm.findMarksAt({ line: line, ch: pos });
+			console.log('has marker', markers, markers.length);
+
+			// if no marker, generate one and replace with widget
+			if (markers.length === 0){
+				this.cm.markText({line: line, ch: pos}, {line: line, ch: end}, { replacedWith: slider });
+			}
+
+			// c = c.substring(0, find.index) + '' + c.substring(tokens.lastIndex);
+			// tokens.lastIndex = find.index; //+ s.length;
+		}
+		console.log(this.cm.getAllMarks());
+
+		return;
+
 		let noError = code({ file: this.cm.getValue(), engine: engine, canvas: canvas, p5canvas: p5canvas });
 		engine.resume();
 

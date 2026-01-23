@@ -167,7 +167,7 @@ window.onload = () => {
 		});
 	}
 
-	function forwardOSC(msg){
+	window.forwardOSC = function(msg){
 		let address = msg.shift();
 		let details = msg;
 		// store the osc message values in the object
