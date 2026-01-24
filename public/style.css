@@ -253,6 +253,13 @@ textarea:hover {
 	background: var(--bg);
 }
 
+.slider {
+	height: 10px;
+	cursor: pointer;
+	display: inline;
+	width: 60px;
+}
+
 .modal {
 	display: none;
 	position: fixed;

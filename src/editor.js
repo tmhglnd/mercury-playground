@@ -352,24 +352,31 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 				// get the arguments for the slider (low, high, default)
 				let args = s.match(/[^A-Za-z()\s\t\n]+/g);
 
+				let widget = document.createElement('div');
+				widget.style.display = 'inline';
+				widget.style.border = 'solid var(--transparent) 1px';
+				let val = document.createElement('p');
+				val.style.display = 'inline';
+				val.style.fontSize = '8pt';
 				let slider = document.createElement('input');
+				slider.className = 'slider';
 				slider.type = 'range';
-				slider.style.height = '10px';
-				slider.style.cursor = 'pointer';
-				slider.style.display = 'inline';
 				slider.step = 0.001;
 				slider.min = args[0] ?? 0;
 				slider.max = args[1] ?? 1;
 				slider.value = args[2] ?? slider.min;
+				widget.appendChild(slider);
+				widget.appendChild(val);
 
 				slider.oninput = () => {
 					// create a "fake" osc message internally with event emitter
 					forwardOSC([id, slider.value]);
+					val.innerHTML = Number(slider.value).toFixed(2);
 				}
 				// initialize with a value immediately
 				forwardOSC([id, slider.value]);
 
-				let mark = this.cm.markText({line: line, ch: pos}, {line: line, ch: end}, { replacedWith: slider });
+				let mark = this.cm.markText({line: line, ch: pos}, {line: line, ch: end}, { replacedWith: widget });
 				mark.widgetID = id;
 			} else {
 				// get the reference of the previous slider from the marker
