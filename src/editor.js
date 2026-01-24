@@ -319,68 +319,76 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 	}
 
 	this.evaluate = function(){
-		// first check for custom widgets in the code
-		// console.log(this.cm.getAllMarks());
-		// this.markers = this.cm.getAllMarks();
-		// this.markers.forEach(m => m.clear());
-
 		// if it has a slider, replace it by a slider widget, then forward code
 		// if it already has a slider widget, get the value from it as well
 		// find some way to forward a reference to the slider value to have it
 		// automatically update.
 		let c = this.cm.getValue();
+		let output = [];
 
 		let tokens = /slider\([^()]*\)/g;
-
+		let previousIndex = 0;
 		while ((find = tokens.exec(c)) !== null) {
-			console.log('found', find);
+			console.log('found', find, tokens.lastIndex, previousIndex);
 			let s = find[0];
-			let args = s.match(/[^A-Za-z()\s\t\n]+/g);
-			console.log('args', args);
-
-			let slider = document.createElement('input');
-			slider.type = 'range';
-			slider.style.height = '10px';
-			slider.style.cursor = 'pointer';
-			slider.style.display = 'inline';
-			slider.step = 0.001;
-			slider.min = args[0] ?? 0;
-			slider.max = args[1] ?? 1;
-			slider.value = args[2] ?? slider.min;
-			let id = `/slider${Math.floor(Math.random() * 10000)}`
-			slider.oninput = () => {
-				// generate unique slider ID
-				// create a "fake" osc message internally with event emitter
-				forwardOSC([id, slider.value]);
-			}
-			window.addEventListener(id, (event) => {
-				console.log('using slider', event.type, event.detail.value);
-			});
 
 			// get the line and position:
 			let lines = c.substring(0, find.index).split('\n');
-			let line = lines.length-1;
+			let line = lines.length - 1;
 			let pos = lines[line].length;
 			let end = pos + s.length;
-			// console.log('found', s, { line: line, pos: pos, end: pos + s.length });
-
 			// check if there is already a marker present at the function
 			let markers = this.cm.findMarksAt({ line: line, ch: pos });
-			console.log('has marker', markers, markers.length);
 
+			// if (markers.length > 0){
+			// 	return;
+			// }
+
+			// generate unique slider ID
+			let id = `/slider${Math.floor(Math.random() * 10000)}`;
+			
 			// if no marker, generate one and replace with widget
 			if (markers.length === 0){
-				this.cm.markText({line: line, ch: pos}, {line: line, ch: end}, { replacedWith: slider });
+				// get the arguments for the slider (low, high, default)
+				let args = s.match(/[^A-Za-z()\s\t\n]+/g);
+
+				let slider = document.createElement('input');
+				slider.type = 'range';
+				slider.style.height = '10px';
+				slider.style.cursor = 'pointer';
+				slider.style.display = 'inline';
+				slider.step = 0.001;
+				slider.min = args[0] ?? 0;
+				slider.max = args[1] ?? 1;
+				slider.value = args[2] ?? slider.min;
+
+				slider.oninput = () => {
+					// create a "fake" osc message internally with event emitter
+					forwardOSC([id, slider.value]);
+				}
+				// initialize with a value immediately
+				forwardOSC([id, slider.value]);
+
+				let mark = this.cm.markText({line: line, ch: pos}, {line: line, ch: end}, { replacedWith: slider });
+				mark.widgetID = id;
+			} else {
+				// get the reference of the previous slider from the marker
+				id = markers[0].widgetID;
 			}
 
-			// c = c.substring(0, find.index) + '' + c.substring(tokens.lastIndex);
-			// tokens.lastIndex = find.index; //+ s.length;
+			// put a reference in the code to the slider ID osc address
+			// don't construct a string yet, to reduce indexing issues
+			output.push(c.substring(previousIndex, find.index));
+			output.push(`'${id}'`);
+
+			previousIndex = tokens.lastIndex;
 		}
-		console.log(this.cm.getAllMarks());
+		// push left-over part of code and concatenate array
+		output.push(c.substring(previousIndex));
+		output = output.join("");
 
-		return;
-
-		let noError = code({ file: this.cm.getValue(), engine: engine, canvas: canvas, p5canvas: p5canvas });
+		let noError = code({ file: output, engine: engine, canvas: canvas, p5canvas: p5canvas });
+		// let noError = code({ file: this.cm.getValue(), engine: engine, canvas: canvas, p5canvas: p5canvas });
 		engine.resume();
 
 		// if an error occured, flash red!
