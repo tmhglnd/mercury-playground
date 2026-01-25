@@ -335,6 +335,85 @@ class SquashProcessor extends AudioWorkletProcessor {
 }
 registerProcessor('squash-processor', SquashProcessor);
 
+// Hal Chamberlin State Variable Filter. Improved version, basedon the paper:
+// Improving the Digital Chamberlin State Variable Filter
+// Updated version based on the paper https://arxiv.org/pdf/2111.05592
+// by Victor Lazzarini and Joseph Timoney, 2022
+// ported to JS by Timo Hoogland, 2026
+class StateVariableFilter extends AudioWorkletProcessor {
+	static get parameterDescriptors() {
+		return [
+			[ 'frequency', 500, 10, sampleRate/2, "k-rate" ],
+			[ 'resonance', 0.1, 0.001, 0.999, "k-rate" ],
+			[ 'type', 0, 0, 3, "k-rate" ],
+		].map(x => new Object({
+			name: x[0],
+			defaultValue: x[1],
+			minValue: x[2],
+			maxValue: x[3],
+			automationRate: x[4]
+		}));
+	}
+
+	constructor(){
+		super();
+		// history values for single sample feedback
+		this.h1 = [];
+		this.h2 = [];
+	}
+
+	process(inputs, outputs, parameters){
+		const input = inputs[0];
+		const output = outputs[0];
+
+		if (input.length < 1){ 
+			return true; 
+		}
+
+		const freq = parameters.frequency[0];
+		const res = parameters.resonance[0];
+		const type = parameters.type[0];
+
+		const Q = Math.pow(res, 6) * 99 + 1;
+		const q1 = Math.max(0, Math.min(250, Q));
+		const cf = Math.tan(Math.PI * freq / sampleRate);
+
+		for (let channel = 0; channel < input[0].length; channel++){
+			// initalize with 0's;
+			this.h1 = this.h1[channel] ?? 0;
+			this.h2 = this.h2[channel] ?? 0;
+
+			for (let i = 0; i < input[channel].length; i++){
+
+				const kdiv = 1 + cf / q1 + cf*cf;
+				const highp = (input[channel][i] - (1 / q1 + cf) * this.h1[channel] - this.h2[channel]) / kdiv;
+
+				let tmp = highp * cf;
+		
+				const bandp = tmp + this.h1[channel];
+				this.h1[channel] = tmp + bandp;
+		
+				tmp = bandp * cf;
+				const lowp = tmp + this.h2[channel];
+				this.h2[channel] = tmp + lowp;
+		
+				if (type < 1){
+					output[channel][i] = lowp;
+				} else if (type < 2){
+					output[channel][i] = highp;
+				} else if (type < 3){
+					output[channel][i] = bandp;
+				} 
+				// else {
+				// 	output[channel][i] = highp + lowp; //notch output
+				// }
+			}
+		}
+		return true;
+	}
+}
+registerProcessor('state-variable-filter', StateVariableFilter);
+
 // Comb Filter processor
 // A LowPass FeedBack CombFilter effect (LBCF)
 // Uses a onepole lowpass filter in the feedback delay for damping
