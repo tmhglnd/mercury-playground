@@ -319,13 +319,11 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 	}
 
 	this.evaluate = function(){
-		// if it has a slider, replace it by a slider widget, then forward code
-		// if it already has a slider widget, get the value from it as well
-		// find some way to forward a reference to the slider value to have it
-		// automatically update.
 		let c = this.cm.getValue();
 		let output = [];
-
+		
+		// if it has a slider, replace it by a slider widget, then forward code
+		// if it already has a slider widget, get the value from it as well
 		let tokens = /slider\([^()]*\)/g;
 		let previousIndex = 0;
 		while ((find = tokens.exec(c)) !== null) {
@@ -340,10 +338,6 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 			// check if there is already a marker present at the function
 			let markers = this.cm.findMarksAt({ line: line, ch: pos });
 
-			// if (markers.length > 0){
-			// 	return;
-			// }
-
 			// generate unique slider ID
 			let id = `/slider${Math.floor(Math.random() * 10000)}`;
 			
@@ -354,7 +348,6 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 
 				let widget = document.createElement('div');
 				widget.style.display = 'inline';
-				widget.style.border = 'solid var(--transparent) 1px';
 				let val = document.createElement('p');
 				val.style.display = 'inline';
 				val.style.fontSize = '8pt';
