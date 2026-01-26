@@ -73,11 +73,11 @@ const fxMap = {
 	// 'tune' : (params) => {
 	// 	return new PitchShift(params);
 	// },
-	'filter' : (params) => {
-		return new Filter(params);
-	},
 	'svf' : (params) => {
 		return new SVF(params);
+	},
+	'filter' : (params) => {
+		return new Filter(params);
 	},
 	'triggerFilter' : (params) => {
 		return new TriggerFilter(params);
@@ -121,9 +121,30 @@ const fxMap = {
 }
 module.exports = fxMap;
 
+const WorkletFX = function(fx){
+	// ToneAudioNode has all the tone effect parameters
+	const _fx = new Tone.ToneAudioNode();
+	// A gain node for connecting with input and output
+	_fx.input = new Tone.Gain(1);
+	_fx.output = new Tone.Gain(1);
+	// the fx processor
+	_fx.workletNode = new Tone.getContext().createAudioWorkletNode(fx);
+	// connect input, fx and output
+	_fx.input.chain(_fx.workletNode, _fx.output);
+	// send a reference back
+	return _fx;
+}
+
+// Helper functions
+
+// Set a parameter in an worklet processor
+const setParam = function(node, param, value, time) {
+	const p = node.workletNode.parameters.get(param);
+	p.setValueAtTime(value, time);
+}
+
 // Dispose a array of nodes
-//
-function disposeNodes(nodes=[]) {
+const disposeNodes = function(nodes=[]) {
 	nodes.forEach((n) => {
 		n?.disconnect();
 		n?.dispose();
@@ -139,21 +160,13 @@ function disposeNodes(nodes=[]) {
 const CombFilter = function(_params) {
 	// the default parameters
 	_params = Util.mapDefaults(_params, [0, 0.8, 0.5, 0.5]);
-	this._pitch = Util.toArray(_params[0]);
-	this._fback = Util.toArray(_params[1]);
-	this._damp = Util.toArray(_params[2]);
-	this._wet = Util.toArray(_params[3]);
+	this._pitch = _params[0];
+	this._fback = _params[1];
+	this._damp = _params[2];
+	this._wet = _params[3];
 
-	// ToneAudioNode has all the tone effect parameters
-	this._fx = new Tone.ToneAudioNode();
-
-	// A gain node for connecting with input and output
-	this._fx.input = new Tone.Gain(1);
-	this._fx.output = new Tone.Gain(1);
-	// the fx processor
-	this._fx.workletNode = Tone.getContext().createAudioWorkletNode('combfilter-processor');
-	// connect input, fx and output
-	this._fx.input.chain(this._fx.workletNode, this._fx.output);
+	// load a worklet FX in a ToneAudioNode
+	this._fx = WorkletFX('combfilter-processor');
 
 	this.set = (count, time, bpm) => {
 		const pitch = Util.toMidi(Util.getParam(this._pitch, count));
@@ -167,15 +180,11 @@ const CombFilter = function(_params) {
 		const _dm = Util.clip(Util.getParam(this._damp, count));
 		const _dw = Util.clip(Util.getParam(this._wet, count));
 		
-		// get parameters from workletprocessor
-		const dt = this._fx.workletNode.parameters.get('time');	
-		dt.setValueAtTime(_dt, time);
-		const fb = this._fx.workletNode.parameters.get('feedback');	
-		fb.setValueAtTime(_fb, time);
-		const dm = this._fx.workletNode.parameters.get('damping');	
-		dm.setValueAtTime(_dm, time);
-		const dw = this._fx.workletNode.parameters.get('drywet');	
-		dw.setValueAtTime(_dw, time);
+		// set parameters for workletprocessor
+		setParam(this._fx, 'time', _dt, time);
+		setParam(this._fx, 'feedback', _fb, time);
+		setParam(this._fx, 'damping', _dm, time);
+		setParam(this._fx, 'drywet', _dw, time);
 	}
 
 	this.chain = () => {
@@ -958,11 +967,6 @@ const LFO = function(_params){
 	}
 }
 
-const setParam = (node, param, value, time) => {
-	const p = node.workletNode.parameters.get(param);
-	p.setValueAtTime(value, time);
-};
-
 const SVF = function(_params){
 	_params = Util.mapDefaults(_params, [ 0, 1200, 0.45 ]);
 	this._type = _params[0];
@@ -971,13 +975,9 @@ const SVF = function(_params){
 
 	// ToneAudioNode has all the tone effect parameters
 	this._fx = new Tone.ToneAudioNode();
-
-	// A gain node for connecting with input and output
 	this._fx.input = new Tone.Gain(1);
 	this._fx.output = new Tone.Gain(1);
-	// the fx processor
 	this._fx.workletNode = Tone.getContext().createAudioWorkletNode('state-variable-filter');
-	// connect input, fx and output
 	this._fx.input.chain(this._fx.workletNode, this._fx.output);
 
 	this.set = function(c, time, bpm){
