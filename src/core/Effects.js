@@ -76,6 +76,9 @@ const fxMap = {
 	'filter' : (params) => {
 		return new Filter(params);
 	},
+	'svf' : (params) => {
+		return new SVF(params);
+	},
 	'triggerFilter' : (params) => {
 		return new TriggerFilter(params);
 	},
@@ -952,6 +955,43 @@ const LFO = function(_params){
 			n.disconnect();
 			n.dispose();
 		});
+	}
+}
+
+const setParam = (node, param, value, time) => {
+	const p = node.workletNode.parameters.get(param);
+	p.setValueAtTime(value, time);
+};
+
+const SVF = function(_params){
+	_params = Util.mapDefaults(_params, [ 0, 1200, 0.45 ]);
+	this._type = _params[0];
+	this._freq = _params[1];
+	this._res = _params[2];
+
+	// ToneAudioNode has all the tone effect parameters
+	this._fx = new Tone.ToneAudioNode();
+
+	// A gain node for connecting with input and output
+	this._fx.input = new Tone.Gain(1);
+	this._fx.output = new Tone.Gain(1);
+	// the fx processor
+	this._fx.workletNode = Tone.getContext().createAudioWorkletNode('state-variable-filter');
+	// connect input, fx and output
+	this._fx.input.chain(this._fx.workletNode, this._fx.output);
+
+	this.set = function(c, time, bpm){
+		setParam(this._fx, 'type', Util.getParam(this._type, c), time);
+		setParam(this._fx, 'frequency', Util.getParam(this._freq, c), time);
+		setParam(this._fx, 'resonance', Util.getParam(this._res, c), time);
+	}
+
+	this.chain = function(){
+		return { 'send' : this._fx, 'return' : this._fx };
+	}
+
+	this.delete = function(){
+		disposeNodes([ this._fx, this._fx.input, this._fx.output ]);
 	}
 }
 
