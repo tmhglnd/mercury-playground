@@ -192,7 +192,7 @@ const CombFilter = function(_params) {
 	}
 
 	this.delete = () => {
-		disposeNodes([this._fx.input, this._fx.output, this._fx]);
+		disposeNodes([ this._fx.input, this._fx.output, this._fx ]);
 	}
 }
 

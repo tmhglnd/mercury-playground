@@ -37,6 +37,8 @@ class MonoInput extends Instrument {
 	}
 
 	delete(){
+		// dispose and disconnect the mic
+		this.mic.dispose();
 		// delete super class
 		super.delete();
 
