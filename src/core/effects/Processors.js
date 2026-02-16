@@ -1,8 +1,43 @@
 
+// The extended worklet processor contains a few base functionalities
+// for all the other processors to be used.
+// 
+class ExtendedWorkletProcessor extends AudioWorkletProcessor {
+	constructor(){
+		super();
+		// is the processor running? use as return in process()
+		this.running = true;
+		this.port.onmessage = (e) => {
+			// dispose on node.port.postMessage('dispose')
+			if (e.data === 'dispose'){ 
+				this.running = false; 
+				// console.log('disposed workletprocessor', this);
+			}
+		}
+	}
+	// Template for parent class processing, 
+	// overwrite this in the parent class
+	// process(inputs, outputs, parameters){
+	// 	const input = inputs[0];
+	// 	const output = outputs[0];
+
+	// 	if (input.length > 0){
+	// 		// for every channel
+	// 		for (let channel = 0; channel < input.length; channel++){
+	// 			// for the length of the sample array (generally 128)
+	// 			for (let i = 0; i < input[0].length; i++){
+	// 				output[channel][i] = input[channel][i];
+	// 			}
+	// 		}
+	// 	}
+	// 	return this.running;
+	// }
+}
+
 // Various noise type processors for the MonoNoise source
 // Type 2 is Pink noise, used from Tone.Noise('pink') instead of calc
 //
-class NoiseProcessor extends AudioWorkletProcessor {
+class NoiseProcessor extends ExtendedWorkletProcessor {
 	static get parameterDescriptors(){
 		return [{
 			name: 'type',
@@ -100,7 +135,7 @@ class NoiseProcessor extends AudioWorkletProcessor {
 				output[0][i] = out;
 			}
 		}		
-		return true;
+		return this.running;
 	}
 }
 registerProcessor('noise-processor', NoiseProcessor);
@@ -109,7 +144,7 @@ registerProcessor('noise-processor', NoiseProcessor);
 // Resulting in a lower samplerate, making it sound more like 8bit/chiptune
 // Programmed with a custom AudioWorkletProcessor, see effects/Processors.js
 //
-class DownSampleProcessor extends AudioWorkletProcessor {
+class DownSampleProcessor extends ExtendedWorkletProcessor {
 	static get parameterDescriptors() {
 		return [{
 			name: 'down',
@@ -154,57 +189,16 @@ class DownSampleProcessor extends AudioWorkletProcessor {
 				this.count++;
 			}
 		}
-		return true;
+		return this.running;
 	}
 }
 registerProcessor('downsampler-processor', DownSampleProcessor);
-
-// A distortion algorithm using the tanh (hyperbolic-tangent) as a 
-// waveshaping technique. Some mapping to apply a more equal loudness 
-// distortion is applied on the overdrive parameter
-//
-class TanhDistortionProcessor extends AudioWorkletProcessor {
-	static get parameterDescriptors(){
-		return [{
-			name: 'amount',
-			defaultValue: 4,
-			minValue: 1
-		}, {
-			name: 'makeup',
-			defaultValue: 0.5,
-			minValue: 0,
-			maxValue: 2
-		}]
-	}
-
-	constructor(){
-		super();
-	}
-
-	process(inputs, outputs, parameters){
-		const input = inputs[0];
-		const output = outputs[0];
-
-		if (input.length > 0){
-			for (let channel=0; channel<input.length; channel++){
-				for (let i=0; i<input[channel].length; i++){
-					const a = (parameters.amount.length > 1)? parameters.amount[i] : parameters.amount[0];
-					const m = (parameters.makeup.length > 1)? parameters.makeup[i] : parameters.makeup[0];
-					// simple waveshaping with tanh
-					output[channel][i] = Math.tanh(input[channel][i] * a) * m;
-				}
-			}
-		}
-		return true;
-	}
-}
-registerProcessor('tanh-distortion-processor', TanhDistortionProcessor);
 
 // A distortion algorithm using the arctan function as a 
 // waveshaping technique. Some mapping to apply a more equal loudness 
 // distortion is applied on the overdrive parameter
 //
-class ArctanDistortionProcessor extends AudioWorkletProcessor {
+class ArctanDistortionProcessor extends ExtendedWorkletProcessor {
 	static get parameterDescriptors(){
 		return [{
 			name: 'amount',
@@ -235,7 +229,7 @@ class ArctanDistortionProcessor extends AudioWorkletProcessor {
 				}
 			}
 		}
-		return true;
+		return this.running;
 	}
 }
 registerProcessor('arctan-distortion-processor', ArctanDistortionProcessor);
@@ -245,7 +239,7 @@ registerProcessor('arctan-distortion-processor', ArctanDistortionProcessor);
 // 1 soft-clipping stage, 2 half-wave rectifier, 3 hard-clipping stage
 // Based on: https://github.com/hazza-music/EHX-Big-Muff-Pi-Emulation/blob/main/Technical%20Essay.pdf
 // 
-class FuzzProcessor extends AudioWorkletProcessor {
+class FuzzProcessor extends ExtendedWorkletProcessor {
 	static get parameterDescriptors() {
 		return [{
 			name: 'amount',
@@ -284,7 +278,7 @@ class FuzzProcessor extends AudioWorkletProcessor {
 				}
 			}
 		}
-		return true;
+		return this.running;
 	}
 }
 registerProcessor('fuzz-processor', FuzzProcessor);
@@ -292,7 +286,7 @@ registerProcessor('fuzz-processor', FuzzProcessor);
 // A distortion/compression effect of an incoming signal
 // Based on an algorithm by Peter McCulloch
 // 
-class SquashProcessor extends AudioWorkletProcessor {
+class SquashProcessor extends ExtendedWorkletProcessor {
 	static get parameterDescriptors(){
 		return [{
 			name: 'amount',
@@ -330,7 +324,7 @@ class SquashProcessor extends AudioWorkletProcessor {
 				}
 			}
 		}
-		return true;
+		return this.running;
 	}
 }
 registerProcessor('squash-processor', SquashProcessor);
@@ -343,7 +337,7 @@ registerProcessor('squash-processor', SquashProcessor);
 // Other useful resource on SVF: 
 // https://www.earlevel.com/main/2003/03/02/the-digital-state-variable-filter/
 // 
-class StateVariableFilter extends AudioWorkletProcessor {
+class StateVariableFilter extends ExtendedWorkletProcessor {
 	static get parameterDescriptors() {
 		return [
 			[ 'frequency', 500, 1, 18000, "k-rate" ],
@@ -409,7 +403,7 @@ class StateVariableFilter extends AudioWorkletProcessor {
 				}
 			}
 		}
-		return true;
+		return this.running;
 	}
 }
 registerProcessor('state-variable-filter', StateVariableFilter);
@@ -420,7 +414,7 @@ registerProcessor('state-variable-filter', StateVariableFilter);
 // Feedback amount can be positive or negative 
 // (negative creates odd harmonics one octave lower)
 // 
-class CombFilterProcessor extends AudioWorkletProcessor {
+class CombFilterProcessor extends ExtendedWorkletProcessor {
 	static get parameterDescriptors() {
 		return [
 			[ 'time', 5, 0, 120, "k-rate" ],
@@ -502,7 +496,7 @@ class CombFilterProcessor extends AudioWorkletProcessor {
 				}
 			}
 		}
-		return true;
+		return this.running;
 	}
 }
 registerProcessor('combfilter-processor', CombFilterProcessor);
@@ -516,12 +510,12 @@ registerProcessor('combfilter-processor', CombFilterProcessor);
 //
 // In jurisdictions that recognize copyright laws, this software is to
 // be released into the public domain.
-
+// 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
 // THE AUTHOR(S) SHALL NOT BE LIABLE FOR ANYTHING, ARISING FROM, OR IN
 // CONNECTION WITH THE SOFTWARE OR THE DISTRIBUTION OF THE SOFTWARE.
 // 
-class DattorroReverb extends AudioWorkletProcessor {
+class DattorroReverb extends ExtendedWorkletProcessor {
 	static get parameterDescriptors() {
 		return [
 			["preDelay", 0, 0, sampleRate - 1, "k-rate"],
@@ -735,63 +729,7 @@ class DattorroReverb extends AudioWorkletProcessor {
 		// Update preDelay index
 		this._pDWrite = (this._pDWrite + 128) % this._pDLength;
 
-		return true;
+		return this.running;
 	}
 }
 registerProcessor('dattorro-reverb', DattorroReverb);
-
-// A custom written Delay audioworkletprocessor
-// In the first place as a test for how to write custom delaylines 
-// With the potential to create more complicated FX for the browser
-//
-// class DelayProcessor extends AudioWorkletProcessor {
-// 	static get parameterDescriptors(){
-// 		return [{
-// 			name : 'delayTime',
-// 			defaultValue: 100,
-// 			minValue: 0,
-// 			maxValue: 1000
-// 		}]
-// 	}
-
-// 	constructor(){
-// 		super();
-// 		// maximum delayline 2 seconds at 48kHz
-// 		this.maxDelay = 44100 * 5;
-// 		// the delaybuffer to be used
-// 		this.delayBuffer = new Float32Array(this.maxDelay);
-// 		// the delay write index
-// 		this.index = 0;
-// 	}
-
-// 	process(inputs, outputs, parameters){
-// 		const input = inputs[0];
-// 		const output = outputs[0];
-
-// 		// if there is anything to process
-// 		if (input.length === 0) return true;
-		
-// 		// for every channel
-// 		for (let channel = 0; channel < 1; channel++){
-// 			// no sound int channel continue to the next channel
-// 			if (!input[channel]) continue;
-
-// 			// for every sample in the blocksize
-// 			for (let i=0; i<input[0].length; i++){
-
-// 				// calculate delaytime from ms to samples
-// 				const delayTime = parameters.delayTime.length > 1 ? parameters.delayTime[i] : parameters.delayTime[0];
-				
-// 				const dt = Math.floor(delayTime * 0.001 * 44100);
-// 				// read from the delayline at the readindex and output
-// 				output[channel][i] = this.delayBuffer[this.index];
-// 				// write a value to the delayline at current position
-// 				this.delayBuffer[this.index] = input[channel][i] + output[channel][i] * 0.9;
-// 				// increment the write index
-// 				this.index = (this.index + 1) % dt;
-// 			}
-// 		}
-// 		return true;
-// 	}
-// }
-// registerProcessor('delay-processor', DelayProcessor);

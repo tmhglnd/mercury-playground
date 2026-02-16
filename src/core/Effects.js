@@ -135,6 +135,30 @@ const WorkletFX = function(fx){
 	return _fx;
 }
 
+// class WorkletFX {
+// 	constructor(fx){
+// 		// ToneAudioNode has all the tone effect parameters
+// 		this._fx = new Tone.ToneAudioNode();
+// 		// A gain node for connecting with input and output
+// 		this._fx.input = new Tone.Gain(1);
+// 		this._fx.output = new Tone.Gain(1);
+// 		// the fx processor
+// 		this._fx.workletNode = new Tone.getContext().createAudioWorkletNode(fx);
+// 		// connect input, fx and output
+// 		this._fx.input.chain(this._fx.workletNode, this._fx.output);
+// 	}
+// 	connect() {
+// 		return this._fx;
+// 	}
+// 	dispose() {
+// 		this._fx.dispose();
+// 	}
+// 	setParam(param, value, time) {
+// 		const p = this._fx.workletNode.parameters.get(param);
+// 		p.setValueAtTime(value, time);
+// 	}
+// }
+
 // Helper functions
 
 // Set a parameter in an worklet processor
@@ -192,6 +216,7 @@ const CombFilter = function(_params) {
 	}
 
 	this.delete = () => {
+		this._fx.workletNode.port.postMessage('dispose');
 		disposeNodes([ this._fx.input, this._fx.output, this._fx ]);
 	}
 }
@@ -342,6 +367,9 @@ const DownSampler = function(_params){
 	}
 
 	this.delete = function(){
+		// stop the processor
+		this._fx.workletNode.port.postMessage('dispose');
+
 		const nodes = [ this._fx, this._fx.input, this._fx.output, this._mix, this._mixDry ];
 
 		nodes.forEach((n) => {
@@ -398,6 +426,8 @@ const Overdrive = function(_params){
 	}
 
 	this.delete = function(){
+		this._fx.workletNode.port.postMessage('dispose');
+
 		let nodes = [ this._fx, this._fx.input, this._fx.output, this._mix, this._mixDry, this._mixWet ];
 		
 		nodes.forEach((n) => {
@@ -453,6 +483,7 @@ const Fuzz = function(_params){
 	}
 
 	this.delete = function(){
+		this._fx.workletNode.port.postMessage('dispose');
 		disposeNodes([ this._fx, this._fx.input, this._fx.output, this._mix, this._mixDry, this._mixWet ]);
 	}
 }
@@ -579,12 +610,8 @@ const Squash = function(_params){
 	}
 
 	this.delete = function(){
-		let nodes = [ this._fx.input, this._fx.output, this._fx, this._mix, this._mixDry ];
-
-		nodes.forEach((n) => {
-			n.disconnect();
-			n.dispose();
-		});
+		this._fx.workletNode.port.postMessage('dispose');
+		disposeNodes([ this._fx.input, this._fx.output, this._fx, this._mix, this._mixDry ])
 	}
 }
 
@@ -673,6 +700,7 @@ const DattorroReverb = function(_params){
 	}
 
 	this.delete = () => {
+		this._fx.workletNode.port.postMessage('dispose');
 		disposeNodes([ this._fx, this._mix, this._mixDry, this._mixWet, this._fx.input, this._fx.output ]);
 	}
 }
@@ -991,6 +1019,7 @@ const SVF = function(_params){
 	}
 
 	this.delete = function(){
+		this._fx.workletNode.port.postMessage('dispose');
 		disposeNodes([ this._fx, this._fx.input, this._fx.output ]);
 	}
 }
