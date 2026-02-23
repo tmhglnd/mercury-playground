@@ -151,6 +151,11 @@ class DownSampleProcessor extends ExtendedWorkletProcessor {
 			defaultValue: 8,
 			minValue: 1,
 			maxValue: 2048
+		}, {
+			name: 'drywet',
+			defaultValue: 0.5,
+			minValue: 0,
+			maxValue: 1
 		}];
 	}
 
@@ -171,19 +176,18 @@ class DownSampleProcessor extends ExtendedWorkletProcessor {
 			// for the length of the sample array (generally 128)
 			for (let i=0; i<input[0].length; i++){
 				const d = (parameters.down.length > 1) ? parameters.down[i] : parameters.down[0];
+				const dw = (parameters.drywet.length > 1) ? parameters.drywet[i] : parameters.drywet[0];
+				
 				// for every channel
 				for (let channel=0; channel<input.length; ++channel){
-					// upsampling for better results
-					// for (let s=0; s<4; s++){
-					// 	if (this.count)
-					// }
-
 					// if counter equals 0, sample and hold
 					if (this.count % d === 0){
 						this.sah[channel] = input[channel][i];
 					}
 					// output the currently held sample
-					output[channel][i] = this.sah[channel];
+					// apply drywet param
+					// output[channel][i] = this.sah[channel];
+					output[channel][i] = input[channel][i] + ((this.sah[channel] - input[channel][i]) * dw);
 				}
 				// increment sample counter
 				this.count++;

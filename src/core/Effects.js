@@ -329,53 +329,30 @@ const FormantFilter = function(_params){
 const DownSampler = function(_params){
 	// apply the default values and convert to arrays where necessary
 	_params = Util.mapDefaults(_params, [ 0.5, 1 ]);
-	this._down = Util.toArray(_params[0]);
-	this._wet = Util.toArray(_params[1]);
+	this._down = _params[0];
+	this._wet = _params[1];
 
 	// ToneAudioNode has all the tone effect parameters
-	this._fx = new Tone.ToneAudioNode();
-
-	// The crossfader mix
-	this._mix = new Tone.Add();
-	this._mixDry = new Tone.Gain(0).connect(this._mix.input);
-	// this._mixWet = new Tone.Gain(0.5).connect(this._mix.addend);
-
-	// A gain node for connecting with input and output
-	this._fx.input = new Tone.Gain(1).connect(this._mixDry);
-	this._fx.output = new Tone.Gain(1).connect(this._mix.addend);
-
-	// the fx processor
-	this._fx.workletNode = Tone.getContext().createAudioWorkletNode('downsampler-processor');
-
-	// connect input, fx and output
-	this._fx.input.chain(this._fx.workletNode, this._fx.output);
+	this._fx = WorkletFX('downsampler-processor');
 
 	this.set = function(c, time, bpm){
 		// some parameter mapping changing input range 0-1 to 1-inf
-		const p = this._fx.workletNode.parameters.get('down');
 		const d = Math.floor(1 / (1 - Util.clip(Util.getParam(this._down, c) ** 0.25, 0, 0.999)));
-		
-		p.setValueAtTime(Util.assureNum(d), time);
-		
+		// the drywet amount clamped between 0 and 1
 		const w = Util.clip(Util.getParam(this._wet, c), 0, 1);
-		this._fx.output.gain.setValueAtTime(w, time);
-		this._mixDry.gain.setValueAtTime(1 - w, time);
+		
+		setParam(this._fx, 'down', d, time);
+		setParam(this._fx, 'drywet', w, time);
 	}
 
 	this.chain = function(){
-		return { 'send' : this._fx, 'return' : this._mix }
+		return { 'send' : this._fx, 'return' : this._fx }
 	}
 
 	this.delete = function(){
 		// stop the processor
 		this._fx.workletNode.port.postMessage('dispose');
-
-		const nodes = [ this._fx, this._fx.input, this._fx.output, this._mix, this._mixDry ];
-
-		nodes.forEach((n) => {
-			n.disconnect();
-			n.dispose();
-		});
+		disposeNodes([ this._fx, this._fx.input, this._fx.output ]);
 	}
 }
 
