@@ -160,7 +160,7 @@ class DownSampleProcessor extends ExtendedWorkletProcessor {
 			maxValue: 2048
 		}, {
 			name: 'drywet',
-			defaultValue: 0.5,
+			defaultValue: 1,
 			minValue: 0,
 			maxValue: 1
 		}];
@@ -217,7 +217,7 @@ class ArctanDistortionProcessor extends ExtendedWorkletProcessor {
 			minValue: 1
 		}, {
 			name: 'drywet',
-			defaultValue: 0.5,
+			defaultValue: 1,
 			minValue: 0,
 			maxValue: 1
 		}]
@@ -238,13 +238,13 @@ class ArctanDistortionProcessor extends ExtendedWorkletProcessor {
 		const gain = parameters.amount[0];
 		const makeup = Math.min(1, Math.max(0, 1 - ((Math.atan(gain) - this.Q_PI) * this.INVQ_PI * 0.823)));
 
-		const wet = parameters.drywet[0];
+		const dw = parameters.drywet[0];
 
 		if (input.length > 0){
 			for (let channel=0; channel<input.length; channel++){
 				for (let i=0; i<input[channel].length; i++){
-					const x = Math.atan(input[channel][i] * gain) * makeup;
-					output[channel][i] = mix(input[channel][i], x, wet);
+					const out = Math.atan(input[channel][i] * gain) * makeup;
+					output[channel][i] = mix(input[channel][i], out, dw);
 				}
 			}
 		}
@@ -264,6 +264,11 @@ class FuzzProcessor extends ExtendedWorkletProcessor {
 			name: 'amount',
 			defaultValue: 5,
 			minValue: 1
+		}, {
+			name: 'drywet',
+			defaultValue: 1,
+			minValue: 0,
+			maxValue: 1
 		}]
 	}
 
@@ -279,6 +284,7 @@ class FuzzProcessor extends ExtendedWorkletProcessor {
 
 		const gain = parameters.amount[0];
 		const makeup = Math.max((1 - Math.pow((gain-1) / 63, 0.13)) * 0.395 + 0.605, 0.605);
+		const dw = parameters.drywet[0];
 
 		if (input.length > 0){
 			for (let channel = 0; channel < input.length; channel++){
@@ -293,7 +299,9 @@ class FuzzProcessor extends ExtendedWorkletProcessor {
 					// onepole lowpass filter for dc-block
 					this.history[channel] = (hc - this.history[channel]) * 0.0015 + this.history[channel];
 					// dc-block and gain compensation and output
-					output[channel][i] = (hc - this.history[channel]) * makeup;
+					const out = (hc - this.history[channel]) * makeup;
+					// apply drywet crossfade
+					output[channel][i] = mix(input[channel][i], out, dw);
 				}
 			}
 		}
@@ -307,17 +315,16 @@ registerProcessor('fuzz-processor', FuzzProcessor);
 // 
 class SquashProcessor extends ExtendedWorkletProcessor {
 	static get parameterDescriptors(){
-		return [{
-			name: 'amount',
-			defaultValue: 4,
-			minValue: 1,
-			maxValue: 1024
-		}, {
-			name: 'makeup',
-			defaultValue: 0.5,
-			minValue: 0,
-			maxValue: 2
-		}];
+		return [
+			[ 'amount', 4, 1, 1024 ],
+			[ 'makeup', 0.5, 0, 2 ],
+			[ 'drywet', 1, 0, 1 ]
+		].map(x => new Object({
+			name: x[0],
+			defaultValue: x[1],
+			minValue: x[2],
+			maxValue: x[3]
+		}));
 	}
 
 	constructor(){
@@ -329,17 +336,20 @@ class SquashProcessor extends ExtendedWorkletProcessor {
 		const output = outputs[0];
 		
 		if (input.length > 0){
-			for (let channel=0; channel<input.length; ++channel){
+			for (let channel=0; channel<input.length; channel++){
 				for (let i=0; i<input[channel].length; i++){
 					// (s * a) / ((s * a)^2 * 0.28 + 1) / √a
 					// drive amount, minimum of 1
 					const a = (parameters.amount.length > 1)? parameters.amount[i] : parameters.amount[0];
 					// makeup gain
 					const m = (parameters.makeup.length > 1)? parameters.makeup[i] : parameters.makeup[0];
+					// drywet balance
+					const dw = (parameters.drywet.length > 1)? parameters.drywet[i] : parameters.drywet[0];
 					// set the waveshaper effect
 					const s = input[channel][i];
 					const x = s * a * 1.412;
-					output[channel][i] = (x / (x * x * 0.28 + 1.0)) * m * 0.708;
+					const out = (x / (x * x * 0.28 + 1.0)) * m * 0.708;
+					output[channel][i] = mix(input[channel][i], out, dw);
 				}
 			}
 		}
