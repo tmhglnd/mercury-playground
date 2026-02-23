@@ -1,4 +1,11 @@
 
+// Some helper functions
+
+// Mix two signals with linear interpolation
+function mix(a=0, b=0, x=0.5){
+	return a + ((b - a) * x);
+}
+
 // The extended worklet processor contains a few base functionalities
 // for all the other processors to be used.
 // 
@@ -208,6 +215,11 @@ class ArctanDistortionProcessor extends ExtendedWorkletProcessor {
 			name: 'amount',
 			defaultValue: 5,
 			minValue: 1
+		}, {
+			name: 'drywet',
+			defaultValue: 0.5,
+			minValue: 0,
+			maxValue: 1
 		}]
 	}
 
@@ -226,10 +238,13 @@ class ArctanDistortionProcessor extends ExtendedWorkletProcessor {
 		const gain = parameters.amount[0];
 		const makeup = Math.min(1, Math.max(0, 1 - ((Math.atan(gain) - this.Q_PI) * this.INVQ_PI * 0.823)));
 
+		const wet = parameters.drywet[0];
+
 		if (input.length > 0){
 			for (let channel=0; channel<input.length; channel++){
 				for (let i=0; i<input[channel].length; i++){
-					output[channel][i] = Math.atan(input[channel][i] * gain) * makeup;
+					const x = Math.atan(input[channel][i] * gain) * makeup;
+					output[channel][i] = mix(input[channel][i], x, wet);
 				}
 			}
 		}

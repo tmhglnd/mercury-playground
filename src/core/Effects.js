@@ -362,55 +362,29 @@ const DownSampler = function(_params){
 //
 const Overdrive = function(_params){
 	_params = Util.mapDefaults(_params, [ 2, 1 ]);
-	// apply the default values and convert to arrays where necessary
-	this._drive = Util.toArray(_params[0]);
-	this._wet = Util.toArray(_params[1]);
-
-	// The crossfader for wet-dry (originally implemented with CrossFade)
-	// this._mix = new Tone.CrossFade();
-	this._mix = new Tone.Add();
-	this._mixWet = new Tone.Gain(0).connect(this._mix.input);
-	this._mixDry = new Tone.Gain(1).connect(this._mix.addend);	
+	this._drive = _params[0];
+	this._wet = _params[1];
 
 	// ToneAudioNode has all the tone effect parameters
-	this._fx = new Tone.ToneAudioNode();
-	// A gain node for connecting with input and output
-	this._fx.input = new Tone.Gain(1).connect(this._mixDry);
-	this._fx.output = new Tone.Gain(1).connect(this._mixWet);
-
-	// the fx processor
-	// this._fx.workletNode = Tone.getContext().createAudioWorkletNode('tanh-distortion-processor');
-	this._fx.workletNode = Tone.getContext().createAudioWorkletNode('arctan-distortion-processor');
-
-	// connect input, fx, output to wetdry
-	this._fx.input.chain(this._fx.workletNode, this._fx.output);
+	this._fx = WorkletFX('arctan-distortion-processor');
 
 	this.set = function(c, time, bpm){
 		// drive amount, minimum drive of 1
 		const d = Util.assureNum(Math.max(0, Util.getParam(this._drive, c)) + 1);
+		const wet = Util.clip(Util.getParam(this._wet, c), 0, 1);
 
 		// set the parameters in the workletNode
-		const amount = this._fx.workletNode.parameters.get('amount');
-		amount.setValueAtTime(d, time);
-
-		const wet = Util.clip(Util.getParam(this._wet, c), 0, 1);
-		this._mixWet.gain.setValueAtTime(wet);
-		this._mixDry.gain.setValueAtTime(1 - wet);
+		setParam(this._fx, 'amount', d, time);
+		setParam(this._fx, 'drywet', wet, time);
 	}
 
 	this.chain = function(){
-		return { 'send' : this._fx, 'return' : this._mix }
+		return { 'send' : this._fx, 'return' : this._fx }
 	}
 
 	this.delete = function(){
 		this._fx.workletNode.port.postMessage('dispose');
-
-		let nodes = [ this._fx, this._fx.input, this._fx.output, this._mix, this._mixDry, this._mixWet ];
-		
-		nodes.forEach((n) => {
-			n.disconnect();
-			n.dispose();
-		});
+		disposeNodes([ this._fx, this._fx.input, this._fx.output ]);
 	}
 }
 
