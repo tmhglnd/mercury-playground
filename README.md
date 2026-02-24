@@ -9,7 +9,7 @@ Mercury currently has 2 versions:
 * Web version running in the browser (Windows/Mac/Linux) (you're in the right place)
 * Original version running in Max8 (Windows/Mac only) [go to this repo](https://github.com/tmhglnd/mercury)
 
-[**🚀 Start coding directly in the playground!** (recommended for beginners)](https://mercury.timohoogland.com/)
+[**🚀 Start coding directly at mercury-playground.cc!** (recommended for beginners)](https://mercury-playground.cc/)
 
 **👾 Or code with the latest full version in Max8:**
 
@@ -270,7 +270,7 @@ You can code together in Mercury by using the amazing [**Flok**](https://flok.cc
 
 😎 **No need for installing!** You can start coding immediately in the browser:
 
-[**https://mercury.timohoogland.com/**](https://mercury.timohoogland.com/)
+[**https://mercury-playground.cc**](https://mercury-playground.cc)
 
 ### 💻 Running without internet
 

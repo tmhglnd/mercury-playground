@@ -764,6 +764,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 	// light/dark mode switcher
 	this.modeSwitch = function(){
 		const btn = document.createElement('button');
+		btn.id = 'switch';
 		btn.title = 'Switch display mode Ctrl/Alt-Shift-D';
 		btn.onclick = () => {
 			switchTheme(localStorage.getItem('theme') === 'darkmode' ? 'lightmode' : 'darkmode');
