@@ -1,9 +1,24 @@
 
+// Constants for calculations
+const MAX_DEF = +340282346638528859811704183484516925440;
+const MIN_DEF = -340282346638528859811704183484516925440;
+
 // Some helper functions
 
 // Mix two signals with linear interpolation
 function mix(a=0, b=0, x=0.5){
 	return a + ((b - a) * x);
+}
+
+// Format descriptors and return to output
+function formatDescriptors(descriptors=[]){
+	return descriptors.map(x => new Object({
+		name: x[0],
+		defaultValue: x[1],
+		minValue: x[2],
+		maxValue: x[3],
+		automationRate: x[4]
+	}));
 }
 
 // The extended worklet processor contains a few base functionalities
@@ -46,17 +61,10 @@ class ExtendedWorkletProcessor extends AudioWorkletProcessor {
 //
 class NoiseProcessor extends ExtendedWorkletProcessor {
 	static get parameterDescriptors(){
-		return [{
-			name: 'type',
-			defaultValue: 5,
-			minValue: 0,
-			maxValue: 5
-		},{
-			name: 'density',
-			defaultValue: 0.125,
-			minValue: 0,
-			maxValue: 1
-		}];
+		return formatDescriptors([
+			[ 'type', 5, 0, 5, 'a-rate' ],
+			[ 'density', 0.125, 0, 1, 'a-rate' ]
+		]);
 	}
 	
 	constructor(){
@@ -153,17 +161,10 @@ registerProcessor('noise-processor', NoiseProcessor);
 //
 class DownSampleProcessor extends ExtendedWorkletProcessor {
 	static get parameterDescriptors() {
-		return [{
-			name: 'down',
-			defaultValue: 8,
-			minValue: 1,
-			maxValue: 2048
-		}, {
-			name: 'drywet',
-			defaultValue: 1,
-			minValue: 0,
-			maxValue: 1
-		}];
+		return formatDescriptors([
+			[ 'down', 8, 1, 2048, 'a-rate' ],
+			[ 'drywet', 1, 0, 1, 'a-rate' ]
+		]);
 	}
 
 	constructor(){
@@ -193,8 +194,8 @@ class DownSampleProcessor extends ExtendedWorkletProcessor {
 					}
 					// output the currently held sample
 					// apply drywet param
-					// output[channel][i] = this.sah[channel];
-					output[channel][i] = input[channel][i] + ((this.sah[channel] - input[channel][i]) * dw);
+					const out = this.sah[channel];
+					output[channel][i] = mix(input[channel][i], out, dw);
 				}
 				// increment sample counter
 				this.count++;
@@ -211,16 +212,10 @@ registerProcessor('downsampler-processor', DownSampleProcessor);
 //
 class ArctanDistortionProcessor extends ExtendedWorkletProcessor {
 	static get parameterDescriptors(){
-		return [{
-			name: 'amount',
-			defaultValue: 5,
-			minValue: 1
-		}, {
-			name: 'drywet',
-			defaultValue: 1,
-			minValue: 0,
-			maxValue: 1
-		}]
+		return formatDescriptors([
+			[ 'amount', 5, 1, MAX_DEF, 'a-rate' ],
+			[ 'drywet', 1, 0, 1, 'a-rate' ]
+		]);
 	}
 
 	constructor(){
@@ -260,16 +255,10 @@ registerProcessor('arctan-distortion-processor', ArctanDistortionProcessor);
 // 
 class FuzzProcessor extends ExtendedWorkletProcessor {
 	static get parameterDescriptors() {
-		return [{
-			name: 'amount',
-			defaultValue: 5,
-			minValue: 1
-		}, {
-			name: 'drywet',
-			defaultValue: 1,
-			minValue: 0,
-			maxValue: 1
-		}]
+		return formatDescriptors([
+			[ 'amount', 5, 1, MAX_DEF, 'a-rate' ],
+			[ 'drywet', 1, 0, 1, 'a-rate' ]
+		]);
 	}
 
 	constructor(){ 
@@ -315,16 +304,11 @@ registerProcessor('fuzz-processor', FuzzProcessor);
 // 
 class SquashProcessor extends ExtendedWorkletProcessor {
 	static get parameterDescriptors(){
-		return [
-			[ 'amount', 4, 1, 1024 ],
-			[ 'makeup', 0.5, 0, 2 ],
-			[ 'drywet', 1, 0, 1 ]
-		].map(x => new Object({
-			name: x[0],
-			defaultValue: x[1],
-			minValue: x[2],
-			maxValue: x[3]
-		}));
+		return formatDescriptors([
+			[ 'amount', 4, 1, 1024, 'a-rate' ],
+			[ 'makeup', 0.5, 0, 2, 'a-rate' ],
+			[ 'drywet', 1, 0, 1, 'a-rate' ]
+		]);
 	}
 
 	constructor(){
@@ -368,17 +352,11 @@ registerProcessor('squash-processor', SquashProcessor);
 // 
 class StateVariableFilter extends ExtendedWorkletProcessor {
 	static get parameterDescriptors() {
-		return [
+		return formatDescriptors([
 			[ 'frequency', 500, 1, 18000, "k-rate" ],
 			[ 'resonance', 0.1, 0.001, 0.999, "k-rate" ],
 			[ 'type', 0, 0, 3, "k-rate" ],
-		].map(x => new Object({
-			name: x[0],
-			defaultValue: x[1],
-			minValue: x[2],
-			maxValue: x[3],
-			automationRate: x[4]
-		}));
+		]);
 	}
 
 	constructor(){
@@ -445,18 +423,12 @@ registerProcessor('state-variable-filter', StateVariableFilter);
 // 
 class CombFilterProcessor extends ExtendedWorkletProcessor {
 	static get parameterDescriptors() {
-		return [
+		return formatDescriptors([
 			[ 'time', 5, 0, 120, "k-rate" ],
 			[ 'feedback', 0.8, -0.999, 0.999, "k-rate" ],
 			[ 'damping', 0.5, 0, 1, "k-rate" ],
 			[ 'drywet', 0.8, 0, 1, "k-rate" ]
-		].map(x => new Object({
-			name: x[0],
-			defaultValue: x[1],
-			minValue: x[2],
-			maxValue: x[3],
-			automationRate: x[4]
-		}));
+		]);
 	}
 	
 	constructor(info) {
@@ -546,7 +518,7 @@ registerProcessor('combfilter-processor', CombFilterProcessor);
 // 
 class DattorroReverb extends ExtendedWorkletProcessor {
 	static get parameterDescriptors() {
-		return [
+		return formatDescriptors([
 			["preDelay", 0, 0, sampleRate - 1, "k-rate"],
 			// ["bandwidth", 0.9999, 0, 1, "k-rate"],	
 			["inputDiffusion1", 0.75, 0, 1, "k-rate"],
@@ -559,13 +531,7 @@ class DattorroReverb extends ExtendedWorkletProcessor {
 			["excursionDepth", 0.7, 0, 2, "k-rate"],
 			["wet", 0.7, 0, 2, "k-rate"],
 			// ["dry", 0.7, 0, 2, "k-rate"]
-		].map(x => new Object({
-			name: x[0],
-			defaultValue: x[1],
-			minValue: x[2],
-			maxValue: x[3],
-			automationRate: x[4]
-		}));
+		]);
 	}
 
 	constructor(options) {
