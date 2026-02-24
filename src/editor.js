@@ -472,17 +472,20 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		example.onclick = () => { this.example() }
 
 		let save = document.createElement('button');
-		save.style.width = '9.4%';
+		save.style.width = '7%';
 		save.innerHTML = 'save';
 		save.title = 'Download code as text (Alt/Ctrl-Shift-S)';
 		save.onclick = () => { this.save() }
 		
 		let rec = document.createElement('button');
 		rec.id = 'recButton';
-		rec.style.width = '9.4%';
+		rec.style.width = '7%';
 		rec.innerHTML = 'record';
 		rec.title = 'Start/Stop recording sound (Alt/Ctrl-Shift-R)';
 		rec.onclick = () => { this.record() }
+
+		let lightdark = this.modeSwitch();
+		lightdark.style.width = '3%';
 
 		div.appendChild(play);
 		div.appendChild(stop);
@@ -490,6 +493,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		div.appendChild(example);
 		div.appendChild(save);
 		div.appendChild(rec);
+		div.appendChild(lightdark);
 	}
 
 	this.menuBottom = function(){
@@ -502,18 +506,18 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		tuts.id = 'tutorials';
 		
 		let snds = document.createElement('select');
-		snds.style.width = '12.5%';
+		snds.style.width = '12.8%';
 		snds.title = 'Insert a sound at the cursor position or replace the selection';
 		snds.id = 'sounds';
 
 		let lstn = document.createElement('button');
-		lstn.style.width = '12.5%';
+		lstn.style.width = '12.8%';
 		lstn.id = lstn.innerHTML = 'prelisten';
 		lstn.title = 'Listen all the sounds (Alt/Ctrl-Shift-L)'
 		lstn.onclick = () => { this.showListenMenu(true) }
 		
 		let load = document.createElement('button');
-		load.style.width = '12.5%';
+		load.style.width = '12.8%';
 		load.id = 'load';
 		load.innerHTML = 'add sounds';
 		load.title = 'Load sounds from the computer (Alt/Ctrl-Shift-A)'
@@ -522,7 +526,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		let help = document.createElement('button');
 		help.id = help.innerHTML = 'help';
 		help.title = 'Open the documentation (Alt/Ctrl-Shift-P)';
-		help.style.width = "12.5%";
+		help.style.width = "12.8%";
 		help.onclick = () => {
 			window.open('https://tmhglnd.github.io/mercury/docs/', '_blank');
 		}
@@ -530,13 +534,13 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		let collab = document.createElement('button');
 		collab.id = collab.innerHTML = 'collaborate';
 		collab.title = 'Collaborate in flok.cc (Alt/Ctrl-Shift-C)';
-		collab.style.width = "12.5%";
+		collab.style.width = "12.8%";
 		collab.onclick = () => {
 			window.open('https://flok.cc', '_blank');
 		}
 
 		let thms = document.createElement('select');
-		thms.style.width = '12.5%';
+		thms.style.width = '12.8%';
 		thms.title = 'Choose a syntax highlighting theme';
 		thms.id = 'themes';
 
@@ -759,17 +763,14 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 
 	// light/dark mode switcher
 	this.modeSwitch = function(){
-		let b = document.getElementById('ui');
-		let btn = document.createElement('button');
-		btn.id = 'switch';
-		btn.className = 'themeswitch';
+		const btn = document.createElement('button');
 		btn.title = 'Switch display mode Ctrl/Alt-Shift-D';
 		btn.onclick = () => {
 			switchTheme(localStorage.getItem('theme') === 'darkmode' ? 'lightmode' : 'darkmode');
 
 			this.setMode(localStorage.getItem('theme'));
 		}
-		b.appendChild(btn);
+		return btn;
 	}
 
 	// set the light/dark mode based on string value

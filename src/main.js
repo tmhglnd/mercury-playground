@@ -196,7 +196,7 @@ window.onload = () => {
 	cm.themeMenu();
 	cm.tutorialMenu();
 	cm.soundsMenu();
-	cm.modeSwitch();
+	// cm.modeSwitch();
 	cm.soundsListenMenu();
 	// cm.settingsMenu();
 	

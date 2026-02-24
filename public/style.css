@@ -149,15 +149,17 @@ button {
 	background: var(--button-bg);
 	color:  var(--secundary);
 	/* color:  rgb(0, 0, 0, 1); */
-	width: 19%;
+	width: 20%;
 	height: 25px;
-	margin: 2px;
+	/* margin: 2px; */
+	margin: 0.16%;
 	/* padding: 10px; */
 	-webkit-app-region: no-drag;
 
 	overflow: hidden;
 	white-space: nowrap;
 	text-overflow: ellipsis; 
+	vertical-align: top;
 }
 	
 .hide p {
@@ -212,9 +214,11 @@ select {
 	/* background: rgb(255, 255, 255, 0.1); */
 	background: var(--button-bg);
 	border-radius: 2px;
-	width: 19%;
+	width: 20%;
 	height: 25px;
-	margin: 2px;
+	/* margin: 2px; */
+	margin: 0.16%;
+	vertical-align: top;
 	-webkit-app-region: no-drag;
 }
 
