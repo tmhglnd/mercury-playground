@@ -70,14 +70,15 @@ CodeMirror.defineSimpleMode("mercury", {
 let mercuryHintList = [
 	'new', 'set', 'list', 'print', 'silence',
 	'tempo', 'scale', 'scalar', 'root', 'randomSeed', 'volume', 'lopass', 'hipass', 'osc', 'midi', 'samples',
-	'sample', 'synth', 'input', 'midi', 'polySample', 'polySynth',
+	'sample', 'synth', 'input', 'midi', 'polySample', 'polySynth', 'noise',
 	'saw', 'sine', 'square', 'triangle',
+	'white', 'pink', 'brown', 'lofi', 'crackle', 'dust',
 	'name', 'solo', 'group', 'time', 'once', 'fx', 'effect', 'out', 'timediv', 'wait', 'play', 'gain', 'shape', 'pan',
 	'note', 'super', 'slide',
 	'speed', 'start', 'tune', 'stretch',
 	'steal', 'spread', 'length', 'chord', 'midinote', 'program', 'pgm', 'change', 'cc',
 	'range', 'trigger', 'hold',
-	'chorus', 'comb', 'degrade', 'delay', 'distort', 'double', 'filter', 'kink', 'lfo', 'reverb', 'shift', 'squash', 'triggerFilter', 'vibrato', 'vocoder',
+	'chorus', 'comb', 'degrade', 'delay', 'distort', 'double', 'filter', 'kink', 'karplus', 'lfo', 'reverb', 'converb', 'shift', 'squash', 'triggerFilter', 'vibrato', 'vocoder', 'fuzz',
 	'spread', 'spreadF', 'spreadInc', 'spreadIncF', 'sine', 'sineF', 'cosine', 'cosineF', 'saw', 'sawF', 'square', 'squareF', 'binary', 'binaryBeat',  'spacing', 'spacingBeat', 'euclidean', 'euclid', 'hexBeat', 'hex', 'fibonacci', 'pisano', 'pell', 'lucas', 'random', 'randomF', 'drunk', 'drunkF', 'urn', 'coin', 'dice', 'clave', 'twelveTone', 'choose', 'pick', 'shuffle', 'expand', 'markovTrain', 'markovChain', 'clone', 'join', 'copy', 'pad', 'every', 'flat', 'invert', 'lace', 'lookup', 'merge', 'palin', 'repeat', 'reverse', 'rotate', 'rot', 'sort', 'slice', 'split', 'cut', 'spray', 'stretch', 'stretchF', 'thin', 'add', 'subtract', 'sub', 'multiply', 'mul', 'divide', 'div', 'mod', 'clip', 'wrap', 'fold', 'map', 'normalize', 'norm', 'equals', 'eq', 'notEquals', 'neq', 'greater', 'gt', 'less', 'lt', 'greaterEquals', 'gte', 'lessEquals', 'lte', 'size', 'sum', 'midiToNote', 'mton', 'midiToFreq', 'mtof', 'noteToMidi', 'ntom', 'noteToFreq', 'ntof', 'freqToMidi', 'ftom', 'freqToNote', 'fton', 'relativeToMidi', 'rtom', 'relativeToFreq', 'rtof', 'chromaToRelative', 'ctor', 'ratioToCent', 'rtoc', 'makeChords', 'chordsFromNumerals', 'chordsFromNames', 'divisionToMs', 'dtoms', 'divisionToRatio', 'dtor', 'ratioToMs', 'rtoms', 'scaleNames', 'toScale', 'textCode', 'ttoc',
 	'on', 'off', 'up', 'down', 'low', 'high', 'band'
 ].sort();
@@ -368,8 +369,8 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 
 	this.silence = function(){
 		// console.log('silence code');
-		// fade out and remove code after 0.1
-		removeSound(getSound(), 0.1);
+		// fade out immediately and remove code after 0.1s
+		removeSound(getSound(), 0.1, true);
 		engine.silence();
 		canvas.clear();
 	}
@@ -397,6 +398,8 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 	}
 
 	this.example = function(){
+		this.silence();
+
 		// initialize editor with some code
 		let names = Object.keys(examples);
 		let amount = names.length;
@@ -406,7 +409,6 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		this.set(examples[names[rand]]);
 		_rand = rand;
 
-		this.silence();
 		this.evaluate();
 	}
 
@@ -470,17 +472,20 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		example.onclick = () => { this.example() }
 
 		let save = document.createElement('button');
-		save.style.width = '9.4%';
+		save.style.width = '7%';
 		save.innerHTML = 'save';
 		save.title = 'Download code as text (Alt/Ctrl-Shift-S)';
 		save.onclick = () => { this.save() }
 		
 		let rec = document.createElement('button');
 		rec.id = 'recButton';
-		rec.style.width = '9.4%';
+		rec.style.width = '7%';
 		rec.innerHTML = 'record';
 		rec.title = 'Start/Stop recording sound (Alt/Ctrl-Shift-R)';
 		rec.onclick = () => { this.record() }
+
+		let lightdark = this.modeSwitch();
+		lightdark.style.width = '3%';
 
 		div.appendChild(play);
 		div.appendChild(stop);
@@ -488,6 +493,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		div.appendChild(example);
 		div.appendChild(save);
 		div.appendChild(rec);
+		div.appendChild(lightdark);
 	}
 
 	this.menuBottom = function(){
@@ -500,18 +506,18 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		tuts.id = 'tutorials';
 		
 		let snds = document.createElement('select');
-		snds.style.width = '12.5%';
+		snds.style.width = '12.8%';
 		snds.title = 'Insert a sound at the cursor position or replace the selection';
 		snds.id = 'sounds';
 
 		let lstn = document.createElement('button');
-		lstn.style.width = '12.5%';
+		lstn.style.width = '12.8%';
 		lstn.id = lstn.innerHTML = 'prelisten';
 		lstn.title = 'Listen all the sounds (Alt/Ctrl-Shift-L)'
 		lstn.onclick = () => { this.showListenMenu(true) }
 		
 		let load = document.createElement('button');
-		load.style.width = '12.5%';
+		load.style.width = '12.8%';
 		load.id = 'load';
 		load.innerHTML = 'add sounds';
 		load.title = 'Load sounds from the computer (Alt/Ctrl-Shift-A)'
@@ -520,7 +526,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		let help = document.createElement('button');
 		help.id = help.innerHTML = 'help';
 		help.title = 'Open the documentation (Alt/Ctrl-Shift-P)';
-		help.style.width = "12.5%";
+		help.style.width = "12.8%";
 		help.onclick = () => {
 			window.open('https://tmhglnd.github.io/mercury/docs/', '_blank');
 		}
@@ -528,13 +534,13 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		let collab = document.createElement('button');
 		collab.id = collab.innerHTML = 'collaborate';
 		collab.title = 'Collaborate in flok.cc (Alt/Ctrl-Shift-C)';
-		collab.style.width = "12.5%";
+		collab.style.width = "12.8%";
 		collab.onclick = () => {
 			window.open('https://flok.cc', '_blank');
 		}
 
 		let thms = document.createElement('select');
-		thms.style.width = '12.5%';
+		thms.style.width = '12.8%';
 		thms.title = 'Choose a syntax highlighting theme';
 		thms.id = 'themes';
 
@@ -568,7 +574,11 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 
 	this.soundsMenu = function(){
 		let menu = document.getElementById('sounds');
-		menu.onchange = () => this.insertSound();
+		menu.onchange = () => {
+			let s = document.getElementById('sounds').value;
+			document.getElementById('sounds').value = 'sounds';
+			this.insertSound(s);
+		}
 
 		let values = ['sounds'].concat(Object.keys(samples));
 		values.forEach((t) => {
@@ -580,10 +590,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		});
 	}
 
-	this.insertSound = function(){
-		let s = document.getElementById('sounds').value;
-		document.getElementById('sounds').value = 'sounds';
-		// console.log(this.cm.getSelection());
+	this.insertSound = function(s){
 		if (this.cm.getSelection() !== ''){
 			this.cm.replaceSelection(s);
 		} else {
@@ -602,6 +609,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		btn.innerHTML = 'zen mode';
 		btn.id = 'zen';
 		btn.title = 'Hide or show the menu bars (Alt/Ctrl-Shift-Z)';
+		btn.style.width = 'auto';
 		btn.onclick = () => {
 			this.menuHidden = !this.menuHidden;
 
@@ -664,15 +672,17 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 
 		let m = document.getElementsByClassName('sounds-prelisten')[0];
 		m.innerHTML = `
+		<span><button id="add-prelisten" style="width:auto">Add to code:</button></span>
 		<span class="close">&times;</span>
 		<p>
-			Click to listen the soundfile. Click again to stop playback.
+			Click to listen the soundfile. Click again to stop playback. Click "add" to add the last played sound to your code.
 		</p>
 		<p id="sound-prelisten-items"></p>
 		`
 		
 		let p = document.getElementById('sound-prelisten-items');
 		let sounds = ['sounds'].concat(Object.keys(samples));
+		let last = '';
 		for (let i=0; i<sounds.length; i++){
 			// skip the keyword sounds that is used for the dropdown menu
 			if (sounds[i] === 'sounds') continue;
@@ -680,6 +690,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 			let aud = document.createElement('audio');
 			aud.volume = 0.5;
 			aud.src = samples[sounds[i]];
+			aud.name = sounds[i];
 			aud.preload = 'auto';
 			// create a button element
 			let btn = document.createElement('button');
@@ -687,15 +698,25 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 			btn.style.width = 'auto';
 			btn.onclick = () => {
 				if (!aud.paused) { aud.pause(); aud.currentTime = 0; }
-				else { aud.play(); }
+				else { 
+					aud.play();
+					let b = document.getElementById('add-prelisten');
+					b.innerHTML = `Add to code: ${last = aud.name}`
+				}
 			}
 			btn.appendChild(aud);
 			p.appendChild(btn);
 		}
-
+		// add the text to the code when clicking add, also close window
+		let b = document.getElementById('add-prelisten');
+		b.onclick = () => { 
+			this.showListenMenu(false);
+			this.insertSound(last);
+		}
+		// close the window when clicking X
 		let span = document.getElementsByClassName('close')[0];
 		span.onclick = () => this.showListenMenu(false);
-
+		// close the window also when clicking outside the box
 		window.onclick = (event) => {
 			if (event.target === modal) this.showListenMenu(false);
 		}
@@ -742,17 +763,15 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 
 	// light/dark mode switcher
 	this.modeSwitch = function(){
-		let b = document.getElementById('ui');
-		let btn = document.createElement('button');
+		const btn = document.createElement('button');
 		btn.id = 'switch';
-		btn.className = 'themeswitch';
 		btn.title = 'Switch display mode Ctrl/Alt-Shift-D';
 		btn.onclick = () => {
 			switchTheme(localStorage.getItem('theme') === 'darkmode' ? 'lightmode' : 'darkmode');
 
 			this.setMode(localStorage.getItem('theme'));
 		}
-		b.appendChild(btn);
+		return btn;
 	}
 
 	// set the light/dark mode based on string value

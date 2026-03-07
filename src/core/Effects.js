@@ -5,16 +5,19 @@ const TL = require('total-serialism').Translate;
 // all the available effects
 const fxMap = {
 	'drive' : (params) => {
-		return new TanhDistortion(params);
+		return new Overdrive(params);
 	},
 	'distort' : (params) => {
-		return new TanhDistortion(params);
+		return new Overdrive(params);
 	},
 	'overdrive' : (params) => {
-		return new TanhDistortion(params);
+		return new Overdrive(params);
 	},
 	'squash' : (params) => {
 		return new Squash(params);
+	},
+	'fuzz' : (params) => {
+		return new Fuzz(params);
 	},
 	'compress' : (params) => {
 		return new Compressor(params);
@@ -24,6 +27,12 @@ const fxMap = {
 	},
 	'comp' : (params) => {
 		return new Compressor(params);
+	},
+	'comb' : (params) => {
+		return new CombFilter(params);
+	},
+	'karplus' : (params) => {
+		return new CombFilter(params);
 	},
 	'lfo' : (params) => {
 		return new LFO(params);
@@ -64,6 +73,9 @@ const fxMap = {
 	// 'tune' : (params) => {
 	// 	return new PitchShift(params);
 	// },
+	'svf' : (params) => {
+		return new SVF(params);
+	},
 	'filter' : (params) => {
 		return new Filter(params);
 	},
@@ -108,6 +120,106 @@ const fxMap = {
 	}
 }
 module.exports = fxMap;
+
+const workletFX = function(fx){
+	// ToneAudioNode has all the tone effect parameters
+	const _fx = new Tone.ToneAudioNode();
+	// A gain node for connecting with input and output
+	_fx.input = new Tone.Gain(1);
+	_fx.output = new Tone.Gain(1);
+	// the fx processor
+	_fx.workletNode = new Tone.getContext().createAudioWorkletNode(fx);
+	// connect input, fx and output
+	_fx.input.chain(_fx.workletNode, _fx.output);
+	// send a reference back
+	return _fx;
+}
+
+// class workletFX {
+// 	constructor(fx){
+// 		// ToneAudioNode has all the tone effect parameters
+// 		this._fx = new Tone.ToneAudioNode();
+// 		// A gain node for connecting with input and output
+// 		this._fx.input = new Tone.Gain(1);
+// 		this._fx.output = new Tone.Gain(1);
+// 		// the fx processor
+// 		this._fx.workletNode = new Tone.getContext().createAudioWorkletNode(fx);
+// 		// connect input, fx and output
+// 		this._fx.input.chain(this._fx.workletNode, this._fx.output);
+// 	}
+// 	connect() {
+// 		return this._fx;
+// 	}
+// 	dispose() {
+// 		this._fx.dispose();
+// 	}
+// 	setParam(param, value, time) {
+// 		const p = this._fx.workletNode.parameters.get(param);
+// 		p.setValueAtTime(value, time);
+// 	}
+// }
+
+// Helper functions
+
+// Set a parameter in an worklet processor
+const setParam = function(node, param, value, time) {
+	const p = node.workletNode.parameters.get(param);
+	p.setValueAtTime(value, time);
+}
+
+// Dispose a array of nodes
+const disposeNodes = function(nodes=[]) {
+	nodes.forEach((n) => {
+		n?.disconnect();
+		n?.dispose();
+	});
+}
+
+// A Lowpass Feedback CombFiltering effect
+// Adds a short feedback delay to the sound based on a specific note
+// resulting in a tonal output, like the resonating sound of a string 
+// sometimes also called Karplus Strong String Synthesis.
+// Negative feedback is possible for generating odd harmonics
+//
+const CombFilter = function(_params) {
+	// the default parameters
+	_params = Util.mapDefaults(_params, [0, 0.8, 0.5, 0.5]);
+	this._pitch = _params[0];
+	this._fback = _params[1];
+	this._damp = _params[2];
+	this._wet = _params[3];
+
+	// load a worklet FX in a ToneAudioNode
+	this._fx = workletFX('combfilter-processor');
+
+	this.set = (count, time, bpm) => {
+		const pitch = Util.toMidi(Util.getParam(this._pitch, count));
+		const _dt = 1000 / Util.mtof(pitch);
+		
+		// some mapping for the feedback to make it logarithmic in length
+		let _fb = Util.getParam(this._fback, count);
+		let sign = _fb < 0 ? -1 : 1;
+		_fb = Util.clip(Math.pow(Math.abs(_fb), 0.1) * sign, -0.999, 0.999);
+
+		const _dm = Util.clip(Util.getParam(this._damp, count));
+		const _dw = Util.clip(Util.getParam(this._wet, count));
+		
+		// set parameters for workletprocessor
+		setParam(this._fx, 'time', _dt, time);
+		setParam(this._fx, 'feedback', _fb, time);
+		setParam(this._fx, 'damping', _dm, time);
+		setParam(this._fx, 'drywet', _dw, time);
+	}
+
+	this.chain = () => {
+		return { 'send' : this._fx, 'return' : this._fx }
+	}
+
+	this.delete = () => {
+		this._fx.workletNode.port.postMessage('dispose');
+		disposeNodes([ this._fx.input, this._fx.output, this._fx ]);
+	}
+}
 
 // A formant/vowel filter. With this filter you can imitate the vowels of human 
 // speech. 
@@ -217,113 +329,94 @@ const FormantFilter = function(_params){
 const DownSampler = function(_params){
 	// apply the default values and convert to arrays where necessary
 	_params = Util.mapDefaults(_params, [ 0.5, 1 ]);
-	this._down = Util.toArray(_params[0]);
-	this._wet = Util.toArray(_params[1]);
+	this._down = _params[0];
+	this._wet = _params[1];
 
-	// ToneAudioNode has all the tone effect parameters
-	this._fx = new Tone.ToneAudioNode();
-
-	// The crossfader mix
-	this._mix = new Tone.Add();
-	this._mixDry = new Tone.Gain(0).connect(this._mix.input);
-	// this._mixWet = new Tone.Gain(0.5).connect(this._mix.addend);
-
-	// A gain node for connecting with input and output
-	this._fx.input = new Tone.Gain(1).connect(this._mixDry);
-	this._fx.output = new Tone.Gain(1).connect(this._mix.addend);
-
-	// the fx processor
-	this._fx.workletNode = Tone.getContext().createAudioWorkletNode('downsampler-processor');
-
-	// connect input, fx and output
-	this._fx.input.chain(this._fx.workletNode, this._fx.output);
+	// load a worklet FX in a ToneAudioNode
+	this._fx = workletFX('downsampler-processor');
 
 	this.set = function(c, time, bpm){
 		// some parameter mapping changing input range 0-1 to 1-inf
-		const p = this._fx.workletNode.parameters.get('down');
 		const d = Math.floor(1 / (1 - Util.clip(Util.getParam(this._down, c) ** 0.25, 0, 0.999)));
-		
-		p.setValueAtTime(Util.assureNum(d), time);
-		
+		// the drywet amount clamped between 0 and 1
 		const w = Util.clip(Util.getParam(this._wet, c), 0, 1);
-		this._fx.output.gain.setValueAtTime(w, time);
-		this._mixDry.gain.setValueAtTime(1 - w, time);
+		
+		setParam(this._fx, 'down', d, time);
+		setParam(this._fx, 'drywet', w, time);
 	}
 
 	this.chain = function(){
-		return { 'send' : this._fx, 'return' : this._mix }
+		return { 'send' : this._fx, 'return' : this._fx }
 	}
 
 	this.delete = function(){
-		const nodes = [ this._fx, this._fx.input, this._fx.output, this._mix, this._mixDry ];
-
-		nodes.forEach((n) => {
-			n.disconnect();
-			n.dispose();
-		});
+		// stop the processor
+		this._fx.workletNode.port.postMessage('dispose');
+		disposeNodes([ this._fx, this._fx.input, this._fx.output ]);
 	}
 }
 
-// A distortion algorithm using the tanh (hyperbolic-tangent) as a 
+// An overdrive/saturation algorithm using the arctan function as a 
 // waveshaping technique. Some mapping to apply a more equal loudness 
-// distortion is applied on the overdrive parameter
+// on the overdrive parameter when increasing the amount
 //
-const TanhDistortion = function(_params){
+const Overdrive = function(_params){
 	_params = Util.mapDefaults(_params, [ 2, 1 ]);
-	// apply the default values and convert to arrays where necessary
-	this._drive = Util.toArray(_params[0]);
-	this._wet = Util.toArray(_params[1]);
+	this._drive = _params[0];
+	this._wet = _params[1];
 
-	// The crossfader for wet-dry (originally implemented with CrossFade)
-	// this._mix = new Tone.CrossFade();
-	this._mix = new Tone.Add();
-	this._mixWet = new Tone.Gain(0).connect(this._mix.input);
-	this._mixDry = new Tone.Gain(1).connect(this._mix.addend);	
-
-	// ToneAudioNode has all the tone effect parameters
-	this._fx = new Tone.ToneAudioNode();
-	// A gain node for connecting with input and output
-	this._fx.input = new Tone.Gain(1).connect(this._mixDry);
-	this._fx.output = new Tone.Gain(1).connect(this._mixWet);
-
-	// the fx processor
-	this._fx.workletNode = Tone.getContext().createAudioWorkletNode('tanh-distortion-processor');
-
-	// connect input, fx, output to wetdry
-	this._fx.input.chain(this._fx.workletNode, this._fx.output);
+	// load a worklet FX in a ToneAudioNode
+	this._fx = workletFX('arctan-distortion-processor');
 
 	this.set = function(c, time, bpm){
 		// drive amount, minimum drive of 1
 		const d = Util.assureNum(Math.max(0, Util.getParam(this._drive, c)) + 1);
-
-		// preamp gain reduction for linear at drive = 1
-		const p = 0.8;
-		// makeup gain
-		const m = 1.0 / (p * (d ** 1.1));
+		const wet = Util.clip(Util.getParam(this._wet, c), 0, 1);
 
 		// set the parameters in the workletNode
-		const amount = this._fx.workletNode.parameters.get('amount');
-		amount.setValueAtTime(p * d * d, time);
-
-		const makeup = this._fx.workletNode.parameters.get('makeup');
-		makeup.setValueAtTime(m, time);
-
-		const wet = Util.clip(Util.getParam(this._wet, c), 0, 1);
-		this._mixWet.gain.setValueAtTime(wet);
-		this._mixDry.gain.setValueAtTime(1 - wet);
+		setParam(this._fx, 'amount', d, time);
+		setParam(this._fx, 'drywet', wet, time);
 	}
 
 	this.chain = function(){
-		return { 'send' : this._fx, 'return' : this._mix }
+		return { 'send' : this._fx, 'return' : this._fx }
 	}
 
 	this.delete = function(){
-		let nodes = [ this._fx, this._fx.input, this._fx.output, this._mix, this._mixDry, this._mixWet ];
-		
-		nodes.forEach((n) => {
-			n.disconnect();
-			n.dispose();
-		});
+		this._fx.workletNode.port.postMessage('dispose');
+		disposeNodes([ this._fx, this._fx.input, this._fx.output ]);
+	}
+}
+
+// A fuzz distortion effect in modelled after the Big Muff Pi pedal 
+// by Electro Harmonics. Using three stages of distortion: 
+// 1 soft-clipping stage, 2 half-wave rectifier, 3 hard-clipping stage
+// 
+const Fuzz = function(_params){
+	_params = Util.mapDefaults(_params, [ 10, 1 ]);
+	this._drive = _params[0];
+	this._wet = _params[1];
+
+	// load a worklet FX in a ToneAudioNode
+	this._fx = workletFX('fuzz-processor');
+
+	this.set = function(c, time, bpm){
+		// drive amount, minimum drive of 1
+		const d = Util.assureNum(Math.max(1, Util.getParam(this._drive, c)) + 1);
+		const wet = Util.clip(Util.getParam(this._wet, c), 0, 1);
+
+		// set the parameters in the workletNode
+		setParam(this._fx, 'amount', d, time);
+		setParam(this._fx, 'drywet', wet, time);
+	}
+
+	this.chain = function(){
+		return { 'send' : this._fx, 'return' : this._fx }
+	}
+
+	this.delete = function(){
+		this._fx.workletNode.port.postMessage('dispose');
+		disposeNodes([ this._fx, this._fx.input, this._fx.output ]);
 	}
 }
 
@@ -408,53 +501,28 @@ const Chorus = function(_params){
 // 
 const Squash = function(_params){
 	_params = Util.mapDefaults(_params, [ 4, 1, 0.28 ]);
-	// apply the default values and convert to arrays where necessary
-	this._squash = Util.toArray(_params[0]);
-	this._wet = Util.toArray(_params[1]);
+	this._squash = _params[0];
+	this._wet = _params[1];
 
-	// The crossfader for wet-dry (originally implemented with CrossFade)
-	// this._mix = new Tone.CrossFade();
-	this._mix = new Tone.Add();
-	this._mixDry = new Tone.Gain(0).connect(this._mix.input);
-	// this._mixWet = new Tone.Gain(0.5).connect(this._mix.addend);	
-
-	// ToneAudioNode has all the tone effect parameters
-	this._fx = new Tone.ToneAudioNode();
-	// A gain node for connecting with input and output
-	this._fx.input = new Tone.Gain(1).connect(this._mixDry);
-	this._fx.output = new Tone.Gain(1).connect(this._mix.addend);
-
-	// the fx processor
-	this._fx.workletNode = Tone.getContext().createAudioWorkletNode('squash-processor');
-	// connect input, fx and output
-	this._fx.input.chain(this._fx.workletNode, this._fx.output);
+	this._fx = workletFX('squash-processor');
 
 	this.set = function(c, time, bpm){
-		let d = Util.assureNum(Math.max(1, Util.getParam(this._squash, c)));
-		let m = 1.0 / Math.sqrt(d);
-		
-		const amount = this._fx.workletNode.parameters.get('amount');
-		amount.setValueAtTime(d, time);
-
-		const makeup = this._fx.workletNode.parameters.get('makeup');
-		makeup.setValueAtTime(m, time);
-
+		const d = Util.assureNum(Math.max(1, Util.getParam(this._squash, c)));
+		const m = 1.0 / Math.sqrt(d);
 		const wet = Util.clip(Util.getParam(this._wet, c));
-		this._fx.output.gain.setValueAtTime(m, time);
-		this._mixDry.gain.setValueAtTime(1 - wet, time);
+		
+		setParam(this._fx, 'amount', d, time);
+		setParam(this._fx, 'makeup', m, time);
+		setParam(this._fx, 'drywet', wet, time);
 	}
 
 	this.chain = function(){
-		return { 'send' : this._fx, 'return' : this._mix }
+		return { 'send' : this._fx, 'return' : this._fx }
 	}
 
 	this.delete = function(){
-		let nodes = [ this._fx.input, this._fx.output, this._fx, this._mix, this._mixDry ];
-
-		nodes.forEach((n) => {
-			n.disconnect();
-			n.dispose();
-		});
+		this._fx.workletNode.port.postMessage('dispose');
+		disposeNodes([ this._fx, this._fx.input, this._fx.output ]);
 	}
 }
 
@@ -543,8 +611,8 @@ const DattorroReverb = function(_params){
 	}
 
 	this.delete = () => {
-		const nodes = [ this._fx, this._mix, this._mixDry, this._fx.input, this._fx.output ];
-		nodes.forEach(n => { n.disconnect(); n.dispose() });
+		this._fx.workletNode.port.postMessage('dispose');
+		disposeNodes([ this._fx, this._mix, this._mixDry, this._mixWet, this._fx.input, this._fx.output ]);
 	}
 }
 
@@ -835,6 +903,35 @@ const LFO = function(_params){
 			n.disconnect();
 			n.dispose();
 		});
+	}
+}
+
+const SVF = function(_params){
+	_params = Util.mapDefaults(_params, [ 0, 1200, 0.45 ]);
+	this._type = _params[0];
+	this._freq = _params[1];
+	this._res = _params[2];
+
+	// ToneAudioNode has all the tone effect parameters
+	this._fx = new Tone.ToneAudioNode();
+	this._fx.input = new Tone.Gain(1);
+	this._fx.output = new Tone.Gain(1);
+	this._fx.workletNode = Tone.getContext().createAudioWorkletNode('state-variable-filter');
+	this._fx.input.chain(this._fx.workletNode, this._fx.output);
+
+	this.set = function(c, time, bpm){
+		setParam(this._fx, 'type', Util.getParam(this._type, c), time);
+		setParam(this._fx, 'frequency', Util.getParam(this._freq, c), time);
+		setParam(this._fx, 'resonance', Util.getParam(this._res, c), time);
+	}
+
+	this.chain = function(){
+		return { 'send' : this._fx, 'return' : this._fx };
+	}
+
+	this.delete = function(){
+		this._fx.workletNode.port.postMessage('dispose');
+		disposeNodes([ this._fx, this._fx.input, this._fx.output ]);
 	}
 }
 

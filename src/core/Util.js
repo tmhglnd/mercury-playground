@@ -21,7 +21,7 @@ function atTime(callback, time){
 
 // convert amplitude to dBFS scale
 function atodb(a=0){
-	return 20 * Math.log(a);
+	return 20 * Math.log10(a);
 }
 
 // clip a value between a specified range, defaults to 0 and 1 clip
