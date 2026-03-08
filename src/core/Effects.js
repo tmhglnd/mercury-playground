@@ -226,40 +226,6 @@ const CombFilter = function(_params) {
 	}
 }
 
-const workletDelay = function(_params) {
-	// param order: timeLeft, timeRight, feedback, damping, drywet
-	_params = Util.mapDefaults(_params, [ '3/16', '2/16', 0.7, 0.6, 0.5 ]);
-
-	this._maxTime = 1000;
-	
-	// load a worklet FX in a ToneAudioNode
-	this._fx = workletFX('stereo-delay');
-
-	this.set = (c, time, bpm) => {
-		const dL = clip(divToS(getParam(_params[0], c), bpm) * 1000, 0, this._maxTime);
-		const dR = clip(divToS(getParam(_params[1], c), bpm) * 1000, 0, this._maxTime);
-		const fb = clip(getParam(_params[2], c), 0, 0.999);
-		const dm = clip(getParam(_params[3], c), 0.01, 0.99);
-		const dw = clip(getParam(_params[4], c));
-
-		// set parameters for workletprocessor
-		setParam(this._fx, 'timeL', dL, time);
-		setParam(this._fx, 'timeR', dR, time);
-		setParam(this._fx, 'feedback', fb, time);
-		setParam(this._fx, 'damping', dm, time);
-		setParam(this._fx, 'drywet', dw, time);
-	}
-
-	this.chain = () => {
-		return { 'send' : this._fx, 'return' : this._fx }
-	}
-
-	this.delete = () => {
-		this._fx.workletNode.port.postMessage('dispose');
-		disposeNodes([ this._fx.input, this._fx.output, this._fx ]);
-	}
-}
-
 // A formant/vowel filter. With this filter you can imitate the vowels of human 
 // speech. 
 // 
@@ -1315,6 +1281,52 @@ const Delay = function(_params){
 	}
 }
 
+// A new pingpong delay implementation using a custom AudioWorkletProcessor. 
+// The custom processor allows for shorter delaytimes, and less overhead since 
+// everything runs inside one Tone AudioNode.
+// The delay includes a lowpass filter in feedback loop and delaytimes are set 
+// for the left and right channel independently. 
+// 
+const workletDelay = function(_params) {
+	// if only 1 param, apply time to both Left and Right
+	if (_params.length === 1){ _params[1] = _params[0] }
+	// if only 2 params, apply time to Left and Right, and second value feedback
+	else if (_params.length === 2){
+		_params[2] = _params[1];
+		_params[1] = _params[0];
+	}
+	// param order: timeLeft, timeRight, feedback, damping, drywet
+	_params = Util.mapDefaults(_params, [ '2/16', '3/16', 0.8, 0.5, 0.5 ]);
+
+	this._maxTime = 1000;
+	// load a worklet FX in a ToneAudioNode
+	this._fx = workletFX('stereo-delay');
+
+	this.set = (c, time, bpm) => {
+		const dL = clip(divToS(getParam(_params[0], c), bpm) * 1000, 0, this._maxTime);
+		const dR = clip(divToS(getParam(_params[1], c), bpm) * 1000, 0, this._maxTime);
+		const fb = clip(getParam(_params[2], c), 0, 2);
+		const dm = clip(getParam(_params[3], c), 0.01, 0.99);
+		const dw = clip(getParam(_params[4], c));
+
+		// set parameters for workletprocessor
+		setParam(this._fx, 'timeL', dL, time);
+		setParam(this._fx, 'timeR', dR, time);
+		setParam(this._fx, 'feedback', fb, time);
+		setParam(this._fx, 'damping', dm, time);
+		setParam(this._fx, 'drywet', dw, time);
+	}
+
+	this.chain = () => {
+		return { 'send' : this._fx, 'return' : this._fx }
+	}
+
+	this.delete = () => {
+		this._fx.workletNode.port.postMessage('dispose');
+		disposeNodes([ this._fx.input, this._fx.output, this._fx ]);
+	}
+}
+
 // Old pingpong delay implementation, just using the Tone.PingPongDelay()
 // const PingPongDelay = function(_params){
 // 	this._fx = new Tone.PingPongDelay();
@@ -1340,26 +1352,5 @@ const Delay = function(_params){
 // 	this.delete = function(){
 // 		this._fx.disconnect();
 // 		this._fx.dispose();
-// 	}
-// }
-
-// const FreeVerb = function(_params){
-// 	this._fx = new Tone.Freeverb(_params[0], _params[1]);
-
-// 	this.set = function(c, time, bpm){
-
-// 	}
-
-// 	this.chain = function(){
-// 		return { 'send' : this._fx, 'return' : this._fx };
-// 	}
-
-// 	this.delete = function(){
-// 		let nodes = [ this._fx ];
-
-// 		nodes.forEach((n) => {
-// 			n.disconnect();
-// 			n.dispose();
-// 		});
 // 	}
 // }

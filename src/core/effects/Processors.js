@@ -4,11 +4,18 @@ const MAX_DEF = +340282346638528859811704183484516925440;
 const MIN_DEF = -340282346638528859811704183484516925440;
 
 // Some helper functions
-
 // Mix two signals with linear interpolation
-function mix(a=0, b=0, x=0.5){
-	return a + ((b - a) * x);
-}
+const mix = (a=0, b=0, x=0.5) => a + ((b - a) * x);
+// function to retrieve a parameter value from array if any exists
+const pv = (param, i) => param[i] ?? param[0];
+// get the sign of the signal -1/1
+const sign = (sig) => sig < 0 ? -1 : 1;
+// truncate the signal (removing fractional component)
+const trunc = (sig) => sig | 0;
+// return the fractional component of a signal
+const fract = (sig) => sig - trunc(sig);
+// fix Not a Number
+const fixnan = (sig) => isNaN(sig) ? 0 : sig;
 
 // Format descriptors and return to output
 function formatDescriptors(descriptors=[]){
@@ -70,7 +77,8 @@ class DelayWorkletProcessor extends ExtendedWorkletProcessor {
 		let size = Math.round(length * 0.001 * sampleRate);
 		let nextPow2 = 2 ** Math.ceil(Math.log2((size)));
 		return [
-			new Float32Array(nextPow2), nextPow2-1, 0, nextPow2 - 1
+			// [0] delay array, [1] write-head, [2] read-head, [3] delaysize
+			new Float32Array(nextPow2), nextPow2-1, 0 | 0, nextPow2 - 1
 		];
 	}
 	// write to specific delayline at delaysize
@@ -82,6 +90,38 @@ class DelayWorkletProcessor extends ExtendedWorkletProcessor {
 		let s = Math.round(ms * 0.001 * sampleRate);
 		return this.delays[i][0][(this.delays[i][2] - s) & this.delays[i][3]];
 	}
+	// read from a delayline with linear interpolation in delaytimes
+	lerpDelayAt(i, ms){
+		let dt = ms * 0.001 * sampleRate;
+		let p = trunc(dt);
+		let x = fract(dt);
+
+		let d0 = this.delays[i][0][(this.delays[i][2] - p & this.delays[i][3])];
+		let d1 = this.delays[i][0][(this.delays[i][2]-(p+1) & this.delays[i][3])];
+		return mix(d0, d1, x);
+	}
+	// // read from delayline with cubic interpolation at specified time in ms
+	// // Cubic interpolation from: O. Niemitalo:
+	// // https://www.musicdsp.org/en/latest/Other/49-cubic-interpollation.html
+	// readDelayCAt(i, ms) {
+	// 	let s = ms * 0.001 * sampleRate;
+
+	// 	let d = this.delays[i],
+	// 		frac = s - ~~s,
+	// 		int = ~~s + d[2] - 1,
+	// 		mask = d[3];
+
+	// 	let x0 = d[0][int++ & mask],
+	// 		x1 = d[0][int++ & mask],
+	// 		x2 = d[0][int++ & mask],
+	// 		x3 = d[0][int & mask];
+
+	// 	let a = (3 * (x1 - x2) - x0 + x3) / 2,
+	// 		b = 2 * x2 + x0 - (5 * x1 + x3) / 2,
+	// 		c = (x2 - x0) / 2;
+
+	// 	return (((a * frac) + b) * frac + c) * frac + x1;
+	// }
 	// move the read and writeheads of the delayline
 	updateReadWriteHeads(i){
 		// increment read and write heads in delay and wrap at delaysize
@@ -513,9 +553,9 @@ registerProcessor('combfilter-processor', CombFilterProcessor);
 class StereoDelayProcessor extends DelayWorkletProcessor {
 	static get parameterDescriptors(){
 		return formatDescriptors([
-			[ 'timeL', 222, 0, 1000, "k-rate" ],
-			[ 'timeR', 296, 0, 1000, "k-rate" ],
-			[ 'feedback', 0.9, 0, 0.999, "k-rate" ],
+			[ 'timeL', 333, 0, 1000, "k-rate" ],
+			[ 'timeR', 444, 0, 1000, "k-rate" ],
+			[ 'feedback', 0.8, 0, 2, "k-rate" ],
 			[ 'damping', 0.5, 0, 1, "k-rate" ],
 			[ 'drywet', 0.5, 0, 1, "k-rate" ]
 		]);
@@ -525,13 +565,15 @@ class StereoDelayProcessor extends DelayWorkletProcessor {
 		super(options);
 
 		const delaySize = 1000;
+		// initialize delaytime for sliding
+		this.dlt = [];
 		// initialize history values for lowpass filter
 		this.lpf = [];
 		// make a stereo delay
 		this.delays = [];
 		for (let i = 0; i < 2; i++){
 			this.delays[i] = this.makeDelay(delaySize);
-			this.lpf[i] = 0;
+			this.lpf[i] = 0, this.dlt[i] = 0;
 		}
 	}
 
@@ -557,12 +599,15 @@ class StereoDelayProcessor extends DelayWorkletProcessor {
 				}
 				// process the Left and Right delay channels
 				for (let c = 0; c < this.delays.length; c++){
+					this.dlt[c] = mix(dt[c], this.dlt[c], 0.99977324);
 					// read from the delayline and apply a lowpass filter
-					this.lpf[c] = mix(this.readDelayAt(c, dt[c]), this.lpf[c], dm);
+					this.lpf[c] = mix(this.lpf[c], this.lerpDelayAt(c, this.dlt[c]), dm);
+					// apply tanh soft-clipping, allowing for positive feedback
+					this.lpf[c] = Math.tanh(this.lpf[c]);
 					// write input to the delayline with prev * feedback
 					this.writeDelay(c, sig[c] + this.lpf[c] * fb);
 					// apply drywet and send output from the filter
-					output[c][i] = mix(this.lpf[c], sig[c], dw);
+					output[c][i] = mix(sig[c], this.lpf[c], dw);
 					// update the read and write heads of the delaylines
 					this.updateReadWriteHeads(c);
 				}
