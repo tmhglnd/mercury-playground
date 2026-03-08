@@ -25,8 +25,8 @@ function formatDescriptors(descriptors=[]){
 // for all the other processors to be used.
 // 
 class ExtendedWorkletProcessor extends AudioWorkletProcessor {
-	constructor(){
-		super();
+	constructor(options){
+		super(options);
 		// is the processor running? use as return in process()
 		this.running = true;
 		this.port.onmessage = (e) => {
@@ -54,6 +54,40 @@ class ExtendedWorkletProcessor extends AudioWorkletProcessor {
 	// 	}
 	// 	return this.running;
 	// }
+}
+
+// The DelayWorkletProcessor is a baseclass that includes various functions for
+// generating a delayline within an audioworklet.
+// 
+class DelayWorkletProcessor extends ExtendedWorkletProcessor {
+	constructor(){
+		super();
+	}
+	// initialize a delayline with maximum size in milliseconds
+	// makeDelay code based on Dattorro Reverberator delays
+	// Thanks to khoin: https://github.com/khoin
+	makeDelay(length) {
+		let size = Math.round(length * 0.001 * sampleRate);
+		let nextPow2 = 2 ** Math.ceil(Math.log2((size)));
+		return [
+			new Float32Array(nextPow2), nextPow2-1, 0, nextPow2 - 1
+		];
+	}
+	// write to specific delayline at delaysize
+	writeDelay(i, data) {
+		return this.delays[i][0][this.delays[i][1]] = data;
+	}
+	// read from delayline at specified time in milliseconds
+	readDelayAt(i, ms) {
+		let s = Math.round(ms * 0.001 * sampleRate);
+		return this.delays[i][0][(this.delays[i][2] - s) & this.delays[i][3]];
+	}
+	// move the read and writeheads of the delayline
+	updateReadWriteHeads(i){
+		// increment read and write heads in delay and wrap at delaysize
+		this.delays[i][1] = (this.delays[i][1] + 1) & this.delays[i][3];
+		this.delays[i][2] = (this.delays[i][2] + 1) & this.delays[i][3];
+	}
 }
 
 // Various noise type processors for the MonoNoise source
@@ -421,10 +455,10 @@ registerProcessor('state-variable-filter', StateVariableFilter);
 // Feedback amount can be positive or negative 
 // (negative creates odd harmonics one octave lower)
 // 
-class CombFilterProcessor extends ExtendedWorkletProcessor {
+class CombFilterProcessor extends DelayWorkletProcessor {
 	static get parameterDescriptors() {
 		return formatDescriptors([
-			[ 'time', 5, 0, 120, "k-rate" ],
+			[ 'time', 5, 0, 128, "k-rate" ],
 			[ 'feedback', 0.8, -0.999, 0.999, "k-rate" ],
 			[ 'damping', 0.5, 0, 1, "k-rate" ],
 			[ 'drywet', 0.8, 0, 1, "k-rate" ]
@@ -435,7 +469,7 @@ class CombFilterProcessor extends ExtendedWorkletProcessor {
 		super();
 
 		const numChannels = info.channelCount;
-		const delaySize = 120;
+		const delaySize = 128;
 		// make delays for amount of channels and
 		// initialize history values for lowpass
 		this.delays = [];
@@ -444,33 +478,6 @@ class CombFilterProcessor extends ExtendedWorkletProcessor {
 			this.delays[i] = this.makeDelay(delaySize);
 			this.lpf[i] = 0;
 		}
-	}
-
-	// makeDelay code based on Dattorro Reverberator delays
-	// Thanks to khoin: https://github.com/khoin
-	makeDelay(length) {
-		let size = Math.round(length * 0.001 * sampleRate);
-		let nextPow2 = 2 ** Math.ceil(Math.log2((size)));
-		return [
-			new Float32Array(nextPow2), nextPow2-1, 0, nextPow2 - 1
-		];
-	}
-	// write to specific delayline at delaysize
-	writeDelay(i, data) {
-		return this.delays[i][0][this.delays[i][1]] = data;
-	}
-
-	// read from delayline at specified time
-	readDelayAt(i, ms) {
-		let s = Math.round(ms * 0.001 * sampleRate);
-		return this.delays[i][0][(this.delays[i][2] - s) & this.delays[i][3]];
-	}
-
-	// move the read and writeheads of the delayline
-	updateReadWriteHeads(i){
-		// increment read and write heads in delay and wrap at delaysize
-		this.delays[i][1] = (this.delays[i][1] + 1) & this.delays[i][3];
-		this.delays[i][2] = (this.delays[i][2] + 1) & this.delays[i][3];
 	}
 
 	process(inputs, outputs, parameters){
@@ -501,6 +508,70 @@ class CombFilterProcessor extends ExtendedWorkletProcessor {
 	}
 }
 registerProcessor('combfilter-processor', CombFilterProcessor);
+
+// Stereo Delay FX Processor
+class StereoDelayProcessor extends DelayWorkletProcessor {
+	static get parameterDescriptors(){
+		return formatDescriptors([
+			[ 'timeL', 222, 0, 1000, "k-rate" ],
+			[ 'timeR', 296, 0, 1000, "k-rate" ],
+			[ 'feedback', 0.9, 0, 0.999, "k-rate" ],
+			[ 'damping', 0.5, 0, 1, "k-rate" ],
+			[ 'drywet', 0.5, 0, 1, "k-rate" ]
+		]);
+	}
+
+	constructor(options){
+		super(options);
+
+		const delaySize = 1000;
+		// initialize history values for lowpass filter
+		this.lpf = [];
+		// make a stereo delay
+		this.delays = [];
+		for (let i = 0; i < 2; i++){
+			this.delays[i] = this.makeDelay(delaySize);
+		}
+	}
+
+	process(inputs, outputs, parameters){
+		const input = inputs[0];
+		const output = outputs[0];
+
+		const dt = [ parameters.timeL[0], parameters.timeR[0] ];
+		// const tR = parameters.timeR[0];
+		const fb = parameters.feedback[0];
+		const dm = Math.max(0, parameters.damping[0]);
+		const dw = parameters.drywet[0];
+
+		// process for every channel and every sample in the channel
+		if (input.length > 0){
+			for (let i = 0; i < input[0].length; i++){
+				let sig = [ input[0][i], 0 ];
+				// if input is mono, duplicate to left/right inputs
+				if (input.length < 1){
+					sig = [ input[0][i], input[1][0] ];
+				} else {
+					// else use right input on right side
+					sig[1] = input[1][i];
+				}
+
+				for (let d = 0; d < 2; d++){
+					// read from the delayline and apply a lowpass filter
+					this.lpf[d] = mix(this.readDelayAt(d, dt[d]), this.lpf[d], dm);
+					// write input to the delayline with prev * feedback
+					this.writeDelay(d, sig[d] + this.lpf[d] * fb);
+					// apply drywet and send output from the filter
+					output[d][i] = mix(this.lpf[d], input[0][i], dw);
+					// update the read and write heads of the delaylines
+					this.updateReadWriteHeads(d);
+				}
+			}
+		}
+		return this.running;
+	}
+}
+registerProcessor('stereo-delay', StereoDelayProcessor)
 
 // Dattorro Reverberator
 // Thanks to port by khoin, taken from:

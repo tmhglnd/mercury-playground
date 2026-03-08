@@ -97,6 +97,9 @@ const fxMap = {
 	'echo' : (params) => {
 		return new Delay(params);
 	},
+	'workletDelay' : (params) => {
+		return new workletDelay(params);
+	},
 	// 'ppDelay' : (params) => {
 	// 	return new PingPongDelay(params);
 	// },
@@ -218,6 +221,21 @@ const CombFilter = function(_params) {
 	this.delete = () => {
 		this._fx.workletNode.port.postMessage('dispose');
 		disposeNodes([ this._fx.input, this._fx.output, this._fx ]);
+	}
+}
+
+const workletDelay = function(_params) {
+	this._fx = workletFX('stereo-delay');
+
+	this.set = () => {}
+
+	this.chain = () => {
+		return { 'send' : this._fx, 'return' : this._fx }
+	}
+
+	this.delay = () => {
+		this._fx.workletNode.port.postMessage('dispose');
+		disposeNodes([ this._fx ]);
 	}
 }
 
