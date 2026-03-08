@@ -531,6 +531,7 @@ class StereoDelayProcessor extends DelayWorkletProcessor {
 		this.delays = [];
 		for (let i = 0; i < 2; i++){
 			this.delays[i] = this.makeDelay(delaySize);
+			this.lpf[i] = 0;
 		}
 	}
 
@@ -539,7 +540,6 @@ class StereoDelayProcessor extends DelayWorkletProcessor {
 		const output = outputs[0];
 
 		const dt = [ parameters.timeL[0], parameters.timeR[0] ];
-		// const tR = parameters.timeR[0];
 		const fb = parameters.feedback[0];
 		const dm = Math.max(0, parameters.damping[0]);
 		const dw = parameters.drywet[0];
@@ -548,23 +548,23 @@ class StereoDelayProcessor extends DelayWorkletProcessor {
 		if (input.length > 0){
 			for (let i = 0; i < input[0].length; i++){
 				let sig = [ input[0][i], 0 ];
-				// if input is mono, duplicate to left/right inputs
 				if (input.length < 1){
+					// if input is mono, duplicate to left/right inputs
 					sig = [ input[0][i], input[1][0] ];
 				} else {
 					// else use right input on right side
 					sig[1] = input[1][i];
 				}
-
-				for (let d = 0; d < 2; d++){
+				// process the Left and Right delay channels
+				for (let c = 0; c < this.delays.length; c++){
 					// read from the delayline and apply a lowpass filter
-					this.lpf[d] = mix(this.readDelayAt(d, dt[d]), this.lpf[d], dm);
+					this.lpf[c] = mix(this.readDelayAt(c, dt[c]), this.lpf[c], dm);
 					// write input to the delayline with prev * feedback
-					this.writeDelay(d, sig[d] + this.lpf[d] * fb);
+					this.writeDelay(c, sig[c] + this.lpf[c] * fb);
 					// apply drywet and send output from the filter
-					output[d][i] = mix(this.lpf[d], input[0][i], dw);
+					output[c][i] = mix(this.lpf[c], sig[c], dw);
 					// update the read and write heads of the delaylines
-					this.updateReadWriteHeads(d);
+					this.updateReadWriteHeads(c);
 				}
 			}
 		}

@@ -2,6 +2,8 @@ const Tone = require('tone');
 const Util = require('./Util.js');
 const TL = require('total-serialism').Translate;
 
+const { clip, formatRatio, divToS, getParam } = require('./Util.js');
+
 // all the available effects
 const fxMap = {
 	'drive' : (params) => {
@@ -225,17 +227,36 @@ const CombFilter = function(_params) {
 }
 
 const workletDelay = function(_params) {
+	// param order: timeLeft, timeRight, feedback, damping, drywet
+	_params = Util.mapDefaults(_params, [ '3/16', '2/16', 0.7, 0.6, 0.5 ]);
+
+	this._maxTime = 1000;
+	
+	// load a worklet FX in a ToneAudioNode
 	this._fx = workletFX('stereo-delay');
 
-	this.set = () => {}
+	this.set = (c, time, bpm) => {
+		const dL = clip(divToS(getParam(_params[0], c), bpm) * 1000, 0, this._maxTime);
+		const dR = clip(divToS(getParam(_params[1], c), bpm) * 1000, 0, this._maxTime);
+		const fb = clip(getParam(_params[2], c), 0, 0.999);
+		const dm = clip(getParam(_params[3], c), 0.01, 0.99);
+		const dw = clip(getParam(_params[4], c));
+
+		// set parameters for workletprocessor
+		setParam(this._fx, 'timeL', dL, time);
+		setParam(this._fx, 'timeR', dR, time);
+		setParam(this._fx, 'feedback', fb, time);
+		setParam(this._fx, 'damping', dm, time);
+		setParam(this._fx, 'drywet', dw, time);
+	}
 
 	this.chain = () => {
 		return { 'send' : this._fx, 'return' : this._fx }
 	}
 
-	this.delay = () => {
+	this.delete = () => {
 		this._fx.workletNode.port.postMessage('dispose');
-		disposeNodes([ this._fx ]);
+		disposeNodes([ this._fx.input, this._fx.output, this._fx ]);
 	}
 }
 
