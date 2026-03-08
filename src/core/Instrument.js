@@ -138,6 +138,9 @@ class Instrument extends Sequencer {
 			}, t * 1000 + 100);
 		}, restTime * 1000 - 25);
 
+		// remove the previous widget immediately
+		// this._widgets.map(w => w?.fadeOut());
+		this._widgets.map(w => w?.delete());
 		// // fade out the sound upon evaluation of new code
 		// this.gain.gain.rampTo(0, t, Tone.now());
 		// setTimeout(() => {
@@ -169,7 +172,7 @@ class Instrument extends Sequencer {
 
 		// remove all fx
 		this._fx.map((f) => f.delete());
-		this._widgets.map(w => w?.delete());
+		// this._widgets.map(w => w?.delete());
 
 		console.log('=> disposed Instrument() with FX:', this._fx, 'and widgets:', this._widgets);
 	}
