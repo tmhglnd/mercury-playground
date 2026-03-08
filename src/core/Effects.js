@@ -99,7 +99,7 @@ const fxMap = {
 	'echo' : (params) => {
 		return new Delay(params);
 	},
-	'workletDelay' : (params) => {
+	'delay2' : (params) => {
 		return new workletDelay(params);
 	},
 	// 'ppDelay' : (params) => {
