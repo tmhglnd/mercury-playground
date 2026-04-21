@@ -9,6 +9,7 @@ class MonoSynth extends Instrument {
 		// Inherit from Instrument
 		super(engine, canvas, line);
 
+		this._bufs = engine.getBuffers();
 		this._wave = Util.toArray(t);
 		this._waveMap = {
 			sine : 'sine',
@@ -44,16 +45,39 @@ class MonoSynth extends Instrument {
 		// the source connects the Synth + Noise to the channelstrip
 		// this.source = new Tone.Gain(0).connect(this.channelStrip());
 
-		this.synth = new Tone.FatOscillator().connect(this.channelStrip());
-		// this.synth = new Tone.Noise('white').connect(this.channelStrip());
+		// this.synth = new Tone.FatOscillator().connect(this.channelStrip());
+		// test with wavetable player processor
+		this.synth = new Tone.ToneAudioNode();
+		this.synth.workletNode = Tone.getContext().createAudioWorkletNode('wavetable-processor');
+		// this.synth.workletNode = Tone.getContext().createAudioWorkletNode('noise-processor');
+		this.synth.input = new Tone.Gain();
+		this.synth.output = new Tone.Gain(0, 'decibels');
+		this.synth.volume = this.synth.output.gain;
+		this.synth.input.chain(this.synth.workletNode, this.synth.output);
+
+		this.synth.connect(this.channelStrip());
+
+		// method to dispose the workletProcessor
+		this.synth.stop = () => {
+			this.synth.workletNode.port.postMessage('dispose');
+		};
+		// set the buffer based on the name
+		this.synth.set = (b) => {
+			let buf = this._bufs.get(b);
+			// console.log('getting buffer', buf);
+			let wave = buf.getChannelData(0);
+			// console.log('buffer content', wave);
+			this.synth.workletNode.port.postMessage({'buffer' : wave });
+		}
 
 		// some ideas for adding the noise oscillator to the synth
 		// this.nxGain = new Tone.Gain(0).connect(this.source);
 		// this.nx = new Tone.Noise("white", { volume: 0.5 }).connect(this.nxGain);
 		// this.nx.connect(this.nxGain);
 
-		this.synth.count = 1;
-		this.synth.start();
+		// this.synth.count = 1;
+		// this.synth.start();
+		// this.synth = this.source;
 		this.source = this.synth;
 
 		// this creates empty functions for the noise oscillator so no errors with note
@@ -69,24 +93,25 @@ class MonoSynth extends Instrument {
 
 		// set voice amount for super synth
 		let v = Util.getParam(this._voices, c);
-		this.synth.count = Math.max(1, Math.floor(v));
+		// this.synth.count = Math.max(1, Math.floor(v));
 
 		// set the detuning of the unison voices
 		// in semitone values from -48 to +48
 		let d = Util.getParam(this._detune, c);
 		// d = Math.log2(d) * 1200;
-		this.synth.spread = d * 100 * 2;
+		// this.synth.spread = d * 100 * 2;
 
 		// set wave to oscillator
 		let w = Util.getParam(this._wave, c);
-		if (this._waveMap[w]){
-			w = this._waveMap[w];
-		} else {
-			log(`${w} is not a valid waveshape`);
-			// default wave if wave does not exist
-			w = 'sine';
-		}
-		this.synth.set({ type: w });
+		// if (this._waveMap[w]){
+		// 	w = this._waveMap[w];
+		// } else {
+		// 	log(`${w} is not a valid waveshape`);
+		// 	// default wave if wave does not exist
+		// 	w = 'sine';
+		// }
+		this.synth.set(w);
+		// this.synth.set({ type: w });
 
 		// set the frequency based on the selected note
 		// note as interval / octave coordinate
@@ -105,9 +130,11 @@ class MonoSynth extends Instrument {
 		// get the slide time for next note and set the frequency
 		let s = Util.divToS(Util.getParam(this._slide, c), this.bpm());
 		if (s > 0 && !this._firstSlide){
-			this.synth.frequency.rampTo(f, s, time);
+			// this.synth.frequency.rampTo(f, s, time);
 		} else {
-			this.synth.frequency.setValueAtTime(f, time);
+			const freq = this.source.workletNode.parameters.get('frequency');
+			// this.synth.frequency.setValueAtTime(f, time);
+			freq.setValueAtTime(f, time);
 		}
 		// first time the synth plays don't slide!
 		this._firstSlide = false;

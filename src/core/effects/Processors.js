@@ -10,6 +10,44 @@ function mix(a=0, b=0, x=0.5){
 	return a + ((b - a) * x);
 }
 
+// Sample from a buffer at a specific sample index with linear interpolation
+function sampleLin(buffer, pos=0){
+	const size = buffer.length;
+	const idx = Math.trunc(pos);
+	const frac = pos - idx;
+
+	const x0 = buffer[idx];
+	const x1 = buffer[(idx + 1) % size];
+
+	return mix(x0, x1, frac);
+}
+
+// Mix 4 signals with a cubic interpolation
+// based on code from Olli Niemitalo:
+// https://www.musicdsp.org/en/latest/Other/49-cubic-interpollation.html
+function cubic(x0=0, x1=0, x2=0, x3=0, f=0.5){
+	let a = (3 * (x1 - x2) - x0 + x3) / 2;
+	let b = 2 * x2 + x0 - (5 * x1 + x3) / 2;
+	let c = (x2 - x0) / 2;
+
+	return (((a * f) + b) * f + c) * f + x1;
+}
+
+// Sample from a buffer at a specific sample index with cubic interpolation
+function sampleCubic(buffer, pos=0){
+	const size = buffer.length;
+	// const pos = phase * size;
+	const idx = Math.trunc(pos);
+	const frac = pos - idx;
+
+	const x0 = buffer[(idx - 1 + size) % size];
+	const x1 = buffer[idx];
+	const x2 = buffer[(idx + 1) % size];
+	const x3 = buffer[(idx + 2) % size];
+
+	return cubic(x0, x1, x2, x3, frac);
+}
+
 // Format descriptors and return to output
 function formatDescriptors(descriptors=[]){
 	return descriptors.map(x => new Object({
@@ -55,6 +93,73 @@ class ExtendedWorkletProcessor extends AudioWorkletProcessor {
 	// 	return this.running;
 	// }
 }
+
+class WavetablePlayer extends AudioWorkletProcessor {
+	static get parameterDescriptors(){
+		return formatDescriptors([
+			[ 'frequency', 220, 0, 22050, 'a-rate' ]
+		]);
+	}
+
+	constructor(){
+		super();
+
+		// is the processor running? use as return in process()
+		this.running = true;
+		this.port.onmessage = (e) => {
+			console.log(e.data);
+			// dispose on node.port.postMessage('dispose')
+			if (e.data === 'dispose'){ 
+				this.running = false; 
+				// console.log('disposed workletprocessor', this);
+			}
+			else {
+				const { buffer } = e.data;
+				this.table = buffer;
+			}
+			// else if (e.data === 'buffer'){
+			// 	console.log('set buffer', e);
+			// }
+		}
+
+		// this.TABLE_SIZE = 1024;
+
+		this.table = new Float32Array(0);
+		// this.table = new Float32Array(this.TABLE_SIZE);
+		// build a cosine wavetable (single-cycle waveform)
+		// for (let i = 0; i < this.TABLE_SIZE; i++){
+		// 	this.table[i] = Math.sin(i / this.TABLE_SIZE * Math.PI * 2);
+		// }
+		// phase of the wave playback
+		this.phase = 0;
+		// inverse of the sampleRate for phase accumulation
+		this.INV_SR = 1 / sampleRate;
+	}
+
+	process(inputs, outputs, parameters){
+		const input = inputs[0];
+		const output = outputs[0];
+
+		// we use output.length because this is a generator
+		if (output.length > 0){
+			for (let i = 0; i < output[0].length; i++){				
+				const freq = parameters.frequency[i] ?? parameters.frequency[0];
+
+				let size = this.table.length;
+				let pos = this.phase * size;
+				// output[0][i] = sampleLin(this.table, pos);
+				// lookup value from table with cubic interpolation
+				output[0][i] = sampleCubic(this.table, pos);
+
+				// increment the phase and wrap
+				this.phase += this.INV_SR * freq;
+				if (this.phase >= 1) this.phase -= 1;
+			}
+		}
+		return this.running;
+	}
+}
+registerProcessor('wavetable-processor', WavetablePlayer);
 
 // Various noise type processors for the MonoNoise source
 // Type 2 is Pink noise, used from Tone.Noise('pink') instead of calc
