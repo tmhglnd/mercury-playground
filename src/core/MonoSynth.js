@@ -64,9 +64,7 @@ class MonoSynth extends Instrument {
 		// set the buffer based on the name
 		this.synth.set = (b) => {
 			let buf = this._bufs.get(b);
-			// console.log('getting buffer', buf);
 			let wave = buf.getChannelData(0);
-			// console.log('buffer content', wave);
 			this.synth.workletNode.port.postMessage({'buffer' : wave });
 		}
 

@@ -117,19 +117,9 @@ class WavetablePlayer extends AudioWorkletProcessor {
 				const { buffer } = e.data;
 				this.table = buffer;
 			}
-			// else if (e.data === 'buffer'){
-			// 	console.log('set buffer', e);
-			// }
 		}
-
-		// this.TABLE_SIZE = 1024;
-
+		// empty table, to be filled from a postMessage({'buffer' : buffer})
 		this.table = new Float32Array(0);
-		// this.table = new Float32Array(this.TABLE_SIZE);
-		// build a cosine wavetable (single-cycle waveform)
-		// for (let i = 0; i < this.TABLE_SIZE; i++){
-		// 	this.table[i] = Math.sin(i / this.TABLE_SIZE * Math.PI * 2);
-		// }
 		// phase of the wave playback
 		this.phase = 0;
 		// inverse of the sampleRate for phase accumulation
@@ -147,9 +137,9 @@ class WavetablePlayer extends AudioWorkletProcessor {
 
 				let size = this.table.length;
 				let pos = this.phase * size;
-				// output[0][i] = sampleLin(this.table, pos);
+				output[0][i] = sampleLin(this.table, pos);
 				// lookup value from table with cubic interpolation
-				output[0][i] = sampleCubic(this.table, pos);
+				// output[0][i] = sampleCubic(this.table, pos);
 
 				// increment the phase and wrap
 				this.phase += this.INV_SR * freq;
