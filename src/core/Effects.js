@@ -94,14 +94,9 @@ const fxMap = {
 		return fxMap.autoFilter(params);
 	},*/
 	'delay' : (params) => {
-		// return new Delay(params);
 		return new WorkletDelay(params);
 	},
 	'echo' : (params) => {
-		// return new Delay(params);
-		return new WorkletDelay(params);
-	},
-	'delay2' : (params) => {
 		return new WorkletDelay(params);
 	},
 	// 'ppDelay' : (params) => {
