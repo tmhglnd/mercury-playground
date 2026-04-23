@@ -2,7 +2,7 @@ const Tone = require('tone');
 const Util = require('./Util.js');
 const TL = require('total-serialism').Translate;
 
-const { clip, formatRatio, divToS, getParam } = require('./Util.js');
+const { clip, formatRatio, divToS, getParam, fixNonFinite } = require('./Util.js');
 
 // all the available effects
 const fxMap = {
@@ -1068,7 +1068,7 @@ const WorkletDelay = function(_params) {
 		// set parameters for workletprocessor
 		setParam(this._fx, 'timeL', dL, time);
 		setParam(this._fx, 'timeR', dR, time);
-		setParam(this._fx, 'feedback', fb, time);
+		setParam(this._fx, 'feedback', fixNonFinite(fb, 0.5), time);
 		setParam(this._fx, 'damping', dm, time);
 		setParam(this._fx, 'drywet', dw, time);
 	}

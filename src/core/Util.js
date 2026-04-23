@@ -40,6 +40,11 @@ function assureNum(v, d=1){
 	return isNaN(v) ? d : v;
 }
 
+// fix non-finite numbers, else output a default value
+function fixNonFinite(v, d=0){
+	return isFinite(parseFloat(v)) ? v : d;
+}
+
 // lookup a value from array with wrap index
 function lookup(a, i){
 	return a[i % a.length];
@@ -239,4 +244,4 @@ function toMidi(n=0, o=0){
 	return toScale(n + o * 12 + 36);
 }
 
-module.exports = { mapDefaults, atTime, atodb, clip, assureNum, lookup, randLookup, isRandom, getParam, toArray, msToS, formatRatio, divToS, divToF, toMidi, mtof, noteToMidi, noteToFreq, assureWave, remap }
+module.exports = { mapDefaults, atTime, atodb, clip, assureNum, fixNonFinite, lookup, randLookup, isRandom, getParam, toArray, msToS, formatRatio, divToS, divToF, toMidi, mtof, noteToMidi, noteToFreq, assureWave, remap }

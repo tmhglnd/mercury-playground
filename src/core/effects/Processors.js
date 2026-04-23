@@ -47,12 +47,11 @@ class ExtendedWorkletProcessor extends AudioWorkletProcessor {
 			}
 		}
 	}
-	// Template for parent class processing, 
-	// overwrite this in the parent class
+	// Template for parent class processing, overwrite this in the parent class
 	// process(inputs, outputs, parameters){
 	// 	const input = inputs[0];
 	// 	const output = outputs[0];
-
+	
 	// 	if (input.length > 0){
 	// 		// for every channel
 	// 		for (let channel = 0; channel < input.length; channel++){
@@ -103,28 +102,28 @@ class DelayWorkletProcessor extends ExtendedWorkletProcessor {
 		let d1 = this.delays[i][0][(this.delays[i][2]-(p+1) & this.delays[i][3])];
 		return mix(d0, d1, x);
 	}
-	// // read from delayline with cubic interpolation at specified time in ms
-	// // Cubic interpolation from: O. Niemitalo:
-	// // https://www.musicdsp.org/en/latest/Other/49-cubic-interpollation.html
-	// readDelayCAt(i, ms) {
-	// 	let s = ms * 0.001 * sampleRate;
+	// read from delayline with cubic interpolation at specified time in ms
+	// Cubic interpolation from: O. Niemitalo:
+	// https://www.musicdsp.org/en/latest/Other/49-cubic-interpollation.html
+	readDelayCAt(i, ms) {
+		let s = ms * 0.001 * sampleRate;
 
-	// 	let d = this.delays[i],
-	// 		frac = s - ~~s,
-	// 		int = ~~s + d[2] - 1,
-	// 		mask = d[3];
+		let d = this.delays[i],
+			frac = s - ~~s,
+			int = ~~s + d[2] - 1,
+			mask = d[3];
 
-	// 	let x0 = d[0][int++ & mask],
-	// 		x1 = d[0][int++ & mask],
-	// 		x2 = d[0][int++ & mask],
-	// 		x3 = d[0][int & mask];
+		let x0 = d[0][int++ & mask],
+			x1 = d[0][int++ & mask],
+			x2 = d[0][int++ & mask],
+			x3 = d[0][int & mask];
 
-	// 	let a = (3 * (x1 - x2) - x0 + x3) / 2,
-	// 		b = 2 * x2 + x0 - (5 * x1 + x3) / 2,
-	// 		c = (x2 - x0) / 2;
+		let a = (3 * (x1 - x2) - x0 + x3) / 2,
+			b = 2 * x2 + x0 - (5 * x1 + x3) / 2,
+			c = (x2 - x0) / 2;
 
-	// 	return (((a * frac) + b) * frac + c) * frac + x1;
-	// }
+		return (((a * frac) + b) * frac + c) * frac + x1;
+	}
 	// move the read and writeheads of the delayline
 	updateReadWriteHeads(i){
 		// increment read and write heads in delay and wrap at delaysize
