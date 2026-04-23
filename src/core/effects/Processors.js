@@ -3,6 +3,9 @@
 const MAX_DEF = +340282346638528859811704183484516925440;
 const MIN_DEF = -340282346638528859811704183484516925440;
 
+const TWO_PI = Math.PI * 2;
+const BLOCKSIZE = 128;
+
 // Some helper functions
 // Mix two signals with linear interpolation
 const mix = (a=0, b=0, x=0.5) => a + ((b - a) * x);
@@ -67,8 +70,8 @@ class ExtendedWorkletProcessor extends AudioWorkletProcessor {
 // generating a delayline within an audioworklet.
 // 
 class DelayWorkletProcessor extends ExtendedWorkletProcessor {
-	constructor(){
-		super();
+	constructor(options){
+		super(options);
 	}
 	// initialize a delayline with maximum size in milliseconds
 	// makeDelay code based on Dattorro Reverberator delays
@@ -564,7 +567,7 @@ class StereoDelayProcessor extends DelayWorkletProcessor {
 	constructor(options){
 		super(options);
 
-		const delaySize = 1000;
+		const delaySize = 2000;
 		// initialize delaytime for sliding
 		this.dlt = [];
 		// initialize history values for lowpass filter
@@ -573,7 +576,7 @@ class StereoDelayProcessor extends DelayWorkletProcessor {
 		this.delays = [];
 		for (let i = 0; i < 2; i++){
 			this.delays[i] = this.makeDelay(delaySize);
-			this.lpf[i] = 0, this.dlt[i] = 0;
+			this.lpf[i] = 0; //this.dlt[i] = 0;
 		}
 	}
 
@@ -586,37 +589,94 @@ class StereoDelayProcessor extends DelayWorkletProcessor {
 		const dm = Math.max(0, parameters.damping[0]);
 		const dw = parameters.drywet[0];
 
+		// preprocessing of the input array, making sure there is a 
+		// signal to be processed by the delayline, otherwise the delay silences
+		// when using if (input.length > 0)
+		const sig = [];
+		if (input.length >= 2){
+			// use right input on right side if stereo
+			for (let i = 0; i < BLOCKSIZE; i++){
+				sig[i] = [ input[0][i], input[1][i] ];
+			}
+		} else if (input.length === 1){
+			// if input is mono, duplicate to left/right inputs
+			for (let i = 0; i < BLOCKSIZE; i++){
+				sig[i] = [ input[0][i], input[0][i] ];
+			}
+		} else {
+			// if no input fill with 0's, processing needs to continue
+			for (let i = 0; i < BLOCKSIZE; i++){
+				sig[i] = [ 0, 0 ];
+			}
+		}
+		
 		// process for every channel and every sample in the channel
-		if (input.length > 0){
-			for (let i = 0; i < input[0].length; i++){
-				let sig = [ input[0][i], 0 ];
-				if (input.length < 1){
-					// if input is mono, duplicate to left/right inputs
-					sig = [ input[0][i], input[1][0] ];
-				} else {
-					// else use right input on right side
-					sig[1] = input[1][i];
-				}
-				// process the Left and Right delay channels
-				for (let c = 0; c < this.delays.length; c++){
-					this.dlt[c] = mix(dt[c], this.dlt[c], 0.99977324);
-					// read from the delayline and apply a lowpass filter
-					this.lpf[c] = mix(this.lpf[c], this.lerpDelayAt(c, this.dlt[c]), dm);
-					// apply tanh soft-clipping, allowing for positive feedback
-					this.lpf[c] = Math.tanh(this.lpf[c]);
-					// write input to the delayline with prev * feedback
-					this.writeDelay(c, sig[c] + this.lpf[c] * fb);
-					// apply drywet and send output from the filter
-					output[c][i] = mix(sig[c], this.lpf[c], dw);
-					// update the read and write heads of the delaylines
-					this.updateReadWriteHeads(c);
-				}
+		for (let i = 0; i < BLOCKSIZE; i++){
+			// process the Left and Right delay channels
+			for (let c = 0; c < this.delays.length; c++){
+				this.dlt[c] = this.dlt[c] ?? dt[c];
+				// set the delaytime with a smooth slide
+				this.dlt[c] = mix(dt[c], this.dlt[c], 0.99977324);
+				// read from the delayline and apply a lowpass filter
+				this.lpf[c] = mix(this.lpf[c], this.lerpDelayAt(c, this.dlt[c]), dm);
+				// apply tanh soft-clipping, allowing for positive feedback
+				this.lpf[c] = Math.tanh(this.lpf[c]);
+				// write input to the delayline with prev * feedback
+				this.writeDelay(c, sig[i][c] + this.lpf[c] * fb);
+				// apply drywet and send output from the filter
+				output[c][i] = mix(sig[i][c], this.lpf[c], dw);
+				// update the read and write heads of the delaylines
+				this.updateReadWriteHeads(c);
 			}
 		}
 		return this.running;
 	}
 }
 registerProcessor('stereo-delay', StereoDelayProcessor)
+
+// class SamplePlayer extends ExtendedWorkletProcessor {
+// 	static get parameterDescriptors() {
+// 		return formatDescriptors([
+// 			[ 'rate', 1, MIN_DEF, MAX_DEF, 'k-rate' ],
+// 			[ 'offset', 0, 0, 1, 'k-rate' ],
+// 			[ 'start', 0, 0, 1, 'k-rate' ]
+// 		]);
+// 	}
+
+// 	constructor(options){
+// 		super(options);
+
+// 		this.buffer = new Float32Array(0);
+// 		this.playhead = 0;
+
+// 		this.running = true;
+// 		this.port.onmessage = (e) => {
+// 			// dispose on node.port.postMessage('dispose')
+// 			if (e.data === 'dispose'){ 
+// 				this.running = false; 
+// 				// console.log('disposed workletprocessor', this);
+// 			} else if (e.data === 'start'){
+// 				this.playhead = 0;
+// 			} else {
+// 				const { buffer } = e.data;
+// 				this.buffer = buffer;
+// 			}
+// 		}
+// 	}
+
+// 	process(inputs, outputs, parameters){
+// 		const input = inputs[0];
+// 		const output = outputs[0];
+
+// 		if (output.length > 0){
+// 			for (let i = 0; i < output[0].length; i++){
+// 				output[0][i] = this.buffer[this.playhead];
+
+// 				this.playhead++;
+// 			}
+// 		}
+// 	}
+// }
 
 // Dattorro Reverberator
 // Thanks to port by khoin, taken from:
