@@ -560,7 +560,7 @@ class StereoDelayProcessor extends DelayWorkletProcessor {
 			[ 'timeR', 444, 0, 1000, "k-rate" ],
 			[ 'feedback', 0.8, 0, 2, "k-rate" ],
 			[ 'damping', 0.5, 0, 1, "k-rate" ],
-			[ 'drywet', 0.5, 0, 1, "k-rate" ]
+			[ 'drywet', 0.4, 0, 1, "k-rate" ]
 		]);
 	}
 
@@ -570,13 +570,14 @@ class StereoDelayProcessor extends DelayWorkletProcessor {
 		const delaySize = 2000;
 		// initialize delaytime for sliding
 		this.dlt = [];
-		// initialize history values for lowpass filter
+		// initialize history values for lowpass & highpass filter
 		this.lpf = [];
+		this.hpf = [];
 		// make a stereo delay
 		this.delays = [];
 		for (let i = 0; i < 2; i++){
 			this.delays[i] = this.makeDelay(delaySize);
-			this.lpf[i] = 0; //this.dlt[i] = 0;
+			this.lpf[i] = 0, this.hpf[i] = 0; //this.dlt[i] = 0;
 		}
 	}
 
@@ -588,6 +589,9 @@ class StereoDelayProcessor extends DelayWorkletProcessor {
 		const fb = parameters.feedback[0];
 		const dm = Math.max(0, parameters.damping[0]);
 		const dw = parameters.drywet[0];
+
+		// the slide time for delaytime changes in milliseconds
+		const sl = 1 - 1 / (25 * 44.1);
 
 		// preprocessing of the input array, making sure there is a 
 		// signal to be processed by the delayline, otherwise the delay silences
@@ -614,15 +618,24 @@ class StereoDelayProcessor extends DelayWorkletProcessor {
 		for (let i = 0; i < BLOCKSIZE; i++){
 			// process the Left and Right delay channels
 			for (let c = 0; c < this.delays.length; c++){
+				// set initial value for delaytime based on parameter
 				this.dlt[c] = this.dlt[c] ?? dt[c];
 				// set the delaytime with a smooth slide
-				this.dlt[c] = mix(dt[c], this.dlt[c], 0.99977324);
+				this.dlt[c] = mix(dt[c], this.dlt[c], sl);
 				// read from the delayline and apply a lowpass filter
 				this.lpf[c] = mix(this.lpf[c], this.lerpDelayAt(c, this.dlt[c]), dm);
 				// apply tanh soft-clipping, allowing for positive feedback
-				this.lpf[c] = Math.tanh(this.lpf[c]);
-				// write input to the delayline with prev * feedback
-				this.writeDelay(c, sig[i][c] + this.lpf[c] * fb);
+				this.lpf[c] = Math.tanh(this.lpf[c] * 0.5) * 2.0;
+				// apply a highpass-filter for reducing DC/low-frequency build
+				this.hpf[c] = mix(this.lpf[c], this.hpf[c], 0.99857626);
+				this.lpf[c] = this.lpf[c] - this.hpf[c];
+			}
+			// write input to the delayline with prev * feedback
+			// outside the for-loop because Left -> Right, and Right -> Left
+			this.writeDelay(1, sig[i][0] + this.lpf[0] * fb);
+			this.writeDelay(0, sig[i][1] + this.lpf[1] * fb);
+			
+			for (let c = 0; c < this.delays.length; c++){
 				// apply drywet and send output from the filter
 				output[c][i] = mix(sig[i][c], this.lpf[c], dw);
 				// update the read and write heads of the delaylines

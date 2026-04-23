@@ -94,13 +94,15 @@ const fxMap = {
 		return fxMap.autoFilter(params);
 	},*/
 	'delay' : (params) => {
-		return new Delay(params);
+		// return new Delay(params);
+		return new WorkletDelay(params);
 	},
 	'echo' : (params) => {
-		return new Delay(params);
+		// return new Delay(params);
+		return new WorkletDelay(params);
 	},
 	'delay2' : (params) => {
-		return new workletDelay(params);
+		return new WorkletDelay(params);
 	},
 	// 'ppDelay' : (params) => {
 	// 	return new PingPongDelay(params);
@@ -1287,7 +1289,7 @@ const Delay = function(_params){
 // The delay includes a lowpass filter in feedback loop and delaytimes are set 
 // for the left and right channel independently. 
 // 
-const workletDelay = function(_params) {
+const WorkletDelay = function(_params) {
 	// if only 1 param, apply time to both Left and Right
 	if (_params.length === 1){ _params[1] = _params[0] }
 	// if only 2 params, apply time to Left and Right, and second value feedback
@@ -1298,7 +1300,7 @@ const workletDelay = function(_params) {
 	// param order: timeLeft, timeRight, feedback, damping, drywet
 	_params = Util.mapDefaults(_params, [ '2/16', '3/16', 0.8, 0.5, 0.5 ]);
 
-	this._maxTime = 1000;
+	this._maxTime = 2000;
 	// load a worklet FX in a ToneAudioNode
 	this._fx = workletFX('stereo-delay');
 
