@@ -45,20 +45,21 @@ class MonoSample extends Instrument {
 
 		if (!this._bufs.has(f)){
 			// default sample if file does not exist
-			log(`${w} is not a valid sample name`);
+			log(`${f} is not a valid sample name`);
 			// default sample is kick_909
 			f = 'kick_909';
 		}
 
-		if (this._bufs.has(f)){	
-			this.sample.buffer = this._bufs.get(f).slice(0);
-		} else {
-			// default sample if file does not exist
-			this.sample.buffer = this._bufs.get('kick_min').slice(0);
-		}
-		
 		// get speed and if 2d array pick randomly
 		let s = Util.getParam(this._speed, c);
+
+		if (s < 0){	
+			this.sample.buffer = this._bufs.get(f).slice(0);
+			this.sample.reverse = true;
+		} else {
+			// default sample if file does not exist
+			this.sample.buffer = this._bufs.get(f);
+		}
 
 		// check if note is not 'off'
 		let i = Util.getParam(this._note[0], c);
@@ -72,11 +73,6 @@ class MonoSample extends Instrument {
 			let r = Util.mtof(n) / t;
 			s = s * r;
 		}
-
-		// reversing seems to reverse every time the 
-		// value is set to true (so after 2 times reverse
-		// it becomes normal playback again) no fix yet
-		this.sample.reverse = s < 0.0;
 
 		// the duration of the buffer in seconds
 		let dur = this.sample.buffer.duration;

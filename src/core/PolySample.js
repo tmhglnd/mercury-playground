@@ -54,21 +54,28 @@ class PolySample extends PolyInstrument {
 		// get the sample from array
 		let b = Util.getParam(this._sound, c);
 
+		if (!this._bufs.has(b)){
+			// default sample if file does not exist
+			log(`${b} is not a valid sample name`);
+			// default sample
+			b = 'xylo_c4';
+		}
+
+		// clean-up previous buffer
 		if (this.sources[id].buffer){
-			// clean-up previous buffer
 			this.sources[id].buffer.dispose();
 		}
-		if (this._bufs.has(b)){	
+		// get speed and if 2d array pick randomly
+		let s = Util.getParam(this._speed, c);
+
+		if (s < 0){
 			this.sources[id].buffer = this._bufs.get(b).slice(0);
+			this.sources[id].reverse = true;
 		} else {
-			// default sample if file does not exist
-			this.sources[id].buffer = this._bufs.get('kick_min').slice(0);
+			this.sources[id].buffer = this._bufs.get(b);
 		}
 		// the duration of the buffer in seconds
 		let dur = this.sources[id].buffer.duration;
-
-		// get speed and if 2d array pick randomly
-		let s = Util.getParam(this._speed, c);
 
 		// set the playbackrate based on the selected note
 		// note as interval / octave coordinate
