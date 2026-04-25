@@ -1,6 +1,9 @@
 // The Mercury Playground main code loader
 // 
 
+// check if the browser is Safari
+window.isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
 // switch theme in css
 switchTheme = (t) => {
 	localStorage.setItem('theme', t);
@@ -55,6 +58,7 @@ window.onload = () => {
 		// console.log('printing', typeof print);
 		let p = JSON.stringify(print).replace(/\,/g, ' ').replace(/\"/g, '');
 		p = p.replace(/\\n/g, '<br>');
+		p = p.replace(/\\+/g, '\\');
 		document.getElementById('console-log').innerHTML += `${p}<br>`;
 		// automatically scroll to bottom when new prints are added
 		let e = document.getElementById('postWindow');
@@ -86,8 +90,10 @@ window.onload = () => {
 			// console.log(`Received: ${msg}`);
 			if (msg[0] === '/mercury-code'){
 				try {
-					cm.set(msg[1]);
-					cm.evaluate();
+					if (cm.get() !== msg[1]){
+						cm.set(msg[1]);
+						cm.evaluate();
+					}
 				} catch (e) {
 					log(`Unable to execute code`);
 				}
@@ -110,52 +116,55 @@ window.onload = () => {
 	window.midiLog = false;
 	window.midiEnable = true;
 
-	WebMidi.enable()
-	.then(() => {
-		console.log("=> WebMIDI enabled!");
-		
-		printMidiDevices();
-
-		WebMidi.inputs.forEach((i) => {			
-			// add a listener for all incoming midi messages on all devices
-			i.addListener('midimessage', (midi) => {
-				if (!window.midiEnable) return;
-
-				let type = midi.message.type;
-				let data = midi.message.dataBytes;
-
-				if (window.midiLog) log(`midi in: ${type} ${data}`);
-				
-				if (type === 'controlchange'){
-					// normalize midi values to 0-1 range
-					forwardOSC([ `/cc/${data[0]}`, data[1] / 127 ]);
-				}
-				else if (type === 'noteon'){
-					let pitch = data[0];
-					let velocity = data[1];
-
-					if (velocity > 0){
-						// console.log('noteon', note);
-
-						forwardOSC([ `/pitch`, pitch ]);
-						forwardOSC([ `/note`, pitch-36 ]);
-						forwardOSC([ `/velocity`, velocity / 127 ]);
-						// forwardOSC([ `/note/trigger`, 1 ]);
-					}
-				}
-			});
-		});
-	})
-	.catch((err) => {
-		console.log("!!! Error enabling WebMIDI !!!", err);
-	});
-
 	window.printMidiDevices = function(){
 		WebMidi.inputs.forEach((i) => {
 			log(`- midi input: ${i.name}`);
 		});
 		WebMidi.outputs.forEach((i) => {
 			log(`- midi output: ${i.name}`);
+		});
+	}
+
+	// If Web MIDI API is available to us
+	if ("requestMIDIAccess" in navigator) {
+		WebMidi.enable({ sysex: true })
+		.then(() => {
+			console.log("=> WebMIDI enabled!");
+			
+			printMidiDevices();
+	
+			WebMidi.inputs.forEach((i) => {			
+				// add a listener for all incoming midi messages on all devices
+				i.addListener('midimessage', (midi) => {
+					if (!window.midiEnable) return;
+	
+					let type = midi.message.type;
+					let data = midi.message.dataBytes;
+	
+					if (window.midiLog) log(`midi in: ${type} ${data}`);
+					
+					if (type === 'controlchange'){
+						// normalize midi values to 0-1 range
+						forwardOSC([ `/cc/${data[0]}`, data[1] / 127 ]);
+					}
+					else if (type === 'noteon'){
+						let pitch = data[0];
+						let velocity = data[1];
+	
+						if (velocity > 0){
+							// console.log('noteon', note);
+	
+							forwardOSC([ `/pitch`, pitch ]);
+							forwardOSC([ `/note`, pitch-36 ]);
+							forwardOSC([ `/velocity`, velocity / 127 ]);
+							// forwardOSC([ `/note/trigger`, 1 ]);
+						}
+					}
+				});
+			});
+		})
+		.catch((err) => {
+			console.log("Error enabling WebMIDI", err);
 		});
 	}
 
@@ -171,9 +180,6 @@ window.onload = () => {
 		window.dispatchEvent(event);
 	}
 
-	// Initialize random BPM
-	Engine.randomBPM();
-
 	// Hydra sketch background loader
 	const Hydra = new Canvas.hydraCanvas('hydra-canvas');
 	// const sketchP5 = new p5(Canvas.p5Canvas, 'p5-canvas');
@@ -182,7 +188,7 @@ window.onload = () => {
 	// the code Editor
 	// also loads the parser and the worker
 	// gets passed the Tone context and Engine
-	let cm = new Editor({ context: Tone, engine: Engine, canvas: Hydra, p5canvas: sketchP5 });
+	window.cm = new Editor({ context: Tone, engine: Engine, canvas: Hydra, p5canvas: sketchP5 });
 
 	// Load all the buttons/menus
 	cm.controls();
@@ -191,7 +197,7 @@ window.onload = () => {
 	cm.themeMenu();
 	cm.tutorialMenu();
 	cm.soundsMenu();
-	cm.modeSwitch();
+	// cm.modeSwitch();
 	cm.soundsListenMenu();
 	// cm.settingsMenu();
 	
@@ -201,14 +207,17 @@ window.onload = () => {
 	} else {
 		cm.clear();
 	}
-
-	cm.setMode(localStorage.getItem('theme'));
-
 	// or load the hash if this is provided in the url
 	let url = new URL(window.location);
 	if (url.hash !== ''){
 		cm.setHash(url.hash);
 	}
-	
+
+	// Set the theme if in local storage
+	cm.setMode(localStorage.getItem('theme'));
+
 	Hydra.link('hydra-ui');
+
+	// Initialize with random BPM
+	Engine.randomBPM();
 }

@@ -39,10 +39,8 @@ class MonoInput extends Instrument {
 	delete(){
 		// delete super class
 		super.delete();
-		// disconnect the sound dispose the player
-		this.source.close();
-		this.source.disconnect();
-		this.source.dispose();
+		// dispose and disconnect the mic
+		this.mic.dispose();
 
 		console.log('=> disposed MonoInput()', this._sound);
 	}

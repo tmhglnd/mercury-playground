@@ -1,6 +1,5 @@
 # 🌕 Mercury Live Coding Playground
 
-
 **Welcome to the Mercury Playground! ✌️ ☮️ Make Music, Not War!** ☮️ ✌️
 
 **Mercury Playground is a free/open-source, beginner-friendly, minimal and human-readable language for the live coding of algorithmic electronic music performances running in the browser**
@@ -10,7 +9,7 @@ Mercury currently has 2 versions:
 * Web version running in the browser (Windows/Mac/Linux) (you're in the right place)
 * Original version running in Max8 (Windows/Mac only) [go to this repo](https://github.com/tmhglnd/mercury)
 
-[**🚀 Start coding directly in the playground!** (recommended for beginners)](https://mercury.timohoogland.com/)
+[**🚀 Start coding directly at mercury-playground.cc!** (recommended for beginners)](https://mercury-playground.cc/)
 
 **👾 Or code with the latest full version in Max8:**
 
@@ -22,7 +21,7 @@ Mercury currently has 2 versions:
 
 [**💬 Join the Mercury Community on Discord**](https://discord.gg/vt59NYU)
 
-![The Mercury playground in the browser](media/screenshot.png)
+![The Mercury playground in the browser](media/mercury-windows.png)
 
 ## 📋 Table of Contents
 
@@ -232,9 +231,9 @@ The playground (browser version) does not have exactly the same functionality as
  	- [x] program / pc
 	- [ ] bend
 	- [ ] sync
-- [ ] osc
+- [x] osc
 	- [x] receive parameters as arguments
-	- [ ] send osc messages as an intrument
+	- [x] send osc messages as an intrument
 - [ ] fx
 	- [x] degrade (chip)
 	- [x] delay
@@ -242,17 +241,20 @@ The playground (browser version) does not have exactly the same functionality as
 		- [ ] ping pong feedback delay
 	- [x] distort (softclipping distortion)
 	- [x] squash (compression/overdrive)
-	- [ ] kink (waveshaping)
 	- [x] filter
  		- [x] filter modulation
 	- [x] triggerFilter
+	- [x] fuzz
+	- [ ] freeze
+	- [ ] looper
 	- [x] lfo
 	- [x] reverb
 		- [x] decaying noise convolution
-		- [ ] dattorro reverb algorithm
+		- [x] dattorro reverb algorithm
 	- [x] shift (pitchshift)
  	- [x] compress 
 	- [x] chorus / double
+	- [x] karplus / comb
 - [x] visual 
 	- [x] use Hydra code synchronized with instrument triggers (*)
 
@@ -268,7 +270,7 @@ You can code together in Mercury by using the amazing [**Flok**](https://flok.cc
 
 😎 **No need for installing!** You can start coding immediately in the browser:
 
-[**https://mercury.timohoogland.com/**](https://mercury.timohoogland.com/)
+[**https://mercury-playground.cc**](https://mercury-playground.cc)
 
 ### 💻 Running without internet
 
@@ -302,9 +304,9 @@ Most of the sounds in Mercury are from [freesound.org](http://www.freesound.org)
 
 You can load Hydra visuals by pasting the code in the textarea below the Editor. Removing the code will disable the visual rendering. [Hydra](https://hydra.ojack.xyz/) is a Live coding visual synthesizer developed Olivia Jack.
 
-![The Mercury playground in the browser](media/screenshot3.png)
+![The Mercury playground in the browser](media/hydra-visuals.png)
 
-[*Visual "Pixelscape" by Marianne Teixido*](https://hydra.ojack.xyz/?code=JTJGJTJGUGl4ZWxzY2FwZSUwQSUyRiUyRk1hcmlhbm5lJTIwVGVpeGlkbyUwQSUyRiUyRmh0dHBzJTNBJTJGJTJGZ2l0aHViLmNvbSUyRk1hcmlhbm5lVGVpeGlkbyUwQSUwQXNyYyhvMCklMEElMjAuc2F0dXJhdGUoMS4wMSklMEElMjAuc2NhbGUoLjk5OSklMEElMjAuY29sb3IoMS4wMSUyQzEuMDElMkMxLjAxKSUwQSUyMC5odWUoLjAxKSUwQSUyMC5tb2R1bGF0ZUh1ZShzcmMobzEpLmh1ZSguMykucG9zdGVyaXplKC0xKS5jb250cmFzdCguNyklMkMyKSUwQSUyMCUyMC5sYXllcihzcmMobzEpJTBBJTIwJTIwJTIwJTIwJTIwJTIwJTIwJTIwJTIwLmx1bWEoKSUwQSUyMCUyMCUyMCUyMCUyMCUyMCUyMCUyMCUyMC5tdWx0KGdyYWRpZW50KDEpJTBBJTIwJTIwJTIwJTIwJTIwJTIwJTIwJTIwJTIwJTIwJTIwJTIwJTIwJTIwJTIwLnNhdHVyYXRlKC45KSkpJTBBJTIwJTIwLm91dChvMCklMEElMEFub2lzZSgxJTJDJTIwLjIpJTBBJTIwJTIwLnJvdGF0ZSgyJTJDLjUpJTBBJTIwJTIwLmxheWVyKHNyYyhvMCklMEElMjAlMjAuc2Nyb2xsWCguMikpJTBBJTIwJTIwLm91dChvMSklMEElMEFyZW5kZXIobzAp)
+[*Visual by Olivia Jack*](https://hydra.ojack.xyz/?code=JTJGJTJGJTIwbGljZW5zZWQlMjB3aXRoJTIwQ0MlMjBCWS1OQy1TQSUyMDQuMCUyMGh0dHBzJTNBJTJGJTJGY3JlYXRpdmVjb21tb25zLm9yZyUyRmxpY2Vuc2VzJTJGYnktbmMtc2ElMkY0LjAlMkYlMEElMkYlMkYlMjBieSUyME9saXZpYSUyMEphY2slMEElMkYlMkYlMjBodHRwcyUzQSUyRiUyRm9qYWNrLmdpdGh1Yi5pbyUwQSUwQW9zYyg0JTJDJTIwMC4xJTJDJTIwMC44KS5jb2xvcigxLjA0JTJDMCUyQyUyMC0xLjEpLnJvdGF0ZSgwLjMwJTJDJTIwMC4xKS5waXhlbGF0ZSgyJTJDJTIwMjApLm1vZHVsYXRlKG5vaXNlKDIuNSklMkMlMjAoKSUyMCUzRCUzRSUyMDEuNSUyMColMjBNYXRoLnNpbigwLjA4JTIwKiUyMHRpbWUpKS5vdXQobzApJTIwJTBB)
 
 You can also code a small Hydra snippet inside the `visual()` function. This function can be added to a specific instrument and is evaluated upon triggering of the instrument. Please see tutorial `601` on the mercury playground site.
 

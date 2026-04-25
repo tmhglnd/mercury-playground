@@ -1,7 +1,7 @@
 {
   "name": "mercury-playground",
-  "version": "1.6.0",
-  "description": "",
+  "version": "1.9.3",
+  "description": "A beginner-friendly, minimal and human-readable language for the live coding of algorithmic electronic music performances",
   "engines": {
     "node": "12.x"
   },
@@ -15,8 +15,16 @@
     "browserify": "browserify -t brfs src/main.js -o public/bundle.js",
     "uglify": "terser public/bundle.js -o public/bundle.min.js -c -m --comments 'false'"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "live coding",
+    "algorithmic",
+    "composition",
+    "electronic music",
+    "algorave",
+    "experimental",
+    "web audio"
+  ],
+  "author": "Timo Hoogland",
   "license": "ISC",
   "dependencies": {
     "codemirror": "^5.65.2",
@@ -25,8 +33,8 @@
     "file-saver": "^2.0.5",
     "fs-extra": "^9.1.0",
     "hydra-synth": "1.3.17",
-    "mercury-examples": "^1.0.8",
-    "mercury-lang": "^1.10.0",
+    "mercury-examples": "^1.0.12",
+    "mercury-lang": "^1.11.4",
     "node-osc": "^8.0.6",
     "p5": "^1.4.2",
     "raf-loop": "^1.1.3",

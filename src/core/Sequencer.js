@@ -3,10 +3,13 @@ const Util = require('./Util.js');
 
 // Basic Sequencer class for triggering events
 class Sequencer {
-	constructor(engine, canvas){
+	constructor(engine, canvas, line){
 		// The Tone engine
 		this._engine = engine;
+		// The Hydra canvas
 		this._canvas = canvas;
+		// The line position in the editor of the instrument
+		this._line = line;
 		
 		// Sequencer specific parameters
 		this._count = 0;
@@ -36,11 +39,24 @@ class Sequencer {
 		return Tone.Transport.bpm.value;
 	}
 
-	makeLoop(){
-		console.log('=> makeLoop()');
+	makeLoop(stepcount, unnamedCount){
 		// dispose of previous loop if active
 		if (this._loop){
 			this._loop.dispose();
+		}
+
+		// transfer the stepcount to count and beatcount if provided
+		if (unnamedCount){
+			this._count = unnamedCount.count;
+			this._beatCount = unnamedCount.beat;
+		}		
+		// replace count if a name is given.
+		// this works through giving the instrument the same name
+		if (stepcount){
+			if (stepcount[this._name]){
+				this._count = stepcount[this._name].count;
+				this._beatCount = stepcount[this._name].beat;
+			}
 		}
 
 		// create the event for a loop or external trigger
@@ -57,14 +73,15 @@ class Sequencer {
 					this._beatCount = 0;
 				}
 			}
-			// set subdivision speeds
-			this._loop.playbackRate = Util.getParam(this._subdiv, this._count);
-			// get the subdivision count (always 0, except when subdividing)
-			this._subdivCnt = (this._subdivCnt + 1) % this._loop.playbackRate;
-			
-			// humanize method is interesting to add
-			this._loop.humanize = Util.getParam(this._human, this._count);
-	
+			if (this._time !== null){
+				// set subdivision speeds
+				this._loop.playbackRate = Util.getParam(this._subdiv, this._count);
+				// get the subdivision count (always 0, except when subdividing)
+				this._subdivCnt = (this._subdivCnt + 1) % this._loop.playbackRate;
+				// humanize method is interesting to add
+				this._loop.humanize = Util.getParam(this._human, this._count);
+			}
+
 			// get beat probability for current count
 			let b = Util.getParam(this._beat, this._count);
 	
@@ -90,7 +107,7 @@ class Sequencer {
 					}, (time - Tone.context.currentTime) * 1000);
 				}
 				// also emit an internal event for other instruments to sync to
-				let event = new CustomEvent(`/${this._name}`, { 
+				const event = new CustomEvent(`/${this._name}`, { 
 					detail: { value: 1, time: time }
 				});
 				window.dispatchEvent(event);
@@ -128,14 +145,15 @@ class Sequencer {
 			}, this._time).start(schedule);
 		} 
 		else {
-			// generate a listener for the osc-address
-			let oscAddress = `${this._offset}`;
-			window.addEventListener(oscAddress, (event) => {
+			// generate a listener for the osc-address and store for removal
+			this._oscAddress = `${this._offset}`;
+			this._listener = (event) => {
 				// trigger the event if value greater than 0
 				if (event.detail.value > 0){
 					this._event(event.detail.time);
 				}
-			});
+			}
+			window.addEventListener(this._oscAddress, this._listener);
 		}
 	}
 
@@ -160,19 +178,23 @@ class Sequencer {
 
 	delete(){
 		// stop and dispose the loop
-		this._loop.stop();
-		this._loop.dispose();
+		this._loop?.stop();
+		this._loop?.dispose();
+		// remove the listenere if one was created
+		if (this._oscAddress){
+			window.removeEventListener(this._oscAddress, this._listener)
+		}
 		console.log('=> disposed Sequencer()');
 	}
 
 	start(){
 		// restart at offset
-		this._loop.start(this._offset);
+		this._loop?.start(this._offset);
 	}
 
 	stop(){
 		// stop sequencer
-		this._loop.stop();
+		this._loop?.stop();
 	}
 
 	time(t, o=0, s=[1]){

@@ -3,9 +3,9 @@ const Util = require('./Util.js');
 const PolyInstrument = require('./PolyInstrument');
 
 class PolySynth extends PolyInstrument {
-	constructor(engine, t='saw', canvas){
+	constructor(engine, t='saw', canvas, line){
 		// Inherit from PolyInstrument
-		super(engine, canvas);
+		super(engine, canvas, line);
 
 		// synth specific variables;
 		this._wave = Util.toArray(t);

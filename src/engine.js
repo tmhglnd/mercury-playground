@@ -30,10 +30,9 @@ let buffers = new Tone.ToneAudioBuffers({
 	urls: samples,
 	onload: function(){ 
 		clearInterval(loadingID);
-		console.log('=> sounds loaded');
+		console.log('=> sounds loaded', buffers);
 		// remove the logging function to the innerHTML from here on
 		console.log = console.olog;
-		// console.log(buffers);
 		// init();
 		// remove loading screen, because probably this
 		// is the last thing that is done
@@ -196,7 +195,7 @@ async function addBufferFromJson(url){
 // master effects chain for Tone
 const GN = new Tone.Gain(1);
 const LP = new Tone.Filter(18000, 'lowpass');
-const HP = new Tone.Filter(5, 'highpass');
+const HP = new Tone.Filter(15, 'highpass');
 Tone.Destination.chain(LP, HP, GN);
 
 // set the lowpass frequency cutoff and ramptime
@@ -232,9 +231,23 @@ function setVolume(g, t=0){
 	}
 }
 
+// // a meter to see the volume of the sound
+// const MTR = new Tone.Meter(0.7);
+// MTR.normalRange = true;
+// GN.connect(MTR);
+// // set an interval to continuously get the volume of the sound
+// setInterval(() => { 
+// 	const ui = document.getElementById('ui');
+// 	const rnd = Math.random() * MTR.getValue() * 50;
+// 	ui.style.transform = `translate(${ MTR.getValue() * 50 }px, ${rnd}px)`;
+// }, 25);
+
 // create a Tone Recording and connect to the final output Node
-const Recorder = new Tone.Recorder({ mimeType: 'audio/webm' });
-GN.connect(Recorder);
+// console.log('creating recording', window.isSafari);
+const Recorder = window.isSafari ? null : new Tone.Recorder({ mimeType: 'audio/webm' });
+if (Recorder){
+	GN.connect(Recorder);
+}
 
 function isRecording(){
 	// returns 'started' if the recording is recording
@@ -242,6 +255,10 @@ function isRecording(){
 }
 
 async function record(on, f){
+	if (window.isSafari){
+		log('Recording not supported by Safari Browser');
+		return;
+	}
 	if (on){
 		// start the recording process
 		Recorder.start();
