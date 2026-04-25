@@ -58,7 +58,7 @@ class PolySample extends PolyInstrument {
 			// default sample if file does not exist
 			log(`${b} is not a valid sample name`);
 			// default sample
-			b = 'xylo_c4';
+			b = 'marimba_c4';
 		}
 
 		// clean-up previous buffer
@@ -68,6 +68,7 @@ class PolySample extends PolyInstrument {
 		// get speed and if 2d array pick randomly
 		let s = Util.getParam(this._speed, c);
 
+		// if reversed copy the buffer and reverse it, otherwise use original
 		if (s < 0){
 			this.sources[id].buffer = this._bufs.get(b).slice(0);
 			this.sources[id].reverse = true;
@@ -95,7 +96,7 @@ class PolySample extends PolyInstrument {
 		// reversing seems to reverse every time the 
 		// value is set to true (so after 2 times reverse
 		// it becomes normal playback again) no fix yet
-		this.sources[id].reverse = s < 0.0;
+		// this.sources[id].reverse = s < 0.0;
 
 		let l = Util.lookup(this._stretch, c);
 		let n = 1;

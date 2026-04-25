@@ -38,11 +38,6 @@ class MonoSample extends Instrument {
 		// get the sample from array
 		let f = Util.getParam(this._sound, c);
 
-		if (this.sample.buffer){
-			// clean-up previous buffer
-			this.sample.buffer.dispose();
-		}
-
 		if (!this._bufs.has(f)){
 			// default sample if file does not exist
 			log(`${f} is not a valid sample name`);
@@ -50,9 +45,14 @@ class MonoSample extends Instrument {
 			f = 'kick_909';
 		}
 
+		// clean-up previous buffer
+		if (this.sample.buffer){
+			this.sample.buffer.dispose();
+		}
 		// get speed and if 2d array pick randomly
 		let s = Util.getParam(this._speed, c);
 
+		// if reversed copy the buffer and reverse it, otherwise use original
 		if (s < 0){	
 			this.sample.buffer = this._bufs.get(f).slice(0);
 			this.sample.reverse = true;
