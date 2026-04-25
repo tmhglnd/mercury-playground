@@ -590,7 +590,7 @@ class StereoDelayProcessor extends DelayWorkletProcessor {
 		const dw = parameters.drywet[0];
 
 		// the slide time for delaytime changes in milliseconds
-		const sl = 1 - 1 / (25 * 44.1);
+		const sl = 1 - 1 / (50 * 44.1);
 
 		// preprocessing of the input array, making sure there is a 
 		// signal to be processed by the delayline, otherwise the delay silences

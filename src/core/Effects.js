@@ -1074,6 +1074,6 @@ const WorkletDelay = function(_params) {
 
 	this.delete = () => {
 		this._fx.workletNode.port.postMessage('dispose');
-		disposeNodes([ this._fx.input, this._fx.output, this._fx ]);
+		disposeNodes([ this._fx ]);
 	}
 }
