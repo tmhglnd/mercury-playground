@@ -139,13 +139,15 @@ function code({ file, engine, canvas, p5canvas }){
 			// log(`set bpm to ${args[0]} Hz`);
 		},
 		'samples' : (args) => {
-			// load samples in the audiobuffer
-			// this can be a single url to a soundfile
-			// or a url to a folder that will be searched through
-			// console.log('Loading samples', args);
-			engine.addBuffers(args);
-			// args.forEach((a) => {
-			// });
+			// if the argument is "default", load all the default samples
+			if (args[0] === 'default'){
+				engine.addDefaultBuffers();
+			} else {
+				// load samples in the audiobuffer
+				// this can be a single url to a soundfile
+				// or a url to a folder that will be searched through
+				engine.addBuffers(args);
+			}
 		},
 		'midiDelay' : (args) => {
 			// set some additional latency for all the midi

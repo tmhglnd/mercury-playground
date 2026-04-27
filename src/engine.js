@@ -110,6 +110,12 @@ function getBuffers(){
 	return buffers;
 }
 
+function addDefaultBuffers(){
+	Object.keys(samples).forEach((s) => {
+		addBufferFromURL(samples[s], s);
+	});
+}
+
 // add files to the buffer from a single File Link
 // an array or file paths, or a json of { name:file, ... }
 function addBuffers(uploads){
@@ -142,8 +148,6 @@ function addBuffers(uploads){
 // if name is undefined it will be constructed from the URL
 // 
 function addBufferFromURL(url, n){
-	log(`loading sample: ${n}`);
-
 	// get file name from url string
 	n = n.split('\\').pop().split('/').pop();
 	// remove extension 
@@ -152,6 +156,13 @@ function addBufferFromURL(url, n){
 	n = n.replace(/[\s]+/g, '_');
 	// remove leading/trailing whitespace
 	n = n.trim().replace(/[\s]+/g, '_');
+
+	// can't have 2 samples with the sample name loaded
+	if (buffers.has(n)){
+		log(`sound '${n}' was already added to the library`);
+		return;
+	}
+	log(`loading sample: ${n}`);
 
 	// load buffer and add to ToneAudioBuffers array
 	const buffer = new Tone.ToneAudioBuffer(url, () => {
@@ -279,4 +290,4 @@ async function record(on, f){
 	}
 }
 
-module.exports = { resume, silence, setBPM, getBPM, randomBPM, getBuffers, addBuffers, setLowPass, setHiPass, setVolume, record, isRecording, addBufferFromURL };
+module.exports = { resume, silence, setBPM, getBPM, randomBPM, getBuffers, addBuffers, setLowPass, setHiPass, setVolume, record, isRecording, addBufferFromURL, addDefaultBuffers };
