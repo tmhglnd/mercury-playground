@@ -2,6 +2,8 @@ const Tone = require('tone');
 const Util = require('./Util.js');
 const Instrument = require('./Instrument.js');
 
+const defaultSamples = require('./../data/samples.json');
+
 class MonoSample extends Instrument {
 	constructor(engine, s, canvas, line){
 		super(engine, canvas, line);
@@ -44,18 +46,24 @@ class MonoSample extends Instrument {
 		}
 
 		if (!this._bufs.has(f)){
-			// default sample if file does not exist
-			log(`${w} is not a valid sample name`);
-			// default sample is kick_909
-			f = 'kick_909';
+			if (defaultSamples[f]){
+				this._engine.addBufferFromURL(defaultSamples[f], f);
+			} else {
+				// default sample if file does not exist
+				log(`${f} is not a loaded sample name and not part of default pack`);
+				// default sample is kick_909
+				f = 'kick_909';
+			}
 		}
 
 		if (this._bufs.has(f)){	
 			this.sample.buffer = this._bufs.get(f);
 			// this.sample.buffer = this._bufs.get(f).slice(0);
 		} else {
+			// don't play if there is no valid buffer loaded
+			return;
 			// default sample if file does not exist
-			this.sample.buffer = this._bufs.get('kick_min');
+			// this.sample.buffer = this._bufs.get('kick_min');
 			// this.sample.buffer = this._bufs.get('kick_min').slice(0);
 		}
 		
@@ -101,7 +109,8 @@ class MonoSample extends Instrument {
 
 	sound(s){
 		// load all soundfiles and return as array
-		this._sound = this.checkBuffer(Util.toArray(s));
+		// this._sound = this.checkBuffer(Util.toArray(s));
+		this._sound = Util.toArray(s);
 	}
 
 	checkBuffer(a){
@@ -111,7 +120,8 @@ class MonoSample extends Instrument {
 				return this.checkBuffer(s);
 			}
 			// error if soundfile does not exist
-			else if (!this._bufs.has(s)){
+			else if (!defaultSamples[s] && !this._bufs.has(s)){
+			// else if (!this._bufs.has(s)){
 				// set default (or an ampty soundfile?)
 				log(`sample ${s} not found`);
 				return 'kick_909';

@@ -21,26 +21,27 @@ console.log(`samplerate: ${Tone.getContext().sampleRate}Hz`);
 console.log(`PPQ: ${Tone.Transport.PPQ}`);
 
 // get the sample file paths from json
-let loadingID = setInterval(() => {
-	console.log('downloading sounds...');
-}, 2500);
+// let loadingID = setInterval(() => {
+// 	console.log('downloading sounds...');
+// }, 2500);
 
 let samples = require('./data/samples.json');
-let buffers = new Tone.ToneAudioBuffers({
-	urls: samples,
-	onload: function(){ 
-		clearInterval(loadingID);
-		console.log('=> sounds loaded', buffers);
-		// remove the logging function to the innerHTML from here on
-		console.log = console.olog;
-		// init();
-		// remove loading screen, because probably this
-		// is the last thing that is done
-		setTimeout(() => {
-			document.getElementById('load').className = 'hideLoad';
-		}, 1000);
-	}
-});
+let buffers = new Tone.ToneAudioBuffers();
+// let buffers = new Tone.ToneAudioBuffers({
+// 	urls: samples,
+// 	onload: function(){ 
+// 		clearInterval(loadingID);
+// 		console.log('=> sounds loaded', buffers);
+// 		// remove the logging function to the innerHTML from here on
+// 		console.log = console.olog;
+// 		// init();
+// 		// remove loading screen, because probably this
+// 		// is the last thing that is done
+// 		setTimeout(() => {
+// 			document.getElementById('load').className = 'hideLoad';
+// 		}, 1000);
+// 	}
+// });
 
 // resume webaudio and transport for livecoding
 function resume(){
@@ -141,6 +142,8 @@ function addBuffers(uploads){
 // if name is undefined it will be constructed from the URL
 // 
 function addBufferFromURL(url, n){
+	log(`loading sample: ${n}`);
+
 	// get file name from url string
 	n = n.split('\\').pop().split('/').pop();
 	// remove extension 
@@ -150,11 +153,12 @@ function addBufferFromURL(url, n){
 	// remove leading/trailing whitespace
 	n = n.trim().replace(/[\s]+/g, '_');
 
-	// add to ToneAudioBuffers
-	buffers.add(n, url, () => {
-		log(`sound added as: ${n}`);
-		URL.revokeObjectURL(url);
+	// load buffer and add to ToneAudioBuffers array
+	const buffer = new Tone.ToneAudioBuffer(url, () => {
+		buffers.add(n, buffer);
 
+		log(`sound added: ${n}`);
+		URL.revokeObjectURL(url);
 		// also add soundfiles to menu for easy selection
 		let m = document.getElementById('sounds');
 		let o = document.createElement('option');
@@ -275,4 +279,4 @@ async function record(on, f){
 	}
 }
 
-module.exports = { resume, silence, setBPM, getBPM, randomBPM, getBuffers, addBuffers, setLowPass, setHiPass, setVolume, record, isRecording };
+module.exports = { resume, silence, setBPM, getBPM, randomBPM, getBuffers, addBuffers, setLowPass, setHiPass, setVolume, record, isRecording, addBufferFromURL };

@@ -46,12 +46,12 @@ window.onload = () => {
 			console.olog = () => {};
 		}
 	}
-	console.log = (...message) => {
-		console.olog(...message);
-		document.getElementById('log').innerHTML += `${message}<br>`;
-		// document.getElementById('console-log').innerHTML += `${message}<br>`
-	};
-	console.error = console.debug = console.info = console.log;
+	// console.log = (...message) => {
+	// 	console.olog(...message);
+	// 	document.getElementById('log').innerHTML += `${message}<br>`;
+	// 	// document.getElementById('console-log').innerHTML += `${message}<br>`
+	// };
+	// console.error = console.debug = console.info = console.log;
 
 	// global log function for in-window console
 	window.log = (print) => {
