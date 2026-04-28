@@ -13,12 +13,12 @@ Tone.context.lookAhead = 0.1;
 // Tone.context.updateInterval = 0.5;
 Tone.context.samplerate = 44100;
 
-console.log('=> Engine settings:');
-console.log(`latency: ${Tone.getContext().lookAhead * 1000}ms`);
-console.log(`updateInterval: ${Tone.getContext().updateInterval * 1000}ms`);
-console.log(`latencyHint: ${Tone.getContext().latencyHint}`);
-console.log(`samplerate: ${Tone.getContext().sampleRate}Hz`);
-console.log(`PPQ: ${Tone.Transport.PPQ}`);
+log('Engine settings:');
+log(`  - latency: ${Tone.getContext().lookAhead * 1000}ms`);
+log(`  - updateInterval: ${Tone.getContext().updateInterval * 1000}ms`);
+log(`  - latencyHint: ${Tone.getContext().latencyHint}`);
+log(`  - samplerate: ${Tone.getContext().sampleRate}Hz`);
+log(`  - PPQ: ${Tone.Transport.PPQ}`);
 
 // get the sample file paths from json
 // let loadingID = setInterval(() => {
