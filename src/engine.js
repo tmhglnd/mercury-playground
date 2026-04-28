@@ -9,12 +9,12 @@ Tone.getContext().addAudioWorkletModule(URL.createObjectURL(new Blob([ fxExtensi
 
 // latency reduces cpu load
 // Tone.context.latencyHint = 'playback';
-Tone.context.lookAhead = 0.1;
+// Tone.context.lookAhead = 0.1;
 // Tone.context.updateInterval = 0.5;
-Tone.context.samplerate = 44100;
+// Tone.context.samplerate = 44100;
 
 log('Engine settings:');
-log(`  - latency: ${Tone.getContext().lookAhead * 1000}ms`);
+log(`  - lookAhead: ${Tone.getContext().lookAhead * 1000}ms`);
 log(`  - updateInterval: ${Tone.getContext().updateInterval * 1000}ms`);
 log(`  - latencyHint: ${Tone.getContext().latencyHint}`);
 log(`  - samplerate: ${Tone.getContext().sampleRate}Hz`);
@@ -177,10 +177,6 @@ function addBufferFromURL(url, n){
 		log(`sound added: ${n}`);
 		URL.revokeObjectURL(url);
 		// also add soundfiles to menu for easy selection
-		let m = document.getElementById('sounds');
-		let o = document.createElement('option');
-		o.value = o.innerHTML = n;
-		m.appendChild(o);
 	}, (e) => {
 		log(`error adding sound from: ${n}`);
 	});
