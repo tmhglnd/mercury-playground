@@ -8,7 +8,6 @@ class MonoSample extends Instrument {
 	constructor(engine, s, canvas, line){
 		super(engine, canvas, line);
 		
-		this._defaults = this._engine.getDefaultSamples();
 		this._bufs = this._engine.getBuffers();
 		this._sound;
 		this.sound(s);
@@ -52,17 +51,11 @@ class MonoSample extends Instrument {
 			} else {
 				// default sample if file does not exist
 				log(`${f} is not a loaded sample name and not part of default pack`);
-				// default sample is kick_909
-				f = 'kick_909';
 			}
-		}
-
-		if (this._bufs.has(f)){	
-			this.sample.buffer = this._bufs.get(f);
-			// this.sample.buffer = this._bufs.get(f).slice(0);
-		} else {
 			// don't play if there is no valid buffer loaded
 			return;
+		} else {
+			this.sample.buffer = this._bufs.get(f);
 		}
 		
 		// get speed and if 2d array pick randomly
