@@ -25,7 +25,7 @@ console.log(`PPQ: ${Tone.Transport.PPQ}`);
 // 	console.log('downloading sounds...');
 // }, 2500);
 
-let samples = require('./data/samples.json');
+const defaultSamples = require('./data/samples.json');
 let buffers = new Tone.ToneAudioBuffers();
 // let buffers = new Tone.ToneAudioBuffers({
 // 	urls: samples,
@@ -110,10 +110,16 @@ function getBuffers(){
 	return buffers;
 }
 
+// load all the default samples from the json
 function addDefaultBuffers(){
-	Object.keys(samples).forEach((s) => {
-		addBufferFromURL(samples[s], s);
+	Object.keys(defaultSamples).forEach((s) => {
+		addBufferFromURL(defaultSamples[s], s);
 	});
+}
+
+// get all the default samples
+function getDefaultSamples(){
+	return defaultSamples;
 }
 
 // add files to the buffer from a single File Link
@@ -159,8 +165,8 @@ function addBufferFromURL(url, n){
 
 	// can't have 2 samples with the sample name loaded
 	if (buffers.has(n)){
-		log(`sound '${n}' was already added to the library`);
-		return;
+		log(`sound '${n}' was already added - but gets overwritten`);
+		// return;
 	}
 	log(`loading sample: ${n}`);
 
@@ -290,4 +296,4 @@ async function record(on, f){
 	}
 }
 
-module.exports = { resume, silence, setBPM, getBPM, randomBPM, getBuffers, addBuffers, setLowPass, setHiPass, setVolume, record, isRecording, addBufferFromURL, addDefaultBuffers };
+module.exports = { resume, silence, setBPM, getBPM, randomBPM, getBuffers, addBuffers, setLowPass, setHiPass, setVolume, record, isRecording, addBufferFromURL, addDefaultBuffers, getDefaultSamples };
