@@ -29,9 +29,6 @@ console.log('=> examples loaded', examples);
 const tutorials = require('mercury-examples').Tutorials;
 console.log('=> tutorials loaded', tutorials);
 
-// get the samplefile path data
-let samples = require('./data/samples.json');
-
 // the simple mode lexer for Mercury syntax-highlighting
 CodeMirror.defineSimpleMode("mercury", {
 	meta: {
@@ -579,15 +576,26 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 			document.getElementById('sounds').value = 'sounds';
 			this.insertSound(s);
 		}
-
-		let values = ['sounds'].concat(Object.keys(samples));
-		values.forEach((t) => {
-			let option = document.createElement('option');
-			option.value = option.innerHTML = t;
-			// also add the sample names to the hint autocomplete
-			mercuryHintList.push(t);
-			menu.appendChild(option);
-		});
+		menu.build = () => {
+			menu.innerHTML = '';
+			// get all the values from the default samples
+			let values = ['sounds'].concat(Object.keys(engine.getDefaultSamples()));
+			// get the keys from the loaded buffers and merge them
+			values = values.concat(Array.from(engine.getBuffers()._buffers.keys()));
+			// remove the duplicates
+			values = [...new Set(values) ];
+			values.forEach((t) => {
+				let option = document.createElement('option');
+				option.value = option.innerHTML = t;
+				// also add the sample names to the hint autocomplete
+				mercuryHintList.push(t);
+				menu.appendChild(option);
+			});
+		}
+		menu.build();
+		menu.onmouseenter = () => {
+			menu.build();
+		}
 	}
 
 	this.insertSound = function(s){
@@ -659,9 +667,14 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 	this.showListenMenu = function(show){
 		let m = document.getElementById('sounds-prelisten-box');
 		if (show){
+			// build the menu
+			this.soundsListenMenu();
 			m.style.display = "block";
 		} else {
 			m.style.display = 'none';
+			// delete the content
+			let l =  document.getElementsByClassName('sounds-prelisten')[0];
+			l.innerHTML = '';
 		}
 		this.listenMenuVisible = show;
 	}
@@ -681,7 +694,13 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		`
 		
 		let p = document.getElementById('sound-prelisten-items');
-		let sounds = ['sounds'].concat(Object.keys(samples));
+		// get all the values from the default samples
+		let sounds = ['sounds'].concat(Object.keys(engine.getDefaultSamples()));
+		// TO-DO: Show sounds that are added later, besides default samples
+		// get the keys from the loaded buffers and merge them
+		// sounds = sounds.concat(Array.from(engine.getBuffers()._buffers.keys()));
+		// remove the duplicates
+		// sounds = [...new Set(sounds) ];
 		let last = '';
 		for (let i=0; i<sounds.length; i++){
 			// skip the keyword sounds that is used for the dropdown menu
@@ -689,9 +708,9 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 			// create an audio element
 			let aud = document.createElement('audio');
 			aud.volume = 0.5;
-			aud.src = samples[sounds[i]];
+			aud.src = engine.getDefaultSamples()[sounds[i]];
 			aud.name = sounds[i];
-			aud.preload = 'auto';
+			aud.preload = 'none';
 			// create a button element
 			let btn = document.createElement('button');
 			btn.innerHTML = sounds[i];

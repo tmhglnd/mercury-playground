@@ -27,32 +27,6 @@ window.onbeforeunload = function() {
 };
 
 window.onload = () => {
-	// load requires
-	const Tone = require('tone');
-	Tone.UserMedia.enumerateDevices().then((devices) => {
-		// print the device labels
-		window.devices = devices.map(device => device.label);
-		console.log("=> Input devices");
-		window.devices.forEach((i) => {
-			console.log(`- input: ${i}`);
-		});
-	});
-	
-	// console.log catch function
-	if (typeof console != "undefined"){ 
-		if (typeof console.log != 'undefined'){
-			console.olog = console.log;
-		} else {
-			console.olog = () => {};
-		}
-	}
-	console.log = (...message) => {
-		console.olog(...message);
-		document.getElementById('log').innerHTML += `${message}<br>`;
-		// document.getElementById('console-log').innerHTML += `${message}<br>`
-	};
-	console.error = console.debug = console.info = console.log;
-
 	// global log function for in-window console
 	window.log = (print) => {
 		// console.log('printing', typeof print);
@@ -66,6 +40,32 @@ window.onload = () => {
 
 		console.log(print);
 	}
+
+	// load requires
+	const Tone = require('tone');
+	Tone.UserMedia.enumerateDevices().then((devices) => {
+		// print the device labels
+		window.devices = devices.map(device => device.label);
+		log("Input devices:");
+		window.devices.forEach((i) => {
+			log(`  - input: ${i}`);
+		});
+	});
+	
+	// console.log catch function
+	// if (typeof console != "undefined"){ 
+	// 	if (typeof console.log != 'undefined'){
+	// 		console.olog = console.log;
+	// 	} else {
+	// 		console.olog = () => {};
+	// 	}
+	// }
+	// console.log = (...message) => {
+	// 	console.olog(...message);
+	// 	document.getElementById('log').innerHTML += `${message}<br>`;
+	// 	// document.getElementById('console-log').innerHTML += `${message}<br>`
+	// };
+	// console.error = console.debug = console.info = console.log;
 
 	const Engine = require('./engine.js');
 	const Editor = require('./editor.js');	
@@ -117,11 +117,12 @@ window.onload = () => {
 	window.midiEnable = true;
 
 	window.printMidiDevices = function(){
+		log(`MIDI input/output devices:`)
 		WebMidi.inputs.forEach((i) => {
-			log(`- midi input: ${i.name}`);
+			log(`  - midi input: ${i.name}`);
 		});
 		WebMidi.outputs.forEach((i) => {
-			log(`- midi output: ${i.name}`);
+			log(`  - midi output: ${i.name}`);
 		});
 	}
 
@@ -198,7 +199,7 @@ window.onload = () => {
 	cm.tutorialMenu();
 	cm.soundsMenu();
 	// cm.modeSwitch();
-	cm.soundsListenMenu();
+	// cm.soundsListenMenu();
 	// cm.settingsMenu();
 	
 	// Load recent code from localStorage if any

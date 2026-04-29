@@ -916,3 +916,52 @@ class DattorroReverb extends ExtendedWorkletProcessor {
 	}
 }
 registerProcessor('dattorro-reverb', DattorroReverb);
+
+// A low frequency oscillator (LFO) implementation as a workletprocessor
+// Outputs a signal that can be used for a variety of modulation inputs
+// 
+class LowFrequencyOscillator extends ExtendedWorkletProcessor {
+	static get parameterDescriptors() {
+		return formatDescriptors([
+			[ 'frequency', 5, 0, 22050, 'k-rate' ],
+			[ 'type', 0, 0, 5, 'k-rate'],
+			[ 'low', 0, 0, 22050, 'k-rate' ],
+			[ 'high', 1, 0, 22050, 'k-rate' ],
+		]);
+	}
+
+	constructor(){
+		super();
+		// the oscillator phase
+		this.phase = 0;
+		// inverse of the samplerate for accumulator
+		this.INV_SR = 1 / sampleRate;
+	}
+
+	process(inputs, outputs, parameters){
+		const input = inputs[0];
+		const output = outputs[0];
+
+		const freq = parameters.frequency[0];
+		const type = parameters.type[0];
+		const lo = parameters.low[0];
+		const hi = parameters.high[0];
+
+		const range = Math.abs(hi - lo);
+		const offset = Math.min(hi, lo);
+
+		if (output.length > 0){
+			for (let i = 0; i < output[0].length; i++){
+				// calculate an inverted unipolar cosine wave
+				const lfo = Math.cos(this.phase * Math.PI * 2) * -0.5 + 0.5;
+				// apply the hi and lo range values and output
+				output[0][i] = lfo * range + offset;
+				// increment the phase for the oscillator, reset above 1
+				this.phase += this.INV_SR * freq;
+				if (this.phase >= 1) this.phase -= 1;
+			}
+		}
+		return this.running;
+	}
+}
+registerProcessor('lfo-processor', LowFrequencyOscillator);

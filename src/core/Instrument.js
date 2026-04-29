@@ -10,6 +10,10 @@ class Instrument extends Sequencer {
 		// Inherit from Sequencer
 		super(engine, canvas, line);
 
+		// reference to all the default samples to be used
+		// by inheriting classes monosample, polysample
+		this._defaults = this._engine.getDefaultSamples();
+
 		// Instrument specific parameters
 		this._gain = [ 0.5, 0 ];		
 		this._pan = [ 0 ];

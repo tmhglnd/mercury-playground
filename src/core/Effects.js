@@ -142,7 +142,7 @@ const workletFX = function(fx){
 // Set a parameter in an worklet processor
 const setParam = function(node, param, value, time) {
 	const p = node.workletNode.parameters.get(param);
-	p.setValueAtTime(value, time);
+	p.setValueAtTime(value, time ?? Tone.now());
 }
 
 // Dispose a array of nodes
@@ -742,16 +742,24 @@ const SVF = function(_params){
 	this._freq = _params[1];
 	this._res = _params[2];
 
-	// ToneAudioNode has all the tone effect parameters
-	this._fx = new Tone.ToneAudioNode();
-	this._fx.input = new Tone.Gain(1);
-	this._fx.output = new Tone.Gain(1);
-	this._fx.workletNode = Tone.getContext().createAudioWorkletNode('state-variable-filter');
-	this._fx.input.chain(this._fx.workletNode, this._fx.output);
+	this._fx = workletFX('state-variable-filter');
+
+	this._lfo = new Tone.ToneAudioNode();
+	this._lfo.workletNode = Tone.getContext().createAudioWorkletNode('lfo-processor');
+	this._lfo.input = new Tone.Gain(1);
+	this._lfo.output = new Tone.Gain(1);
+	this._lfo.input.chain(this._lfo.workletNode, this._lfo.output);
+
+	let filterFreq = this._fx.workletNode.parameters.get('frequency');
+	this._lfo.connect(filterFreq);
+
+	setParam(this._lfo, 'low', 90);
+	setParam(this._lfo, 'high', 1500);
+	setParam(this._lfo, 'frequency', 2);
 
 	this.set = function(c, time, bpm){
 		setParam(this._fx, 'type', Util.getParam(this._type, c), time);
-		setParam(this._fx, 'frequency', Util.getParam(this._freq, c), time);
+		// setParam(this._fx, 'frequency', Util.getParam(this._freq, c), time);
 		setParam(this._fx, 'resonance', Util.getParam(this._res, c), time);
 	}
 
@@ -798,12 +806,15 @@ const Filter = function(_params){
 
 	// available filter types for the filter
 	this._types = {
+		'lp' : 'lowpass',
 		'lo' : 'lowpass',
 		'low' : 'lowpass',
 		'lowpass' : 'lowpass',
+		'hp' : 'highpass',
 		'hi' : 'highpass',
 		'high' : 'highpass',
 		'highpass' : 'highpass',
+		'bp' : 'bandpass',
 		'band' : 'bandpass',
 		'bandpass': 'bandpass',
 	}
