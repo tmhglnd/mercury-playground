@@ -211,23 +211,24 @@ class FMProcessor extends ExtendedWorkletProcessor {
 				const modA = parameters.modAmp[i] ?? parameters.modAmp[0];
 				
 				let sum = 0;
-				for (let v = 0; v < 1; v++){
-					const id = i - Math.floor(vcs / 2);
+				for (let v = 0; v < vcs; v++){
+					// get the index for the detuning factor
+					const id = v - Math.floor(vcs / 2);
 
-					// const carF = base * Math.pow(2, -dtn * id / 12);
-					const modF = base * harm;
-					// const modF = carF * harm;
+					const carF = base * Math.pow(2, -dtn * id / 12);
+					const modF = carF * harm;
 					const modD = modF * indx;
 
 					// initialize in a random phase if not 0
 					this.carrier[v] = this.carrier[v] ?? Math.random();
 					this.modulator[v] = this.modulator[v] ?? Math.random();
 
+					// calculate the modulator sinewave
 					const mod = Math.cos(this.modulator[v] * TWOPI) * modA * modA;
 					
 					// the carrier increments by the:
 					// base freq + modulator signal * modulation depth 
-					this.carrier[v] += (base + mod * modD) * INV_SR;
+					this.carrier[v] += (carF + mod * modD) * INV_SR;
 					this.carrier[v] = phaseWrap(this.carrier[v]);
 					
 					// the modulator increments by the:
