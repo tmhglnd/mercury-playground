@@ -259,8 +259,8 @@ class DownSampleProcessor extends ExtendedWorkletProcessor {
 		if (input.length > 0){
 			// for the length of the sample array (generally 128)
 			for (let i=0; i<input[0].length; i++){
-				const d = (parameters.down.length > 1) ? parameters.down[i] : parameters.down[0];
-				const dw = (parameters.drywet.length > 1) ? parameters.drywet[i] : parameters.drywet[0];
+				const d = parameters.down[i] ?? parameters.down[0];
+				const dw = parameters.drywet[i] ?? parameters.drywet[0];
 				
 				// for every channel
 				for (let channel=0; channel<input.length; ++channel){
@@ -590,7 +590,7 @@ class StereoDelayProcessor extends DelayWorkletProcessor {
 		const dw = parameters.drywet[0];
 
 		// the slide time for delaytime changes in milliseconds
-		const sl = 1 - 1 / (50 * 44.1);
+		const sl = 1 - 1 / (25 * 44.1);
 
 		// preprocessing of the input array, making sure there is a 
 		// signal to be processed by the delayline, otherwise the delay silences
@@ -624,15 +624,15 @@ class StereoDelayProcessor extends DelayWorkletProcessor {
 				// read from the delayline and apply a lowpass filter
 				this.lpf[c] = mix(this.lpf[c], this.lerpDelayAt(c, this.dlt[c]), dm);
 				// apply tanh soft-clipping, allowing for positive feedback
-				this.lpf[c] = Math.tanh(this.lpf[c] * 0.5) * 2.0;
+				this.lpf[c] = Math.tanh(this.lpf[c] * 0.5 * fb) * 2.0;
 				// apply a highpass-filter for reducing DC/low-frequency build
 				this.hpf[c] = mix(this.lpf[c], this.hpf[c], 0.99857626);
 				this.lpf[c] = this.lpf[c] - this.hpf[c];
 			}
 			// write input to the delayline with prev * feedback
 			// outside the for-loop because Left -> Right, and Right -> Left
-			this.writeDelay(1, sig[i][0] + this.lpf[0] * fb);
-			this.writeDelay(0, sig[i][1] + this.lpf[1] * fb);
+			this.writeDelay(1, sig[i][0] + this.lpf[0]);
+			this.writeDelay(0, sig[i][1] + this.lpf[1]);
 			
 			for (let c = 0; c < this.delays.length; c++){
 				// apply drywet and send output from the filter
