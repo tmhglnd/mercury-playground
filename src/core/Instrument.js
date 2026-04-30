@@ -103,7 +103,8 @@ class Instrument extends Sequencer {
 			this.adsr.gain.exponentialRampTo(0.0, rel * 5, time + att + dec + retrigger);
 		} else {
 			// if shape is 'off' turn on the gain of the envelope
-			this.adsr.gain.setValueAtTime(1.0, time);
+			// this.adsr.gain.setValueAtTime(1.0, time);
+			this.adsr.gain.linearRampTo(1.0, 0.005, time);
 		}
 	}
 

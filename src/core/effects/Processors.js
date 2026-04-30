@@ -178,15 +178,19 @@ class FMProcessor extends ExtendedWorkletProcessor {
 			[ 'frequency', 200, 0, 22050, 'a-rate' ],
 			[ 'harmonicity', 2, 0, MAX_DEF, 'k-rate' ],
 			[ 'index', 2, 0, MAX_DEF, 'k-rate' ],
-			[ 'modAmp', 0, 0, 1, 'a-rate' ]
+			[ 'modAmp', 0, 0, 1, 'a-rate' ],
+			[ 'voices', 3, 1, 11, 'k-rate' ],
+			[ 'detune', 0.11, 0, 24, 'k-rate' ]
 		]);
 	}
 
 	constructor(){
 		super();
 		// for the phases of the fm synth
-		this.carrier = 0;
-		this.modulator = 0;
+		// this.carrier = 0;
+		this.carrier = [];
+		// this.modulator = 0;
+		this.modulator = [];
 	}
 
 	process(inputs, outputs, parameters){
@@ -197,25 +201,43 @@ class FMProcessor extends ExtendedWorkletProcessor {
 		const harm = parameters.harmonicity[0];
 		const indx = parameters.index[0];
 
+		const vcs = parameters.voices[0];
+		const dtn = parameters.detune[0];
+
+		const cmp = 1 / Math.pow(vcs, 0.5);
+
 		if (output.length > 0){
 			for (let i = 0; i < output[0].length; i++){
 				const modA = parameters.modAmp[i] ?? parameters.modAmp[0];
-				const modF = base * harm;
-				const modD = modF * indx;
-				const mod = Math.cos(this.modulator * TWOPI) * modA * modA;
 				
-				// the carrier increments by the:
-				// base freq + modulator signal * modulation depth 
-				this.carrier += (base + mod * modD) * INV_SR;
-				phaseWrap(this.carrier);
-				
-				// the modulator increments by the:
-				// base freq * harmonicity
-				this.modulator += modF * INV_SR;
-				phaseWrap(this.modulator);
+				let sum = 0;
+				for (let v = 0; v < 1; v++){
+					const id = i - Math.floor(vcs / 2);
 
-				// output the signal
-				output[0][i] = Math.cos(this.carrier * TWOPI);
+					// const carF = base * Math.pow(2, -dtn * id / 12);
+					const modF = base * harm;
+					// const modF = carF * harm;
+					const modD = modF * indx;
+
+					// initialize in a random phase if not 0
+					this.carrier[v] = this.carrier[v] ?? Math.random();
+					this.modulator[v] = this.modulator[v] ?? Math.random();
+
+					const mod = Math.cos(this.modulator[v] * TWOPI) * modA * modA;
+					
+					// the carrier increments by the:
+					// base freq + modulator signal * modulation depth 
+					this.carrier[v] += (base + mod * modD) * INV_SR;
+					this.carrier[v] = phaseWrap(this.carrier[v]);
+					
+					// the modulator increments by the:
+					// base freq * harmonicity
+					this.modulator[v] += modF * INV_SR;
+					this.modulator[v] = phaseWrap(this.modulator[v]);
+					// output the signal
+					sum += Math.cos(this.carrier[v] * TWOPI);
+				}
+				output[0][i] = sum * cmp;
 			}
 		}
 		return this.running;

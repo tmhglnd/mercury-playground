@@ -10,6 +10,8 @@ class MonoFM extends Instrument {
 		// synth specific parameters
 		this._harm = [2];
 		this._indx = [2];
+		this._voices = [1];
+		this._detune = [0];
 
 		this.createSource();
 
@@ -44,6 +46,10 @@ class MonoFM extends Instrument {
 		this.source.setParam('harmonicity', h, time);
 		const d = getParam(this._indx, c);
 		this.source.setParam('index', d, time);
+		const v = getParam(this._voices, c);
+		this.source.setParam('voices', v, time);
+		const t = getParam(this._detune, c);
+		this.source.setParam('detune', t, time);
 
 		// get the interval and octave, calculate the note
 		// calculate the frequency based on the note
@@ -58,13 +64,15 @@ class MonoFM extends Instrument {
 			const atk = Math.max(divToS(getParam(this._fmA, c), this.bpm()), 0.001);
 			const sus = Math.max(divToS(getParam(this._fmS, c), this.bpm()), 0.001);
 			const rel = Math.max(divToS(getParam(this._fmR, c), this.bpm()), 0.001);
+
 			// schedule the attack of the envelope
 			this.fmASR.linearRampTo(1, atk, time);
 			// schedule the release of the envelope after attack and sustain
 			this.fmASR.linearRampTo(0, rel, time + atk + sus);
 		} else {
 			// when the shape is 'off' set to 1
-			this.fmASR.setValueAtTime(1, time);
+			// this.fmASR.setValueAtTime(1, time);
+			this.fmASR.linearRampTo(1, 0.005, time);
 		}
 	}
 
@@ -80,6 +88,13 @@ class MonoFM extends Instrument {
 		this._indx = toArray(i);
 	}
 	depth = this.index;
+
+	super(v=[3], d=[0.111]){
+		// add unison voices and detune them with a spread
+		this._voices = toArray(v);
+		this._detune = toArray(d);
+	}
+	unison = this.super;
 
 	fmShape(...e){
 		console.log('fmshape', e);
