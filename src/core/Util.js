@@ -245,4 +245,14 @@ function setWorkletParam(node, param, value, time) {
 	p.setValueAtTime(value, time ?? Tone.now());
 }
 
+// function rampWorkletParam(node, param, value, ramp, start) {
+// 	const p = node.workletNode.parameters.get(param);
+// 	// first cancel any scheduled ramps and hold the value
+// 	const current = p.getValueAtTime(start);
+// 	p.cancelAndHoldAtTime(start);
+// 	p.setValueAtTime(current, start);
+// 	// now schedule a new ramp
+// 	p.linearRampToValueAtTime(value, start + ramp);
+// }
+
 module.exports = { mapDefaults, atTime, atodb, clip, assureNum, lookup, randLookup, isRandom, getParam, toArray, msToS, formatRatio, divToS, divToF, toMidi, mtof, noteToMidi, noteToFreq, assureWave, remap, setWorkletParam }

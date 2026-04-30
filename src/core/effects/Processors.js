@@ -177,17 +177,16 @@ class FMProcessor extends ExtendedWorkletProcessor {
 		return formatDescriptors([
 			[ 'frequency', 200, 0, 22050, 'a-rate' ],
 			[ 'harmonicity', 2, 0, MAX_DEF, 'k-rate' ],
-			[ 'index', 2, 0, MAX_DEF, 'k-rate' ]
+			[ 'index', 2, 0, MAX_DEF, 'k-rate' ],
+			[ 'modAmp', 0, 0, 1, 'a-rate' ]
 		]);
 	}
 
 	constructor(){
 		super();
-
+		// for the phases of the fm synth
 		this.carrier = 0;
 		this.modulator = 0;
-
-		// this.INV_SR = 1 / sampleRate;
 	}
 
 	process(inputs, outputs, parameters){
@@ -200,9 +199,10 @@ class FMProcessor extends ExtendedWorkletProcessor {
 
 		if (output.length > 0){
 			for (let i = 0; i < output[0].length; i++){
+				const modA = parameters.modAmp[i] ?? parameters.modAmp[0];
 				const modF = base * harm;
 				const modD = modF * indx;
-				const mod = Math.cos(this.modulator * TWOPI);
+				const mod = Math.cos(this.modulator * TWOPI) * modA * modA;
 				
 				// the carrier increments by the:
 				// base freq + modulator signal * modulation depth 
