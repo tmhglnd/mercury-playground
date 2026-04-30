@@ -175,7 +175,7 @@ registerProcessor('noise-processor', NoiseProcessor);
 class FMProcessor extends ExtendedWorkletProcessor {
 	static get parameterDescriptors() {
 		return formatDescriptors([
-			[ 'frequency', 200, 0, 22050, 'k-rate' ],
+			[ 'frequency', 200, 0, 22050, 'a-rate' ],
 			[ 'harmonicity', 2, 0, MAX_DEF, 'k-rate' ],
 			[ 'index', 2, 0, MAX_DEF, 'k-rate' ],
 			[ 'modAmp', 0, 0, 1, 'a-rate' ],
@@ -195,7 +195,7 @@ class FMProcessor extends ExtendedWorkletProcessor {
 		// this is a source, so no inputs
 		const output = outputs[0];
 
-		const base = parameters.frequency[0];
+		// const base = parameters.frequency[0];
 		const harm = parameters.harmonicity[0];
 		const indx = parameters.index[0];
 
@@ -206,6 +206,7 @@ class FMProcessor extends ExtendedWorkletProcessor {
 
 		if (output.length > 0){
 			for (let i = 0; i < output[0].length; i++){
+				const base = parameters.frequency[i] ?? parameters.frequency[0];
 				const modA = parameters.modAmp[i] ?? parameters.modAmp[0];
 				
 				let sum = 0;

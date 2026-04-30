@@ -8,6 +8,9 @@ class MonoFM extends Instrument {
 		super(engine, canvas, line);
 
 		// synth specific parameters
+		this._note = [ 0, 0 ];
+		this._slide = [ 0 ];
+		this._firstSlide = true;
 		this._harm = [2];
 		this._indx = [2];
 		this._voices = [1];
@@ -38,6 +41,9 @@ class MonoFM extends Instrument {
 		// a Signal as envelope for the FM modulator
 		this.fmASR = new Tone.Signal(0, 'gain');
 		this.fmASR.connect(this.source.workletNode.parameters.get('modAmp'));
+
+		this.fmFreq = new Tone.Signal(0, 'frequency');
+		this.fmFreq.connect(this.source.workletNode.parameters.get('frequency'))
 	}
 
 	sourceEvent(c, e, time){
@@ -60,7 +66,16 @@ class MonoFM extends Instrument {
 		const o = getParam(this._note[1], c);
 		const n = toMidi(i, o);
 		const f = mtof(n);
-		this.source.setParam('frequency', f, time);
+
+		// get the slide time for next note and set the frequency
+		const s = divToS(getParam(this._slide, c), this.bpm());
+		if (s > 0 && !this._firstSlide){
+			this.fmFreq.rampTo(f, s, time);
+		} else {
+			this.fmFreq.setValueAtTime(f, time);
+		}
+		// first time the synth plays don't slide!
+		this._firstSlide = false;
 
 		// apply an envelope to the modulator
 		if (this._fmA){
@@ -98,6 +113,11 @@ class MonoFM extends Instrument {
 		this._detune = toArray(d);
 	}
 	unison = this.super;
+
+	slide(s){
+		// glide from one note to another
+		this._slide = toArray(s);
+	}
 
 	fmShape(...e){
 		console.log('fmshape', e);
