@@ -175,21 +175,19 @@ registerProcessor('noise-processor', NoiseProcessor);
 class FMProcessor extends ExtendedWorkletProcessor {
 	static get parameterDescriptors() {
 		return formatDescriptors([
-			[ 'frequency', 200, 0, 22050, 'a-rate' ],
+			[ 'frequency', 200, 0, 22050, 'k-rate' ],
 			[ 'harmonicity', 2, 0, MAX_DEF, 'k-rate' ],
 			[ 'index', 2, 0, MAX_DEF, 'k-rate' ],
 			[ 'modAmp', 0, 0, 1, 'a-rate' ],
-			[ 'voices', 3, 1, 11, 'k-rate' ],
-			[ 'detune', 0.11, 0, 24, 'k-rate' ]
+			[ 'voices', 1, 1, 11, 'k-rate' ],
+			[ 'detune', 0, 0, 24, 'k-rate' ]
 		]);
 	}
 
-	constructor(){
-		super();
-		// for the phases of the fm synth
-		// this.carrier = 0;
+	constructor(options){
+		super(options);
+		// for the phases of the fm synth and voices
 		this.carrier = [];
-		// this.modulator = 0;
 		this.modulator = [];
 	}
 
@@ -214,30 +212,29 @@ class FMProcessor extends ExtendedWorkletProcessor {
 				for (let v = 0; v < vcs; v++){
 					// get the index for the detuning factor
 					const id = v - Math.floor(vcs / 2);
-
+					
 					const carF = base * Math.pow(2, -dtn * id / 12);
 					const modF = carF * harm;
 					const modD = modF * indx;
-
+					
 					// initialize in a random phase if not 0
 					this.carrier[v] = this.carrier[v] ?? Math.random();
 					this.modulator[v] = this.modulator[v] ?? Math.random();
-
+					
 					// calculate the modulator sinewave
 					const mod = Math.cos(this.modulator[v] * TWOPI) * modA * modA;
 					
-					// the carrier increments by the:
-					// base freq + modulator signal * modulation depth 
+					// the carrier increments by the: base + modulator * depth 
 					this.carrier[v] += (carF + mod * modD) * INV_SR;
-					this.carrier[v] = phaseWrap(this.carrier[v]);
-					
-					// the modulator increments by the:
-					// base freq * harmonicity
+					phaseWrap(this.carrier[v]);
+					// the modulator increments by the: base freq * harmonicity
 					this.modulator[v] += modF * INV_SR;
-					this.modulator[v] = phaseWrap(this.modulator[v]);
-					// output the signal
+					phaseWrap(this.modulator[v]);
+					
+					// calclate the carrier oscillator and add to total
 					sum += Math.cos(this.carrier[v] * TWOPI);
 				}
+				// output the signal
 				output[0][i] = sum * cmp;
 			}
 		}

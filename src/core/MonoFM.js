@@ -44,10 +44,13 @@ class MonoFM extends Instrument {
 		// get the harmonicity and modulation index
 		const h = getParam(this._harm, c);
 		this.source.setParam('harmonicity', h, time);
+
 		const d = getParam(this._indx, c);
 		this.source.setParam('index', d, time);
+		// get the voices and detune amount for unison
 		const v = getParam(this._voices, c);
 		this.source.setParam('voices', v, time);
+
 		const t = getParam(this._detune, c);
 		this.source.setParam('detune', t, time);
 
