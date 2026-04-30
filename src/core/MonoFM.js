@@ -33,15 +33,15 @@ class MonoFM extends Instrument {
 		this.source.stop = () => { 
 			this.source.workletNode.port.postMessage('dispose'); 
 		}
-		// an envelope for the FM modulator
+		// a Signal as envelope for the FM modulator
 		this.fmASR = new Tone.Signal(0, 'gain');
 		this.fmASR.connect(this.source.workletNode.parameters.get('modAmp'));
 	}
 
 	sourceEvent(c, e, time){
+		// get the harmonicity and modulation index
 		const h = getParam(this._harm, c);
 		this.source.setParam('harmonicity', h, time);
-
 		const d = getParam(this._indx, c);
 		this.source.setParam('index', d, time);
 
@@ -53,27 +53,27 @@ class MonoFM extends Instrument {
 		const f = mtof(n);
 		this.source.setParam('frequency', f, time);
 
+		// apply an envelope to the modulator
 		if (this._fmA){
-			// console.log('fmshape has params')
 			const atk = Math.max(divToS(getParam(this._fmA, c), this.bpm()), 0.001);
 			const sus = Math.max(divToS(getParam(this._fmS, c), this.bpm()), 0.001);
 			const rel = Math.max(divToS(getParam(this._fmR, c), this.bpm()), 0.001);
-
 			// schedule the attack of the envelope
 			this.fmASR.linearRampTo(1, atk, time);
-			// schedule the release of the envelope after attack
-			this.fmASR.linearRampTo(0, rel, time + atk);
+			// schedule the release of the envelope after attack and sustain
+			this.fmASR.linearRampTo(0, rel, time + atk + sus);
 		} else {
-			this.source.setParam('modAmp', 1.0, time);
+			// when the shape is 'off' set to 1
+			this.fmASR.setValueAtTime(1, time);
 		}
 	}
 
-	ratio(h=[2]){
+	harmonicity(h=[2]){
 		// the harmonicity determines the modulation 
 		// frequency, as a list of ratios
 		this._harm = toArray(h);
 	}
-	harmonicity = this.ratio;
+	ratio = this.harmonicity;
 
 	index(i=[2]){
 		// the index determines the modulation depth
