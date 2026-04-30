@@ -239,4 +239,10 @@ function toMidi(n=0, o=0){
 	return toScale(n + o * 12 + 36);
 }
 
-module.exports = { mapDefaults, atTime, atodb, clip, assureNum, lookup, randLookup, isRandom, getParam, toArray, msToS, formatRatio, divToS, divToF, toMidi, mtof, noteToMidi, noteToFreq, assureWave, remap }
+// Set a parameter in an worklet processor
+function setWorkletParam(node, param, value, time) {
+	const p = node.workletNode.parameters.get(param);
+	p.setValueAtTime(value, time ?? Tone.now());
+}
+
+module.exports = { mapDefaults, atTime, atodb, clip, assureNum, lookup, randLookup, isRandom, getParam, toArray, msToS, formatRatio, divToS, divToF, toMidi, mtof, noteToMidi, noteToFreq, assureWave, remap, setWorkletParam }

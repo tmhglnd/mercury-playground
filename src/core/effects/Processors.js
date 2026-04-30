@@ -4,6 +4,19 @@ const MAX_DEF = +340282346638528859811704183484516925440;
 const MIN_DEF = -340282346638528859811704183484516925440;
 
 // Some helper functions
+const TWOPI = Math.PI * 2.0;
+const SR = sampleRate;
+const INV_SR = 1 / sampleRate;
+
+// Wrap the phase between 0 and 1
+function phaseWrap(phase){
+	if (phase >= 1.0){
+		phase -= 1.0;
+	} else if (phase < 0.0){
+		phase += 1.0;
+	}
+	return phase;
+}
 
 // Mix two signals with linear interpolation
 function mix(a=0, b=0, x=0.5){
@@ -154,6 +167,61 @@ class NoiseProcessor extends ExtendedWorkletProcessor {
 	}
 }
 registerProcessor('noise-processor', NoiseProcessor);
+
+// An FM Synth Processor consisting of a carrier and modulator (operator)
+// Set the carrier frequency in Hz and specify the modulator frequency 
+// in Harmonicity (ratio). Set the modulation depth as Index 
+// (ratio to the harmonicity). 
+class FMProcessor extends ExtendedWorkletProcessor {
+	static get parameterDescriptors() {
+		return formatDescriptors([
+			[ 'frequency', 200, 0, 22050, 'a-rate' ],
+			[ 'harmonicity', 2, 0, MAX_DEF, 'k-rate' ],
+			[ 'index', 2, 0, MAX_DEF, 'k-rate' ]
+		]);
+	}
+
+	constructor(){
+		super();
+
+		this.carrier = 0;
+		this.modulator = 0;
+
+		// this.INV_SR = 1 / sampleRate;
+	}
+
+	process(inputs, outputs, parameters){
+		// this is a source, so no inputs
+		const output = outputs[0];
+
+		const base = parameters.frequency[0];
+		const harm = parameters.harmonicity[0];
+		const indx = parameters.index[0];
+
+		if (output.length > 0){
+			for (let i = 0; i < output[0].length; i++){
+				const modF = base * harm;
+				const modD = modF * indx;
+				const mod = Math.cos(this.modulator * TWOPI);
+				
+				// the carrier increments by the:
+				// base freq + modulator signal * modulation depth 
+				this.carrier += (base + mod * modD) * INV_SR;
+				phaseWrap(this.carrier);
+				
+				// the modulator increments by the:
+				// base freq * harmonicity
+				this.modulator += modF * INV_SR;
+				phaseWrap(this.modulator);
+
+				// output the signal
+				output[0][i] = Math.cos(this.carrier * TWOPI);
+			}
+		}
+		return this.running;
+	}
+}
+registerProcessor('fm-processor', FMProcessor);
 
 // A Downsampling Chiptune effect. Downsamples the signal by a specified amount
 // Resulting in a lower samplerate, making it sound more like 8bit/chiptune
