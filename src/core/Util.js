@@ -242,7 +242,8 @@ function toMidi(n=0, o=0){
 // Set a parameter in an worklet processor
 function setWorkletParam(node, param, value, time) {
 	const p = node.workletNode.parameters.get(param);
-	p.setValueAtTime(value, time ?? Tone.now());
+	const v = assureNum(value);
+	p.setValueAtTime(v, time ?? Tone.now());
 }
 
 // function rampWorkletParam(node, param, value, ramp, start) {

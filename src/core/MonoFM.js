@@ -142,6 +142,8 @@ class MonoFM extends Instrument {
 		}
 	}
 
+	wave2(){} //placeholder 
+
 	delete(){
 		super.delete();
 		console.log('disposed MonoFM()');

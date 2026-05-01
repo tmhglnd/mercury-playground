@@ -184,7 +184,6 @@ function code({ file, engine, canvas, p5canvas }){
 			return inst;
 		},
 		'loop' : (obj) => {
-			// console.log('make sample', obj);
 			let type = obj.type;
 			let args = obj.functions;			
 			let inst = new MonoSample(engine, type, canvas, obj.line);
@@ -192,17 +191,14 @@ function code({ file, engine, canvas, p5canvas }){
 			objectMap.applyFunctions(args, inst, type);
 			return inst;
 		},
-		'fmsynth' : (obj) => {
-			const inst = new MonoFM(engine, obj.type, canvas, obj.line);
-			objectMap.applyFunctions(obj.functions, inst, obj.type);
-			return inst;
-		},
 		'synth' : (obj) => {
-			let type = obj.type;
-			let args = obj.functions;			
-			let inst = new MonoSynth(engine, type, canvas, obj.line);
-
-			objectMap.applyFunctions(args, inst, type);
+			let { type, functions, line } = obj;
+			if (type === 'fm'){
+				inst = new MonoFM(engine, type, canvas, line);
+			} else {
+				inst = new MonoSynth(engine, type, canvas, line);
+			}
+			objectMap.applyFunctions(functions, inst, type);
 			return inst;
 		},
 		'noise' : (obj) => {
