@@ -244,4 +244,21 @@ function toMidi(n=0, o=0){
 	return toScale(n + o * 12 + 36);
 }
 
-module.exports = { mapDefaults, atTime, atodb, clip, assureNum, fixNonFinite, lookup, randLookup, isRandom, getParam, toArray, msToS, formatRatio, divToS, divToF, toMidi, mtof, noteToMidi, noteToFreq, assureWave, remap }
+// Set a parameter in an worklet processor
+function setWorkletParam(node, param, value, time) {
+	const p = node.workletNode.parameters.get(param);
+	const v = assureNum(value);
+	p.setValueAtTime(v, time ?? Tone.now());
+}
+
+// function rampWorkletParam(node, param, value, ramp, start) {
+// 	const p = node.workletNode.parameters.get(param);
+// 	// first cancel any scheduled ramps and hold the value
+// 	const current = p.getValueAtTime(start);
+// 	p.cancelAndHoldAtTime(start);
+// 	p.setValueAtTime(current, start);
+// 	// now schedule a new ramp
+// 	p.linearRampToValueAtTime(value, start + ramp);
+// }
+
+module.exports = { mapDefaults, atTime, atodb, clip, assureNum, fixNonFinite, lookup, randLookup, isRandom, getParam, toArray, msToS, formatRatio, divToS, divToF, toMidi, mtof, noteToMidi, noteToFreq, assureWave, remap, setWorkletParam }

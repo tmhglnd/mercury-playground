@@ -3,8 +3,21 @@
 const MAX_DEF = +340282346638528859811704183484516925440;
 const MIN_DEF = -340282346638528859811704183484516925440;
 
-const TWO_PI = Math.PI * 2;
+// Some helper functions
+const TWOPI = Math.PI * 2.0;
+const SR = sampleRate;
+const INV_SR = 1 / sampleRate;
 const BLOCKSIZE = 128;
+
+// Wrap the phase between 0 and 1
+function phaseWrap(phase){
+	if (phase >= 1.0){
+		phase -= 1.0;
+	} else if (phase < 0.0){
+		phase += 1.0;
+	}
+	return phase;
+}
 
 // Some helper functions
 // Mix two signals with linear interpolation
@@ -230,6 +243,82 @@ class NoiseProcessor extends ExtendedWorkletProcessor {
 	}
 }
 registerProcessor('noise-processor', NoiseProcessor);
+
+// An FM Synth Processor consisting of a carrier and modulator (operator)
+// Set the carrier frequency in Hz and specify the modulator frequency 
+// in Harmonicity (ratio). Set the modulation depth as Index 
+// (ratio to the harmonicity). 
+class FMProcessor extends ExtendedWorkletProcessor {
+	static get parameterDescriptors() {
+		return formatDescriptors([
+			[ 'frequency', 200, 0, 22050, 'a-rate' ],
+			[ 'harmonicity', 2, 0, MAX_DEF, 'k-rate' ],
+			[ 'index', 2, 0, MAX_DEF, 'k-rate' ],
+			[ 'modAmp', 0, 0, 1, 'a-rate' ],
+			[ 'voices', 1, 1, 11, 'k-rate' ],
+			[ 'detune', 0, 0, 24, 'k-rate' ]
+		]);
+	}
+
+	constructor(options){
+		super(options);
+		// for the phases of the fm synth and voices
+		this.carrier = [];
+		this.modulator = [];
+	}
+
+	process(inputs, outputs, parameters){
+		// this is a source, so no inputs
+		const output = outputs[0];
+
+		// const base = parameters.frequency[0];
+		const harm = parameters.harmonicity[0];
+		const indx = parameters.index[0];
+
+		const vcs = parameters.voices[0];
+		const dtn = parameters.detune[0];
+
+		const cmp = 1 / Math.pow(vcs, 0.5);
+
+		if (output.length > 0){
+			for (let i = 0; i < output[0].length; i++){
+				const base = parameters.frequency[i] ?? parameters.frequency[0];
+				const modA = parameters.modAmp[i] ?? parameters.modAmp[0];
+				
+				let sum = 0;
+				for (let v = 0; v < vcs; v++){
+					// get the index for the detuning factor
+					const id = v - Math.floor(vcs / 2);
+					
+					const carF = base * Math.pow(2, -dtn * id / 12);
+					const modF = carF * harm;
+					const modD = modF * indx;
+					
+					// initialize in a random phase if not 0
+					this.carrier[v] = this.carrier[v] ?? Math.random();
+					this.modulator[v] = this.modulator[v] ?? Math.random();
+					
+					// calculate the modulator sinewave
+					const mod = Math.cos(this.modulator[v] * TWOPI) * modA * modA;
+					
+					// the carrier increments by the: base + modulator * depth 
+					this.carrier[v] += (carF + mod * modD) * INV_SR;
+					phaseWrap(this.carrier[v]);
+					// the modulator increments by the: base freq * harmonicity
+					this.modulator[v] += modF * INV_SR;
+					phaseWrap(this.modulator[v]);
+					
+					// calclate the carrier oscillator and add to total
+					sum += Math.cos(this.carrier[v] * TWOPI);
+				}
+				// output the signal
+				output[0][i] = sum * cmp;
+			}
+		}
+		return this.running;
+	}
+}
+registerProcessor('fm-processor', FMProcessor);
 
 // A Downsampling Chiptune effect. Downsamples the signal by a specified amount
 // Resulting in a lower samplerate, making it sound more like 8bit/chiptune
