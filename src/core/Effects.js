@@ -72,6 +72,9 @@ const fxMap = {
 	'pitchShift' : (params) => {
 		return new PitchShift(params);
 	},
+	'workletShift' : (params) => {
+		return new WorkletPitchShift(params);
+	},
 	// 'tune' : (params) => {
 	// 	return new PitchShift(params);
 	// },
@@ -654,6 +657,23 @@ const PitchShift = function(_params){
 		this._fx.disconnect();
 		this._fx.dispose();
 	}
+}
+
+const WorkletPitchShift = function(_params){
+	this._params = Util.mapDefaults(_params, [2, 0.5])
+	this._fx = workletFX('pitchshift-processor');
+
+	this.set = (c, time) => {
+		let s = getParam(this._params[0], c);
+		setParam(this._fx, 'shift', s, time);
+
+		let dw = getParam(this._params[1], c);
+		setParam(this._fx, 'drywet', dw, time);
+	}
+
+	this.chain = () => { return { 'send' : this._fx, 'return' : this._fx } }
+
+	this.delete = () => {}
 }
 
 // LFO FX

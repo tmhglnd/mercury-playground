@@ -537,8 +537,7 @@ class WavelossProcessor extends ExtendedWorkletProcessor {
 		if (input.length > 0){
 			for (let c = 0; c < input.length; c++){
 				this.prob[c] = this.prob[c] ?? 0;
-				// this.latch[c] = this.latch[c] ?? 0;
-
+				
 				for (let i = 0; i < input[c].length; i++){
 					// take the sign and find the zero-crossing
 					const sign = (input[c][i] > 0) ? 1 : -1;
@@ -785,6 +784,59 @@ class StereoDelayProcessor extends DelayWorkletProcessor {
 	}
 }
 registerProcessor('stereo-delay', StereoDelayProcessor)
+
+// A time domain pitch shifter
+//
+class PitchShiftProcessor extends DelayWorkletProcessor {
+	static get parameterDescriptors(){
+		return formatDescriptors([
+			['shift', 0, 2, MAX_DEF, 'k-rate'],
+			['drywet', 1, 0, 1, 'k-rate']
+		])
+	}
+
+	constructor(){
+		super();
+
+		const dsize = 110;
+		this.wsize = 50;
+
+		this.delays = [];
+		this.phase = 0;
+		this.delays[0] = this.makeDelay(dsize);
+	}
+
+	process(inputs, outputs, parameters){
+		const input = inputs[0];
+		const output = outputs[0];
+
+		const ratio = (1 - parameters.shift[0]) / (this.wsize * 0.001);
+		const dw = parameters.drywet[0];
+
+		if (input.length > 0){
+			for (let i=0; i<input[0].length; i++){
+				// read playhead 1
+				const tap1 = this.readDelayCAt(0, this.phase * this.wsize + 5);
+				// read playhead 2 with 180º phaseshift ( +0.5 )
+				const p2 = ((this.phase + 0.5) % 1);
+				const tap2 = this.readDelayCAt(0, p2 * this.wsize + 5);
+				// calculate the windowing based on the phases 
+				// 2 overlapping cosine windows
+				const window1 = Math.cos(this.phase * TWOPI) * -0.5 + 0.5;
+				const window2 = Math.cos(p2 * TWOPI) * -0.5 + 0.5;
+				// output is combination of both taps with windows
+				output[0][i] = mix(input[0][i], tap1 * window1 + tap2 * window2, dw);
+
+				this.writeDelay(0, input[0][i]);
+				this.updateReadWriteHeads(0);
+				this.phase += ratio * INV_SR;
+				this.phase = phaseWrap(this.phase);
+			}
+		}
+		return this.running;
+	}
+}
+registerProcessor('pitchshift-processor', PitchShiftProcessor);
 
 // class SamplePlayer extends ExtendedWorkletProcessor {
 // 	static get parameterDescriptors() {
