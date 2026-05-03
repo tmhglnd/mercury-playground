@@ -806,8 +806,8 @@ class DattorroReverb extends ExtendedWorkletProcessor {
 			["damping", 0.005, 0, 1, "k-rate"],
 			["excursionRate", 0.5, 0, 2, "k-rate"],
 			["excursionDepth", 0.7, 0, 2, "k-rate"],
-			["wet", 0.7, 0, 2, "k-rate"],
-			// ["dry", 0.7, 0, 2, "k-rate"]
+			["gain", 0.7, 0, 2, "k-rate"],
+			["drywet", 0.5, 0, 1, "k-rate"]
 		]);
 	}
 
@@ -899,8 +899,8 @@ class DattorroReverb extends ExtendedWorkletProcessor {
 			dp = 1 - parameters.damping[0],
 			ex = parameters.excursionRate[0] / sampleRate,
 			ed = parameters.excursionDepth[0] * sampleRate / 1000,
-			we = parameters.wet[0]; //* 0.6, // lo & ro both mult. by 0.6 anyways
-			// dr = parameters.dry[0];
+			gn = parameters.gain[0], //* 0.6, // lo & ro both mult. by 0.6 anyways
+			dw = parameters.drywet[0];
 
 		// write to predelay and dry output
 		if (inputs[0].length == 2) {
@@ -908,16 +908,17 @@ class DattorroReverb extends ExtendedWorkletProcessor {
 				this._preDelay[this._pDWrite + i] = (inputs[0][0][i] + inputs[0][1][i]) * 0.5;
 
 				// removed the dry parameter, this is handled in the Tone Node
-				// outputs[0][0][i] = inputs[0][0][i] * dr;
-				// outputs[0][1][i] = inputs[0][1][i] * dr;
+				// initially add the input to the output sound with dry amp
+				outputs[0][0][i] = inputs[0][0][i] * (1-dw);
+				outputs[0][1][i] = inputs[0][1][i] * (1-dw);
 			}
 		} else if (inputs[0].length > 0) {
 			this._preDelay.set(
 				inputs[0][0],
 				this._pDWrite
 			);
-			// for (let i = 127; i >= 0; i--)
-			// 	outputs[0][0][i] = outputs[0][1][i] = inputs[0][0][i] * dr;
+			for (let i = 127; i >= 0; i--)
+				outputs[0][0][i] = outputs[0][1][i] = inputs[0][0][i] * (1-dw);
 		} else {
 			this._preDelay.set(
 				new Float32Array(128),
@@ -985,8 +986,8 @@ class DattorroReverb extends ExtendedWorkletProcessor {
 				this.readDelayAt(10, this._taps[12]) -
 				this.readDelayAt(11, this._taps[13]);
 
-			outputs[0][0][i] += lo * we;
-			outputs[0][1][i] += ro * we;
+			outputs[0][0][i] += lo * gn * dw;
+			outputs[0][1][i] += ro * gn * dw;
 
 			this._excPhase += ex;
 
