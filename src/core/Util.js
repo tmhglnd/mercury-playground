@@ -156,6 +156,18 @@ function msToS(ms){
 	return ms / 1000.0;
 }
 
+// convert a fraction string to a floating point value
+// or pass through
+function fractToFloat(f){
+	if (typeof f !== 'string') return f;
+	// check if string has format fraction and evaluate
+	if (String(f).match(/\d+\/\d+/)){
+		return eval(String(f));
+	}
+	// otherwise return input
+	return f;
+}
+
 // parse division formats to Tone Loop intervals in seconds
 function formatRatio(d, bpm){
 	if (String(d).match(/\d+\/\d+/)){
@@ -177,7 +189,7 @@ function divToS(d, bpm){
 		return Number(d) / 1000;
 	} else {
 		console.log(`${d} is not a valid time value`);
-		return 0.1;
+		return 0.25;
 	}
 }
 
@@ -261,4 +273,4 @@ function setWorkletParam(node, param, value, time) {
 // 	p.linearRampToValueAtTime(value, start + ramp);
 // }
 
-module.exports = { mapDefaults, atTime, atodb, clip, assureNum, fixNonFinite, lookup, randLookup, isRandom, getParam, toArray, msToS, formatRatio, divToS, divToF, toMidi, mtof, noteToMidi, noteToFreq, assureWave, remap, setWorkletParam }
+module.exports = { mapDefaults, atTime, atodb, clip, assureNum, fixNonFinite, lookup, randLookup, isRandom, getParam, toArray, msToS, fractToFloat, formatRatio, divToS, divToF, toMidi, mtof, noteToMidi, noteToFreq, assureWave, remap, setWorkletParam }

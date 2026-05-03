@@ -2,7 +2,7 @@ const Tone = require('tone');
 const Util = require('./Util.js');
 const TL = require('total-serialism').Translate;
 
-const { clip, divToS, getParam, fixNonFinite,  } = require('./Util.js');
+const { clip, divToS, getParam, fixNonFinite, fractToFloat } = require('./Util.js');
 
 // all the available effects
 const fxMap = {
@@ -1091,7 +1091,8 @@ const WorkletDelay = function(_params) {
 	this.set = (c, time, bpm) => {
 		const dL = clip(divToS(getParam(_params[0], c), bpm) * 1000, 0, this._maxTime);
 		const dR = clip(divToS(getParam(_params[1], c), bpm) * 1000, 0, this._maxTime);
-		const fb = clip(getParam(_params[2], c), 0, 2);
+		const fb = clip(fractToFloat(getParam(_params[2], c), 0, 2));
+		console.log(fb);
 		const dm = clip(getParam(_params[3], c), 0.01, 0.99);
 		const dw = clip(getParam(_params[4], c));
 
@@ -1099,8 +1100,8 @@ const WorkletDelay = function(_params) {
 		setParam(this._fx, 'timeL', dL, time);
 		setParam(this._fx, 'timeR', dR, time);
 		setParam(this._fx, 'feedback', fixNonFinite(fb, 0.5), time);
-		setParam(this._fx, 'damping', dm, time);
-		setParam(this._fx, 'drywet', dw, time);
+		setParam(this._fx, 'damping', fixNonFinite(dm, 0.5), time);
+		setParam(this._fx, 'drywet', fixNonFinite(dw, 0.5), time);
 	}
 
 	this.chain = () => {
