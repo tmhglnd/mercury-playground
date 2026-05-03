@@ -2,7 +2,7 @@ const Tone = require('tone');
 const Util = require('./Util.js');
 const TL = require('total-serialism').Translate;
 
-const { clip, divToS, getParam, fixNonFinite } = require('./Util.js');
+const { clip, divToS, getParam, fixNonFinite,  } = require('./Util.js');
 
 // all the available effects
 const fxMap = {
@@ -119,6 +119,12 @@ const fxMap = {
 	},
 	'speak' : (params) => {
 		return new FormantFilter(params);
+	},
+	'loss' : (params) => {
+		return new WaveLoss(params);
+	},
+	'waveloss' : (params) => {
+		return new WaveLoss(params);
 	}
 }
 module.exports = fxMap;
@@ -133,6 +139,10 @@ const workletFX = function(fx){
 	_fx.workletNode = new Tone.getContext().createAudioWorkletNode(fx);
 	// connect input, fx and output
 	_fx.input.chain(_fx.workletNode, _fx.output);
+	// create a dispose function
+	_fx.disposeWorklet = () => { 
+		_fx.workletNode.port.postMessage('dispose');
+	}
 	// send a reference back
 	return _fx;
 }
@@ -400,6 +410,34 @@ const Fuzz = function(_params){
 	this.delete = function(){
 		this._fx.workletNode.port.postMessage('dispose');
 		disposeNodes([ this._fx, this._fx.input, this._fx.output ]);
+	}
+}
+
+// Waveloss FX
+// The waveloss effect gradually drops sound (reduces it to 0) between detected
+// zero-crossings in the signal. This is based on a probability. The amount
+// increases the probability that the signal will be dropped.
+// Inspired by Supercollider waveloss function. 
+// The technique was described by Trevor Wishart in a lecture.
+// 
+const WaveLoss = function(_params){
+	_params = Util.mapDefaults(_params, [0.5, 1]);
+	this._amount = _params[0];
+
+	this._fx = workletFX('waveloss-processor');
+
+	this.set = (count, time, bpm) => {
+		const a = clip(fixNonFinite(getParam(this._amount, count)));
+		setParam(this._fx, 'amount', a, time);
+	}
+
+	this.chain = () => { 
+		return { 'send' : this._fx, 'return' : this._fx } 
+	}
+
+	this.delete = () => {
+		this._fx.disposeWorklet();
+		disposeNodes([ this._fx ]);
 	}
 }
 

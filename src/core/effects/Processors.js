@@ -507,6 +507,57 @@ class SquashProcessor extends ExtendedWorkletProcessor {
 }
 registerProcessor('squash-processor', SquashProcessor);
 
+// Waveloss FX
+// The waveloss effect gradually drops sound (reduces it to 0) between detected
+// zero-crossings in the signal. This is based on a probability. The amount
+// increases the probability that the signal will be dropped.
+// Inspired by Supercollider waveloss function. 
+// The technique was described by Trevor Wishart in a lecture.
+// 
+class WavelossProcessor extends ExtendedWorkletProcessor {
+	static get parameterDescriptors(){
+		return formatDescriptors([
+			['amount', 0.5, 0, 1, 'k-rate'],
+			['drywet', 1, 0, 1, 'k-rate']
+		])
+	}
+
+	constructor(){
+		super();
+
+		this.prev = [];
+		this.prob = [];
+	}
+
+	process(inputs, outputs, parameters){
+		const input = inputs[0];
+		const output = outputs[0];
+		const amt = parameters.amount[0];
+
+		if (input.length > 0){
+			for (let c = 0; c < input.length; c++){
+				this.prob[c] = this.prob[c] ?? 0;
+				// this.latch[c] = this.latch[c] ?? 0;
+
+				for (let i = 0; i < input[c].length; i++){
+					// take the sign and find the zero-crossing
+					const sign = (input[c][i] > 0) ? 1 : -1;
+					const change = sign != (this.prev[c] ?? 0);
+					this.prev[c] = sign;
+
+					// when zerocrossing, sample from noise for probability
+					if (change){ this.prob[c] = Math.random(); }
+
+					// waveloss when probabilty is higher than amount
+					output[c][i] = (this.prob[c] > amt) ? input[c][i] : 0;
+				}
+			}
+		}
+		return this.running;
+	}
+}
+registerProcessor('waveloss-processor', WavelossProcessor);
+
 // Hal Chamberlin State Variable Filter. Improved version, basedon the paper:
 // Improving the Digital Chamberlin State Variable Filter
 // Updated version based on the paper https://arxiv.org/pdf/2111.05592
