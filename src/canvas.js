@@ -89,12 +89,21 @@ let hydraCanvas = function(c, u) {
 		};
 
 		let btn = document.createElement('button');
-		btn.style.width = 'auto';
+		btn.style.width = '12.8%';
 		btn.innerHTML = 'code with Hydra';
 		btn.onclick = () => { window.open('https://hydra.ojack.xyz/', '_blank'); }
 
+		let collab = document.createElement('button');
+		collab.id = collab.innerHTML = 'collaborate';
+		collab.title = 'Collaborate in flok.cc (Alt/Ctrl-Shift-C)';
+		collab.style.width = "12.8%";
+		collab.onclick = () => {
+			window.open('https://flok.cc', '_blank');
+		}
+
 		div.appendChild(text);
 		div.appendChild(btn);
+		div.appendChild(collab);
 	}
 
 	this.engine = loop((dt) => {

@@ -542,26 +542,32 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 			window.open('https://tmhglnd.github.io/mercury/docs/', '_blank');
 		}
 
-		let collab = document.createElement('button');
-		collab.id = collab.innerHTML = 'collaborate';
-		collab.title = 'Collaborate in flok.cc (Alt/Ctrl-Shift-C)';
-		collab.style.width = "12.8%";
-		collab.onclick = () => {
-			window.open('https://flok.cc', '_blank');
-		}
+		// let collab = document.createElement('button');
+		// collab.id = collab.innerHTML = 'collaborate';
+		// collab.title = 'Collaborate in flok.cc (Alt/Ctrl-Shift-C)';
+		// collab.style.width = "12.8%";
+		// collab.onclick = () => {
+		// 	window.open('https://flok.cc', '_blank');
+		// }
 
 		let thms = document.createElement('select');
 		thms.style.width = '12.8%';
 		thms.title = 'Choose a syntax highlighting theme';
 		thms.id = 'themes';
 
+		let fnts = document.createElement('select');
+		fnts.style.width = '12.8%'
+		fnts.title = 'Choose a font for the editor';
+		fnts.id = 'fonts';
+
 		p.appendChild(tuts);
+		p.appendChild(help);
 		p.appendChild(snds);
 		p.appendChild(lstn);
 		p.appendChild(load);
-		p.appendChild(help);
-		p.appendChild(collab);
+		// p.appendChild(collab);
 		p.appendChild(thms);
+		p.appendChild(fnts);
 	}
 
 	this.tutorialMenu = function(){
@@ -673,6 +679,29 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		}
 
 		menu.value = localStorage.getItem(selectedMode === 'lightmode' ? 'lightSyntax' : 'darkSyntax');
+	}
+
+	// font menu for the editor
+	this.fontMenu = function(){
+		const menu = document.getElementById('fonts');
+		menu.innerHTML = '';
+		menu.onchange = () => {
+			this.setFont(menu.value);
+		};
+
+		let fonts = [ 'ubuntu', 'roboto', 'jetbrains', 'doto rounded', 'share tech', 'vt323', 'courier prime', 'sixtyfour', 'bytesized', 'tiny5', 'jgs5', 'open dyslexic', 'monocraft', 'unscii-8', 'unscii-mcr', 'miracode', 'facade ouest', 'terminal grotesque open', 'steps' ].sort();
+
+		for (let f of fonts){
+			let option = document.createElement('option');
+			option.value = option.innerHTML = f;
+			menu.appendChild(option);
+		}
+	}
+
+	this.setFont = function(font){
+		document.body.style.fontFamily = font;
+		localStorage.setItem('font', font);
+		document.getElementById('fonts').value = font;
 	}
 
 	this.listenMenuVisible = false;
