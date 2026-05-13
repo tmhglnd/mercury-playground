@@ -199,7 +199,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 			'Shift-Alt-L': () => { 
 				this.showListenMenu(!this.listenMenuVisible) },
 			'Shift-Ctrl-L': () => { 
-				this.showListenMenu(!this.listenMenuVisible) },
+				this.showListenMenu(!this.listenMenuVisible) }
 			// 'Alt-,': () => { this.showSettings(!this.settingsVisible) },
 			// 'Ctrl-,': () => { this.showSettings(!this.settingsVisible) }
 		}
@@ -739,8 +739,8 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		// useful before a performance. also works with `set samples default`
 		let s = document.getElementById('preload-sounds');
 		s.onclick = () => {
-			log('Preloading...');
 			this.showListenMenu(false);
+			log('Preloading...');
 			engine.addDefaultBuffers();
 		}
 		// close the window when clicking X
