@@ -199,7 +199,9 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 			'Shift-Alt-L': () => { 
 				this.showListenMenu(!this.listenMenuVisible) },
 			'Shift-Ctrl-L': () => { 
-				this.showListenMenu(!this.listenMenuVisible) }
+				this.showListenMenu(!this.listenMenuVisible) },
+			// 'Alt-,': () => { this.showSettings(!this.settingsVisible) },
+			// 'Ctrl-,': () => { this.showSettings(!this.settingsVisible) }
 		}
 	}
 
@@ -685,6 +687,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 
 		let m = document.getElementsByClassName('sounds-prelisten')[0];
 		m.innerHTML = `
+		<span><button id="preload-sounds" style="width:auto">Preload all sounds</button></span>
 		<span><button id="add-prelisten" style="width:auto">Add to code:</button></span>
 		<span class="close">&times;</span>
 		<p>
@@ -732,6 +735,14 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 			this.showListenMenu(false);
 			this.insertSound(last);
 		}
+		// preload all the sounds in case of slow internet connection or 
+		// useful before a performance. also works with `set samples default`
+		let s = document.getElementById('preload-sounds');
+		s.onclick = () => {
+			log('Preloading...');
+			this.showListenMenu(false);
+			engine.addDefaultBuffers();
+		}
 		// close the window when clicking X
 		let span = document.getElementsByClassName('close')[0];
 		span.onclick = () => this.showListenMenu(false);
@@ -744,40 +755,20 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 
 	// settings menu with more options and some explanation
 	// TO-DO, currently not in use
+	// this.settingsVisible = false;
+	// 
+	// this.showSettings = function(show){
+	// 	let s = document.getElementById('settings-menu-box');
+	// 	if (show){
+	// 		s.style.display = 'block';
+	// 	} else {
+	// 		s.style.display = 'none';
+	// 	}
+	// 	this.settingsVisible = show;
+	// }
+	// 
 	// this.settingsMenu = function(){
-	// 	let modal = document.getElementById('modalbox');
-	// 	// let m = document.createElement('div');
-	// 	// m.className = "settings-menu";
-	// 	let m = document.getElementsByClassName('settings-menu')[0];
-	// 	m.innerHTML = `
-	// 	<span class="close">&times;</span>
-	// 	<p>
-	// 		Theme <select id="themes" style="width:30%"></select>
-	// 	</p>`;
-
-	// 	let menu = document.getElementById('themes');
-	// 	menu.onchange = () => { this.changeTheme() };
-
-	// 	let themes = ['ayu-dark', 'base16-dark', 'material-darker', 'material-ocean', 'moxer', 'tomorrow-night-eighties', 'panda-syntax', 'yonce'];
-
-	// 	// 	let lightThemes = ['elegant', 'duotone-light', 'base16-light']
-		
-	// 	for (let t=0; t<themes.length; t++){
-	// 		let option = document.createElement('option');
-	// 		option.value = themes[t];
-	// 		option.innerHTML = themes[t];
-	// 		menu.appendChild(option);
-	// 	}
-	// 	menu.value = defaultTheme;
-
-	// 	// close the window when clicking the cross or outside of the box
-	// 	let span = document.getElementsByClassName('close')[0];
-	// 	span.onclick = () => modal.style.display = "none";
-		
-	// 	window.onclick = (event) => {
-	// 		if (event.target === modal) modal.style.display = "none";
-	// 	}
-	// 	modal.appendChild(m);
+	// 	let settingbox = document.getElementById('settings-menu-box');
 	// }
 
 	// light/dark mode switcher

@@ -301,6 +301,7 @@ textarea:hover {
 	color: var(--accent);
 	text-decoration: none;
 	cursor: pointer;
+	outline: 1pt solid var(--accent);
 }
 
 .bottom-ui {
