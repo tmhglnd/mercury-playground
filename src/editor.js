@@ -68,7 +68,7 @@ let mercuryHintList = [
 	'new', 'set', 'list', 'print', 'silence',
 	'tempo', 'scale', 'scalar', 'root', 'randomSeed', 'volume', 'lopass', 'hipass', 'osc', 'midi', 'samples',
 	'sample', 'synth', 'input', 'midi', 'polySample', 'polySynth', 'noise',
-	'saw', 'sine', 'square', 'triangle',
+	'saw', 'sine', 'square', 'triangle', 'fm',
 	'white', 'pink', 'brown', 'lofi', 'crackle', 'dust',
 	'name', 'solo', 'group', 'time', 'once', 'fx', 'effect', 'out', 'timediv', 'wait', 'play', 'gain', 'shape', 'pan',
 	'note', 'super', 'slide',
@@ -85,6 +85,8 @@ let WORD = /[\w]+/;
 
 // a hinting function for the Mercury language
 CodeMirror.registerHelper('hint', 'mercury', (editor, options) => {
+	// let hintList = mercuryHintList;
+
 	// set word and range parameters
 	let word = options && options.word || WORD;
 	let list = options && options.list || []
@@ -99,6 +101,16 @@ CodeMirror.registerHelper('hint', 'mercury', (editor, options) => {
 		--start;
 	}
 	let curWord = start != end && curLine.slice(start, end);
+
+	// narrow down the hintlist based on the start of the line
+	// console.log('start', curLine.trim().match(/^[\w]+/));
+	// let firstWord = curLine.trim().match(/^[\w]+/);
+	// if (extendedHintList[firstWord]){
+	// 	hintList = extendedHintList[firstWord];
+	// }
+	// if (!curWord){
+	// 	list.push(...hintList);
+	// }
 
 	// go over the hintlist and select words that match the current found word
 	for (let i=0; i<mercuryHintList.length; i++){
