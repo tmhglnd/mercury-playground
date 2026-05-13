@@ -11,7 +11,7 @@ const precacheResources = [
 	'/',
 	'index.html',
 	'bundle.js',
-	'style.css'
+	'style.css',
 ]
 
 self.addEventListener('install', (event) => {
@@ -24,17 +24,25 @@ self.addEventListener('install', (event) => {
 	)
 });
 
-// self.addEventListener('activate', (event) => {
-
-// });
-
 self.addEventListener('fetch', (event) => {
-	// event.request.url
+	// intercept the fetch event to check if file is cached
 	event.respondWith(
-		caches.match(event.request)
-		.then(cachedResponse => {
-			return cachedResponse || fetch(event.request)
+		caches.open('cache-mercury').then(cache => {
+			// if file matches cache return the cached response
+			return cache.match(event.request)
+				.then(cachedResponse => {
+					return cachedResponse || fetch(event.request)
+						.then(response => {
+							// otherwise fetch the file from the network 
+							// and put in cache
+							cache.put(event.request, response.clone());
+							return response;
+						});
+				})
 		})
 	);
 });
 
+
+// self.addEventListener('activate', (event) => {
+// });
