@@ -28,11 +28,14 @@ class PolyInstrument extends Instrument {
 	}
 
 	channelStrip(){
-		// gain => output
-		this.gain = new Tone.Gain(0).toDestination();
+		// gain => output (for fade-in/out from evaluation)
+		this.gain = new Tone.Gain(0, 'normalRange').toDestination();
+		// postfx-gain => gain (for gain() function in instrument)
+		this.post = new Tone.Gain(1, "gain").connect(this.gain);
 		// panning => gain
 		this.panner = new Tone.Panner(0).connect(this.gain);
 		// adsr => panning
+		// done through createVoices
 	}
 
 	createVoices(){
@@ -161,6 +164,10 @@ class PolyInstrument extends Instrument {
 		// disconnect the sound dispose the player
 		this.gain.disconnect();
 		this.gain.dispose();
+
+		this.post.disconnect();
+		this.post.dispose();
+		
 		this.panner.disconnect();
 		this.panner.dispose();
 

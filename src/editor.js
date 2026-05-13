@@ -29,9 +29,6 @@ console.log('=> examples loaded', examples);
 const tutorials = require('mercury-examples').Tutorials;
 console.log('=> tutorials loaded', tutorials);
 
-// get the samplefile path data
-let samples = require('./data/samples.json');
-
 // the simple mode lexer for Mercury syntax-highlighting
 CodeMirror.defineSimpleMode("mercury", {
 	meta: {
@@ -70,14 +67,15 @@ CodeMirror.defineSimpleMode("mercury", {
 let mercuryHintList = [
 	'new', 'set', 'list', 'print', 'silence',
 	'tempo', 'scale', 'scalar', 'root', 'randomSeed', 'volume', 'lopass', 'hipass', 'osc', 'midi', 'samples',
-	'sample', 'synth', 'input', 'midi', 'polySample', 'polySynth',
+	'sample', 'synth', 'input', 'midi', 'polySample', 'polySynth', 'noise',
 	'saw', 'sine', 'square', 'triangle',
+	'white', 'pink', 'brown', 'lofi', 'crackle', 'dust',
 	'name', 'solo', 'group', 'time', 'once', 'fx', 'effect', 'out', 'timediv', 'wait', 'play', 'gain', 'shape', 'pan',
 	'note', 'super', 'slide',
 	'speed', 'start', 'tune', 'stretch',
 	'steal', 'spread', 'length', 'chord', 'midinote', 'program', 'pgm', 'change', 'cc',
 	'range', 'trigger', 'hold',
-	'chorus', 'comb', 'degrade', 'delay', 'distort', 'double', 'filter', 'kink', 'lfo', 'reverb', 'shift', 'squash', 'triggerFilter', 'vibrato', 'vocoder',
+	'chorus', 'comb', 'degrade', 'delay', 'distort', 'double', 'filter', 'kink', 'karplus', 'lfo', 'reverb', 'converb', 'shift', 'squash', 'triggerFilter', 'vibrato', 'vocoder', 'fuzz',
 	'spread', 'spreadF', 'spreadInc', 'spreadIncF', 'sine', 'sineF', 'cosine', 'cosineF', 'saw', 'sawF', 'square', 'squareF', 'binary', 'binaryBeat',  'spacing', 'spacingBeat', 'euclidean', 'euclid', 'hexBeat', 'hex', 'fibonacci', 'pisano', 'pell', 'lucas', 'random', 'randomF', 'drunk', 'drunkF', 'urn', 'coin', 'dice', 'clave', 'twelveTone', 'choose', 'pick', 'shuffle', 'expand', 'markovTrain', 'markovChain', 'clone', 'join', 'copy', 'pad', 'every', 'flat', 'invert', 'lace', 'lookup', 'merge', 'palin', 'repeat', 'reverse', 'rotate', 'rot', 'sort', 'slice', 'split', 'cut', 'spray', 'stretch', 'stretchF', 'thin', 'add', 'subtract', 'sub', 'multiply', 'mul', 'divide', 'div', 'mod', 'clip', 'wrap', 'fold', 'map', 'normalize', 'norm', 'equals', 'eq', 'notEquals', 'neq', 'greater', 'gt', 'less', 'lt', 'greaterEquals', 'gte', 'lessEquals', 'lte', 'size', 'sum', 'midiToNote', 'mton', 'midiToFreq', 'mtof', 'noteToMidi', 'ntom', 'noteToFreq', 'ntof', 'freqToMidi', 'ftom', 'freqToNote', 'fton', 'relativeToMidi', 'rtom', 'relativeToFreq', 'rtof', 'chromaToRelative', 'ctor', 'ratioToCent', 'rtoc', 'makeChords', 'chordsFromNumerals', 'chordsFromNames', 'divisionToMs', 'dtoms', 'divisionToRatio', 'dtor', 'ratioToMs', 'rtoms', 'scaleNames', 'toScale', 'textCode', 'ttoc',
 	'on', 'off', 'up', 'down', 'low', 'high', 'band'
 ].sort();
@@ -202,6 +200,8 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 				this.showListenMenu(!this.listenMenuVisible) },
 			'Shift-Ctrl-L': () => { 
 				this.showListenMenu(!this.listenMenuVisible) }
+			// 'Alt-,': () => { this.showSettings(!this.settingsVisible) },
+			// 'Ctrl-,': () => { this.showSettings(!this.settingsVisible) }
 		}
 	}
 
@@ -471,17 +471,20 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		example.onclick = () => { this.example() }
 
 		let save = document.createElement('button');
-		save.style.width = '9.4%';
+		save.style.width = '7%';
 		save.innerHTML = 'save';
 		save.title = 'Download code as text (Alt/Ctrl-Shift-S)';
 		save.onclick = () => { this.save() }
 		
 		let rec = document.createElement('button');
 		rec.id = 'recButton';
-		rec.style.width = '9.4%';
+		rec.style.width = '7%';
 		rec.innerHTML = 'record';
 		rec.title = 'Start/Stop recording sound (Alt/Ctrl-Shift-R)';
 		rec.onclick = () => { this.record() }
+
+		let lightdark = this.modeSwitch();
+		lightdark.style.width = '3%';
 
 		div.appendChild(play);
 		div.appendChild(stop);
@@ -489,6 +492,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		div.appendChild(example);
 		div.appendChild(save);
 		div.appendChild(rec);
+		div.appendChild(lightdark);
 	}
 
 	this.menuBottom = function(){
@@ -501,18 +505,18 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		tuts.id = 'tutorials';
 		
 		let snds = document.createElement('select');
-		snds.style.width = '12.5%';
+		snds.style.width = '12.8%';
 		snds.title = 'Insert a sound at the cursor position or replace the selection';
 		snds.id = 'sounds';
 
 		let lstn = document.createElement('button');
-		lstn.style.width = '12.5%';
+		lstn.style.width = '12.8%';
 		lstn.id = lstn.innerHTML = 'prelisten';
 		lstn.title = 'Listen all the sounds (Alt/Ctrl-Shift-L)'
 		lstn.onclick = () => { this.showListenMenu(true) }
 		
 		let load = document.createElement('button');
-		load.style.width = '12.5%';
+		load.style.width = '12.8%';
 		load.id = 'load';
 		load.innerHTML = 'add sounds';
 		load.title = 'Load sounds from the computer (Alt/Ctrl-Shift-A)'
@@ -521,7 +525,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		let help = document.createElement('button');
 		help.id = help.innerHTML = 'help';
 		help.title = 'Open the documentation (Alt/Ctrl-Shift-P)';
-		help.style.width = "12.5%";
+		help.style.width = "12.8%";
 		help.onclick = () => {
 			window.open('https://tmhglnd.github.io/mercury/docs/', '_blank');
 		}
@@ -529,13 +533,13 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		let collab = document.createElement('button');
 		collab.id = collab.innerHTML = 'collaborate';
 		collab.title = 'Collaborate in flok.cc (Alt/Ctrl-Shift-C)';
-		collab.style.width = "12.5%";
+		collab.style.width = "12.8%";
 		collab.onclick = () => {
 			window.open('https://flok.cc', '_blank');
 		}
 
 		let thms = document.createElement('select');
-		thms.style.width = '12.5%';
+		thms.style.width = '12.8%';
 		thms.title = 'Choose a syntax highlighting theme';
 		thms.id = 'themes';
 
@@ -574,15 +578,26 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 			document.getElementById('sounds').value = 'sounds';
 			this.insertSound(s);
 		}
-
-		let values = ['sounds'].concat(Object.keys(samples));
-		values.forEach((t) => {
-			let option = document.createElement('option');
-			option.value = option.innerHTML = t;
-			// also add the sample names to the hint autocomplete
-			mercuryHintList.push(t);
-			menu.appendChild(option);
-		});
+		menu.build = () => {
+			menu.innerHTML = '';
+			// get all the values from the default samples
+			let values = ['sounds'].concat(Object.keys(engine.getDefaultSamples()));
+			// get the keys from the loaded buffers and merge them
+			values = values.concat(Array.from(engine.getBuffers()._buffers.keys()));
+			// remove the duplicates
+			values = [...new Set(values) ];
+			values.forEach((t) => {
+				let option = document.createElement('option');
+				option.value = option.innerHTML = t;
+				// also add the sample names to the hint autocomplete
+				mercuryHintList.push(t);
+				menu.appendChild(option);
+			});
+		}
+		menu.build();
+		menu.onmouseenter = () => {
+			menu.build();
+		}
 	}
 
 	this.insertSound = function(s){
@@ -604,6 +619,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		btn.innerHTML = 'zen mode';
 		btn.id = 'zen';
 		btn.title = 'Hide or show the menu bars (Alt/Ctrl-Shift-Z)';
+		btn.style.width = 'auto';
 		btn.onclick = () => {
 			this.menuHidden = !this.menuHidden;
 
@@ -653,9 +669,14 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 	this.showListenMenu = function(show){
 		let m = document.getElementById('sounds-prelisten-box');
 		if (show){
+			// build the menu
+			this.soundsListenMenu();
 			m.style.display = "block";
 		} else {
 			m.style.display = 'none';
+			// delete the content
+			let l =  document.getElementsByClassName('sounds-prelisten')[0];
+			l.innerHTML = '';
 		}
 		this.listenMenuVisible = show;
 	}
@@ -666,6 +687,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 
 		let m = document.getElementsByClassName('sounds-prelisten')[0];
 		m.innerHTML = `
+		<span><button id="preload-sounds" style="width:auto">Preload all sounds</button></span>
 		<span><button id="add-prelisten" style="width:auto">Add to code:</button></span>
 		<span class="close">&times;</span>
 		<p>
@@ -675,7 +697,13 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		`
 		
 		let p = document.getElementById('sound-prelisten-items');
-		let sounds = ['sounds'].concat(Object.keys(samples));
+		// get all the values from the default samples
+		let sounds = ['sounds'].concat(Object.keys(engine.getDefaultSamples()));
+		// TO-DO: Show sounds that are added later, besides default samples
+		// get the keys from the loaded buffers and merge them
+		// sounds = sounds.concat(Array.from(engine.getBuffers()._buffers.keys()));
+		// remove the duplicates
+		// sounds = [...new Set(sounds) ];
 		let last = '';
 		for (let i=0; i<sounds.length; i++){
 			// skip the keyword sounds that is used for the dropdown menu
@@ -683,9 +711,9 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 			// create an audio element
 			let aud = document.createElement('audio');
 			aud.volume = 0.5;
-			aud.src = samples[sounds[i]];
+			aud.src = engine.getDefaultSamples()[sounds[i]];
 			aud.name = sounds[i];
-			aud.preload = 'auto';
+			aud.preload = 'none';
 			// create a button element
 			let btn = document.createElement('button');
 			btn.innerHTML = sounds[i];
@@ -707,6 +735,14 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 			this.showListenMenu(false);
 			this.insertSound(last);
 		}
+		// preload all the sounds in case of slow internet connection or 
+		// useful before a performance. also works with `set samples default`
+		let s = document.getElementById('preload-sounds');
+		s.onclick = () => {
+			this.showListenMenu(false);
+			log('Preloading...');
+			engine.addDefaultBuffers();
+		}
 		// close the window when clicking X
 		let span = document.getElementsByClassName('close')[0];
 		span.onclick = () => this.showListenMenu(false);
@@ -719,55 +755,33 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 
 	// settings menu with more options and some explanation
 	// TO-DO, currently not in use
+	// this.settingsVisible = false;
+	// 
+	// this.showSettings = function(show){
+	// 	let s = document.getElementById('settings-menu-box');
+	// 	if (show){
+	// 		s.style.display = 'block';
+	// 	} else {
+	// 		s.style.display = 'none';
+	// 	}
+	// 	this.settingsVisible = show;
+	// }
+	// 
 	// this.settingsMenu = function(){
-	// 	let modal = document.getElementById('modalbox');
-	// 	// let m = document.createElement('div');
-	// 	// m.className = "settings-menu";
-	// 	let m = document.getElementsByClassName('settings-menu')[0];
-	// 	m.innerHTML = `
-	// 	<span class="close">&times;</span>
-	// 	<p>
-	// 		Theme <select id="themes" style="width:30%"></select>
-	// 	</p>`;
-
-	// 	let menu = document.getElementById('themes');
-	// 	menu.onchange = () => { this.changeTheme() };
-
-	// 	let themes = ['ayu-dark', 'base16-dark', 'material-darker', 'material-ocean', 'moxer', 'tomorrow-night-eighties', 'panda-syntax', 'yonce'];
-
-	// 	// 	let lightThemes = ['elegant', 'duotone-light', 'base16-light']
-		
-	// 	for (let t=0; t<themes.length; t++){
-	// 		let option = document.createElement('option');
-	// 		option.value = themes[t];
-	// 		option.innerHTML = themes[t];
-	// 		menu.appendChild(option);
-	// 	}
-	// 	menu.value = defaultTheme;
-
-	// 	// close the window when clicking the cross or outside of the box
-	// 	let span = document.getElementsByClassName('close')[0];
-	// 	span.onclick = () => modal.style.display = "none";
-		
-	// 	window.onclick = (event) => {
-	// 		if (event.target === modal) modal.style.display = "none";
-	// 	}
-	// 	modal.appendChild(m);
+	// 	let settingbox = document.getElementById('settings-menu-box');
 	// }
 
 	// light/dark mode switcher
 	this.modeSwitch = function(){
-		let b = document.getElementById('ui');
-		let btn = document.createElement('button');
+		const btn = document.createElement('button');
 		btn.id = 'switch';
-		btn.className = 'themeswitch';
 		btn.title = 'Switch display mode Ctrl/Alt-Shift-D';
 		btn.onclick = () => {
 			switchTheme(localStorage.getItem('theme') === 'darkmode' ? 'lightmode' : 'darkmode');
 
 			this.setMode(localStorage.getItem('theme'));
 		}
-		b.appendChild(btn);
+		return btn;
 	}
 
 	// set the light/dark mode based on string value

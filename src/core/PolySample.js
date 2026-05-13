@@ -58,12 +58,27 @@ class PolySample extends PolyInstrument {
 			// clean-up previous buffer
 			this.sources[id].buffer.dispose();
 		}
-		if (this._bufs.has(b)){	
-			this.sources[id].buffer = this._bufs.get(b);
+
+		// if (this._bufs.has(b)){	
+		// 	this.sources[id].buffer = this._bufs.get(b);
+		// } else {
+		// 	// default sample if file does not exist
+		// 	this.sources[id].buffer = this._bufs.get('kick_min');
+		// }
+
+		if (!this._bufs.has(b)){
+			if (this._defaults[b]){
+				this._engine.addBufferFromURL(this._defaults[b], b);
+			} else {
+				// default sample if file does not exist
+				log(`${f} is not a loaded sample name and not part of default pack`);
+			}
+			// don't play if there is no valid buffer loaded
+			return;
 		} else {
-			// default sample if file does not exist
-			this.sources[id].buffer = this._bufs.get('kick_min');
+			this.sources[id].buffer = this._bufs.get(b);
 		}
+
 		// the duration of the buffer in seconds
 		let dur = this.sources[id].buffer.duration;
 
@@ -109,24 +124,25 @@ class PolySample extends PolyInstrument {
 
 	sound(s){
 		// load all soundfiles and return as array
-		this._sound = this.checkBuffer(Util.toArray(s));
+		// this._sound = this.checkBuffer(Util.toArray(s));
+		this._sound = Util.toArray(s);
 	}
 
-	checkBuffer(a){
-		// check if file is part of the loaded samples
-		return a.map((s) => {
-			if (Array.isArray(s)) {
-				return this.checkBuffer(s);
-			}
-			// error if soundfile does not exist
-			else if (!this._bufs.has(s)){
-				// set default (or an ampty soundfile?)
-				log(`sample ${s} not found`);
-				return 'kick_909';
-			}
-			return s;
-		});
-	}
+	// checkBuffer(a){
+	// 	// check if file is part of the loaded samples
+	// 	return a.map((s) => {
+	// 		if (Array.isArray(s)) {
+	// 			return this.checkBuffer(s);
+	// 		}
+	// 		// error if soundfile does not exist
+	// 		else if (!this._bufs.has(s)){
+	// 			// set default (or an ampty soundfile?)
+	// 			log(`sample ${s} not found`);
+	// 			return 'kick_909';
+	// 		}
+	// 		return s;
+	// 	});
+	// }
 
 	note(i=0, o=0){
 		// set the note as semitone interval and octave offset

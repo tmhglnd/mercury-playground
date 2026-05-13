@@ -9,7 +9,7 @@ Mercury currently has 2 versions:
 * Web version running in the browser (Windows/Mac/Linux) (you're in the right place)
 * Original version running in Max8 (Windows/Mac only) [go to this repo](https://github.com/tmhglnd/mercury)
 
-[**🚀 Start coding directly in the playground!** (recommended for beginners)](https://mercury.timohoogland.com/)
+[**🚀 Start coding directly at mercury-playground.cc!** (recommended for beginners)](https://mercury-playground.cc/)
 
 **👾 Or code with the latest full version in Max8:**
 
@@ -241,10 +241,12 @@ The playground (browser version) does not have exactly the same functionality as
 		- [ ] ping pong feedback delay
 	- [x] distort (softclipping distortion)
 	- [x] squash (compression/overdrive)
-	- [ ] kink (waveshaping)
 	- [x] filter
  		- [x] filter modulation
 	- [x] triggerFilter
+	- [x] fuzz
+	- [ ] freeze
+	- [ ] looper
 	- [x] lfo
 	- [x] reverb
 		- [x] decaying noise convolution
@@ -252,6 +254,7 @@ The playground (browser version) does not have exactly the same functionality as
 	- [x] shift (pitchshift)
  	- [x] compress 
 	- [x] chorus / double
+	- [x] karplus / comb
 - [x] visual 
 	- [x] use Hydra code synchronized with instrument triggers (*)
 
@@ -267,7 +270,7 @@ You can code together in Mercury by using the amazing [**Flok**](https://flok.cc
 
 😎 **No need for installing!** You can start coding immediately in the browser:
 
-[**https://mercury.timohoogland.com/**](https://mercury.timohoogland.com/)
+[**https://mercury-playground.cc**](https://mercury-playground.cc)
 
 ### 💻 Running without internet
 

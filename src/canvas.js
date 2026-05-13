@@ -89,6 +89,7 @@ let hydraCanvas = function(c, u) {
 		};
 
 		let btn = document.createElement('button');
+		btn.style.width = 'auto';
 		btn.innerHTML = 'code with Hydra';
 		btn.onclick = () => { window.open('https://hydra.ojack.xyz/', '_blank'); }
 

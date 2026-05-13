@@ -2,14 +2,16 @@ const Tone = require('tone');
 const Util = require('total-serialism').Utility;
 const TL = require('total-serialism').Translate;
 const Mercury = require('mercury-lang');
-const MonoSample = require('./core/MonoSample.js');
-const MonoMidi = require('./core/MonoMidi.js');
 const MonoSynth = require('./core/MonoSynth.js');
+const MonoSample = require('./core/MonoSample.js');
+const MonoNoise = require('./core/MonoNoise.js');
+const MonoFM = require('./core/MonoFM.js');
 const MonoInput = require('./core/MonoInput.js');
+const MonoMidi = require('./core/MonoMidi.js');
+const MonoOSC = require('./core/MonoOSC.js');
 const PolySynth = require('./core/PolySynth.js');
 const PolySample = require('./core/PolySample.js');
 const Tempos = require('./data/genre-tempos.json');
-const MonoOSC = require('./core/MonoOSC.js');
 const { divToS } = require('./core/Util.js');
 
 // cross-fade time, depracted, is now fadeOut
@@ -138,13 +140,15 @@ function code({ file, engine, canvas, p5canvas }){
 			// log(`set bpm to ${args[0]} Hz`);
 		},
 		'samples' : (args) => {
-			// load samples in the audiobuffer
-			// this can be a single url to a soundfile
-			// or a url to a folder that will be searched through
-			// console.log('Loading samples', args);
-			engine.addBuffers(args);
-			// args.forEach((a) => {
-			// });
+			// if the argument is "default", load all the default samples
+			if (args[0] === 'default'){
+				engine.addDefaultBuffers();
+			} else {
+				// load samples in the audiobuffer
+				// this can be a single url to a soundfile
+				// or a url to a folder that will be searched through
+				engine.addBuffers(args);
+			}
 		},
 		'midiDelay' : (args) => {
 			// set some additional latency for all the midi
@@ -180,7 +184,6 @@ function code({ file, engine, canvas, p5canvas }){
 			return inst;
 		},
 		'loop' : (obj) => {
-			// console.log('make sample', obj);
 			let type = obj.type;
 			let args = obj.functions;			
 			let inst = new MonoSample(engine, type, canvas, obj.line);
@@ -189,12 +192,20 @@ function code({ file, engine, canvas, p5canvas }){
 			return inst;
 		},
 		'synth' : (obj) => {
-			// console.log('make synth', obj);
-			let type = obj.type;
-			let args = obj.functions;			
-			let inst = new MonoSynth(engine, type, canvas, obj.line);
-
-			objectMap.applyFunctions(args, inst, type);
+			let { type, functions, line } = obj;
+			if (type === 'fm'){
+				inst = new MonoFM(engine, type, canvas, line);
+			} else {
+				inst = new MonoSynth(engine, type, canvas, line);
+			}
+			objectMap.applyFunctions(functions, inst, type);
+			return inst;
+		},
+		'noise' : (obj) => {
+			let { type, functions, line } = obj;
+			let inst = new MonoNoise(engine, type, canvas, line);
+			
+			objectMap.applyFunctions(functions, inst, type);
 			return inst;
 		},
 		'polySynth' : (obj) => {

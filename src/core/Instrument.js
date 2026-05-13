@@ -10,6 +10,10 @@ class Instrument extends Sequencer {
 		// Inherit from Sequencer
 		super(engine, canvas, line);
 
+		// reference to all the default samples to be used
+		// by inheriting classes monosample, polysample
+		this._defaults = this._engine.getDefaultSamples();
+
 		// Instrument specific parameters
 		this._gain = [ 0.5, 0 ];		
 		this._pan = [ 0 ];
@@ -21,6 +25,7 @@ class Instrument extends Sequencer {
 		this.adsr;
 		this.panner;
 		this.gain;
+		this.post;
 		this._fx;
 
 		// The source to be defined by inheriting class
@@ -33,14 +38,14 @@ class Instrument extends Sequencer {
 	}
 
 	channelStrip(){
-		// gain => output
+		// gain => output (for fade-in/out from evaluation)
 		this.gain = new Tone.Gain(0, "normalRange").toDestination();
-		// postfx-gain => gain
-		// this.postAmp = new Tone.Gain(0).connect(this.gain);
+		// postfx-gain => gain (for gain() function in instrument)
+		this.post = new Tone.Gain(1, "gain").connect(this.gain);
 		// panning => gain
-		this.panner = new Tone.Panner(0).connect(this.gain);
-		// this.panner = new Tone.Panner(0).connect(this.postAmp);
-		// adsr => panning
+		// this.panner = new Tone.Panner(0).connect(this.gain);
+		this.panner = new Tone.Panner(0).connect(this.post);
+		// adsr => panning (for shape() function)
 		this.adsr = this.envelope(this.panner);
 		// return Node to connect source => adsr
 		return this.adsr;
@@ -69,12 +74,10 @@ class Instrument extends Sequencer {
 		this.panner.pan.setValueAtTime(p, time);
 
 		// ramp volume
-		let g = atodb(getParam(this._gain[0], c) * 0.707);
-		// let g = getParam(this._gain[0], c) * 0.707;
+		let g = getParam(this._gain[0], c) * 0.7079;
 		let r = msToS(Math.max(0, getParam(this._gain[1], c)));
-		this.source.volume.rampTo(g, r, time);
 		// this.source.volume.setValueAtTime(1, time);
-		// this.postAmp.gain.rampTo(g, r, time);
+		this.post.gain.rampTo(g, r, time);
 
 		this.sourceEvent(c, e, time);
 		// let play = this.sourceEvent(c, e, time);
@@ -100,7 +103,8 @@ class Instrument extends Sequencer {
 			this.adsr.gain.exponentialRampTo(0.0, rel * 5, time + att + dec + retrigger);
 		} else {
 			// if shape is 'off' turn on the gain of the envelope
-			this.adsr.gain.setValueAtTime(1.0, time);
+			// this.adsr.gain.setValueAtTime(1.0, time);
+			this.adsr.gain.linearRampTo(1.0, 0.005, time);
 		}
 	}
 
@@ -139,6 +143,9 @@ class Instrument extends Sequencer {
 			}, t * 1000 + 100);
 		}, restTime * 1000 - 25);
 
+		// remove the previous widget immediately
+		// this._widgets.map(w => w?.fadeOut());
+		this._widgets.map(w => w?.delete());
 		// // fade out the sound upon evaluation of new code
 		// this.gain.gain.rampTo(0, t, Tone.now());
 		// setTimeout(() => {
@@ -154,6 +161,9 @@ class Instrument extends Sequencer {
 		this.gain.disconnect();
 		this.gain.dispose();
 
+		this.post.disconnect();
+		this.post.dispose();
+
 		this.panner.disconnect();
 		this.panner.dispose();
 
@@ -167,7 +177,7 @@ class Instrument extends Sequencer {
 
 		// remove all fx
 		this._fx.map((f) => f.delete());
-		this._widgets.map(w => w?.delete());
+		// this._widgets.map(w => w?.delete());
 
 		console.log('=> disposed Instrument() with FX:', this._fx, 'and widgets:', this._widgets);
 	}
@@ -245,24 +255,31 @@ class Instrument extends Sequencer {
 				pfx = this._ch[f];
 			}
 			// pfx.return.connect(Tone.Destination);
-			pfx.return.connect(this.gain);
+			// pfx.return.connect(this.gain);
+			pfx.return.connect(this.post);
 		}
 	}
 
-	scope(h=30){
-		let w = new Widget.Scope(this._line, h);
+	scope(h=30, c){
+		let w = new Widget.Scope(this._line, h, c);
 		this._widgets.push(w);
 		this.gain.connect(w.input());
 	}
 
-	waveform(h=30){
-		let w = new Widget.WaveForm(this._line, h);
+	waveform(h=30, c){
+		let w = new Widget.WaveForm(this._line, h, c);
 		this._widgets.push(w);
 		this.gain.connect(w.input());
 	}
 
-	spectrum(h=30){
-		let w = new Widget.Spectrum(this._line, h);
+	meter(h=20, c){
+		let w = new Widget.Meter(this._line, h, c);
+		this._widgets.push(w);
+		this.gain.connect(w.input());
+	}
+
+	spectrum(h=30, c){
+		let w = new Widget.Spectrum(this._line, h, c);
 		this._widgets.push(w);
 		this.gain.connect(w.input());
 	}
