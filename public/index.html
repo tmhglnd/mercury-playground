@@ -75,10 +75,21 @@
 
 <body>
 	<script>
-		if (typeof navigator.serviceWorker !== 'undefined'){
-			navigator.serviceWorker.register('service-worker.js');
-			// console.log('[serviceworker] registered');
+		if (typeof navigator.serviceWorker !== undefined){
+			window.addEventListener('load', () => {
+				navigator.serviceWorker.register('/service-worker.js')
+				.then(reg => {
+					console.log('[serviceworker] registered', reg);
+				})
+				.catch(err => {
+					console.log('[serviceworker] registration failed', err);
+				});
+			});
 		}
+		// if (typeof navigator.serviceWorker !== 'undefined'){
+		// 	navigator.serviceWorker.register('service-worker.js');
+		// 	// console.log('[serviceworker] registered');
+		// }
 	</script>
 
 	<script type="text/javascript" src="./bundle.js"></script>
