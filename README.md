@@ -347,6 +347,7 @@ Contributions to the Mercury environment are much appreciated in whatever form t
 - [Anne Veinberg](https://anneveinberg.com/) for working with Mercury and a Mercury extensions for the [CodeKlavier](https://codeklavier.space/) project
 - [Rafaele Maria Andrade](https://www.rafaele-andrade.com/) for collaboration on [networked performance](https://www.youtube.com/watch?v=7UWywv_DPHI&t=4s) between Mercury and Knurl
 - Live performance image by Zuzanna Zgierska
+- Fonts thanks to amazing work by people such as: [viznut](https://viznut.fi/unscii/), [Raphaël Bastide (velvetyne)](https://velvetyne.fr/), [Abbie Gonzales (opendyslexic)](https://opendyslexic.org/), [Idrees Hassan (monocraft)](https://opendyslexic.org/), and more. See the full list under `/assets/fonts/README.md`
 
 ## ✨ Inspiration
 
