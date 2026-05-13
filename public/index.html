@@ -80,6 +80,14 @@
 				navigator.serviceWorker.register('/service-worker.js')
 				.then(reg => {
 					console.log('[serviceworker] registered', reg);
+					// reg.onupdatefound = () => {
+					// 	const newSW = reg.installing;
+					// 	newSW.onstatechange = () => {
+					// 		if (newSW.state === 'installed' && navigator.serviceWorker.controller){
+					// 			window.location.reload();
+					// 		}
+					// 	}
+					// }
 				})
 				.catch(err => {
 					console.log('[serviceworker] registration failed', err);
