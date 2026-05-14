@@ -1,7 +1,8 @@
 
 @font-face {
 	font-family: 'ubuntu';
-	src: url('assets/fonts/ubuntu-mono/UbuntuMono-Regular.woff2') format('woff2'),
+	src: local('Ubuntu Mono'), 
+		url('assets/fonts/ubuntu-mono/UbuntuMono-Regular.woff2') format('woff2'),
 		url('assets/fonts/ubuntu-mono/UbuntuMono-Regular.woff') format('woff');
 	font-weight: bold;
 	font-style: normal;
