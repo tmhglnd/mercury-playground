@@ -1104,7 +1104,7 @@ const WorkletDelay = function(_params) {
 	// param order: timeLeft, timeRight, feedback, damping, drywet
 	_params = Util.mapDefaults(_params, [ '2/16', '3/16', 0.8, 0.5, 0.5 ]);
 
-	this._maxTime = 2000;
+	this._maxTime = 5000;
 	// load a worklet FX in a ToneAudioNode
 	this._fx = workletFX('stereo-delay');
 
@@ -1115,6 +1115,8 @@ const WorkletDelay = function(_params) {
 		console.log(fb);
 		const dm = clip(getParam(_params[3], c), 0.01, 0.99);
 		const dw = clip(getParam(_params[4], c));
+
+		console.log('delay params', dL, dR, fb, dm, dw);
 
 		// set parameters for workletprocessor
 		setParam(this._fx, 'timeL', dL, time);

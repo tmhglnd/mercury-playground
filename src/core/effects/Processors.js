@@ -694,8 +694,8 @@ registerProcessor('combfilter-processor', CombFilterProcessor);
 class StereoDelayProcessor extends DelayWorkletProcessor {
 	static get parameterDescriptors(){
 		return formatDescriptors([
-			[ 'timeL', 333, 0, 1000, "k-rate" ],
-			[ 'timeR', 444, 0, 1000, "k-rate" ],
+			[ 'timeL', 333, 0, 5000, "k-rate" ],
+			[ 'timeR', 444, 0, 5000, "k-rate" ],
 			[ 'feedback', 0.8, 0, 2, "k-rate" ],
 			[ 'damping', 0.5, 0, 1, "k-rate" ],
 			[ 'drywet', 0.4, 0, 1, "k-rate" ]
@@ -705,7 +705,7 @@ class StereoDelayProcessor extends DelayWorkletProcessor {
 	constructor(options){
 		super(options);
 
-		const delaySize = 2000;
+		const delaySize = 5000;
 		// initialize delaytime for sliding
 		this.dlt = [];
 		// initialize history values for lowpass & highpass filter
@@ -790,7 +790,7 @@ registerProcessor('stereo-delay', StereoDelayProcessor)
 class PitchShiftProcessor extends DelayWorkletProcessor {
 	static get parameterDescriptors(){
 		return formatDescriptors([
-			['shift', 0, 2, MAX_DEF, 'k-rate'],
+			['shift', 0, MIN_DEF, MAX_DEF, 'k-rate'],
 			['drywet', 1, 0, 1, 'k-rate']
 		])
 	}
