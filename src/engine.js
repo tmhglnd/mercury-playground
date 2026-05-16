@@ -1,5 +1,21 @@
 const Tone = require('tone');
 const { divToS } = require('./core/Util.js');
+const { getWaveBlob } = require('webm-to-wav-converter');
+const { FFmpeg } = require('@ffmpeg/ffmpeg');
+const { toBlobURL } = require('@ffmpeg/util');
+
+const ffmpeg = new FFmpeg();
+(async() => {
+	ffmpeg.on('progress', ({progress, time}) => {
+		console.log(`${progress * 100}%, ${time / 1000000}s`);
+	});
+	const baseURL = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/umd';
+	ffmpeg.load({
+		coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
+		wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
+	})
+})();
+console.log(ffmpeg);
 
 // load extra AudioWorkletProcessors from file
 // transformed to inline with browserify brfs
@@ -262,6 +278,7 @@ function setVolume(g, t=0){
 // create a Tone Recording and connect to the final output Node
 // console.log('creating recording', window.isSafari);
 const Recorder = window.isSafari ? null : new Tone.Recorder({ mimeType: 'audio/webm' });
+
 if (Recorder){
 	GN.connect(Recorder);
 }
@@ -283,11 +300,12 @@ async function record(on, f){
 		// stop the recording process
 		// the recorded audio is returned as a blob
 		const recording = await Recorder.stop();
+		// get the recorded blob from the Recorder and convert to 16-bit WAV
+		const wavBlob = await getWaveBlob(recording, false);
 		// download the recording by creating an anchor element and blob url
-		const url = URL.createObjectURL(recording);
 		const anchor = document.createElement("a");
-		anchor.download = `${f}.webm`;
-		anchor.href = url;
+		anchor.href = URL.createObjectURL(wavBlob);
+		anchor.download = `${f}.wav`;
 		anchor.click();
 	}
 }
