@@ -133,7 +133,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 
 	this.showHint = false;
 
-	// array for makers containing custom html nodes such as slider
+	// array for markers containing custom html nodes such as slider
 	this.markers = [];
 
 	this.options = {
@@ -320,72 +320,8 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 
 	this.evaluate = function(){
 		let c = this.cm.getValue();
-		let output = [];
-		
-		// if it has a slider, replace it by a slider widget, then forward code
-		// if it already has a slider widget, get the value from it as well
-		let tokens = /slider\([^()]*\)/g;
-		let previousIndex = 0;
-		while ((find = tokens.exec(c)) !== null) {
-			console.log('found', find, tokens.lastIndex, previousIndex);
-			let s = find[0];
 
-			// get the line and position:
-			let lines = c.substring(0, find.index).split('\n');
-			let line = lines.length - 1;
-			let pos = lines[line].length;
-			let end = pos + s.length;
-			// check if there is already a marker present at the function
-			let markers = this.cm.findMarksAt({ line: line, ch: pos });
-
-			// generate unique slider ID
-			let id = `/slider${Math.floor(Math.random() * 10000)}`;
-			
-			// if no marker, generate one and replace with widget
-			if (markers.length === 0){
-				// get the arguments for the slider (low, high, default)
-				let args = s.match(/[^A-Za-z()\s\t\n]+/g);
-
-				let widget = document.createElement('div');
-				widget.style.display = 'inline';
-				let val = document.createElement('p');
-				val.style.display = 'inline';
-				val.style.fontSize = '8pt';
-				let slider = document.createElement('input');
-				slider.className = 'slider';
-				slider.type = 'range';
-				slider.step = 0.001;
-				slider.min = args[0] ?? 0;
-				slider.max = args[1] ?? 1;
-				slider.value = args[2] ?? slider.min;
-				widget.appendChild(slider);
-				widget.appendChild(val);
-
-				slider.oninput = () => {
-					// create a "fake" osc message internally with event emitter
-					forwardOSC([id, slider.value]);
-					val.innerHTML = Number(slider.value).toFixed(2);
-				}
-				// initialize with a value immediately
-				forwardOSC([id, slider.value]);
-
-				let mark = this.cm.markText({line: line, ch: pos}, {line: line, ch: end}, { replacedWith: widget });
-				mark.widgetID = id;
-			} else {
-				// get the reference of the previous slider from the marker
-				id = markers[0].widgetID;
-			}
-
-			// put a reference in the code to the slider ID osc address
-			// don't construct a string yet, to reduce indexing issues
-			output.push(c.substring(previousIndex, find.index));
-			output.push(`'${id}'`);
-
-			previousIndex = tokens.lastIndex;
-		}
-		// push left-over part of code and concatenate array
-		output.push(c.substring(previousIndex));
-		output = output.join("");
+		let output = this.sliderWidget(c);
 
 		let noError = code({ file: output, engine: engine, canvas: canvas, p5canvas: p5canvas });
 		// let noError = code({ file: this.cm.getValue(), engine: engine, canvas: canvas, p5canvas: p5canvas });
@@ -446,6 +382,88 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		removeSound(getSound(), 0.1, true);
 		engine.silence();
 		canvas.clear();
+	}
+
+	this.sliderWidget = function(code){
+		let output = [];
+		// if it has a slider, replace it by a slider widget, then forward code
+		// if it already has a slider widget, get the value from it as well
+		let tokens = /slider\([^\(\)]*\)/g;
+		let previousIndex = 0;
+		while ((find = tokens.exec(code)) !== null) {
+			// console.log('found', find, tokens.lastIndex, previousIndex);
+			let s = find[0];
+
+			// get the line and position:
+			let lines = code.substring(0, find.index).split('\n');
+			let line = lines.length - 1;
+			let pos = lines[line].length;
+			let end = pos + s.length;
+			
+			// if the line is actually a comment, ignore
+			if (lines[line].match(/^\/\/.*/g)){
+				previousIndex = tokens.lastIndex;
+				continue;
+			}
+			
+			// check if there is already a marker present at the function
+			let markers = this.cm.findMarksAt({ line: line, ch: pos });
+
+			// generate unique slider ID
+			let id = `/slider${Math.floor(Math.random() * 10000)}`;
+			
+			// if no marker, generate one and replace with widget
+			if (markers.length === 0){
+				// get the arguments for the slider (low, high, default)
+				let args = s.match(/[^A-Za-z()\s\t\n]+/g) ?? [];
+				// create the slider widget DOM element
+				let widget = document.createElement('div');
+				widget.style.display = 'inline';
+				let val = document.createElement('p');
+				val.style.display = 'inline';
+				val.style.fontSize = '8pt';
+				let slider = document.createElement('input');
+				slider.className = 'slider';
+				slider.type = 'range';
+				slider.step = 0.0001;
+				// minimum slider value is argument or 0
+				slider.min = args[0] ?? 0;
+				// maximum slider value is argument or 1
+				slider.max = args[1] ?? 1;
+				// swap the highest and lowest arguments if needed
+				if (slider.min > slider.max) { 
+					let temp = slider.min;
+					slider.min = slider.max;
+					slider.max = temp;
+				}
+				// default slider value is argument or minimum
+				slider.value = args[2] ?? slider.min;
+				widget.appendChild(slider);
+				widget.appendChild(val);
+				// create a "fake" osc message internally with event emitter
+				slider.oninput = () => {
+					forwardOSC([id, slider.value]);
+					val.innerHTML = Number(slider.value).toPrecision(3);
+				}
+				// initialize with a value immediately
+				forwardOSC([id, slider.value]);
+
+				let mark = this.cm.markText({line: line, ch: pos}, {line: line, ch: end}, { replacedWith: widget });
+				mark.widgetID = id;
+			} else {
+				// get the reference of the previous slider from the marker
+				id = markers[0].widgetID;
+			}
+			// put a reference in the code to the slider ID osc address
+			// don't construct a string yet, to reduce indexing issues
+			output.push(code.substring(previousIndex, find.index));
+			output.push(`'${id}'`);
+
+			previousIndex = tokens.lastIndex;
+		}
+		// push left-over part of code and concatenate array
+		output.push(code.substring(previousIndex));
+		return output.join("");
 	}
 
 	// hide the editor on shortkey
