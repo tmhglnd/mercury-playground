@@ -9,15 +9,6 @@
 
 	<!-- <script src="https://cdn.jsdelivr.net/npm/p5@1.4.2/lib/p5.min.js"></script> -->
 
-	<link rel="preconnect" href="https://fonts.gstatic.com">
-	<link href="https://fonts.googleapis.com/css2?family=Major+Mono+Display&display=swap" rel="stylesheet">
-
-	<!-- <link rel="preconnect" href="https://fonts.gstatic.com"> -->
-	<!-- <link href="https://fonts.googleapis.com/css2?family=Major+Mono+Display&family=VT323&display=swap" rel="stylesheet"> -->
-
-	<link rel="preconnect" href="https://fonts.gstatic.com">
-	<link href="https://fonts.googleapis.com/css2?family=Major+Mono+Display&family=Ubuntu+Mono&family=VT323&display=swap" rel="stylesheet">
-
 	<!-- Now included via require in main.js -->
 	<!-- <script src="./../node_modules/tone/build/Tone.js"></script> -->
 	<!-- <script src="https://unpkg.com/mercury-lang/build/mercury.es5.min.js"></script> -->
@@ -73,17 +64,38 @@
 
 
 <body>
+	<div class="font-preload" style="opacity: 0%">
+		<span style="font-family: 'ubuntu', monospace;"></span>
+		<span style="font-family: 'roboto', monospace;"></span>
+		<span style="font-family: 'jetbrains', monospace;"></span>
+		<span style="font-family: 'doto rounded', monospace;"></span>
+		<span style="font-family: 'share tech', monospace;"></span>
+		<span style="font-family: 'vt323', monospace;"></span>
+		<span style="font-family: 'courier prime', monospace;"></span>
+		<span style="font-family: 'sixtyfour', monospace;"></span>
+		<span style="font-family: 'bytesized', monospace;"></span>
+		<span style="font-family: 'tiny5', monospace;"></span>
+		<span style="font-family: 'jgs5', monospace;"></span>
+		<span style="font-family: 'open dyslexic', monospace;"></span>
+		<span style="font-family: 'monocraft', monospace;"></span>
+		<span style="font-family: 'miracode', monospace;"></span>
+		<span style="font-family: 'unscii-8', monospace;"></span>
+		<span style="font-family: 'unscii-mcr', monospace;"></span>
+		<span style="font-family: 'facade ouest', monospace;"></span>
+		<span style="font-family: 'terminal grotesque open', monospace;"></span>
+		<span style="font-family: 'steps', monospace;"></span>
+	</div>
+
 	<script type="text/javascript" src="./bundle.js"></script>
 	<!-- <script type="text/javascript" src="./bundle.min.js"></script> -->
 
-	<div id='load' class='loadscreen'>
-		<!-- <div class='loader'></div> -->
+	<!-- <div id='load' class='loadscreen'>
 		<div class='loadText'>
 			<p id='log'> 
 				Waking up...<br><br>
 			</p>
 		</div>
-	</div>
+	</div> -->
 
 	<div id="p5-canvas" class="canvas"></div>
 	<canvas id="hydra-canvas" class="canvas"></canvas>
@@ -98,10 +110,6 @@
 		<div id="sounds-prelisten-box" class="modal">
 			<div class="sounds-prelisten"></div>
 		</div>
-
-		<!-- <div id="modalbox" class="modal">
-			<div class="settings-menu"></div>
-		</div> -->
 		
 		<div id="settings">
 			<p id='bpm'></p>
@@ -111,6 +119,11 @@
 		<div id="code-editor"></div>
 		
 		<div id="menu-bottom"></div>
+
+		<div id="settings-menu-box" style="border:solid white; display:none">
+			<p>Some extended settings here</p>
+		</div>
+
 		<div id='postWindow'>
 			<p id="console-log"></p>
 		</div>

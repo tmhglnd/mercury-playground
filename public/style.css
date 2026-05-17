@@ -1,6 +1,191 @@
-/* * {
-    box-sizing: border-box
-}  */
+
+@font-face {
+	font-family: 'ubuntu';
+	src: local('Ubuntu Mono'), 
+		url('assets/fonts/ubuntu-mono/UbuntuMono-Regular.woff2') format('woff2'),
+		url('assets/fonts/ubuntu-mono/UbuntuMono-Regular.woff') format('woff');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+	size-adjust: 100%;
+}
+
+@font-face {
+    font-family: 'roboto';
+    src: url('assets/fonts/roboto-mono/RobotoMono-Bold.woff') format('woff2'),
+        url('assets/fonts/roboto-mono/RobotoMono-Bold.woff') format('woff');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+	size-adjust: 85%;
+}
+
+@font-face {
+    font-family: 'jetbrains';
+    src: url('assets/fonts/jetbrains-mono/JetBrainsMono-Bold.woff') format('woff2'),
+        url('assets/fonts/jetbrains-mono/JetBrainsMono-Bold.woff2') format('woff');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+	size-adjust: 85%;
+}
+
+@font-face {
+    font-family: 'doto rounded';
+    src: url('assets/fonts/doto/DotoRounded-ExtraBold.woff2') format('woff2'),
+        url('assets/fonts/doto/DotoRounded-ExtraBold.woff') format('woff');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+	size-adjust: 90%;
+}
+
+@font-face {
+    font-family: 'share tech';
+    src: url('assets/fonts/share-tech-mono/ShareTechMono-Regular.woff2') format('woff2'),
+        url('assets/fonts/share-tech-mono/ShareTechMono-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+	size-adjust: 95%;
+}
+
+@font-face {
+    font-family: 'vt323';
+    src: url('assets/fonts/vt323/VT323-Regular.woff2') format('woff2'),
+        url('assets/fonts/vt323/VT323-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+	size-adjust: 120%;
+}
+
+@font-face {
+    font-family: 'courier prime';
+    src: url('assets/fonts/courier-prime/CourierPrime-Bold.woff2') format('woff2'),
+        url('assets/fonts/courier-prime/CourierPrime-Bold.woff') format('woff');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+	size-adjust: 90%;
+}
+
+@font-face {
+    font-family: 'sixtyfour';
+    src: url('assets/fonts/sixtyfour/Sixtyfour-Regular.woff2') format('woff2'),
+        url('assets/fonts/sixtyfour/Sixtyfour-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+	size-adjust: 60%;
+}
+
+@font-face {
+    font-family: 'bytesized';
+    src: url('assets/fonts/bytesized/Bytesized-Regular.woff2') format('woff2'),
+        url('assets/fonts/bytesized/Bytesized-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+	size-adjust: 120%;
+}
+
+@font-face {
+    font-family: 'tiny5';
+    src: url('assets/fonts/tiny5/Tiny5-Regular.woff2') format('woff2'),
+        url('assets/fonts/tiny5/Tiny5-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+	size-adjust: 110%;
+}
+
+@font-face {
+    font-family: 'jgs5';
+    src: url('assets/fonts/jgs5/jgs5.woff2') format('woff2'),
+        url('assets/fonts/jgs5/jgs5.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'open dyslexic';
+    src: url('assets/fonts/opendyslexic/OpenDyslexicMono-Regular.woff2') format('woff2'),
+        url('assets/fonts/opendyslexic/OpenDyslexicMono-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+	size-adjust: 85%;
+}
+
+@font-face {
+    font-family: 'monocraft';
+    src: url('assets/fonts/monocraft/Monocraft-SemiBold.woff2') format('woff2'),
+        url('assets/fonts/monocraft/Monocraft-SemiBold.woff') format('woff');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+	size-adjust: 80%;
+}
+
+@font-face {
+    font-family: 'unscii-mcr';
+    src: url('assets/fonts/unscii/unscii-8-mcr.woff2') format('woff2'),
+        url('assets/fonts/unscii/unscii-8-mcr.woff') format('woff');
+    font-weight: 100;
+    font-style: normal;
+    font-display: swap;
+	size-adjust: 65%;
+}
+
+@font-face {
+    font-family: 'unscii-8';
+    src: url('assets/fonts/unscii/unscii-8.woff2') format('woff2'),
+        url('assets/fonts/unscii/unscii-8.woff') format('woff');
+    font-weight: 100;
+    font-style: normal;
+    font-display: swap;
+	size-adjust: 65%;
+}
+
+@font-face {
+    font-family: 'miracode';
+    src: url('assets/fonts/miracode/Miracode.woff2') format('woff2'),
+        url('assets/fonts/miracode/Miracode.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+	size-adjust: 80%;
+}
+
+@font-face {
+    font-family: 'facade ouest';
+    src: url('assets/fonts/facade/Facade-Ouest.woff2') format('woff2'),
+        url('assets/fonts/facade/Facade-Ouest.woff') format('woff');
+    font-weight: 100;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'terminal grotesque open';
+    src: url('assets/fonts/terminal-grotesque-open/TerminalGrotesque-Open.woff2') format('woff2'),
+        url('assets/fonts/terminal-grotesque-open/TerminalGrotesque-Open.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+	size-adjust: 110%;
+}
+
+@font-face {
+    font-family: 'steps';
+    src: url('assets/fonts/steps-mono/Steps-Mono-Mono.woff2') format('woff2'),
+        url('assets/fonts/steps-mono/Steps-Mono-Mono.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
 
 /* Hide scrollbar for Chrome, Safari and Opera */
 ::-webkit-scrollbar {
@@ -92,19 +277,27 @@
 	-webkit-app-region: drag;
 }
 
+/* html * {
+	font-size: 12pt;
+	font-family: 'Ubuntu Mono', monospace;
+} */
+
 body {
 	/* background: rgb(20, 20, 20); */
 	background: var(--bg);
 	/* background: rgb(0, 0, 0, 0); */
 	/* font-family: "Andale Mono"; */
+	/* font-family: 'Inconsolata', monospace; */
 	font-family: 'Ubuntu Mono', monospace;
+	/* font-family: 'Roboto Mono', monospace; */
+	/* font-family: 'Bytesized', monospace; */
 
 	margin: 0;
 	z-index: 10;
 }
 
 h1 {
-	font-family: 'Major Mono Display', monospace;
+	/* font-family: 'Major Mono Display', monospace; */
 	/* text-align: right; */
 	/* font-weight: 'normal'; */
 	/* font-size: 36px; */
@@ -116,8 +309,6 @@ h1 {
 }
 
 p {
-	/* font-family: "Andale Mono"; */
-	/* font-family: "courier new"; */
 	color: var(--primary);
 	-webkit-app-region: no-drag;
 	overflow-wrap: break-word;
@@ -149,15 +340,17 @@ button {
 	background: var(--button-bg);
 	color:  var(--secundary);
 	/* color:  rgb(0, 0, 0, 1); */
-	width: 19%;
+	width: 20%;
 	height: 25px;
-	margin: 2px;
+	/* margin: 2px; */
+	margin: 0.16%;
 	/* padding: 10px; */
 	-webkit-app-region: no-drag;
 
 	overflow: hidden;
 	white-space: nowrap;
 	text-overflow: ellipsis; 
+	vertical-align: top;
 }
 	
 .hide p {
@@ -212,9 +405,11 @@ select {
 	/* background: rgb(255, 255, 255, 0.1); */
 	background: var(--button-bg);
 	border-radius: 2px;
-	width: 19%;
+	width: 20%;
 	height: 25px;
-	margin: 2px;
+	/* margin: 2px; */
+	margin: 0.16%;
+	vertical-align: top;
 	-webkit-app-region: no-drag;
 }
 
@@ -304,6 +499,7 @@ textarea:hover {
 	color: var(--accent);
 	text-decoration: none;
 	cursor: pointer;
+	outline: 1pt solid var(--accent);
 }
 
 .bottom-ui {
@@ -320,13 +516,14 @@ textarea:hover {
 	background-color: var(--transparant) !important;
 	/* background-color: transparent !important; */
 	/* border: 1px solid black; */
-	font-size: 16px;
+	/* font-size: 16px; */
 	height: auto;
 	/* max-height: 200%; */
 	/* font-family: "Consolas"; */
 	/* font-family: 'Ubuntu Mono', monospace; */
 	font-family: inherit;
 	font-size: 1em;
+	/* font-size: 2vw; */
 	line-height: 1.6 !important;
 
 	-webkit-app-region: no-drag;
@@ -347,6 +544,7 @@ textarea:hover {
 }
 
 .CodeMirror-hints {
+	font-family: inherit !important;
 	border-radius: 0px;
 	border: 1px solid var(--secundary);
 	padding: 5px;
@@ -435,7 +633,8 @@ textarea:hover {
 }
 
 #postWindow {
-	font-family: monospace;
+	/* font-family: monospace; */
+	font-size: 11pt;
 	float: center;
 	z-index: 1000;
 	margin-left: 20px;

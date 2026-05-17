@@ -10,6 +10,10 @@ class Instrument extends Sequencer {
 		// Inherit from Sequencer
 		super(engine, canvas, line);
 
+		// reference to all the default samples to be used
+		// by inheriting classes monosample, polysample
+		this._defaults = this._engine.getDefaultSamples();
+
 		// Instrument specific parameters
 		this._gain = [ 0.5, 0 ];		
 		this._pan = [ 0 ];
@@ -99,7 +103,8 @@ class Instrument extends Sequencer {
 			this.adsr.gain.exponentialRampTo(0.0, rel * 5, time + att + dec + retrigger);
 		} else {
 			// if shape is 'off' turn on the gain of the envelope
-			this.adsr.gain.setValueAtTime(1.0, time);
+			// this.adsr.gain.setValueAtTime(1.0, time);
+			this.adsr.gain.linearRampTo(1.0, 0.005, time);
 		}
 	}
 
@@ -138,6 +143,9 @@ class Instrument extends Sequencer {
 			}, t * 1000 + 100);
 		}, restTime * 1000 - 25);
 
+		// remove the previous widget immediately
+		// this._widgets.map(w => w?.fadeOut());
+		this._widgets.map(w => w?.delete());
 		// // fade out the sound upon evaluation of new code
 		// this.gain.gain.rampTo(0, t, Tone.now());
 		// setTimeout(() => {
@@ -169,7 +177,7 @@ class Instrument extends Sequencer {
 
 		// remove all fx
 		this._fx.map((f) => f.delete());
-		this._widgets.map(w => w?.delete());
+		// this._widgets.map(w => w?.delete());
 
 		console.log('=> disposed Instrument() with FX:', this._fx, 'and widgets:', this._widgets);
 	}

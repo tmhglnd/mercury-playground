@@ -9,7 +9,7 @@ Mercury currently has 2 versions:
 * Web version running in the browser (Windows/Mac/Linux) (you're in the right place)
 * Original version running in Max8 (Windows/Mac only) [go to this repo](https://github.com/tmhglnd/mercury)
 
-[**🚀 Start coding directly in the playground!** (recommended for beginners)](https://mercury.timohoogland.com/)
+[**🚀 Start coding directly at mercury-playground.cc!** (recommended for beginners)](https://mercury-playground.cc/)
 
 **👾 Or code with the latest full version in Max8:**
 
@@ -270,7 +270,7 @@ You can code together in Mercury by using the amazing [**Flok**](https://flok.cc
 
 😎 **No need for installing!** You can start coding immediately in the browser:
 
-[**https://mercury.timohoogland.com/**](https://mercury.timohoogland.com/)
+[**https://mercury-playground.cc**](https://mercury-playground.cc)
 
 ### 💻 Running without internet
 
@@ -347,6 +347,7 @@ Contributions to the Mercury environment are much appreciated in whatever form t
 - [Anne Veinberg](https://anneveinberg.com/) for working with Mercury and a Mercury extensions for the [CodeKlavier](https://codeklavier.space/) project
 - [Rafaele Maria Andrade](https://www.rafaele-andrade.com/) for collaboration on [networked performance](https://www.youtube.com/watch?v=7UWywv_DPHI&t=4s) between Mercury and Knurl
 - Live performance image by Zuzanna Zgierska
+- Fonts thanks to amazing work by people such as: [viznut](https://viznut.fi/unscii/), [Raphaël Bastide (velvetyne)](https://velvetyne.fr/), [Abbie Gonzales (opendyslexic)](https://opendyslexic.org/), [Adel Faure (jgs)](https://adelfaure.net/tools/jgs/), [Idrees Hassan (monocraft)](https://opendyslexic.org/), and more. See the full list under `/assets/fonts/README.md`
 
 ## ✨ Inspiration
 

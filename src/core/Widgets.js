@@ -16,10 +16,11 @@ class Widget {
 		this.cnv.height = height;
 		// the color for the widget, or undefined
 		this.color = color;
+		this.fade = 1;
 		// get the 2d context from canvas
 		this.ctx = this.cnv.getContext('2d');
 		// create a new widget between the editor lines
-		this.widget = window.cm.cm.addLineWidget(line - 1, this.cnv);		
+		this.widget = window.cm.cm.addLineWidget(line - 1, this.cnv, { insertAt: 0 });		
 		// the auto scaling for the scope
 		this.scopeScale = -Infinity;
 	}
@@ -32,6 +33,7 @@ class Widget {
 	// start the rendering of the animation based on AnimationFrame
 	start(){
 		let framedraw = () => {
+			// this.ctx.globalAlpha = this.fade * this.ctx.globalAlpha;
 			this.draw();
 			this.anim = requestAnimationFrame(framedraw);
 		}
@@ -43,7 +45,7 @@ class Widget {
 	draw(){
 		// erase the previous drawn line
 		this.ctx.clearRect(0, 0, this.cnv.width, this.cnv.height);
-
+		
 		this.ctx.lineCap = "round";
 		this.ctx.lineWidth = 2;
 		this.ctx.strokeStyle = this.color ? this.color : window.getComputedStyle(document.documentElement).getPropertyValue('--accent');
@@ -63,6 +65,10 @@ class Widget {
 			}
 		}
 		this.ctx.stroke();
+	}
+
+	fadeOut(){
+		this.fade = 0.95;
 	}
 
 	// remove all traces
