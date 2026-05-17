@@ -30,6 +30,7 @@ class MonoInput extends Instrument {
 		this.mic.channelInterpretation = 'discrete';
 		
 		this.source = this.mic;
+		this.source.stop = this.mic.close;
 	}
 
 	sourceEvent(c, e, time){
