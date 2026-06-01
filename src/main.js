@@ -196,6 +196,7 @@ window.onload = () => {
 	cm.menuBottom();
 	cm.hide();
 	cm.themeMenu();
+	cm.fontMenu();
 	cm.tutorialMenu();
 	cm.soundsMenu();
 	// cm.modeSwitch();
@@ -216,6 +217,12 @@ window.onload = () => {
 
 	// Set the theme if in local storage
 	cm.setMode(localStorage.getItem('theme'));
+
+	// set default value for font to ubuntu
+	if (!localStorage.getItem('font')){
+		localStorage.setItem('font', 'ubuntu');
+	}
+	cm.setFont(localStorage.getItem('font'));
 
 	Hydra.link('hydra-ui');
 

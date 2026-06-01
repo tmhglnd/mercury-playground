@@ -68,7 +68,7 @@ let mercuryHintList = [
 	'new', 'set', 'list', 'print', 'silence',
 	'tempo', 'scale', 'scalar', 'root', 'randomSeed', 'volume', 'lopass', 'hipass', 'osc', 'midi', 'samples',
 	'sample', 'synth', 'input', 'midi', 'polySample', 'polySynth', 'noise',
-	'saw', 'sine', 'square', 'triangle',
+	'saw', 'sine', 'square', 'triangle', 'fm',
 	'white', 'pink', 'brown', 'lofi', 'crackle', 'dust',
 	'name', 'solo', 'group', 'time', 'once', 'fx', 'effect', 'out', 'timediv', 'wait', 'play', 'gain', 'shape', 'pan',
 	'note', 'super', 'slide',
@@ -85,6 +85,8 @@ let WORD = /[\w]+/;
 
 // a hinting function for the Mercury language
 CodeMirror.registerHelper('hint', 'mercury', (editor, options) => {
+	// let hintList = mercuryHintList;
+
 	// set word and range parameters
 	let word = options && options.word || WORD;
 	let list = options && options.list || []
@@ -99,6 +101,16 @@ CodeMirror.registerHelper('hint', 'mercury', (editor, options) => {
 		--start;
 	}
 	let curWord = start != end && curLine.slice(start, end);
+
+	// narrow down the hintlist based on the start of the line
+	// console.log('start', curLine.trim().match(/^[\w]+/));
+	// let firstWord = curLine.trim().match(/^[\w]+/);
+	// if (extendedHintList[firstWord]){
+	// 	hintList = extendedHintList[firstWord];
+	// }
+	// if (!curWord){
+	// 	list.push(...hintList);
+	// }
 
 	// go over the hintlist and select words that match the current found word
 	for (let i=0; i<mercuryHintList.length; i++){
@@ -200,6 +212,8 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 				this.showListenMenu(!this.listenMenuVisible) },
 			'Shift-Ctrl-L': () => { 
 				this.showListenMenu(!this.listenMenuVisible) }
+			// 'Alt-,': () => { this.showSettings(!this.settingsVisible) },
+			// 'Ctrl-,': () => { this.showSettings(!this.settingsVisible) }
 		}
 	}
 
@@ -528,26 +542,32 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 			window.open('https://tmhglnd.github.io/mercury/docs/', '_blank');
 		}
 
-		let collab = document.createElement('button');
-		collab.id = collab.innerHTML = 'collaborate';
-		collab.title = 'Collaborate in flok.cc (Alt/Ctrl-Shift-C)';
-		collab.style.width = "12.8%";
-		collab.onclick = () => {
-			window.open('https://flok.cc', '_blank');
-		}
+		// let collab = document.createElement('button');
+		// collab.id = collab.innerHTML = 'collaborate';
+		// collab.title = 'Collaborate in flok.cc (Alt/Ctrl-Shift-C)';
+		// collab.style.width = "12.8%";
+		// collab.onclick = () => {
+		// 	window.open('https://flok.cc', '_blank');
+		// }
 
 		let thms = document.createElement('select');
 		thms.style.width = '12.8%';
 		thms.title = 'Choose a syntax highlighting theme';
 		thms.id = 'themes';
 
+		let fnts = document.createElement('select');
+		fnts.style.width = '12.8%'
+		fnts.title = 'Choose a font for the editor';
+		fnts.id = 'fonts';
+
 		p.appendChild(tuts);
+		p.appendChild(help);
 		p.appendChild(snds);
 		p.appendChild(lstn);
 		p.appendChild(load);
-		p.appendChild(help);
-		p.appendChild(collab);
+		// p.appendChild(collab);
 		p.appendChild(thms);
+		p.appendChild(fnts);
 	}
 
 	this.tutorialMenu = function(){
@@ -661,6 +681,29 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 		menu.value = localStorage.getItem(selectedMode === 'lightmode' ? 'lightSyntax' : 'darkSyntax');
 	}
 
+	// font menu for the editor
+	this.fontMenu = function(){
+		const menu = document.getElementById('fonts');
+		menu.innerHTML = '';
+		menu.onchange = () => {
+			this.setFont(menu.value);
+		};
+
+		let fonts = [ 'ubuntu', 'roboto', 'jetbrains', 'doto rounded', 'share tech', 'vt323', 'courier prime', 'sixtyfour', 'bytesized', 'tiny5', 'jgs5', 'open dyslexic', 'monocraft', 'unscii-8', 'unscii-mcr', 'miracode', 'facade ouest', 'terminal grotesque open', 'steps' ].sort();
+
+		for (let f of fonts){
+			let option = document.createElement('option');
+			option.value = option.innerHTML = f;
+			menu.appendChild(option);
+		}
+	}
+
+	this.setFont = function(font){
+		document.body.style.fontFamily = font;
+		localStorage.setItem('font', font);
+		document.getElementById('fonts').value = font;
+	}
+
 	this.listenMenuVisible = false;
 
 	// toggle the visibility of the sounds prelisten menu
@@ -685,6 +728,7 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 
 		let m = document.getElementsByClassName('sounds-prelisten')[0];
 		m.innerHTML = `
+		<span><button id="preload-sounds" style="width:auto">Preload all sounds</button></span>
 		<span><button id="add-prelisten" style="width:auto">Add to code:</button></span>
 		<span class="close">&times;</span>
 		<p>
@@ -732,6 +776,14 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 			this.showListenMenu(false);
 			this.insertSound(last);
 		}
+		// preload all the sounds in case of slow internet connection or 
+		// useful before a performance. also works with `set samples default`
+		let s = document.getElementById('preload-sounds');
+		s.onclick = () => {
+			this.showListenMenu(false);
+			log('Preloading...');
+			engine.addDefaultBuffers();
+		}
 		// close the window when clicking X
 		let span = document.getElementsByClassName('close')[0];
 		span.onclick = () => this.showListenMenu(false);
@@ -744,40 +796,20 @@ const Editor = function({ context, engine, canvas, p5canvas }) {
 
 	// settings menu with more options and some explanation
 	// TO-DO, currently not in use
+	// this.settingsVisible = false;
+	// 
+	// this.showSettings = function(show){
+	// 	let s = document.getElementById('settings-menu-box');
+	// 	if (show){
+	// 		s.style.display = 'block';
+	// 	} else {
+	// 		s.style.display = 'none';
+	// 	}
+	// 	this.settingsVisible = show;
+	// }
+	// 
 	// this.settingsMenu = function(){
-	// 	let modal = document.getElementById('modalbox');
-	// 	// let m = document.createElement('div');
-	// 	// m.className = "settings-menu";
-	// 	let m = document.getElementsByClassName('settings-menu')[0];
-	// 	m.innerHTML = `
-	// 	<span class="close">&times;</span>
-	// 	<p>
-	// 		Theme <select id="themes" style="width:30%"></select>
-	// 	</p>`;
-
-	// 	let menu = document.getElementById('themes');
-	// 	menu.onchange = () => { this.changeTheme() };
-
-	// 	let themes = ['ayu-dark', 'base16-dark', 'material-darker', 'material-ocean', 'moxer', 'tomorrow-night-eighties', 'panda-syntax', 'yonce'];
-
-	// 	// 	let lightThemes = ['elegant', 'duotone-light', 'base16-light']
-		
-	// 	for (let t=0; t<themes.length; t++){
-	// 		let option = document.createElement('option');
-	// 		option.value = themes[t];
-	// 		option.innerHTML = themes[t];
-	// 		menu.appendChild(option);
-	// 	}
-	// 	menu.value = defaultTheme;
-
-	// 	// close the window when clicking the cross or outside of the box
-	// 	let span = document.getElementsByClassName('close')[0];
-	// 	span.onclick = () => modal.style.display = "none";
-		
-	// 	window.onclick = (event) => {
-	// 		if (event.target === modal) modal.style.display = "none";
-	// 	}
-	// 	modal.appendChild(m);
+	// 	let settingbox = document.getElementById('settings-menu-box');
 	// }
 
 	// light/dark mode switcher
