@@ -1,8 +1,10 @@
 const Tone = require('tone');
-const Util = require('./Util.js');
 const TL = require('total-serialism').Translate;
-
-const { clip, divToS, getParam, fixNonFinite, fractToFloat } = require('./Util.js');
+const Util = require('./Util.js');
+const { getParam, mapDefaults } = require('./Util.js');
+const { clip, divToS, fractToFloat } = require('./Util.js');
+const { fixNan, fixNonFinite } = require('./Util.js');
+const { checkFiltertype, filtertypeIndex } = require('./Util.js');
 
 // all the available effects
 const fxMap = {
@@ -80,6 +82,9 @@ const fxMap = {
 	// },
 	'svf' : (params) => {
 		return new SVF(params);
+	},
+	'autofilter' : (params) => {
+		return new AutoSVFilter(params);
 	},
 	'filter' : (params) => {
 		return new Filter(params);
@@ -365,7 +370,7 @@ const Overdrive = function(_params){
 
 	this.set = function(c, time, bpm){
 		// drive amount, minimum drive of 1
-		const d = Util.assureNum(Math.max(0, Util.getParam(this._drive, c)) + 1);
+		const d = Util.fixNan(Math.max(0, Util.getParam(this._drive, c)) + 1);
 		const wet = Util.clip(Util.getParam(this._wet, c), 0, 1);
 
 		// set the parameters in the workletNode
@@ -398,7 +403,7 @@ const Fuzz = function(_params){
 
 	this.set = function(c, time, bpm){
 		// drive amount, minimum drive of 1
-		const d = Util.assureNum(Math.max(1, Util.getParam(this._drive, c)) + 1);
+		const d = Util.fixNan(Math.max(1, Util.getParam(this._drive, c)) + 1);
 		const wet = Util.clip(Util.getParam(this._wet, c), 0, 1);
 
 		// set the parameters in the workletNode
@@ -534,7 +539,7 @@ const Squash = function(_params){
 	this._fx = workletFX('squash-processor');
 
 	this.set = function(c, time, bpm){
-		const d = Util.assureNum(Math.max(1, Util.getParam(this._squash, c)));
+		const d = Util.fixNan(Math.max(1, Util.getParam(this._squash, c)));
 		const m = 1.0 / Math.sqrt(d);
 		const wet = Util.clip(Util.getParam(this._wet, c));
 		
@@ -773,7 +778,7 @@ const LFO = function(_params){
 // State Variable Filter FX
 // A new filter using the State Variable Filter implementation from Hal 
 // Chamberlin. The improved version, based on the paper:
-// Improving the Digital Chamberlin State Variable Filter
+// "Improving the Digital Chamberlin State Variable Filter"
 // Updated version based on the paper https://arxiv.org/pdf/2111.05592
 // by Victor Lazzarini and Joseph Timoney, 2022
 // ported to gen~ and later JS by Timo Hoogland, 2026
@@ -781,30 +786,26 @@ const LFO = function(_params){
 // https://www.earlevel.com/main/2003/03/02/the-digital-state-variable-filter/
 //
 const SVF = function(_params){
-	_params = Util.mapDefaults(_params, [ 0, 1200, 0.45 ]);
+	if (typeof _params[0] === 'string'){
+		_params = Util.mapDefaults(_params, ['lowpass', 1200, 0.45]);
+	} else {
+		_params = [['low']].concat(Util.mapDefaults(_params, [1200, 0.45]));
+	}
 	this._type = _params[0];
 	this._freq = _params[1];
 	this._res = _params[2];
 
 	this._fx = workletFX('state-variable-filter');
 
-	this._lfo = new Tone.ToneAudioNode();
-	this._lfo.workletNode = Tone.getContext().createAudioWorkletNode('lfo-processor');
-	this._lfo.input = new Tone.Gain(1);
-	this._lfo.output = new Tone.Gain(1);
-	this._lfo.input.chain(this._lfo.workletNode, this._lfo.output);
-
-	let filterFreq = this._fx.workletNode.parameters.get('frequency');
-	this._lfo.connect(filterFreq);
-
-	setParam(this._lfo, 'low', 90);
-	setParam(this._lfo, 'high', 1500);
-	setParam(this._lfo, 'frequency', 2);
-
 	this.set = function(c, time, bpm){
-		setParam(this._fx, 'type', Util.getParam(this._type, c), time);
-		// setParam(this._fx, 'frequency', Util.getParam(this._freq, c), time);
-		setParam(this._fx, 'resonance', Util.getParam(this._res, c), time);
+		let tp = filtertypeIndex(checkFiltertype(getParam(this._type, c)));
+		setParam(this._fx, 'type', tp, time);
+
+		let fq = clip(fixNan(getParam(this._freq, c), 1000), 5, 18000);
+		setParam(this._fx, 'frequency', fq, time);
+
+		let rs = clip(fixNan(getParam(this._res, c), 0.8), 0.01, 0.99);
+		setParam(this._fx, 'resonance', rs, time);
 	}
 
 	this.chain = function(){
@@ -813,7 +814,51 @@ const SVF = function(_params){
 
 	this.delete = function(){
 		this._fx.workletNode.port.postMessage('dispose');
-		disposeNodes([ this._fx, this._fx.input, this._fx.output ]);
+		disposeNodes([ this._fx ]);
+	}
+}
+
+// State Variable Filter with LFO option
+// Based on improved Hal Chamberlin SVF, see above for references
+// 
+const AutoSVFilter = function(_params){
+	_params = Util.mapDefaults(_params, ['low', '1/1', 200, 3000, 0.45, 'sine', 0.5 ]);
+	// this._type = Util.filtertypeToInt(_params[0]);
+
+	this._fx = workletFX('state-variable-filter');
+	
+	// generate an LFO to modulate the cutoff-frequency of the filter
+	this._lfo = new Tone.LFO();
+	this._scale = new Tone.ScaleExp();
+	this._lfo.connect(this._scale);
+	this._scale.connect(this._fx.frequency);
+
+	this.set = (c, time, bpm) => {
+		let tp = Util.filtertypeToInt(Util.filtertypeToName(Util.getParam(_params[0], c)));
+		setParam(this._fx, 'type', tp, time);
+
+		// setParam(this._fx, 'frequency', 300, time);
+		// setParam(this._fx, 'resonance', Util.getParam(_params[4], c), time);
+		
+		let t = Util.divToS(Util.getParam(_params[1], c), bpm);
+		let f = 1 / t;
+		let lo = Util.clip(Util.getParam(_params[2], c), 5, 19000);
+		let hi = Util.clip(Util.getParam(_params[3], c), 5, 19000);
+		let exp = Util.clip(Util.getParam(_params[5], c), 0.01, 100);
+
+		this._scale.min = lo;
+		this._scale.max = hi;
+		this._scale.exponent = exp;
+		this._lfo.frequency.setValueAtTime(f, time);
+	}
+
+	this.chain = () => {
+		return { 'send' : this._fx, 'return' : this._fx };
+	}
+
+	this.delete = () => {
+		this._fx.workletNode.port.postMessage('dispose');
+		disposeNodes([ this._fx ])
 	}
 }
 

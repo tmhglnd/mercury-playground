@@ -568,7 +568,7 @@ registerProcessor('waveloss-processor', WavelossProcessor);
 class StateVariableFilter extends ExtendedWorkletProcessor {
 	static get parameterDescriptors() {
 		return formatDescriptors([
-			[ 'frequency', 500, 1, 18000, "k-rate" ],
+			[ 'frequency', 500, 5, 18000, "k-rate" ],
 			[ 'resonance', 0.1, 0.001, 0.999, "k-rate" ],
 			[ 'type', 0, 0, 3, "k-rate" ],
 		]);

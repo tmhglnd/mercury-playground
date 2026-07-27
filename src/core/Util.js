@@ -12,8 +12,8 @@ function mapDefaults(params, defaults){
 	return defaults.map(p => toArray(p));
 }
 
-// Function that is evaluated at a specific time from Tone Transpor
-// More precise than Tone.Transport.ScheduleOnce()
+// Function that is evaluated at a specific time from Tone Transport
+// Seems to be more precise than Tone.Transport.ScheduleOnce()
 // Workaround for Tone objects that don't have setValueAtTime
 function atTime(callback, time){
 	setTimeout(callback, (time - Tone.context.currentTime) * 1000);
@@ -36,7 +36,7 @@ function remap(val=0, inLo=0, inHi=1, outLo=0, outHi=1, exp=1){
 }
 
 // make sure the output is a number, else output a default value
-function assureNum(v, d=1){
+function fixNan(v, d=1){
 	return isNaN(v) ? d : v;
 }
 
@@ -259,8 +259,44 @@ function toMidi(n=0, o=0){
 // Set a parameter in an worklet processor
 function setWorkletParam(node, param, value, time) {
 	const p = node.workletNode.parameters.get(param);
-	const v = assureNum(value);
+	const v = fixNan(value);
 	p.setValueAtTime(v, time ?? Tone.now());
+}
+
+function checkFiltertype(type){
+	let types = {
+		'lp' : 'lowpass',
+		'lo' : 'lowpass',
+		'low' : 'lowpass',
+		'lowpass' : 'lowpass',
+		'hp' : 'highpass',
+		'hi' : 'highpass',
+		'high' : 'highpass',
+		'highpass' : 'highpass',
+		'bp' : 'bandpass',
+		'band' : 'bandpass',
+		'bandpass': 'bandpass',
+	}
+	if (types[type]){
+		return types[type];
+	}
+	log(`${type} is not a valid filter type. Defaulting to lowpass`);
+	return 'lowpass';
+}
+
+// Get an integer based on the name of a filtertype
+// or just return the integer
+function filtertypeIndex(type){
+	let types = {
+		'lowpass' : 0,
+		'highpass' : 1,
+		'bandpass' : 2
+	}
+	if (Object.hasOwn(types, type)){
+		return types[type];
+	}
+	log(`${type} is not a valid filter type. Defaulting to lowpass`);
+	return 0;
 }
 
 // function rampWorkletParam(node, param, value, ramp, start) {
@@ -273,4 +309,4 @@ function setWorkletParam(node, param, value, time) {
 // 	p.linearRampToValueAtTime(value, start + ramp);
 // }
 
-module.exports = { mapDefaults, atTime, atodb, clip, assureNum, fixNonFinite, lookup, randLookup, isRandom, getParam, toArray, msToS, fractToFloat, formatRatio, divToS, divToF, toMidi, mtof, noteToMidi, noteToFreq, assureWave, remap, setWorkletParam }
+module.exports = { mapDefaults, atTime, atodb, clip, fixNan, fixNonFinite, lookup, randLookup, isRandom, getParam, toArray, msToS, fractToFloat, formatRatio, divToS, divToF, toMidi, mtof, noteToMidi, noteToFreq, assureWave, remap, setWorkletParam, checkFiltertype, filtertypeIndex }
