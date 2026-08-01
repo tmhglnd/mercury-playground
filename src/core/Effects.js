@@ -1,7 +1,7 @@
 const Tone = require('tone');
 const TL = require('total-serialism').Translate;
 const Util = require('./Util.js');
-const { getParam, mapDefaults } = require('./Util.js');
+const { getParam, mapDefaults, toArray } = require('./Util.js');
 const { clip, divToS, fractToFloat } = require('./Util.js');
 const { fixNan, fixNonFinite } = require('./Util.js');
 const { checkFiltertype, filtertypeIndex } = require('./Util.js');
@@ -786,11 +786,18 @@ const LFO = function(_params){
 // https://www.earlevel.com/main/2003/03/02/the-digital-state-variable-filter/
 //
 const SVF = function(_params){
-	if (typeof _params[0] === 'string'){
-		_params = Util.mapDefaults(_params, ['lowpass', 1200, 0.45]);
-	} else {
-		_params = [['low']].concat(Util.mapDefaults(_params, [1200, 0.45]));
+	_params = toArray(_params);
+	if (_params.length < 3 && _params.length){
+		if (typeof _params[0][0] !== 'string'){
+			_params = [['low']].concat(_params);
+		}
 	}
+	_params = Util.mapDefaults(_params, ['lowpass', 1200, 0.45]);
+	// if (_params.length < 3 && typeof _params[0] === 'string'){
+	// 	_params = Util.mapDefaults(_params, ['lowpass', 1200, 0.45]);
+	// } else {
+	// 	_params = [['low']].concat(Util.mapDefaults(_params, [1200, 0.45]));
+	// }
 	this._type = _params[0];
 	this._freq = _params[1];
 	this._res = _params[2];
@@ -804,7 +811,7 @@ const SVF = function(_params){
 		let fq = clip(fixNan(getParam(this._freq, c), 1000), 5, 18000);
 		setParam(this._fx, 'frequency', fq, time);
 
-		let rs = clip(fixNan(getParam(this._res, c), 0.8), 0.01, 0.99);
+		let rs = clip(fixNan(getParam(this._res, c), 0.8), 0.01, 0.95);
 		setParam(this._fx, 'resonance', rs, time);
 	}
 
@@ -1163,8 +1170,6 @@ const WorkletDelay = function(_params) {
 		console.log(fb);
 		const dm = clip(getParam(_params[3], c), 0.01, 0.99);
 		const dw = clip(getParam(_params[4], c));
-
-		console.log('delay params', dL, dR, fb, dm, dw);
 
 		// set parameters for workletprocessor
 		setParam(this._fx, 'timeL', dL, time);
