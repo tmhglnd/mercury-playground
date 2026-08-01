@@ -1031,42 +1031,27 @@ const Filter = function(_params){
 //
 const TriggerFilter = function(_params){
 	this._fx = new Tone.Filter(1000, 'lowpass', -24);
-	this._adsr = new Tone.Envelope({
-		attackCurve: "linear",
-		decayCurve: "linear",
-		sustain: 0,
-		release: 0.001
-	});
+	// this._adsr = new Tone.Envelope({
+	// 	attackCurve: "linear",
+	// 	decayCurve: "linear",
+	// 	sustain: 0,
+	// 	release: 0.001
+	// });
+	this._adsr = new Tone.Signal(0);
 	this._mul = new Tone.Multiply();
 	this._add = new Tone.Add();
 	this._pow = new Tone.Pow(3);
 
-	this._adsr.connect(this._pow.connect(this._mul));
+	this._adsr.connect(this._pow);
+	this._pow.connect(this._mul);
 	this._mul.connect(this._add);
 	this._add.connect(this._fx.frequency);
-
-	this._types = {
-		'lo' : 'lowpass',
-		'low' : 'lowpass',
-		'lowpass' : 'lowpass',
-		'hi' : 'highpass',
-		'high' : 'highpass',
-		'highpass' : 'highpass',
-		'band' : 'bandpass',
-		'bandpass': 'bandpass'
-	}
+	this._adsr.connect(this._fx.frequency);
 
 	// replace defaults with provided arguments
 	_params = Util.mapDefaults(_params, ['low', 1, '1/16', 4000, 100, 1]);
-	// this.defaults.splice(0, _params.length, ..._params);
-	_params = _params.map(p => Util.toArray(p));
 
-	if (this._types[_params[0][0]]){
-		this._fx.set({ type: this._types[_params[0][0]] });
-	} else {
-		log(`'${_params[0][0]}' is not a valid filter type. Defaulting to lowpass`);
-		this._fx.set({ type: 'lowpass' });
-	}
+	this._fx.set({ type: checkFiltertype(_params[0][0]) });
 
 	this._att = _params[1];
 	this._rel = _params[2];
@@ -1074,9 +1059,15 @@ const TriggerFilter = function(_params){
 	this._low = _params[4];
 	this._exp = _params[5];
 
+	// this._mtr = new Tone.Meter();
+	// this._mtr.normalRange = true;
+	// this._mtr.smoothing = 0;	
+	// this._gn.connect(this._mtr);
+	// setInterval(() => { console.log(this._adsr.getValueAtTime(Tone.now())) }, 100); 
+
 	this.set = function(c, time, bpm){
-		this._adsr.attack = Util.divToS(Util.getParam(this._att, c), bpm);
-		this._adsr.decay = Util.divToS(Util.getParam(this._rel, c), bpm);
+		// this._adsr.attack = Util.divToS(Util.getParam(this._att, c), bpm);
+		// this._adsr.decay = Util.divToS(Util.getParam(this._rel, c), bpm);
 
 		let min = Util.getParam(this._low, c);
 		let max = Util.getParam(this._high, c);
@@ -1089,11 +1080,26 @@ const TriggerFilter = function(_params){
 		Util.atTime(() => { this._pow.value = exp }, time);
 
 		// fade-out running envelope over 5 ms
-		if (this._adsr.value > 0){
-			this._adsr.triggerRelease(time);
-			time += this._adsr.release;
+		// if (this._adsr.value > 0){
+		// 	this._adsr.triggerRelease(time);
+		// 	time += this._adsr.release;
+		// }
+		let retrigger = 0;
+		if (this._adsr.getValueAtTime(time) > 0.01){
+			retrigger = 0.002;
+			this._adsr.rampTo(0.0, retrigger, time);
 		}
-		this._adsr.triggerAttack(time, 1);
+		// this._adsr.triggerAttack(time, 1);
+		let att = divToS(getParam(this._att, c), bpm);
+		// this._adsr.value.linearRampTo(1000.0, att, time + retrigger);
+		this._adsr.rampTo(1, att, time + retrigger);
+
+		let rel = divToS(getParam(this._rel, c), bpm);
+		// this._adsr.value.linearRampTo(50.0, rel, time + att + retrigger);
+		this._adsr.rampTo(0, rel, time + att + retrigger);
+
+		// console.log('gain', this._gn.gain.getValueAtTime(time));
+		// console.log('filter adsr', att, rel, time, retrigger);
 	}
 
 	this.chain = function(){
@@ -1102,11 +1108,7 @@ const TriggerFilter = function(_params){
 
 	this.delete = function(){
 		let nodes = [ this._fx, this._adsr, this._mul, this._add, this._pow ];
-
-		nodes.forEach((n) => {
-			n.disconnect();
-			n.dispose();
-		});
+		disposeNodes(nodes);
 	}
 }
 
@@ -1130,13 +1132,14 @@ const TriggerFilter = function(_params){
 }*/
 
 // Delay FX
-// A new pingpong delay implementation using a custom AudioWorkletProcessor. 
+// A new ping-pong delay implementation using a custom AudioWorkletProcessor. 
 // The custom processor allows for shorter delaytimes, and less overhead since 
-// everything runs inside one Tone AudioNode instead of using multiple.
-// The delay includes a lowpass filter in feedback loop and delaytimes are set 
-// for the left and right channel independently, but channels are cross-mixed.
-// The feedbackloop also includes a 10Hz highpass filter to remove DC-offset and
-// reduce energy build-up in the low-frequency range with high feedback amounts
+// everything runs inside one Tone AudioNode instead of using multiple 
+// Web Audio Nodes. The delay includes a lowpass filter in the feedback 
+// loop and delaytimes are set for the left and right channel independently, 
+// but channels are cross-mixed. The feedbackloop also includes a 10Hz highpass 
+// filter to remove DC-offset and reduce energy build-up in the low-frequency 
+// range with high feedback amounts.
 //
 const WorkletDelay = function(_params) {
 	// if only 1 param, apply time to both Left and Right

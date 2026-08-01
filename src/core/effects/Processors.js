@@ -4,6 +4,7 @@ const MAX_DEF = +340282346638528859811704183484516925440;
 const MIN_DEF = -340282346638528859811704183484516925440;
 
 // Some helper functions
+const PI = Math.PI;
 const TWOPI = Math.PI * 2.0;
 const SR = sampleRate;
 const INV_SR = 1 / sampleRate;
@@ -32,6 +33,10 @@ const trunc = (sig) => sig | 0;
 const fract = (sig) => sig - trunc(sig);
 // fix Not a Number
 const fixnan = (sig) => isNaN(sig) ? 0 : sig;
+// Mix two signals with equal power gain
+const equalPowerMix = (a=0, b=0, x=0.5) => {
+	return a * Math.cos(x * 0.5 * PI) + b * Math.cos((x * 0.5 - 0.5) * PI);
+}
 
 // Format descriptors and return to output
 function formatDescriptors(descriptors=[]){
@@ -774,8 +779,8 @@ class StereoDelayProcessor extends DelayWorkletProcessor {
 			this.writeDelay(0, sig[i][1] + this.lpf[1]);
 			
 			for (let c = 0; c < this.delays.length; c++){
-				// apply drywet and send output from the filter
-				output[c][i] = mix(sig[i][c], this.lpf[c], dw);
+				// apply equalpower drywet and send output from the filter
+				output[c][i] = equalPowerMix(sig[i][c], this.lpf[c], dw);
 				// update the read and write heads of the delaylines
 				this.updateReadWriteHeads(c);
 			}
