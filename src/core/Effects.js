@@ -1,7 +1,7 @@
 const Tone = require('tone');
 const TL = require('total-serialism').Translate;
 const Util = require('./Util.js');
-const { getParam, mapDefaults, toArray } = require('./Util.js');
+const { getParam, mapDefaults, toArray, atTime } = require('./Util.js');
 const { clip, divToS, fractToFloat } = require('./Util.js');
 const { fixNan, fixNonFinite } = require('./Util.js');
 const { checkFiltertype, filtertypeIndex } = require('./Util.js');
@@ -793,11 +793,7 @@ const SVF = function(_params){
 		}
 	}
 	_params = Util.mapDefaults(_params, ['lowpass', 1200, 0.45]);
-	// if (_params.length < 3 && typeof _params[0] === 'string'){
-	// 	_params = Util.mapDefaults(_params, ['lowpass', 1200, 0.45]);
-	// } else {
-	// 	_params = [['low']].concat(Util.mapDefaults(_params, [1200, 0.45]));
-	// }
+
 	this._type = _params[0];
 	this._freq = _params[1];
 	this._res = _params[2];
@@ -1048,12 +1044,14 @@ const TriggerFilter = function(_params){
 	this._mul = new Tone.Multiply();
 	this._add = new Tone.Add();
 	this._pow = new Tone.Pow(3);
+	// this._scale = new Tone.ScaleExp(0, 1, 1);
 
+	// this._adsr.connect(this._scale);
 	this._adsr.connect(this._pow);
 	this._pow.connect(this._mul);
 	this._mul.connect(this._add);
 	this._add.connect(this._fx.frequency);
-	this._adsr.connect(this._fx.frequency);
+	// this._scale.connect(this._fx.frequency);
 
 	// replace defaults with provided arguments
 	_params = Util.mapDefaults(_params, ['low', 1, '1/16', 4000, 100, 1]);
@@ -1084,7 +1082,11 @@ const TriggerFilter = function(_params){
 
 		this._mul.setValueAtTime(range, time);
 		this._add.setValueAtTime(lower, time);
-		Util.atTime(() => { this._pow.value = exp }, time);
+		atTime(() => { this._pow.value = exp }, time);
+
+		// atTime(() => { this._scale.min = min }, time);
+		// atTime(() => { this._scale.max = max }, time);
+		// atTime(() => { this._scale.exponent = exp }, time);
 
 		// fade-out running envelope over 5 ms
 		// if (this._adsr.value > 0){
@@ -1093,7 +1095,7 @@ const TriggerFilter = function(_params){
 		// }
 		let retrigger = 0;
 		if (this._adsr.getValueAtTime(time) > 0.01){
-			retrigger = 0.002;
+			retrigger = 0.005;
 			this._adsr.rampTo(0.0, retrigger, time);
 		}
 		// this._adsr.triggerAttack(time, 1);

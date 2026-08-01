@@ -635,6 +635,10 @@ class StateVariableFilter extends ExtendedWorkletProcessor {
 }
 registerProcessor('state-variable-filter', StateVariableFilter);
 
+// class ScaleExp extends AudioWorkletProcessor {
+
+// }
+
 // Comb Filter processor
 // A LowPass FeedBack CombFilter effect (LBCF)
 // Uses a onepole lowpass filter in the feedback delay for damping
