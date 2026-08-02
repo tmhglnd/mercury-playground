@@ -1076,7 +1076,7 @@ const WorkletDelay = function(_params) {
 		_params[1] = _params[0];
 	}
 	// param order: timeLeft, timeRight, feedback, damping, drywet
-	_params = Util.mapDefaults(_params, [ '2/16', '3/16', 0.8, 0.5, 0.5 ]);
+	_params = Util.mapDefaults(_params, [ '2/16', '3/16', 0.8, 0.4, 0.5 ]);
 
 	this._maxTime = 5000;
 	// load a worklet FX in a ToneAudioNode
