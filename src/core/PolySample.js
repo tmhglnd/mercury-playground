@@ -71,7 +71,7 @@ class PolySample extends PolyInstrument {
 				this._engine.addBufferFromURL(this._defaults[b], b);
 			} else {
 				// default sample if file does not exist
-				log(`${f} is not a loaded sample name and not part of default pack`);
+				log(`${b} is not a loaded sample name and not part of default pack`);
 			}
 			// don't play if there is no valid buffer loaded
 			return;
