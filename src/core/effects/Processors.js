@@ -573,7 +573,7 @@ registerProcessor('waveloss-processor', WavelossProcessor);
 class StateVariableFilter extends ExtendedWorkletProcessor {
 	static get parameterDescriptors() {
 		return formatDescriptors([
-			[ 'frequency', 500, 5, 18000, "k-rate" ],
+			[ 'frequency', 500, 0, 18000, "a-rate" ],
 			[ 'resonance', 0.1, 0.001, 0.999, "k-rate" ],
 			[ 'type', 0, 0, 3, "k-rate" ],
 		]);
@@ -621,10 +621,11 @@ class StateVariableFilter extends ExtendedWorkletProcessor {
 						output[channel][i] = lowp;
 					} else if (type < 2){
 						output[channel][i] = highp;
-					} else if (type < 3){
+					} else {
 						output[channel][i] = bandp;
 					} 
 					// else {
+					//  notch output disabled
 					// 	output[channel][i] = highp + lowp; //notch output
 					// }
 				}
@@ -634,10 +635,6 @@ class StateVariableFilter extends ExtendedWorkletProcessor {
 	}
 }
 registerProcessor('state-variable-filter', StateVariableFilter);
-
-// class ScaleExp extends AudioWorkletProcessor {
-
-// }
 
 // Comb Filter processor
 // A LowPass FeedBack CombFilter effect (LBCF)

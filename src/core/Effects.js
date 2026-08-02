@@ -824,46 +824,46 @@ const SVF = function(_params){
 // State Variable Filter with LFO option
 // Based on improved Hal Chamberlin SVF, see above for references
 // 
-const AutoSVFilter = function(_params){
-	_params = Util.mapDefaults(_params, ['low', '1/1', 200, 3000, 0.45, 'sine', 0.5 ]);
-	// this._type = Util.filtertypeToInt(_params[0]);
+// const AutoSVFilter = function(_params){
+// 	_params = Util.mapDefaults(_params, ['low', '1/1', 200, 3000, 0.45, 'sine', 0.5 ]);
+// 	// this._type = Util.filtertypeToInt(_params[0]);
 
-	this._fx = workletFX('state-variable-filter');
+// 	this._fx = workletFX('state-variable-filter');
 	
-	// generate an LFO to modulate the cutoff-frequency of the filter
-	this._lfo = new Tone.LFO();
-	this._scale = new Tone.ScaleExp();
-	this._lfo.connect(this._scale);
-	this._scale.connect(this._fx.frequency);
+// 	// generate an LFO to modulate the cutoff-frequency of the filter
+// 	this._lfo = new Tone.LFO();
+// 	this._scale = new Tone.ScaleExp();
+// 	this._lfo.connect(this._scale);
+// 	this._scale.connect(this._fx.frequency);
 
-	this.set = (c, time, bpm) => {
-		let tp = Util.filtertypeToInt(Util.filtertypeToName(Util.getParam(_params[0], c)));
-		setParam(this._fx, 'type', tp, time);
+// 	this.set = (c, time, bpm) => {
+// 		let tp = Util.filtertypeToInt(Util.filtertypeToName(Util.getParam(_params[0], c)));
+// 		setParam(this._fx, 'type', tp, time);
 
-		// setParam(this._fx, 'frequency', 300, time);
-		// setParam(this._fx, 'resonance', Util.getParam(_params[4], c), time);
+// 		// setParam(this._fx, 'frequency', 300, time);
+// 		// setParam(this._fx, 'resonance', Util.getParam(_params[4], c), time);
 		
-		let t = Util.divToS(Util.getParam(_params[1], c), bpm);
-		let f = 1 / t;
-		let lo = Util.clip(Util.getParam(_params[2], c), 5, 19000);
-		let hi = Util.clip(Util.getParam(_params[3], c), 5, 19000);
-		let exp = Util.clip(Util.getParam(_params[5], c), 0.01, 100);
+// 		let t = Util.divToS(Util.getParam(_params[1], c), bpm);
+// 		let f = 1 / t;
+// 		let lo = Util.clip(Util.getParam(_params[2], c), 5, 19000);
+// 		let hi = Util.clip(Util.getParam(_params[3], c), 5, 19000);
+// 		let exp = Util.clip(Util.getParam(_params[5], c), 0.01, 100);
 
-		this._scale.min = lo;
-		this._scale.max = hi;
-		this._scale.exponent = exp;
-		this._lfo.frequency.setValueAtTime(f, time);
-	}
+// 		this._scale.min = lo;
+// 		this._scale.max = hi;
+// 		this._scale.exponent = exp;
+// 		this._lfo.frequency.setValueAtTime(f, time);
+// 	}
 
-	this.chain = () => {
-		return { 'send' : this._fx, 'return' : this._fx };
-	}
+// 	this.chain = () => {
+// 		return { 'send' : this._fx, 'return' : this._fx };
+// 	}
 
-	this.delete = () => {
-		this._fx.workletNode.port.postMessage('dispose');
-		disposeNodes([ this._fx ])
-	}
-}
+// 	this.delete = () => {
+// 		this._fx.workletNode.port.postMessage('dispose');
+// 		disposeNodes([ this._fx ])
+// 	}
+// }
 
 // Filter FX
 // A filter FX, choose between highpass, lowpass and bandpass
@@ -1026,37 +1026,52 @@ const Filter = function(_params){
 }
 
 // TriggerFilter FX
-// A automated filter (filter with envelope) that is triggered by the note
+// A automated filter (filter with envelope) that is triggered by the sequencer.
+// Uses the updated Hal Chamberlin State Variable Filter in a worklet processor.
 // Set the filter type (lowpass, highpass, bandpass)
 // Set the attack and release time
 // Set the low and high filter range
 // Set the curve mode
 //
 const TriggerFilter = function(_params){
-	this._fx = new Tone.Filter(1000, 'lowpass', -24);
-	this._adsr = new Tone.Signal(0);
+	this._fx = workletFX('state-variable-filter');
+	this._env = new Tone.Signal(0);
 	this._mul = new Tone.Multiply();
 	this._add = new Tone.Add();
-	this._pow = new Tone.Pow(3);
+	this._pow = new Tone.Pow(2);
 
-	this._adsr.connect(this._pow);
+	this._env.connect(this._pow);
 	this._pow.connect(this._mul);
 	this._mul.connect(this._add);
-	this._add.connect(this._fx.frequency);
+
+	// connect envelope to frequency parameter from workletnode
+	this._freqParam = this._fx.workletNode.parameters.get('frequency');
+	this._add.connect(this._freqParam);
 
 	// replace defaults with provided arguments
 	_params = Util.mapDefaults(_params, ['low', 1, '1/16', 4000, 100, 0.5]);
 
-	this._fx.set({ type: checkFiltertype(_params[0][0]) });
+	// default resonance for the filter
+	setParam(this._fx, 'resonance', 0.3);
+
+	this._type = _params[0];
+	this._att = _params[1];
+	this._rel = _params[2];
+	this._max = _params[3];
+	this._min = _params[4];
+	this._exp = _params[5];
 
 	this.set = function(c, time, bpm){
-		let att = divToS(getParam(_params[1], c), bpm);
-		let rel = divToS(getParam(_params[2], c), bpm);
-		let max = Util.getParam(_params[3], c);
-		let min = Util.getParam(_params[4], c);
+		let tp = filtertypeIndex(checkFiltertype(getParam(this._type, c)));
+		setParam(this._fx, 'type', tp, time);
+
+		let att = divToS(getParam(this._att, c), bpm);
+		let rel = divToS(getParam(this._rel, c), bpm);
+		let max = Util.getParam(this._max, c);
+		let min = Util.getParam(this._min, c);
 		let range = Math.abs(max - min);
 		let lower = Math.min(max, min);
-		let exp = 1 / Util.getParam(_params[5], c);
+		let exp = 1 / Util.getParam(this._exp, c);
 
 		this._mul.setValueAtTime(range, time);
 		this._add.setValueAtTime(lower, time);
@@ -1064,13 +1079,13 @@ const TriggerFilter = function(_params){
 
 		// retrigger fade-out envelope over 2 ms
 		let retrigger = 0;
-		if (this._adsr.getValueAtTime(time) > 0.01){
-			this._adsr.rampTo(0.0, 0.002, time);
+		if (this._env.getValueAtTime(time) > 0.01){
+			this._env.rampTo(0.0, 0.002, time);
 			retrigger = 0.003;
 		}
-		this._adsr.rampTo(1, att, time + retrigger);
-
-		this._adsr.rampTo(0, rel, time + att + retrigger);
+		// trigger attack and release part of the envelope for filter modulation
+		this._env.rampTo(1, att, time + retrigger);
+		this._env.rampTo(0, rel, time + att + retrigger);
 	}
 
 	this.chain = function(){
@@ -1078,7 +1093,7 @@ const TriggerFilter = function(_params){
 	}
 
 	this.delete = function(){
-		let nodes = [ this._fx, this._adsr, this._mul, this._add, this._pow ];
+		let nodes = [ this._fx, this._env, this._mul, this._add, this._pow ];
 		disposeNodes(nodes);
 	}
 }
