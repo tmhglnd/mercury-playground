@@ -818,7 +818,7 @@ const SVF = function(_params){
 	}
 
 	this.delete = function(){
-		this._fx.workletNode.port.postMessage('dispose');
+		this._fx.disposeWorklet();
 		disposeNodes([ this._fx ]);
 	}
 }
@@ -887,7 +887,7 @@ const AutoSVF = function(_params){
 	}
 
 	this.delete = () => {
-		this._fx.workletNode.port.postMessage('dispose');
+		this._fx.disposeWorklet();
 		disposeNodes([ this._fx ])
 	}
 }
@@ -1052,8 +1052,8 @@ const TriggerFilter = function(_params){
 	}
 
 	this.delete = function(){
-		let nodes = [ this._fx, this._env, this._mul, this._add, this._pow ];
-		disposeNodes(nodes);
+		this._fx.disposeWorklet();
+		disposeNodes([ this._fx, this._env, this._mul, this._add, this._pow ]);
 	}
 }
 
@@ -1102,7 +1102,7 @@ const WorkletDelay = function(_params) {
 	}
 
 	this.delete = () => {
-		this._fx.workletNode.port.postMessage('dispose');
+		this._fx.disposeWorklet();
 		disposeNodes([ this._fx ]);
 	}
 }
