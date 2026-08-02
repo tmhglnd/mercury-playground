@@ -218,27 +218,69 @@ function noteToFreq(i, o){
 	return mtof(n);
 }
 
-function assureWave(w){
+// assert the wavetype is valid for an oscillator
+function assertWave(w){
 	let waveMap = {
 		sine : 'sine',
+		sin : 'sine',
+		cosine : 'sine',
+		cos : 'sine',
 		saw : 'sawtooth',
+		sawtooth : 'sawtooth',
 		square : 'square',
+		rect : 'square',
 		triangle : 'triangle',
 		tri : 'triangle',
-		rect : 'square',
 		fm: 'fmsine',
 		am: 'amsine',
 		pwm: 'pwm',
 		organ: 'sine4',
 	}
 	if (waveMap[w]){
-		w = waveMap[w];
-	} else {
-		log(`${w} is not a valid waveshape`);
-		// default wave if wave does not exist
-		w = 'sine';
+		return waveMap[w];
+	} 
+	log(`${w} is not a valid waveshape. Defaulting to: sine`);
+	return 'sine';
+}
+
+// assert the wavetype is valid for an LFO
+function assertLfoWave(w){
+	let waves = {
+		sine : 'sine',
+		// sineUp : 'sine',
+		// sineDown : 'sine',
+		saw : 'sawtooth',
+		sawUp: 'sawtooth',
+		sawDown: 'sawtooth',
+		sawtooth: 'sawtooth',
+		up: 'sawtooth',
+		down: 'sawtooth',
+		square : 'square',
+		rect : 'square',
+		// squareUp : 'square',
+		// squareDown : 'square',
+		triangle : 'triangle',
+		tri : 'triangle',
 	}
-	return w;
+	if (waves[w]){
+		return waves[w];
+	} 
+	log(`${w} is not a valid waveshape. Defaulting to: sine`);
+	return 'sine';
+}
+
+// correct the lfo startime for ToneJS LFO's for correct phase
+function lfoTimeCorrection(wave, time){
+	let mul = 1;
+	switch (wave) {
+		case 'sine' :
+			mul = 0.25; break;
+		case 'triangle' :
+			mul = 0.25; break;
+		case 'sawtooth' :
+			mul = 0.5; break;
+	}
+	return time * mul;
 }
 
 // convert note and octave (int/float/name) to a midi value
@@ -280,7 +322,7 @@ function checkFiltertype(type){
 	if (types[type]){
 		return types[type];
 	}
-	log(`${type} is not a valid filter type. Defaulting to lowpass`);
+	log(`${type} is not a valid filter type. Defaulting to: lowpass`);
 	return 'lowpass';
 }
 
@@ -295,7 +337,7 @@ function filtertypeIndex(type){
 	if (Object.hasOwn(types, type)){
 		return types[type];
 	}
-	log(`${type} is not a valid filter type. Defaulting to lowpass`);
+	log(`${type} is not a valid filter type. Defaulting to: lowpass`);
 	return 0;
 }
 
@@ -309,4 +351,4 @@ function filtertypeIndex(type){
 // 	p.linearRampToValueAtTime(value, start + ramp);
 // }
 
-module.exports = { mapDefaults, atTime, atodb, clip, fixNan, fixNonFinite, lookup, randLookup, isRandom, getParam, toArray, msToS, fractToFloat, formatRatio, divToS, divToF, toMidi, mtof, noteToMidi, noteToFreq, assureWave, remap, setWorkletParam, checkFiltertype, filtertypeIndex }
+module.exports = { mapDefaults, atTime, atodb, clip, fixNan, fixNonFinite, lookup, randLookup, isRandom, getParam, toArray, msToS, fractToFloat, formatRatio, divToS, divToF, toMidi, mtof, noteToMidi, noteToFreq, assertWave, assertLfoWave, remap, setWorkletParam, checkFiltertype, filtertypeIndex, lfoTimeCorrection }

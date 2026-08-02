@@ -47,7 +47,7 @@ class PolySynth extends PolyInstrument {
 
 		// set wave to oscillator
 		let w = Util.getParam(this._wave, c);
-		this.sources[id].set({ type: Util.assureWave(w) });
+		this.sources[id].set({ type: Util.assertWave(w) });
 
 		// set the frequency based on the selected note
 		// note as interval / octave coordinate

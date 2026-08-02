@@ -5,6 +5,7 @@ const { getParam, mapDefaults, toArray, atTime } = require('./Util.js');
 const { clip, divToS, fractToFloat } = require('./Util.js');
 const { fixNan, fixNonFinite } = require('./Util.js');
 const { checkFiltertype, filtertypeIndex } = require('./Util.js');
+const { assertLfoWave } = require('./Util.js');
 
 // all the available effects
 const fxMap = {
@@ -84,8 +85,8 @@ const fxMap = {
 		return new SVF(params);
 	},
 	'autofilter' : (params) => {
-		return new AutoSVFilter(params);
-	},
+		return new AutoSVF(params);
+	},	
 	'filter' : (params) => {
 		return new Filter(params);
 	},
@@ -824,68 +825,76 @@ const SVF = function(_params){
 // State Variable Filter with LFO option
 // Based on improved Hal Chamberlin SVF, see above for references
 // 
-// const AutoSVFilter = function(_params){
-// 	_params = Util.mapDefaults(_params, ['low', '1/1', 200, 3000, 0.45, 'sine', 0.5 ]);
-// 	// this._type = Util.filtertypeToInt(_params[0]);
-
-// 	this._fx = workletFX('state-variable-filter');
+const AutoSVF = function(_params){
+	_params = Util.mapDefaults(_params, ['low', '1/1', 200, 3000, 0.45, 'sine', 0.5 ]);
+	// this._type = Util.filtertypeToInt(_params[0]);
+	this._fx = workletFX('state-variable-filter');
 	
-// 	// generate an LFO to modulate the cutoff-frequency of the filter
-// 	this._lfo = new Tone.LFO();
-// 	this._scale = new Tone.ScaleExp();
-// 	this._lfo.connect(this._scale);
-// 	this._scale.connect(this._fx.frequency);
+	// generate an LFO to modulate the cutoff-frequency of the filter
+	this._lfo = new Tone.LFO();
+	this._scale = new Tone.ScaleExp();
+	this._lfo.connect(this._scale);
+	
+	// connect the LFO to the frequency param of the worklet processor
+	this._freqParam = this._fx.workletNode.parameters.get('frequency');
+	this._scale.connect(this._freqParam);
 
-// 	this.set = (c, time, bpm) => {
-// 		let tp = Util.filtertypeToInt(Util.filtertypeToName(Util.getParam(_params[0], c)));
-// 		setParam(this._fx, 'type', tp, time);
+	this.set = (c, time, bpm) => {
+		let tp = filtertypeIndex(checkFiltertype(getParam(_params[0], c)));
+		setParam(this._fx, 'type', tp, time);
 
-// 		// setParam(this._fx, 'frequency', 300, time);
-// 		// setParam(this._fx, 'resonance', Util.getParam(_params[4], c), time);
+		let t = divToS(getParam(_params[1], c), bpm);
+		let f = 1 / t;
+		this._lfo.frequency.setValueAtTime(f, time);
+
+		let lo = clip(getParam(_params[2], c), 5, 18000);
+		atTime(() => { this._scale.min = lo }, time);
+
+		let hi = clip(getParam(_params[3], c), 5, 18000);
+		atTime(() => { this._scale.max = hi }, time);
+
+		let exp = clip(getParam(_params[6], c), 0.01, 100);
+		atTime(() => { this._scale.exponent = exp }, time);
 		
-// 		let t = Util.divToS(Util.getParam(_params[1], c), bpm);
-// 		let f = 1 / t;
-// 		let lo = Util.clip(Util.getParam(_params[2], c), 5, 19000);
-// 		let hi = Util.clip(Util.getParam(_params[3], c), 5, 19000);
-// 		let exp = Util.clip(Util.getParam(_params[5], c), 0.01, 100);
+		let res = clip(getParam(_params[4], c));
+		setParam(this._fx, 'resonance', res, time);
 
-// 		this._scale.min = lo;
-// 		this._scale.max = hi;
-// 		this._scale.exponent = exp;
-// 		this._lfo.frequency.setValueAtTime(f, time);
-// 	}
+		if (this._lfo.state !== 'started'){
+			this._lfo.start(time);
+		}
+	}
 
-// 	this.chain = () => {
-// 		return { 'send' : this._fx, 'return' : this._fx };
-// 	}
+	this.chain = () => {
+		return { 'send' : this._fx, 'return' : this._fx };
+	}
 
-// 	this.delete = () => {
-// 		this._fx.workletNode.port.postMessage('dispose');
-// 		disposeNodes([ this._fx ])
-// 	}
-// }
+	this.delete = () => {
+		this._fx.workletNode.port.postMessage('dispose');
+		disposeNodes([ this._fx ])
+	}
+}
 
 // Filter FX
 // A filter FX, choose between highpass, lowpass and bandpass
 // Set the cutoff frequency and Q factor
-// Optionally with extra arguments you can apply a modulation
+// Optionally with extra arguments you can apply a modulation LFO
 //
 const Filter = function(_params){
 	// parameter mapping changes based on amount of arguments
 	this._static = true;
 	if (_params.length < 4){
 		if (typeof _params[0] === 'string'){
-			_params = Util.mapDefaults(_params, ['low', 1200, 0.45]);
+			_params = mapDefaults(_params, ['low', 1200, 0.45]);
 		} else {
-			_params = [['low']].concat(Util.mapDefaults(_params, [1200, 0.45]));
+			_params = [['low']].concat(mapDefaults(_params, [1200, 0.45]));
 		}
 	}
 	else {
-		_params = Util.mapDefaults(_params, ['low', '1/1', 200, 3000, 0.45, 'sine', 0.5]);
+		_params = mapDefaults(_params, ['low', '1/1', 200, 3000, 0.45, 'sine', 0.5]);
 		this._static = false;
 	}
 
-	this._fx = new Tone.Filter();
+	this._fx = new Tone.Filter({ rolloff: -24 });
 
 	// the following is only used if the parameters for modulation
 	// are added as arguments to the fx(filter) function
@@ -894,121 +903,60 @@ const Filter = function(_params){
 		this._scale = new Tone.ScaleExp();
 		this._lfo.connect(this._scale);
 		this._scale.connect(this._fx.frequency);
+		this._lfo.max = 1;
 	}
-
 	// available filter types for the filter
-	this._types = {
-		'lp' : 'lowpass',
-		'lo' : 'lowpass',
-		'low' : 'lowpass',
-		'lowpass' : 'lowpass',
-		'hp' : 'highpass',
-		'hi' : 'highpass',
-		'high' : 'highpass',
-		'highpass' : 'highpass',
-		'bp' : 'bandpass',
-		'band' : 'bandpass',
-		'bandpass': 'bandpass',
-	}
-	if (this._types[_params[0]]){
-		this._fx.set({ type: this._types[_params[0]] });
-	} else {
-		console.log(`'${_params[0]}' is not a valid filter type. Defaults to lowpass`);
-		this._fx.set({ type: 'lowpass' });
-	}
-	this._fx.set({ rolloff: -24 });
-
-	// available waveforms for the LFO
-	this._waveMap = {
-		sine : 'sine',
-		// sineUp : 'sine',
-		// sineDown : 'sine',
-		saw : 'sawtooth',
-		sawUp: 'sawtooth',
-		sawDown: 'sawtooth',
-		up: 'sawtooth',
-		down: 'sawtooth',
-		// square : 'square',
-		// squareUp : 'square',
-		// squareDown : 'square',
-		// rect : 'square',
-		triangle : 'triangle',
-		tri : 'triangle',
-	}
+	this._fx.set({ type: checkFiltertype(_params[0]) });
 
 	this.set = function(c, time, bpm){
 		let _q;
 		// if the filter is static use the settings of frequency and resonance 
 		if (this._static){
-			let f = Util.getParam(_params[1], c);
 			_q = _params[2];
-
+			
+			let f = getParam(_params[1], c);
 			this._fx.frequency.setValueAtTime(f, time);
-			// let rt = Util.divToS(Util.getParam(this._rt, c), bpm);
 		} else {
 			_q = _params[4];
-			let t = Util.divToS(Util.getParam(_params[1], c), bpm);
+
+			let t = divToS(getParam(_params[1], c), bpm);
 			let f = 1 / t;
-			let lo = Util.clip(Util.getParam(_params[2], c), 5, 19000);
-			let hi = Util.clip(Util.getParam(_params[3], c), 5, 19000);
-
-			let w = Util.getParam(_params[5], c);
-			if (this._waveMap[w]){
-				w = this._waveMap[w];
-			} else {
-				if (isNaN(w)){
-					log(`${w} is not a valid waveshape. Defaults to sine`);
-					// default wave if wave does not exist
-					w = 'sine';
-				} else {
-					// w = value between 0 and 1, map to up, down, triangle 
-					// 0=down, 0.5=triangle, 1=up
-					switch(Math.floor(Util.clip(w, 0, 1)*2.99)){
-						case 0: 
-							// regular saw up
-							w = 'sawtooth'; break;
-						case 1:
-							w = 'sine'; break;
-						case 2:
-							w = 'sawtooth';
-							// swap hi/lo range for saw down effect
-							let tmp = lo; lo = hi; hi = tmp; break;
-					}
-				}
-			}
-			this._lfo.set({ type: w });
-
-			let exp = Util.clip(Util.getParam(_params[6], c), 0.01, 100);
-
-			this._scale.min = lo;
-			this._scale.max = hi;
-			this._scale.exponent = exp;
 			this._lfo.frequency.setValueAtTime(f, time);
 
-			this._lfo.max = 1;
+			let lo = clip(getParam(_params[2], c), 5, 19000);
+			atTime(() => { this._scale.min = lo }, time);
 
-			if (this._lfo.state !== 'started'){
-				switch (w) {
-					case 'sine' :
-						time += t * 0.25; break;
-					case 'triangle' :
-						time += t * 0.25; break;
-					case 'sawtooth' :
-						time += t * 0.5; break;
-				}	
+			let hi = clip(getParam(_params[3], c), 5, 19000);
+			atTime(() => { this._scale.max = hi }, time);
+
+			let w = getParam(_params[5], c);
+			if (!isNaN(w)){
+				switch(Math.floor(clip(w, 0, 1)*2.99)){
+					case 0: 
+						// regular saw up
+						w = 'sawtooth'; break;
+					case 1:
+						w = 'sine'; break;
+						case 2:
+						// swap hi/lo range for saw down effect
+						w = 'sawtooth';
+						let tmp = lo; lo = hi; hi = tmp; break;
+				}
+			}
+			w = assertLfoWave(w);
+			atTime(() => { this._lfo.set({ type: w }) }, time);
+			
+			let exp = clip(getParam(_params[6], c), 0.01, 100);
+			atTime(() => { this._scale.exponent = exp }, time);
+
+			if (this._lfo.state !== 'started'){	
+				time += Util.lfoTimeCorrection(w, t);
 				this._lfo.start(time);
 			}
 		}
-
-		let r = 1 / (1 - Math.min(0.95, Math.max(0, Util.getParam(_q, c))));
+		
+		let r = 1 / (1 - Math.min(0.95, Math.max(0, getParam(_q, c))));
 		this._fx.Q.setValueAtTime(r, time);
-
-		// ramptime removed now that modulation is possible
-		// if (rt > 0){
-		// 	this._fx.frequency.rampTo(f, rt, time);
-		// } else {
-		// 	this._fx.frequency.setValueAtTime(f, time);
-		// }
 	}
 
 	this.chain = function(){
@@ -1017,11 +965,7 @@ const Filter = function(_params){
 
 	this.delete = function(){
 		let nodes = [ this._fx, this._lfo, this._scale ];
-
-		nodes.forEach((n) => {
-			n?.disconnect();
-			n?.dispose();
-		});
+		disposeNodes(nodes);
 	}
 }
 
