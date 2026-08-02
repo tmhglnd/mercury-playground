@@ -1034,81 +1034,43 @@ const Filter = function(_params){
 //
 const TriggerFilter = function(_params){
 	this._fx = new Tone.Filter(1000, 'lowpass', -24);
-	// this._adsr = new Tone.Envelope({
-	// 	attackCurve: "linear",
-	// 	decayCurve: "linear",
-	// 	sustain: 0,
-	// 	release: 0.001
-	// });
 	this._adsr = new Tone.Signal(0);
 	this._mul = new Tone.Multiply();
 	this._add = new Tone.Add();
 	this._pow = new Tone.Pow(3);
-	// this._scale = new Tone.ScaleExp(0, 1, 1);
 
-	// this._adsr.connect(this._scale);
 	this._adsr.connect(this._pow);
 	this._pow.connect(this._mul);
 	this._mul.connect(this._add);
 	this._add.connect(this._fx.frequency);
-	// this._scale.connect(this._fx.frequency);
 
 	// replace defaults with provided arguments
-	_params = Util.mapDefaults(_params, ['low', 1, '1/16', 4000, 100, 1]);
+	_params = Util.mapDefaults(_params, ['low', 1, '1/16', 4000, 100, 0.5]);
 
 	this._fx.set({ type: checkFiltertype(_params[0][0]) });
 
-	this._att = _params[1];
-	this._rel = _params[2];
-	this._high = _params[3];
-	this._low = _params[4];
-	this._exp = _params[5];
-
-	// this._mtr = new Tone.Meter();
-	// this._mtr.normalRange = true;
-	// this._mtr.smoothing = 0;	
-	// this._gn.connect(this._mtr);
-	// setInterval(() => { console.log(this._adsr.getValueAtTime(Tone.now())) }, 100); 
-
 	this.set = function(c, time, bpm){
-		// this._adsr.attack = Util.divToS(Util.getParam(this._att, c), bpm);
-		// this._adsr.decay = Util.divToS(Util.getParam(this._rel, c), bpm);
-
-		let min = Util.getParam(this._low, c);
-		let max = Util.getParam(this._high, c);
+		let att = divToS(getParam(_params[1], c), bpm);
+		let rel = divToS(getParam(_params[2], c), bpm);
+		let max = Util.getParam(_params[3], c);
+		let min = Util.getParam(_params[4], c);
 		let range = Math.abs(max - min);
 		let lower = Math.min(max, min);
-		let exp = 1 / Util.getParam(this._exp, c);
+		let exp = 1 / Util.getParam(_params[5], c);
 
 		this._mul.setValueAtTime(range, time);
 		this._add.setValueAtTime(lower, time);
 		atTime(() => { this._pow.value = exp }, time);
 
-		// atTime(() => { this._scale.min = min }, time);
-		// atTime(() => { this._scale.max = max }, time);
-		// atTime(() => { this._scale.exponent = exp }, time);
-
-		// fade-out running envelope over 5 ms
-		// if (this._adsr.value > 0){
-		// 	this._adsr.triggerRelease(time);
-		// 	time += this._adsr.release;
-		// }
+		// retrigger fade-out envelope over 2 ms
 		let retrigger = 0;
 		if (this._adsr.getValueAtTime(time) > 0.01){
-			retrigger = 0.005;
-			this._adsr.rampTo(0.0, retrigger, time);
+			this._adsr.rampTo(0.0, 0.002, time);
+			retrigger = 0.003;
 		}
-		// this._adsr.triggerAttack(time, 1);
-		let att = divToS(getParam(this._att, c), bpm);
-		// this._adsr.value.linearRampTo(1000.0, att, time + retrigger);
 		this._adsr.rampTo(1, att, time + retrigger);
 
-		let rel = divToS(getParam(this._rel, c), bpm);
-		// this._adsr.value.linearRampTo(50.0, rel, time + att + retrigger);
 		this._adsr.rampTo(0, rel, time + att + retrigger);
-
-		// console.log('gain', this._gn.gain.getValueAtTime(time));
-		// console.log('filter adsr', att, rel, time, retrigger);
 	}
 
 	this.chain = function(){
