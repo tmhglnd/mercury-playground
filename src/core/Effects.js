@@ -5,7 +5,7 @@ const { getParam, mapDefaults, toArray, atTime } = require('./Util.js');
 const { clip, divToS, fractToFloat } = require('./Util.js');
 const { fixNan, fixNonFinite } = require('./Util.js');
 const { checkFiltertype, filtertypeIndex } = require('./Util.js');
-const { assertLfoWave } = require('./Util.js');
+const { assertLfoWave, lfoTimeCorrection } = require('./Util.js');
 
 // all the available effects
 const fxMap = {
@@ -826,18 +826,16 @@ const SVF = function(_params){
 // Based on improved Hal Chamberlin SVF, see above for references
 // 
 const AutoSVF = function(_params){
-	_params = Util.mapDefaults(_params, ['low', '1/1', 200, 3000, 0.45, 'sine', 0.5 ]);
-	// this._type = Util.filtertypeToInt(_params[0]);
+	_params = mapDefaults(_params, [ 'low', '1/1', 200, 3000, 0.45, 'sine', 0.5 ]);
 	this._fx = workletFX('state-variable-filter');
 	
 	// generate an LFO to modulate the cutoff-frequency of the filter
 	this._lfo = new Tone.LFO();
 	this._scale = new Tone.ScaleExp();
-	this._lfo.connect(this._scale);
 	
 	// connect the LFO to the frequency param of the worklet processor
 	this._freqParam = this._fx.workletNode.parameters.get('frequency');
-	this._scale.connect(this._freqParam);
+	this._lfo.chain(this._scale, this._freqParam);
 
 	this.set = (c, time, bpm) => {
 		let tp = filtertypeIndex(checkFiltertype(getParam(_params[0], c)));
@@ -848,18 +846,37 @@ const AutoSVF = function(_params){
 		this._lfo.frequency.setValueAtTime(f, time);
 
 		let lo = clip(getParam(_params[2], c), 5, 18000);
-		atTime(() => { this._scale.min = lo }, time);
-
 		let hi = clip(getParam(_params[3], c), 5, 18000);
-		atTime(() => { this._scale.max = hi }, time);
+		let exp = clip(getParam(_params[6], c), 0.001, 100);
+		let res = clip(getParam(_params[4], c), 0.001, 0.95);
+		
+		let w = getParam(_params[5], c);
+		if (!isNaN(w)){
+			switch(Math.floor(clip(w, 0, 1)*2.99)){
+				case 0: 
+					// regular saw up
+					w = 'sawtooth'; break;
+				case 1:
+					w = 'sine'; break;
+				case 2:
+					// swap hi/lo range for saw down effect, invert exponent
+					w = 'sawtooth';
+					let tmp = lo; lo = hi; hi = tmp; 
+					exp = 1 / exp;
+					break;
+			}
+		}
+		w = assertLfoWave(w);
+		atTime(() => { this._lfo.set({ type: w }) }, time);
 
-		let exp = clip(getParam(_params[6], c), 0.01, 100);
+		atTime(() => { this._scale.min = lo }, time);
+		atTime(() => { this._scale.max = hi }, time);
 		atTime(() => { this._scale.exponent = exp }, time);
 		
-		let res = clip(getParam(_params[4], c));
 		setParam(this._fx, 'resonance', res, time);
 
 		if (this._lfo.state !== 'started'){
+			time += lfoTimeCorrection(w, t);
 			this._lfo.start(time);
 		}
 	}
@@ -901,9 +918,7 @@ const Filter = function(_params){
 	if (!this._static){
 		this._lfo = new Tone.LFO();
 		this._scale = new Tone.ScaleExp();
-		this._lfo.connect(this._scale);
-		this._scale.connect(this._fx.frequency);
-		this._lfo.max = 1;
+		this._lfo.chain(this._scale, this._fx.frequency);
 	}
 	// available filter types for the filter
 	this._fx.set({ type: checkFiltertype(_params[0]) });
@@ -918,16 +933,14 @@ const Filter = function(_params){
 			this._fx.frequency.setValueAtTime(f, time);
 		} else {
 			_q = _params[4];
-
+			
 			let t = divToS(getParam(_params[1], c), bpm);
 			let f = 1 / t;
 			this._lfo.frequency.setValueAtTime(f, time);
-
+			
 			let lo = clip(getParam(_params[2], c), 5, 19000);
-			atTime(() => { this._scale.min = lo }, time);
-
 			let hi = clip(getParam(_params[3], c), 5, 19000);
-			atTime(() => { this._scale.max = hi }, time);
+			let exp = clip(getParam(_params[6], c), 0.001, 100);
 
 			let w = getParam(_params[5], c);
 			if (!isNaN(w)){
@@ -937,24 +950,27 @@ const Filter = function(_params){
 						w = 'sawtooth'; break;
 					case 1:
 						w = 'sine'; break;
-						case 2:
-						// swap hi/lo range for saw down effect
+					case 2:
+						// swap hi/lo range for saw down effect, invert exponent
 						w = 'sawtooth';
-						let tmp = lo; lo = hi; hi = tmp; break;
+						let tmp = lo; lo = hi; hi = tmp; 
+						exp = 1 / exp;
+						break;
 				}
 			}
 			w = assertLfoWave(w);
 			atTime(() => { this._lfo.set({ type: w }) }, time);
-			
-			let exp = clip(getParam(_params[6], c), 0.01, 100);
+
+			atTime(() => { this._scale.min = lo }, time);
+			atTime(() => { this._scale.max = hi }, time);
 			atTime(() => { this._scale.exponent = exp }, time);
 
 			if (this._lfo.state !== 'started'){	
-				time += Util.lfoTimeCorrection(w, t);
+				time += lfoTimeCorrection(w, t);
 				this._lfo.start(time);
 			}
 		}
-		
+
 		let r = 1 / (1 - Math.min(0.95, Math.max(0, getParam(_q, c))));
 		this._fx.Q.setValueAtTime(r, time);
 	}
