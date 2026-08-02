@@ -81,13 +81,14 @@ const fxMap = {
 	// 'tune' : (params) => {
 	// 	return new PitchShift(params);
 	// },
-	'svf' : (params) => {
-		return new SVF(params);
-	},
-	'autofilter' : (params) => {
-		return new AutoSVF(params);
-	},	
 	'filter' : (params) => {
+		if (params.length < 4){
+			return new SVF(params);
+		} else {
+			return new AutoSVF(params);
+		}
+	},
+	'oldfilter' : (params) => {
 		return new Filter(params);
 	},
 	'triggerFilter' : (params) => {
@@ -96,12 +97,12 @@ const fxMap = {
 	'envFilter' : (params) => {
 		return new TriggerFilter(params);
 	},
-	/*'autoFilter' : (params) => {
-		return new AutoFilter(params);
+	'autofilter' : (params) => {
+		return new AutoSVF(params);
 	},
 	'wobble' : (params) => {
-		return fxMap.autoFilter(params);
-	},*/
+		return new AutoSVF(params);
+	},
 	'delay' : (params) => {
 		return new WorkletDelay(params);
 	},
@@ -822,8 +823,8 @@ const SVF = function(_params){
 	}
 }
 
-// State Variable Filter with LFO option
-// Based on improved Hal Chamberlin SVF, see above for references
+// State Variable Filter with LFO modulation option
+// Based on improved Hal Chamberlin SVF, see SVF above for more references
 // 
 const AutoSVF = function(_params){
 	_params = mapDefaults(_params, [ 'low', '1/1', 200, 3000, 0.45, 'sine', 0.5 ]);
@@ -988,10 +989,8 @@ const Filter = function(_params){
 // TriggerFilter FX
 // A automated filter (filter with envelope) that is triggered by the sequencer.
 // Uses the updated Hal Chamberlin State Variable Filter in a worklet processor.
-// Set the filter type (lowpass, highpass, bandpass)
-// Set the attack and release time
-// Set the low and high filter range
-// Set the curve mode
+// Set the filter type (lowpass, highpass, bandpass). Set the attack and 
+// release time. Set the low and high filter range. Set the curve mode
 //
 const TriggerFilter = function(_params){
 	this._fx = workletFX('state-variable-filter');
@@ -1058,25 +1057,6 @@ const TriggerFilter = function(_params){
 	}
 }
 
-/*const AutoFilter = function(_params){
-	console.log('FX => AutoFilter()', _params);
-
-	this._fx = new Tone.AutoFilter('8n', 100, 4000);
-
-	this.set = function(c, time, bpm){
-
-	}
-
-	this.chain = function(){
-		return { 'send' : this._fx, 'return' : this._fx }
-	}
-
-	this.delete = function(){
-		this._fx.disconnect();
-		this._fx.dispose();
-	}
-}*/
-
 // Delay FX
 // A new ping-pong delay implementation using a custom AudioWorkletProcessor. 
 // The custom processor allows for shorter delaytimes, and less overhead since 
@@ -1106,7 +1086,6 @@ const WorkletDelay = function(_params) {
 		const dL = clip(divToS(getParam(_params[0], c), bpm) * 1000, 0, this._maxTime);
 		const dR = clip(divToS(getParam(_params[1], c), bpm) * 1000, 0, this._maxTime);
 		const fb = clip(fractToFloat(getParam(_params[2], c), 0, 2));
-		console.log(fb);
 		const dm = clip(getParam(_params[3], c), 0.01, 0.99);
 		const dw = clip(getParam(_params[4], c));
 
