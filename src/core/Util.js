@@ -12,8 +12,8 @@ function mapDefaults(params, defaults){
 	return defaults.map(p => toArray(p));
 }
 
-// Function that is evaluated at a specific time from Tone Transpor
-// More precise than Tone.Transport.ScheduleOnce()
+// Function that is evaluated at a specific time from Tone Transport
+// Seems to be more precise than Tone.Transport.ScheduleOnce()
 // Workaround for Tone objects that don't have setValueAtTime
 function atTime(callback, time){
 	setTimeout(callback, (time - Tone.context.currentTime) * 1000);
@@ -36,8 +36,13 @@ function remap(val=0, inLo=0, inHi=1, outLo=0, outHi=1, exp=1){
 }
 
 // make sure the output is a number, else output a default value
-function assureNum(v, d=1){
+function fixNan(v, d=1){
 	return isNaN(v) ? d : v;
+}
+
+// fix non-finite numbers, else output a default value
+function fixNonFinite(v, d=0){
+	return isFinite(parseFloat(v)) ? v : d;
 }
 
 // lookup a value from array with wrap index
@@ -151,6 +156,18 @@ function msToS(ms){
 	return ms / 1000.0;
 }
 
+// convert a fraction string to a floating point value
+// or pass through
+function fractToFloat(f){
+	if (typeof f !== 'string') return f;
+	// check if string has format fraction and evaluate
+	if (String(f).match(/\d+\/\d+/)){
+		return eval(String(f));
+	}
+	// otherwise return input
+	return f;
+}
+
 // parse division formats to Tone Loop intervals in seconds
 function formatRatio(d, bpm){
 	if (String(d).match(/\d+\/\d+/)){
@@ -172,7 +189,7 @@ function divToS(d, bpm){
 		return Number(d) / 1000;
 	} else {
 		console.log(`${d} is not a valid time value`);
-		return 0.1;
+		return 0.25;
 	}
 }
 
@@ -201,27 +218,69 @@ function noteToFreq(i, o){
 	return mtof(n);
 }
 
-function assureWave(w){
+// assert the wavetype is valid for an oscillator
+function assertWave(w){
 	let waveMap = {
 		sine : 'sine',
+		sin : 'sine',
+		cosine : 'sine',
+		cos : 'sine',
 		saw : 'sawtooth',
+		sawtooth : 'sawtooth',
 		square : 'square',
+		rect : 'square',
 		triangle : 'triangle',
 		tri : 'triangle',
-		rect : 'square',
 		fm: 'fmsine',
 		am: 'amsine',
 		pwm: 'pwm',
 		organ: 'sine4',
 	}
 	if (waveMap[w]){
-		w = waveMap[w];
-	} else {
-		log(`${w} is not a valid waveshape`);
-		// default wave if wave does not exist
-		w = 'sine';
+		return waveMap[w];
+	} 
+	log(`${w} is not a valid waveshape. Defaulting to: sine`);
+	return 'sine';
+}
+
+// assert the wavetype is valid for an LFO
+function assertLfoWave(w){
+	let waves = {
+		sine : 'sine',
+		// sineUp : 'sine',
+		// sineDown : 'sine',
+		saw : 'sawtooth',
+		sawUp: 'sawtooth',
+		sawDown: 'sawtooth',
+		sawtooth: 'sawtooth',
+		up: 'sawtooth',
+		down: 'sawtooth',
+		square : 'square',
+		rect : 'square',
+		// squareUp : 'square',
+		// squareDown : 'square',
+		triangle : 'triangle',
+		tri : 'triangle',
 	}
-	return w;
+	if (waves[w]){
+		return waves[w];
+	} 
+	log(`${w} is not a valid waveshape. Defaulting to: sine`);
+	return 'sine';
+}
+
+// correct the lfo startime for ToneJS LFO's for correct phase
+function lfoTimeCorrection(wave, time){
+	let mul = 1;
+	switch (wave) {
+		case 'sine' :
+			mul = 0.25; break;
+		case 'triangle' :
+			mul = 0.25; break;
+		case 'sawtooth' :
+			mul = 0.5; break;
+	}
+	return time * mul;
 }
 
 // convert note and octave (int/float/name) to a midi value
@@ -242,8 +301,44 @@ function toMidi(n=0, o=0){
 // Set a parameter in an worklet processor
 function setWorkletParam(node, param, value, time) {
 	const p = node.workletNode.parameters.get(param);
-	const v = assureNum(value);
+	const v = fixNan(value);
 	p.setValueAtTime(v, time ?? Tone.now());
+}
+
+function checkFiltertype(type){
+	let types = {
+		'lp' : 'lowpass',
+		'lo' : 'lowpass',
+		'low' : 'lowpass',
+		'lowpass' : 'lowpass',
+		'hp' : 'highpass',
+		'hi' : 'highpass',
+		'high' : 'highpass',
+		'highpass' : 'highpass',
+		'bp' : 'bandpass',
+		'band' : 'bandpass',
+		'bandpass': 'bandpass',
+	}
+	if (types[type]){
+		return types[type];
+	}
+	log(`${type} is not a valid filter type. Defaulting to: lowpass`);
+	return 'lowpass';
+}
+
+// Get an integer based on the name of a filtertype
+// or just return the integer
+function filtertypeIndex(type){
+	let types = {
+		'lowpass' : 0,
+		'highpass' : 1,
+		'bandpass' : 2
+	}
+	if (Object.hasOwn(types, type)){
+		return types[type];
+	}
+	log(`${type} is not a valid filter type. Defaulting to: lowpass`);
+	return 0;
 }
 
 // function rampWorkletParam(node, param, value, ramp, start) {
@@ -256,4 +351,4 @@ function setWorkletParam(node, param, value, time) {
 // 	p.linearRampToValueAtTime(value, start + ramp);
 // }
 
-module.exports = { mapDefaults, atTime, atodb, clip, assureNum, lookup, randLookup, isRandom, getParam, toArray, msToS, formatRatio, divToS, divToF, toMidi, mtof, noteToMidi, noteToFreq, assureWave, remap, setWorkletParam }
+module.exports = { mapDefaults, atTime, atodb, clip, fixNan, fixNonFinite, lookup, randLookup, isRandom, getParam, toArray, msToS, fractToFloat, formatRatio, divToS, divToF, toMidi, mtof, noteToMidi, noteToFreq, assertWave, assertLfoWave, remap, setWorkletParam, checkFiltertype, filtertypeIndex, lfoTimeCorrection }

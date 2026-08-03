@@ -4,9 +4,11 @@ const MAX_DEF = +340282346638528859811704183484516925440;
 const MIN_DEF = -340282346638528859811704183484516925440;
 
 // Some helper functions
+const PI = Math.PI;
 const TWOPI = Math.PI * 2.0;
 const SR = sampleRate;
 const INV_SR = 1 / sampleRate;
+const BLOCKSIZE = 128;
 
 // Wrap the phase between 0 and 1
 function phaseWrap(phase){
@@ -18,9 +20,22 @@ function phaseWrap(phase){
 	return phase;
 }
 
+// Some helper functions
 // Mix two signals with linear interpolation
-function mix(a=0, b=0, x=0.5){
-	return a + ((b - a) * x);
+const mix = (a=0, b=0, x=0.5) => a + ((b - a) * x);
+// function to retrieve a parameter value from array if any exists
+const pv = (param, i) => param[i] ?? param[0];
+// get the sign of the signal -1/1
+const sign = (sig) => sig < 0 ? -1 : 1;
+// truncate the signal (removing fractional component)
+const trunc = (sig) => sig | 0;
+// return the fractional component of a signal
+const fract = (sig) => sig - trunc(sig);
+// fix Not a Number
+const fixnan = (sig) => isNaN(sig) ? 0 : sig;
+// Mix two signals with equal power gain
+const equalPowerMix = (a=0, b=0, x=0.5) => {
+	return a * Math.cos(x * 0.5 * PI) + b * Math.cos((x * 0.5 - 0.5) * PI);
 }
 
 // Format descriptors and return to output
@@ -38,8 +53,8 @@ function formatDescriptors(descriptors=[]){
 // for all the other processors to be used.
 // 
 class ExtendedWorkletProcessor extends AudioWorkletProcessor {
-	constructor(){
-		super();
+	constructor(options){
+		super(options);
 		// is the processor running? use as return in process()
 		this.running = true;
 		this.port.onmessage = (e) => {
@@ -50,12 +65,11 @@ class ExtendedWorkletProcessor extends AudioWorkletProcessor {
 			}
 		}
 	}
-	// Template for parent class processing, 
-	// overwrite this in the parent class
+	// Template for parent class processing, overwrite this in the parent class
 	// process(inputs, outputs, parameters){
 	// 	const input = inputs[0];
 	// 	const output = outputs[0];
-
+	
 	// 	if (input.length > 0){
 	// 		// for every channel
 	// 		for (let channel = 0; channel < input.length; channel++){
@@ -67,6 +81,73 @@ class ExtendedWorkletProcessor extends AudioWorkletProcessor {
 	// 	}
 	// 	return this.running;
 	// }
+}
+
+// The DelayWorkletProcessor is a baseclass that includes various functions for
+// generating a delayline within an audioworklet.
+// 
+class DelayWorkletProcessor extends ExtendedWorkletProcessor {
+	constructor(options){
+		super(options);
+	}
+	// initialize a delayline with maximum size in milliseconds
+	// makeDelay code based on Dattorro Reverberator delays
+	// Thanks to khoin: https://github.com/khoin
+	makeDelay(length) {
+		let size = Math.round(length * 0.001 * sampleRate);
+		let nextPow2 = 2 ** Math.ceil(Math.log2((size)));
+		return [
+			// [0] delay array, [1] write-head, [2] read-head, [3] delaysize
+			new Float32Array(nextPow2), nextPow2-1, 0 | 0, nextPow2 - 1
+		];
+	}
+	// write to specific delayline at delaysize
+	writeDelay(i, data) {
+		return this.delays[i][0][this.delays[i][1]] = data;
+	}
+	// read from delayline at specified time in milliseconds
+	readDelayAt(i, ms) {
+		let s = Math.round(ms * 0.001 * sampleRate);
+		return this.delays[i][0][(this.delays[i][2] - s) & this.delays[i][3]];
+	}
+	// read from a delayline with linear interpolation in delaytimes
+	lerpDelayAt(i, ms){
+		let dt = ms * 0.001 * sampleRate;
+		let p = trunc(dt);
+		let x = fract(dt);
+
+		let d0 = this.delays[i][0][(this.delays[i][2] - p & this.delays[i][3])];
+		let d1 = this.delays[i][0][(this.delays[i][2]-(p+1) & this.delays[i][3])];
+		return mix(d0, d1, x);
+	}
+	// read from delayline with cubic interpolation at specified time in ms
+	// Cubic interpolation from: O. Niemitalo:
+	// https://www.musicdsp.org/en/latest/Other/49-cubic-interpollation.html
+	readDelayCAt(i, ms) {
+		let s = ms * 0.001 * sampleRate;
+
+		let d = this.delays[i],
+			frac = s - ~~s,
+			int = ~~s + d[2] - 1,
+			mask = d[3];
+
+		let x0 = d[0][int++ & mask],
+			x1 = d[0][int++ & mask],
+			x2 = d[0][int++ & mask],
+			x3 = d[0][int & mask];
+
+		let a = (3 * (x1 - x2) - x0 + x3) / 2,
+			b = 2 * x2 + x0 - (5 * x1 + x3) / 2,
+			c = (x2 - x0) / 2;
+
+		return (((a * frac) + b) * frac + c) * frac + x1;
+	}
+	// move the read and writeheads of the delayline
+	updateReadWriteHeads(i){
+		// increment read and write heads in delay and wrap at delaysize
+		this.delays[i][1] = (this.delays[i][1] + 1) & this.delays[i][3];
+		this.delays[i][2] = (this.delays[i][2] + 1) & this.delays[i][3];
+	}
 }
 
 // Various noise type processors for the MonoNoise source
@@ -272,8 +353,8 @@ class DownSampleProcessor extends ExtendedWorkletProcessor {
 		if (input.length > 0){
 			// for the length of the sample array (generally 128)
 			for (let i=0; i<input[0].length; i++){
-				const d = (parameters.down.length > 1) ? parameters.down[i] : parameters.down[0];
-				const dw = (parameters.drywet.length > 1) ? parameters.drywet[i] : parameters.drywet[0];
+				const d = parameters.down[i] ?? parameters.down[0];
+				const dw = parameters.drywet[i] ?? parameters.drywet[0];
 				
 				// for every channel
 				for (let channel=0; channel<input.length; ++channel){
@@ -431,6 +512,56 @@ class SquashProcessor extends ExtendedWorkletProcessor {
 }
 registerProcessor('squash-processor', SquashProcessor);
 
+// Waveloss FX
+// The waveloss effect gradually drops sound (reduces it to 0) between detected
+// zero-crossings in the signal. This is based on a probability. The amount
+// increases the probability that the signal will be dropped.
+// Inspired by Supercollider waveloss function. 
+// The technique was described by Trevor Wishart in a lecture.
+// 
+class WavelossProcessor extends ExtendedWorkletProcessor {
+	static get parameterDescriptors(){
+		return formatDescriptors([
+			['amount', 0.5, 0, 1, 'k-rate'],
+			['drywet', 1, 0, 1, 'k-rate']
+		])
+	}
+
+	constructor(){
+		super();
+
+		this.prev = [];
+		this.prob = [];
+	}
+
+	process(inputs, outputs, parameters){
+		const input = inputs[0];
+		const output = outputs[0];
+		const amt = parameters.amount[0];
+
+		if (input.length > 0){
+			for (let c = 0; c < input.length; c++){
+				this.prob[c] = this.prob[c] ?? 0;
+				
+				for (let i = 0; i < input[c].length; i++){
+					// take the sign and find the zero-crossing
+					const sign = (input[c][i] > 0) ? 1 : -1;
+					const change = sign != (this.prev[c] ?? 0);
+					this.prev[c] = sign;
+
+					// when zerocrossing, sample from noise for probability
+					if (change){ this.prob[c] = Math.random(); }
+
+					// waveloss when probabilty is higher than amount
+					output[c][i] = (this.prob[c] > amt) ? input[c][i] : 0;
+				}
+			}
+		}
+		return this.running;
+	}
+}
+registerProcessor('waveloss-processor', WavelossProcessor);
+
 // Hal Chamberlin State Variable Filter. Improved version, basedon the paper:
 // Improving the Digital Chamberlin State Variable Filter
 // Updated version based on the paper https://arxiv.org/pdf/2111.05592
@@ -442,7 +573,7 @@ registerProcessor('squash-processor', SquashProcessor);
 class StateVariableFilter extends ExtendedWorkletProcessor {
 	static get parameterDescriptors() {
 		return formatDescriptors([
-			[ 'frequency', 500, 1, 18000, "k-rate" ],
+			[ 'frequency', 500, 0, 18000, "a-rate" ],
 			[ 'resonance', 0.1, 0.001, 0.999, "k-rate" ],
 			[ 'type', 0, 0, 3, "k-rate" ],
 		]);
@@ -490,10 +621,11 @@ class StateVariableFilter extends ExtendedWorkletProcessor {
 						output[channel][i] = lowp;
 					} else if (type < 2){
 						output[channel][i] = highp;
-					} else if (type < 3){
+					} else {
 						output[channel][i] = bandp;
 					} 
 					// else {
+					//  notch output disabled
 					// 	output[channel][i] = highp + lowp; //notch output
 					// }
 				}
@@ -510,10 +642,10 @@ registerProcessor('state-variable-filter', StateVariableFilter);
 // Feedback amount can be positive or negative 
 // (negative creates odd harmonics one octave lower)
 // 
-class CombFilterProcessor extends ExtendedWorkletProcessor {
+class CombFilterProcessor extends DelayWorkletProcessor {
 	static get parameterDescriptors() {
 		return formatDescriptors([
-			[ 'time', 5, 0, 120, "k-rate" ],
+			[ 'time', 5, 0, 128, "k-rate" ],
 			[ 'feedback', 0.8, -0.999, 0.999, "k-rate" ],
 			[ 'damping', 0.5, 0, 1, "k-rate" ],
 			[ 'drywet', 0.8, 0, 1, "k-rate" ]
@@ -524,7 +656,7 @@ class CombFilterProcessor extends ExtendedWorkletProcessor {
 		super();
 
 		const numChannels = info.channelCount;
-		const delaySize = 120;
+		const delaySize = 128;
 		// make delays for amount of channels and
 		// initialize history values for lowpass
 		this.delays = [];
@@ -533,33 +665,6 @@ class CombFilterProcessor extends ExtendedWorkletProcessor {
 			this.delays[i] = this.makeDelay(delaySize);
 			this.lpf[i] = 0;
 		}
-	}
-
-	// makeDelay code based on Dattorro Reverberator delays
-	// Thanks to khoin: https://github.com/khoin
-	makeDelay(length) {
-		let size = Math.round(length * 0.001 * sampleRate);
-		let nextPow2 = 2 ** Math.ceil(Math.log2((size)));
-		return [
-			new Float32Array(nextPow2), nextPow2-1, 0, nextPow2 - 1
-		];
-	}
-	// write to specific delayline at delaysize
-	writeDelay(i, data) {
-		return this.delays[i][0][this.delays[i][1]] = data;
-	}
-
-	// read from delayline at specified time
-	readDelayAt(i, ms) {
-		let s = Math.round(ms * 0.001 * sampleRate);
-		return this.delays[i][0][(this.delays[i][2] - s) & this.delays[i][3]];
-	}
-
-	// move the read and writeheads of the delayline
-	updateReadWriteHeads(i){
-		// increment read and write heads in delay and wrap at delaysize
-		this.delays[i][1] = (this.delays[i][1] + 1) & this.delays[i][3];
-		this.delays[i][2] = (this.delays[i][2] + 1) & this.delays[i][3];
 	}
 
 	process(inputs, outputs, parameters){
@@ -591,6 +696,198 @@ class CombFilterProcessor extends ExtendedWorkletProcessor {
 }
 registerProcessor('combfilter-processor', CombFilterProcessor);
 
+// Stereo Delay FX Processor
+class StereoDelayProcessor extends DelayWorkletProcessor {
+	static get parameterDescriptors(){
+		return formatDescriptors([
+			[ 'timeL', 333, 0, 5000, "k-rate" ],
+			[ 'timeR', 444, 0, 5000, "k-rate" ],
+			[ 'feedback', 0.8, 0, 2, "k-rate" ],
+			[ 'damping', 0.5, 0, 1, "k-rate" ],
+			[ 'drywet', 0.4, 0, 1, "k-rate" ]
+		]);
+	}
+
+	constructor(options){
+		super(options);
+
+		const delaySize = 5000;
+		// initialize delaytime for sliding
+		this.dlt = [];
+		// initialize history values for lowpass & highpass filter
+		this.lpf = [];
+		this.hpf = [];
+		// make a stereo delay
+		this.delays = [];
+		for (let i = 0; i < 2; i++){
+			this.delays[i] = this.makeDelay(delaySize);
+			this.lpf[i] = 0, this.hpf[i] = 0; //this.dlt[i] = 0;
+		}
+	}
+
+	process(inputs, outputs, parameters){
+		const input = inputs[0];
+		const output = outputs[0];
+
+		const dt = [ parameters.timeL[0], parameters.timeR[0] ];
+		const fb = parameters.feedback[0];
+		const dm = Math.max(0, parameters.damping[0]);
+		const dw = parameters.drywet[0];
+
+		// the slide time for delaytime changes in milliseconds
+		const sl = 1 - 1 / (25 * 44.1);
+
+		// preprocessing of the input array, making sure there is a 
+		// signal to be processed by the delayline, otherwise the delay silences
+		// when using if (input.length > 0)
+		const sig = [];
+		if (input.length >= 2){
+			// use right input on right side if stereo
+			for (let i = 0; i < BLOCKSIZE; i++){
+				sig[i] = [ input[0][i], input[1][i] ];
+			}
+		} else if (input.length === 1){
+			// if input is mono, duplicate to left/right inputs
+			for (let i = 0; i < BLOCKSIZE; i++){
+				sig[i] = [ input[0][i], input[0][i] ];
+			}
+		} else {
+			// if no input fill with 0's, processing needs to continue
+			for (let i = 0; i < BLOCKSIZE; i++){
+				sig[i] = [ 0, 0 ];
+			}
+		}
+		
+		// process for every channel and every sample in the channel
+		for (let i = 0; i < BLOCKSIZE; i++){
+			// process the Left and Right delay channels
+			for (let c = 0; c < this.delays.length; c++){
+				// set initial value for delaytime based on parameter
+				this.dlt[c] = this.dlt[c] ?? dt[c];
+				// set the delaytime with a smooth slide
+				this.dlt[c] = mix(dt[c], this.dlt[c], sl);
+				// read from the delayline and apply a lowpass filter
+				this.lpf[c] = mix(this.lpf[c], this.lerpDelayAt(c, this.dlt[c]), dm);
+				// apply tanh soft-clipping, allowing for positive feedback
+				this.lpf[c] = Math.tanh(this.lpf[c] * 0.5 * fb) * 2.0;
+				// apply a highpass-filter for reducing DC/low-frequency build
+				this.hpf[c] = mix(this.lpf[c], this.hpf[c], 0.99857626);
+				this.lpf[c] = this.lpf[c] - this.hpf[c];
+			}
+			// write input to the delayline with prev * feedback
+			// outside the for-loop because Left -> Right, and Right -> Left
+			this.writeDelay(1, sig[i][0] + this.lpf[0]);
+			this.writeDelay(0, sig[i][1] + this.lpf[1]);
+			
+			for (let c = 0; c < this.delays.length; c++){
+				// apply equalpower drywet and send output from the filter
+				output[c][i] = equalPowerMix(sig[i][c], this.lpf[c], dw);
+				// update the read and write heads of the delaylines
+				this.updateReadWriteHeads(c);
+			}
+		}
+		return this.running;
+	}
+}
+registerProcessor('stereo-delay', StereoDelayProcessor)
+
+// A time domain pitch shifter
+//
+class PitchShiftProcessor extends DelayWorkletProcessor {
+	static get parameterDescriptors(){
+		return formatDescriptors([
+			['shift', 0, MIN_DEF, MAX_DEF, 'k-rate'],
+			['drywet', 1, 0, 1, 'k-rate']
+		])
+	}
+
+	constructor(){
+		super();
+
+		const dsize = 110;
+		this.wsize = 50;
+
+		this.delays = [];
+		this.phase = 0;
+		this.delays[0] = this.makeDelay(dsize);
+	}
+
+	process(inputs, outputs, parameters){
+		const input = inputs[0];
+		const output = outputs[0];
+
+		const ratio = (1 - parameters.shift[0]) / (this.wsize * 0.001);
+		const dw = parameters.drywet[0];
+
+		if (input.length > 0){
+			for (let i=0; i<input[0].length; i++){
+				// read playhead 1
+				const tap1 = this.readDelayCAt(0, this.phase * this.wsize + 5);
+				// read playhead 2 with 180º phaseshift ( +0.5 )
+				const p2 = ((this.phase + 0.5) % 1);
+				const tap2 = this.readDelayCAt(0, p2 * this.wsize + 5);
+				// calculate the windowing based on the phases 
+				// 2 overlapping cosine windows
+				const window1 = Math.cos(this.phase * TWOPI) * -0.5 + 0.5;
+				const window2 = Math.cos(p2 * TWOPI) * -0.5 + 0.5;
+				// output is combination of both taps with windows
+				output[0][i] = mix(input[0][i], tap1 * window1 + tap2 * window2, dw);
+
+				this.writeDelay(0, input[0][i]);
+				this.updateReadWriteHeads(0);
+				this.phase += ratio * INV_SR;
+				this.phase = phaseWrap(this.phase);
+			}
+		}
+		return this.running;
+	}
+}
+registerProcessor('pitchshift-processor', PitchShiftProcessor);
+
+// class SamplePlayer extends ExtendedWorkletProcessor {
+// 	static get parameterDescriptors() {
+// 		return formatDescriptors([
+// 			[ 'rate', 1, MIN_DEF, MAX_DEF, 'k-rate' ],
+// 			[ 'offset', 0, 0, 1, 'k-rate' ],
+// 			[ 'start', 0, 0, 1, 'k-rate' ]
+// 		]);
+// 	}
+
+// 	constructor(options){
+// 		super(options);
+
+// 		this.buffer = new Float32Array(0);
+// 		this.playhead = 0;
+
+// 		this.running = true;
+// 		this.port.onmessage = (e) => {
+// 			// dispose on node.port.postMessage('dispose')
+// 			if (e.data === 'dispose'){ 
+// 				this.running = false; 
+// 				// console.log('disposed workletprocessor', this);
+// 			} else if (e.data === 'start'){
+// 				this.playhead = 0;
+// 			} else {
+// 				const { buffer } = e.data;
+// 				this.buffer = buffer;
+// 			}
+// 		}
+// 	}
+
+// 	process(inputs, outputs, parameters){
+// 		const input = inputs[0];
+// 		const output = outputs[0];
+
+// 		if (output.length > 0){
+// 			for (let i = 0; i < output[0].length; i++){
+// 				output[0][i] = this.buffer[this.playhead];
+
+// 				this.playhead++;
+// 			}
+// 		}
+// 	}
+// }
+
 // Dattorro Reverberator
 // Thanks to port by khoin, taken from:
 // https://github.com/khoin/DattorroReverbNode
@@ -618,8 +915,8 @@ class DattorroReverb extends ExtendedWorkletProcessor {
 			["damping", 0.005, 0, 1, "k-rate"],
 			["excursionRate", 0.5, 0, 2, "k-rate"],
 			["excursionDepth", 0.7, 0, 2, "k-rate"],
-			["wet", 0.7, 0, 2, "k-rate"],
-			// ["dry", 0.7, 0, 2, "k-rate"]
+			["gain", 0.7, 0, 2, "k-rate"],
+			["drywet", 0.5, 0, 1, "k-rate"]
 		]);
 	}
 
@@ -711,8 +1008,8 @@ class DattorroReverb extends ExtendedWorkletProcessor {
 			dp = 1 - parameters.damping[0],
 			ex = parameters.excursionRate[0] / sampleRate,
 			ed = parameters.excursionDepth[0] * sampleRate / 1000,
-			we = parameters.wet[0]; //* 0.6, // lo & ro both mult. by 0.6 anyways
-			// dr = parameters.dry[0];
+			gn = parameters.gain[0], //* 0.6, // lo & ro both mult. by 0.6 anyways
+			dw = parameters.drywet[0];
 
 		// write to predelay and dry output
 		if (inputs[0].length == 2) {
@@ -720,16 +1017,17 @@ class DattorroReverb extends ExtendedWorkletProcessor {
 				this._preDelay[this._pDWrite + i] = (inputs[0][0][i] + inputs[0][1][i]) * 0.5;
 
 				// removed the dry parameter, this is handled in the Tone Node
-				// outputs[0][0][i] = inputs[0][0][i] * dr;
-				// outputs[0][1][i] = inputs[0][1][i] * dr;
+				// initially add the input to the output sound with dry amp
+				outputs[0][0][i] = inputs[0][0][i] * (1-dw);
+				outputs[0][1][i] = inputs[0][1][i] * (1-dw);
 			}
 		} else if (inputs[0].length > 0) {
 			this._preDelay.set(
 				inputs[0][0],
 				this._pDWrite
 			);
-			// for (let i = 127; i >= 0; i--)
-			// 	outputs[0][0][i] = outputs[0][1][i] = inputs[0][0][i] * dr;
+			for (let i = 127; i >= 0; i--)
+				outputs[0][0][i] = outputs[0][1][i] = inputs[0][0][i] * (1-dw);
 		} else {
 			this._preDelay.set(
 				new Float32Array(128),
@@ -797,8 +1095,8 @@ class DattorroReverb extends ExtendedWorkletProcessor {
 				this.readDelayAt(10, this._taps[12]) -
 				this.readDelayAt(11, this._taps[13]);
 
-			outputs[0][0][i] += lo * we;
-			outputs[0][1][i] += ro * we;
+			outputs[0][0][i] += lo * gn * dw;
+			outputs[0][1][i] += ro * gn * dw;
 
 			this._excPhase += ex;
 
