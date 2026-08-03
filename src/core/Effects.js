@@ -794,6 +794,7 @@ const SVF = function(_params){
 			_params = [['low']].concat(_params);
 		}
 	}
+	// parameter order: type, cutoff, resonance
 	_params = Util.mapDefaults(_params, ['lowpass', 1200, 0.45]);
 
 	this._type = _params[0];
@@ -827,6 +828,8 @@ const SVF = function(_params){
 // Based on improved Hal Chamberlin SVF, see SVF above for more references
 // 
 const AutoSVF = function(_params){
+	// parameter order: type, timediv, low cutoff, high cutoff, 
+	// resonance, lfo-wave/slope, curve
 	_params = mapDefaults(_params, [ 'low', '1/1', 200, 3000, 0.45, 'sine', 0.5 ]);
 	this._fx = workletFX('state-variable-filter');
 	
@@ -1008,6 +1011,7 @@ const TriggerFilter = function(_params){
 	this._add.connect(this._freqParam);
 
 	// replace defaults with provided arguments
+	// parameter order: type, attack, release, high cutoff, low cutoff, curve
 	_params = Util.mapDefaults(_params, ['low', 1, '1/16', 4000, 100, 0.5]);
 
 	// default resonance for the filter
