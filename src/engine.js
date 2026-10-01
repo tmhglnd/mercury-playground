@@ -33,7 +33,6 @@ log(`  - outputchannels: ${Tone.Destination.channelCount}`);
 // }, 2500);
 
 const defaultSamples = require('./data/samples.json');
-const { max } = require('total-serialism/src/statistic.js');
 let buffers = new Tone.ToneAudioBuffers();
 // let buffers = new Tone.ToneAudioBuffers({
 // 	urls: samples,
@@ -50,15 +49,6 @@ let buffers = new Tone.ToneAudioBuffers();
 // 		}, 1000);
 // 	}
 // });
-
-// console.log('Tone Destination', Tone.Destination);
-// Tone.Destination.channelCount = maxChannels;
-// const Matrix = new Tone.Merge(Tone.Destination.maxChannelCount);
-// Matrix.connect(Tone.Destination);
-// const testOsc = new Tone.Oscillator(200, 'sine').disconnect();
-// testOsc.connect(Matrix, 0, 10);
-// const testNoise = new Tone.Noise('pink').disconnect();
-// testNoise.connect(Matrix, 0, 11);
 
 // resume webaudio and transport for livecoding
 function resume(){
@@ -232,6 +222,17 @@ const LP = new Tone.Filter(18000, 'lowpass');
 const HP = new Tone.Filter(15, 'highpass');
 Tone.Destination.chain(LP, HP, GN);
 
+const Matrix = new Tone.Merge(Tone.Destination.maxChannelCount)
+Matrix.connect(Tone.Destination);
+
+function getMatrix(){
+	return Matrix;
+}
+
+function getChannels(){
+	return maxChannels;
+}
+
 // set the lowpass frequency cutoff and ramptime
 function setLowPass(f, t=0){
 	f = (f === 'default')? 18000 : f;
@@ -309,4 +310,4 @@ async function record(on, f){
 	}
 }
 
-module.exports = { resume, silence, setBPM, getBPM, randomBPM, getBuffers, addBuffers, setLowPass, setHiPass, setVolume, record, isRecording, addBufferFromURL, addDefaultBuffers, getDefaultSamples };
+module.exports = { resume, silence, setBPM, getBPM, randomBPM, getBuffers, addBuffers, setLowPass, setHiPass, setVolume, record, isRecording, addBufferFromURL, addDefaultBuffers, getDefaultSamples, getMatrix, getChannels };

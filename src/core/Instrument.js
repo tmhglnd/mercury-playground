@@ -1,5 +1,5 @@
 const Tone = require('tone');
-const { toArray, getParam, isRandom, atodb, msToS, divToS } = require('./Util.js');
+const { toArray, getParam, isRandom, atodb, msToS, divToS, clip } = require('./Util.js');
 const Widget = require('./Widgets.js');
 const fxMap = require('./Effects.js');
 const Sequencer = require('./Sequencer.js');
@@ -112,6 +112,26 @@ class Instrument extends Sequencer {
 		// trigger some events specifically for a source
 		// specified in more detail in the inheriting class
 		console.log('Instrument()', this._name, c);
+	}
+
+	// set the output channels for this instrument
+	out(l, r=0){
+		// if no arguments, just return and send out stereo 1/2 as normal
+		if (l === undefined){ return; }
+		// otherwise disconnect the gain, split the gain to stereo channels
+		this.split = new Tone.Split(2); // split the stereosignal
+		this.gain.disconnect();
+		this.gain.connect(this.split);
+		// connect the left channel (mono) for sure
+		l = clip(l, 0, this._engine.getChannels());
+		if (l){
+			this.split.connect(this._engine.getMatrix(), 0, Math.max(0, l-1));
+		}
+		// right is muted if no argument greater than 0
+		r = clip(r, 0, this._engine.getChannels());
+		if (r){
+			this.split.connect(this._engine.getMatrix(), 1, Math.max(0, r-1));
+		}
 	}
 
 	fadeIn(t=0){
