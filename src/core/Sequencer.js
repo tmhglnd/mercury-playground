@@ -240,10 +240,10 @@ class Sequencer {
 	once(o=0){
 		// play the sample/synth/midi once or not?
 		// the moment of playing is determined by the time and offset
-		this._once = (o > 0 || o === 'on') ? true : false;
+		this._once = (o > 0 || o === 'on' || o === 'true') ? true : false;
 	}
 
-	ratchet(s=[1], p=1){
+	ratchet(p=1, s=[1]){
 		// set the ratcheting probability and subdivision
 		// for now defaults to the timediv method
 		log(`ratchet() probability not yet supported, defaults to timediv() with probability of 1`);

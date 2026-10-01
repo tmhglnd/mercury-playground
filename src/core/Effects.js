@@ -88,7 +88,7 @@ const fxMap = {
 			return new AutoSVF(params);
 		}
 	},
-	'oldfilter' : (params) => {
+	'oldFilter' : (params) => {
 		return new Filter(params);
 	},
 	'triggerFilter' : (params) => {
@@ -97,7 +97,7 @@ const fxMap = {
 	'envFilter' : (params) => {
 		return new TriggerFilter(params);
 	},
-	'autofilter' : (params) => {
+	'autoFilter' : (params) => {
 		return new AutoSVF(params);
 	},
 	'wobble' : (params) => {

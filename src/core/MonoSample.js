@@ -50,7 +50,7 @@ class MonoSample extends Instrument {
 				this._engine.addBufferFromURL(this._defaults[f], f);
 			} else {
 				// default sample if file does not exist
-				log(`${f} is not a loaded sample name and not part of default pack`);
+				log(`${f} is not a loaded sample and not part of the default samplepack`);
 			}
 			// don't play if there is no valid buffer loaded
 			return;
