@@ -13,12 +13,19 @@ Tone.getContext().addAudioWorkletModule(URL.createObjectURL(new Blob([ fxExtensi
 // Tone.context.updateInterval = 0.5;
 // Tone.context.samplerate = 44100;
 
+// maximum amount of channels based on output selection
+const maxChannels = Tone.Destination.maxChannelCount;
+// set the channelcount to the maximum channelcount
+Tone.Destination.channelCount = maxChannels;
+
 log('Engine settings:');
 log(`  - lookAhead: ${Tone.getContext().lookAhead * 1000}ms`);
 log(`  - updateInterval: ${Tone.getContext().updateInterval * 1000}ms`);
 log(`  - latencyHint: ${Tone.getContext().latencyHint}`);
 log(`  - samplerate: ${Tone.getContext().sampleRate}Hz`);
 log(`  - PPQ: ${Tone.Transport.PPQ}`);
+log(`  - outputchannels: ${Tone.Destination.channelCount}`);
+// log(`  - inputchannels: ${Tone.Destination.numberOfInputs}`);
 
 // get the sample file paths from json
 // let loadingID = setInterval(() => {
@@ -26,6 +33,7 @@ log(`  - PPQ: ${Tone.Transport.PPQ}`);
 // }, 2500);
 
 const defaultSamples = require('./data/samples.json');
+const { max } = require('total-serialism/src/statistic.js');
 let buffers = new Tone.ToneAudioBuffers();
 // let buffers = new Tone.ToneAudioBuffers({
 // 	urls: samples,
@@ -42,6 +50,15 @@ let buffers = new Tone.ToneAudioBuffers();
 // 		}, 1000);
 // 	}
 // });
+
+// console.log('Tone Destination', Tone.Destination);
+// Tone.Destination.channelCount = maxChannels;
+// const Matrix = new Tone.Merge(Tone.Destination.maxChannelCount);
+// Matrix.connect(Tone.Destination);
+// const testOsc = new Tone.Oscillator(200, 'sine').disconnect();
+// testOsc.connect(Matrix, 0, 10);
+// const testNoise = new Tone.Noise('pink').disconnect();
+// testNoise.connect(Matrix, 0, 11);
 
 // resume webaudio and transport for livecoding
 function resume(){
