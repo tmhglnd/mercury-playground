@@ -195,6 +195,10 @@ class Instrument extends Sequencer {
 		this.source?.disconnect();
 		this.source?.dispose();
 
+		// dispose the split if multichannel output was used
+		this.split?.disconnect();
+		this.split?.dispose();
+
 		// remove all fx
 		this._fx.map((f) => f.delete());
 		// this._widgets.map(w => w?.delete());

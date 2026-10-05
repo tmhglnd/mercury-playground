@@ -222,13 +222,16 @@ const LP = new Tone.Filter(18000, 'lowpass');
 const HP = new Tone.Filter(15, 'highpass');
 Tone.Destination.chain(LP, HP, GN);
 
-const Matrix = new Tone.Merge(Tone.Destination.maxChannelCount)
+// a mxing/routing "matrix" for multichannel output
+const Matrix = new Tone.Merge(Tone.Destination.maxChannelCount);
 Matrix.connect(Tone.Destination);
 
+// return the mixing matrix for connections within instruments
 function getMatrix(){
 	return Matrix;
 }
 
+// get maximum possible channels based on selected output device
 function getChannels(){
 	return maxChannels;
 }
