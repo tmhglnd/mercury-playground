@@ -118,19 +118,30 @@ class Instrument extends Sequencer {
 	out(l, r=0){
 		// if no arguments, just return and send out stereo 1/2 as normal
 		if (l === undefined){ return; }
+		console.log('output channels', l, r);
+		// lists as argument for out are not yet supported
+		if (Array.isArray(l)){
+			log(`out() doesn't support list as argument`);
+			l = l[0];
+		}
+		if (Array.isArray(r)){
+			log(`out() doesn't support list as argument`);
+			r = r[0];
+		}
 		// otherwise disconnect the gain, split the gain to stereo channels
 		this.split = new Tone.Split(2); // split the stereosignal
 		this.gain.disconnect();
 		this.gain.connect(this.split);
+		
 		// connect the left channel (mono) for sure
-		l = clip(l, 0, this._engine.getChannels());
-		if (l){
-			this.split.connect(this._engine.getMatrix(), 0, Math.max(0, l-1));
+		l = clip(l, 0, this._engine.getMaxChannels());
+		if (l > 0){
+			this.split.connect(this._engine.getMatrix(), 0, l-1);
 		}
 		// right is muted if no argument greater than 0
-		r = clip(r, 0, this._engine.getChannels());
-		if (r){
-			this.split.connect(this._engine.getMatrix(), 1, Math.max(0, r-1));
+		r = clip(r, 0, this._engine.getMaxChannels());
+		if (r > 0){
+			this.split.connect(this._engine.getMatrix(), 1, r-1);
 		}
 	}
 

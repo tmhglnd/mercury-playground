@@ -232,7 +232,7 @@ function getMatrix(){
 }
 
 // get maximum possible channels based on selected output device
-function getChannels(){
+function getMaxChannels(){
 	return maxChannels;
 }
 
@@ -313,4 +313,4 @@ async function record(on, f){
 	}
 }
 
-module.exports = { resume, silence, setBPM, getBPM, randomBPM, getBuffers, addBuffers, setLowPass, setHiPass, setVolume, record, isRecording, addBufferFromURL, addDefaultBuffers, getDefaultSamples, getMatrix, getChannels };
+module.exports = { resume, silence, setBPM, getBPM, randomBPM, getBuffers, addBuffers, setLowPass, setHiPass, setVolume, record, isRecording, addBufferFromURL, addDefaultBuffers, getDefaultSamples, getMatrix, getMaxChannels };
