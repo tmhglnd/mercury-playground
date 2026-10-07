@@ -134,12 +134,12 @@ class Instrument extends Sequencer {
 		this.gain.connect(this.split);
 		
 		// connect the left channel (mono) for sure
-		l = clip(l, 0, this._engine.getMaxChannels());
+		// l = clip(l, 0, this._engine.getMaxChannels());
 		if (l > 0){
 			this.split.connect(this._engine.getMatrix(), 0, l-1);
 		}
 		// right is muted if no argument greater than 0
-		r = clip(r, 0, this._engine.getMaxChannels());
+		// r = clip(r, 0, this._engine.getMaxChannels());
 		if (r > 0){
 			this.split.connect(this._engine.getMatrix(), 1, r-1);
 		}

@@ -14,9 +14,12 @@ Tone.getContext().addAudioWorkletModule(URL.createObjectURL(new Blob([ fxExtensi
 // Tone.context.samplerate = 44100;
 
 // maximum amount of channels based on output selection
+const channels = Tone.Destination.channelCount;
 const maxChannels = Tone.Destination.maxChannelCount;
-// set the channelcount to the maximum channelcount
-Tone.Destination.channelCount = maxChannels;
+
+console.log('Destination:', Tone.Destination);
+console.log('Max channels:', Tone.Destination.maxChannelCount);
+console.log('Num channels:', Tone.Destination.channelCount);
 
 log('Engine settings:');
 log(`  - lookAhead: ${Tone.getContext().lookAhead * 1000}ms`);
@@ -26,6 +29,10 @@ log(`  - samplerate: ${Tone.getContext().sampleRate}Hz`);
 log(`  - PPQ: ${Tone.Transport.PPQ}`);
 log(`  - outputchannels: ${Tone.Destination.channelCount}`);
 // log(`  - inputchannels: ${Tone.Destination.numberOfInputs}`);
+
+// set the channelcount to the maximum channelcount
+// temporarily set to 16 to test blackhole outputs
+Tone.Destination.channelCount = 16;
 
 // get the sample file paths from json
 // let loadingID = setInterval(() => {
