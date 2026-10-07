@@ -26,7 +26,7 @@ window.onbeforeunload = function() {
 	return "Code may be lost if you refresh. Are you sure?";
 };
 
-window.onload = async () => {
+window.onload = () => {
 	// global log function for in-window console
 	window.log = (print) => {
 		// console.log('printing', typeof print);
@@ -44,19 +44,21 @@ window.onload = async () => {
 	// load requires
 	const Tone = require('tone');
 	Tone.UserMedia.enumerateDevices().then((devices) => {
-		// print the device labels
+		// print the input device labels
 		window.devices = devices.map(device => device.label);
-		// log("Input devices:");
-		// window.devices.forEach((i) => {
-		// 	log(`  - input: ${i}`);
-		// });
+		log("Input devices:");
+		window.devices.forEach((i) => {
+			log(`  - input: ${i}`);
+		});
 	});
 
-	// print all visible devices if permission granted
+	// print all visible output devices if permission granted
 	navigator.mediaDevices.enumerateDevices().then((devices) => {
-		log("Input/Output Devices:");
+		console.log("Output Devices:");
 		devices.forEach((device) => {
-			log(`  - ${device.kind}: ${device.label}`);
+			if (device.kind === 'audiooutput'){
+				console.log(`  - output: ${device.label}`);
+			}
 		});
 	});
 	
